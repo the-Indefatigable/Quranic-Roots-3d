@@ -22,7 +22,8 @@ export interface Bab {
   arabicPattern: string;
   romanNumeral: string;
   meaning: string;
-  semanticMeaning?: string; 
+  semanticMeaning?: string;
+  verbMeaning?: string; // specific meaning of this root in this form, e.g. "to teach" for Form II of علم
   prepositions?: { preposition: string; meaning: string }[];
   color: string;
   tenses: Tense[];

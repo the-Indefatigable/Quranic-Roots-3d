@@ -256,14 +256,27 @@ export const TreeView: React.FC = () => {
             </div>
           </div>
         </div>
-        <div style={{ fontSize: '13px', color: '#999abb', marginTop: '6px' }}>
-          {bab.meaning}
-        </div>
-        
-        {bab.semanticMeaning && (
-          <div style={{ 
-            fontSize: '11px', 
-            color: '#bbf', 
+        {/* Specific verb meaning for this root+form combo */}
+        {bab.verbMeaning ? (
+          <div style={{
+            fontSize: '15px',
+            color: '#e8eeff',
+            marginTop: '8px',
+            fontStyle: 'italic',
+            fontWeight: 500,
+          }}>
+            "{bab.verbMeaning}"
+          </div>
+        ) : (
+          <div style={{ fontSize: '13px', color: '#999abb', marginTop: '6px' }}>
+            {bab.meaning}
+          </div>
+        )}
+
+        {bab.semanticMeaning && !bab.verbMeaning && (
+          <div style={{
+            fontSize: '11px',
+            color: '#bbf',
             marginTop: '4px',
             background: 'rgba(100, 100, 255, 0.1)',
             padding: '2px 8px',
@@ -664,7 +677,7 @@ export const TreeView: React.FC = () => {
                 {activeTenseModal.tense.englishName}
               </div>
               <div style={{ color: '#fff', fontSize: '18px', marginTop: '8px', fontStyle: 'italic' }}>
-                "{activeTenseModal.bab.meaning}"
+                "{activeTenseModal.bab.verbMeaning || activeTenseModal.bab.meaning}"
               </div>
 
               {activeTenseModal.bab.prepositions && activeTenseModal.bab.prepositions.length > 0 && (
