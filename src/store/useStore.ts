@@ -3,8 +3,10 @@ import Fuse from 'fuse.js';
 import { verbRoots } from '../data/verbs';
 import type { VerbRoot } from '../data/verbs';
 
+export type ViewMode = 'space' | 'tree' | 'quiz' | 'explore' | 'stats';
+
 interface Store {
-  viewMode: 'space' | 'tree';
+  viewMode: ViewMode;
   selectedRoot: string | null;
   expandedBab: string | null;
   expandedTense: string | null;
@@ -14,12 +16,13 @@ interface Store {
   simulationActive: boolean;
   simulationIndex: number;
 
+  setViewMode: (mode: ViewMode) => void;
   setSelectedRoot: (id: string | null) => void;
   setExpandedBab: (id: string | null) => void;
   setExpandedTense: (id: string | null) => void;
   setSearch: (q: string) => void;
   backToSpace: () => void;
-  
+
   startSimulation: () => void;
   stopSimulation: () => void;
   nextSimStep: () => void;
@@ -90,6 +93,7 @@ const initialRoot = params.get('root') ?? null;
 export const useStore = create<Store>((set) => ({
   viewMode: initialRoot ? 'tree' : 'space',
   selectedRoot: initialRoot,
+
   expandedBab: null,
   expandedTense: null,
   searchQuery: '',
@@ -97,6 +101,8 @@ export const useStore = create<Store>((set) => ({
   
   simulationActive: false,
   simulationIndex: 0,
+
+  setViewMode: (mode) => set({ viewMode: mode, selectedRoot: null, expandedBab: null, expandedTense: null, simulationActive: false }),
 
   setSelectedRoot: (id) =>
     set((state) => {

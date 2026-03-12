@@ -1,9 +1,11 @@
 import React, { Suspense, useState, useEffect } from 'react';
 import { Scene } from './components/Scene';
 import { SearchPanel } from './components/SearchPanel';
+import { NavBar } from './components/NavBar';
 import { useStore } from './store/useStore';
 import { initData } from './data/verbs';
 import { BootScreen } from './components/BootScreen';
+import { useSwipeGesture } from './hooks/useSwipeGesture';
 
 const ErrorScreen: React.FC<{ message: string }> = ({ message }) => (
   <div style={{ width: '100vw', height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#050510', color: '#ff6b6b', fontFamily: 'sans-serif', gap: '12px' }}>
@@ -15,13 +17,27 @@ const ErrorScreen: React.FC<{ message: string }> = ({ message }) => (
   </div>
 );
 
-const TreeView = React.lazy(() => import('./components/TreeView').then(module => ({ default: module.TreeView })));
-const SimulationHUD = React.lazy(() => import('./components/SimulationHUD').then(module => ({ default: module.SimulationHUD })));
+const TreeView      = React.lazy(() => import('./components/TreeView').then(m => ({ default: m.TreeView })));
+const SimulationHUD = React.lazy(() => import('./components/SimulationHUD').then(m => ({ default: m.SimulationHUD })));
+const QuizMode      = React.lazy(() => import('./components/QuizMode').then(m => ({ default: m.QuizMode })));
+const StatsPanel    = React.lazy(() => import('./components/StatsPanel').then(m => ({ default: m.StatsPanel })));
+const ExplorePanel  = React.lazy(() => import('./components/ExplorePanel').then(m => ({ default: m.ExplorePanel })));
+
+const FullPageFallback = () => (
+  <div style={{ position: 'fixed', inset: 0, background: '#02050f', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.3)', fontSize: '13px', fontFamily: 'sans-serif', zIndex: 700 }}>
+    Loading...
+  </div>
+);
 
 const App: React.FC = () => {
-  const viewMode = useStore((s) => s.viewMode);
+  const viewMode          = useStore(s => s.viewMode);
+  const simulationActive  = useStore(s => s.simulationActive);
+  const backToSpace       = useStore(s => s.backToSpace);
+
   const [isDataLoaded, setIsDataLoaded] = useState(false);
-  const [loadError, setLoadError] = useState<string | null>(null);
+  const [loadError, setLoadError]       = useState<string | null>(null);
+  // Delay the 3D scene mode switch so TreeView fade-in hides the 3D swap
+  const [sceneViewMode, setSceneViewMode] = useState<'space' | 'tree'>(viewMode === 'tree' ? 'tree' : 'space');
 
   useEffect(() => {
     initData()
@@ -29,22 +45,39 @@ const App: React.FC = () => {
       .catch((err: unknown) => setLoadError(err instanceof Error ? err.message : String(err)));
   }, []);
 
+  // Delay 3D scene mode switch by 420ms when going to tree (lets TreeView fade in first)
+  useEffect(() => {
+    if (viewMode === 'tree') {
+      const t = setTimeout(() => setSceneViewMode('tree'), 420);
+      return () => clearTimeout(t);
+    } else {
+      setSceneViewMode('space');
+    }
+  }, [viewMode]);
+
+  // Swipe right → back to space from tree view
+  useSwipeGesture({ onSwipeRight: () => { if (viewMode === 'tree') backToSpace(); } });
+
   if (loadError) return <ErrorScreen message={loadError} />;
   if (!isDataLoaded) return <BootScreen />;
 
+  const showCanvas  = viewMode === 'space' || viewMode === 'tree';
+  const showNavBar  = viewMode !== 'tree';
+
   return (
     <div style={{ width: '100vw', height: '100vh', overflow: 'hidden', background: '#050510' }}>
-      {/* 3D canvas fills screen */}
-      <Scene />
 
-      {/* 2D HTML Family Tree Overlay */}
+      {/* 3D canvas — only in space/tree modes */}
+      {showCanvas && <Scene sceneViewMode={sceneViewMode} />}
+
+      {/* Tree view overlay */}
       {viewMode === 'tree' && (
-        <Suspense fallback={<div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>Loading Tree...</div>}>
+        <Suspense fallback={null}>
           <TreeView />
         </Suspense>
       )}
 
-      {/* UI overlays — only in space mode */}
+      {/* Space-mode overlays */}
       {viewMode === 'space' && (
         <>
           <SearchPanel />
@@ -52,36 +85,48 @@ const App: React.FC = () => {
             <SimulationHUD />
           </Suspense>
 
-          {/* Title watermark */}
-          <div
-            style={{
+          {/* Title watermark — hide when simulation running */}
+          {!simulationActive && (
+            <div style={{
               position: 'fixed',
-              bottom: '24px',
+              bottom: '88px',
               left: '50%',
               transform: 'translateX(-50%)',
               zIndex: 100,
               textAlign: 'center',
               pointerEvents: 'none',
               userSelect: 'none',
-            }}
-          >
-            <div
-              style={{
-                fontSize: '13px',
-                color: 'rgba(74,158,255,0.45)',
-                letterSpacing: '0.25em',
-                textTransform: 'uppercase',
-                fontWeight: 500,
-              }}
-            >
-              Quranic Verb Roots — 3D Explorer
+            }}>
+              <div style={{ fontSize: '13px', color: 'rgba(74,158,255,0.45)', letterSpacing: '0.25em', textTransform: 'uppercase', fontWeight: 500 }}>
+                Quranic Verb Roots — 3D Explorer
+              </div>
+              <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.18)', marginTop: '3px', letterSpacing: '0.1em' }}>
+                Click a root to explore · Drag to orbit · Swipe to navigate
+              </div>
             </div>
-            <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.18)', marginTop: '3px', letterSpacing: '0.1em' }}>
-              Click a root word to explore its forms · Drag to orbit
-            </div>
-          </div>
+          )}
         </>
       )}
+
+      {/* Quiz / Stats / Explore pages */}
+      {viewMode === 'quiz' && (
+        <Suspense fallback={<FullPageFallback />}>
+          <QuizMode />
+        </Suspense>
+      )}
+      {viewMode === 'stats' && (
+        <Suspense fallback={<FullPageFallback />}>
+          <StatsPanel />
+        </Suspense>
+      )}
+      {viewMode === 'explore' && (
+        <Suspense fallback={<FullPageFallback />}>
+          <ExplorePanel />
+        </Suspense>
+      )}
+
+      {/* Bottom nav — hidden in tree view (TreeView has its own nav) */}
+      {showNavBar && <NavBar />}
     </div>
   );
 };

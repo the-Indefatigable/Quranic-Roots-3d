@@ -52,34 +52,30 @@ const CameraRig: React.FC = () => {
   return null;
 };
 
-const SceneContents: React.FC = () => {
-  const { viewMode } = useStore();
-  
+const SceneContents: React.FC<{ sceneViewMode: 'space' | 'tree' }> = ({ sceneViewMode }) => {
   return (
     <>
       <ambientLight intensity={0.2} color="#1a2040" />
       <pointLight position={[50, 70, 50]}    intensity={1.0} color="#4a9eff" />
       <pointLight position={[-50, -50, -50]} intensity={0.5} color="#ff6600" />
       <pointLight position={[0, -60, 30]}    intensity={0.3} color="#00aaff" />
-      
+
       <CameraRig />
-      
-      {viewMode === 'space' ? (
+
+      {sceneViewMode === 'space' ? (
         <>
           <Stars />
           <RootsField />
         </>
       ) : (
-        <>
-          <NebulaBackground />
-        </>
+        <NebulaBackground />
       )}
     </>
   );
 };
 
 // ── Canvas ─────────────────────────────────────────────────────────────────────
-export const Scene: React.FC = () => {
+export const Scene: React.FC<{ sceneViewMode: 'space' | 'tree' }> = ({ sceneViewMode }) => {
   const { setSelectedRoot, viewMode } = useStore();
 
   return (
@@ -92,7 +88,7 @@ export const Scene: React.FC = () => {
     >
       <color attach="background" args={['#02050f']} />
       <fog attach="fog" args={['#050510', 100, 300]} />
-      <SceneContents />
+      <SceneContents sceneViewMode={sceneViewMode} />
       <OrbitControls
         makeDefault
         enableDamping

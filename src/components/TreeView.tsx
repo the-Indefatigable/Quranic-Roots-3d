@@ -6,6 +6,7 @@ import React, { useState, useEffect } from 'react';
 import { useStore, verbRoots } from '../store/useStore';
 import { TENSE_COLORS } from '../data/verbs';
 import type { Bab, Tense, ConjugationForm } from '../data/verbs';
+import { useSwipeGesture } from '../hooks/useSwipeGesture';
 
 // ── Generic Org Tree Node ──────────────────────────────────────────────────
 const OrgNode: React.FC<{
@@ -85,6 +86,9 @@ export const TreeView: React.FC = () => {
     setActiveTenseModal(null);
     setZoom(1);
   }, [selectedRoot]);
+
+  // Swipe right = back to space (mobile gesture)
+  useSwipeGesture({ onSwipeRight: () => { if (!activeTenseModal) backToSpace(); } });
 
   if (!root) return null;
 
@@ -341,13 +345,13 @@ export const TreeView: React.FC = () => {
         position: 'fixed',
         inset: 0,
         zIndex: 900,
-        background: 'rgba(5, 5, 15, 0.95)',
+        background: '#02050f',
         backdropFilter: 'blur(30px)',
         WebkitBackdropFilter: 'blur(30px)',
         overflow: 'auto', // Allow both horizontal and vertical scrolling natively
         opacity: visible ? 1 : 0,
         transform: visible ? 'none' : 'translateY(20px)',
-        transition: 'opacity 0.35s ease, transform 0.35s ease',
+        transition: 'opacity 0.4s ease, transform 0.4s ease',
         scrollbarWidth: 'thin',
         scrollbarColor: 'rgba(255,153,0,0.3) transparent',
       }}

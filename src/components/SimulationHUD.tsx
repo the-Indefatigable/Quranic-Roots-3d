@@ -20,23 +20,23 @@ export const SimulationHUD: React.FC = () => {
       <style>{`
         @media (max-width: 768px) {
           .mobile-sim-hud {
-            bottom: 15px !important;
+            bottom: 80px !important;
             padding: 8px 12px !important;
             gap: 6px !important;
             flex-wrap: wrap !important;
             justify-content: center !important;
-            width: calc(100% - 30px) !important;
+            max-width: calc(100% - 32px) !important;
             border-radius: 20px !important;
           }
         }
       `}</style>
-      <div 
+      <div
         className="mobile-sim-hud"
         style={{
           position: 'fixed',
-          bottom: '30px',
-      left: '50%',
-      transform: 'translateX(-50%)',
+          bottom: '88px',
+          left: '50%',
+          transform: 'translateX(-50%)',
       display: 'flex',
       alignItems: 'center',
       gap: '12px',
