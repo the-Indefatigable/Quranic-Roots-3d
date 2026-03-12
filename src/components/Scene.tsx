@@ -4,7 +4,6 @@ import { OrbitControls, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { useStore } from '../store/useStore';
 import { RootsField } from './RootsField';
-import { TreeView3D } from './TreeView3D';
 import { NebulaBackground } from './NebulaBackground';
 
 // ── Starfield — single points draw call ───────────────────────────────────────
@@ -72,7 +71,6 @@ const SceneContents: React.FC = () => {
       ) : (
         <>
           <NebulaBackground />
-          <TreeView3D />
         </>
       )}
     </>

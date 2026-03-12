@@ -52,7 +52,9 @@ export function rebuildSearchIndex() {
 
   fuseInstance = new Fuse(fuseItems, {
     keys: ['text'],
-    threshold: 0.35,
+    threshold: 0.15, // Extra strict matching to avoid single letter matches
+    distance: 50,
+    ignoreLocation: true,
     includeScore: true,
   });
 }
@@ -70,10 +72,12 @@ function searchRoots(query: string): string[] | null {
   const results = fuseInstance.search(query);
   const seen = new Set<string>();
   const ids: string[] = [];
+  const MAX_SEARCH_RESULTS = 15;
   for (const r of results) {
     if (!seen.has(r.item.rootId)) {
       seen.add(r.item.rootId);
       ids.push(r.item.rootId);
+      if (ids.length >= MAX_SEARCH_RESULTS) break;
     }
   }
   return ids;

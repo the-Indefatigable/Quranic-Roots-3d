@@ -32,20 +32,7 @@ const INST_MAT   = new THREE.MeshStandardMaterial({
   emissiveIntensity: 0.5,
 });
 
-// ── Precompute positions ─────────────────────────────────────────────────────
-const POSITIONS = getRootPositions(verbRoots.length);
-
-// Pre-compute root frequencies for far-away LOD (top 30 most common)
-const ROOT_BY_FREQ = verbRoots
-  .map((r, i) => ({ idx: i, freq: r.totalFreq || 0 }))
-  .sort((a, b) => b.freq - a.freq);
-const TOP_ROOTS = new Set(ROOT_BY_FREQ.slice(0, 30).map(r => r.idx));
-
-// ── Precompute galactic path line ───────────────────────────────────────────
-const EDGES: [number, number][] = [];
-for (let i = 0; i < verbRoots.length - 1; i++) {
-  EDGES.push([i, i + 1]);
-}
+// Dynamic geometry will be built inside the component once verbRoots is populated
 
 // ── Visible root info ─────────────────────────────────────────────────────────
 interface VisibleRoot {
@@ -62,6 +49,24 @@ function getRootSize(distSq: number): number {
 // ── Main component ─────────────────────────────────────────────────────────────
 export const RootsField: React.FC = () => {
   const count    = verbRoots.length;
+  
+  const { positions, topRoots, edges } = useMemo(() => {
+    const len = verbRoots.length;
+    const p = getRootPositions(len);
+    
+    const rFreq = verbRoots
+      .map((r, i) => ({ idx: i, freq: r.totalFreq || 0 }))
+      .sort((a, b) => b.freq - a.freq);
+    const top = new Set(rFreq.slice(0, 30).map(r => r.idx));
+    
+    const e: [number, number][] = [];
+    for (let i = 0; i < len - 1; i++) {
+      e.push([i, i + 1]);
+    }
+    
+    return { positions: p, topRoots: top, edges: e };
+  }, [count]);
+
   const meshRef  = useRef<THREE.InstancedMesh>(null!);
   const webMatRef= useRef<THREE.LineBasicMaterial>(null!);
   const dummy    = useMemo(() => new THREE.Object3D(), []);
@@ -79,9 +84,9 @@ export const RootsField: React.FC = () => {
 
   // ── Web geometry (built once) ───────────────────────────────────────────────
   const webGeo = useMemo(() => {
-    const pts = new Float32Array(EDGES.length * 6);
-    EDGES.forEach(([i, j], e) => {
-      const a = POSITIONS[i], b = POSITIONS[j];
+    const pts = new Float32Array(edges.length * 6);
+    edges.forEach(([i, j], e) => {
+      const a = positions[i], b = positions[j];
       pts[e * 6 + 0] = a.x; pts[e * 6 + 1] = a.y; pts[e * 6 + 2] = a.z;
       pts[e * 6 + 3] = b.x; pts[e * 6 + 4] = b.y; pts[e * 6 + 5] = b.z;
     });
@@ -105,7 +110,7 @@ export const RootsField: React.FC = () => {
 
     // Camera Auto-Pilot for Simulation Match
     if (simulationActive) {
-      const targetPos = POSITIONS[simulationIndex];
+      const targetPos = positions[simulationIndex];
       // Offset camera to look down the curve (slightly outside and above)
       const dir = targetPos.clone().normalize();
       const idealCamPos = targetPos.clone().add(dir.multiplyScalar(25)).add(new THREE.Vector3(0, 8, 0));
@@ -131,7 +136,7 @@ export const RootsField: React.FC = () => {
     // Update instanced root spheres
     for (let i = 0; i < count; i++) {
       const root = verbRoots[i];
-      const pos = POSITIONS[i];
+      const pos = positions[i];
       const isSelected = root.id === selectedRoot;
       const isSearchDimmed = searchSet !== null && !searchSet.has(root.id);
 
@@ -176,7 +181,7 @@ export const RootsField: React.FC = () => {
       if (simulationActive) {
         const indices = [simulationIndex - 1, simulationIndex, simulationIndex + 1].filter(idx => idx >= 0 && idx < count);
         for (const ri of indices) {
-          const rootPos = POSITIONS[ri];
+          const rootPos = positions[ri];
           const distSq = state.camera.position.distanceToSquared(rootPos);
           next.push({
             rootIdx: ri,
@@ -191,11 +196,11 @@ export const RootsField: React.FC = () => {
           const collected: VisibleRoot[] = [];
 
           for (let ri = 0; ri < count; ri++) {
-            const rootPos = POSITIONS[ri];
+            const rootPos = positions[ri];
             const distSq = camPos.distanceToSquared(rootPos);
             const dist = Math.sqrt(distSq);
 
-            if (dist > 180 && !TOP_ROOTS.has(ri)) continue;
+            if (dist > 180 && !topRoots.has(ri)) continue;
 
             collected.push({
               rootIdx: ri,
@@ -276,7 +281,7 @@ export const RootsField: React.FC = () => {
       {/* Root word labels — only closest or hovered/selected */}
       {visibleRoots.map(({ rootIdx, size }, i) => {
         const root = verbRoots[rootIdx];
-        const p = POSITIONS[rootIdx];
+        const p = positions[rootIdx];
         
         // Show label if it's the selected root, hovered root, or one of the top 2 closest roots.
         // In simulation mode, visibleRoots is naturally restricted to the 3 active roots, so we always show them.

@@ -66,7 +66,7 @@ import { rebuildSearchIndex } from '../store/useStore';
 export const verbRoots: VerbRoot[] = [];
 
 export async function initData() {
-  const res = await fetch('/data/verbsData.json');
+  const res = await fetch(`/data/verbsData.json?t=${Date.now()}`);
   const jsonData = await res.json();
   const roots = jsonData.roots as VerbRoot[];
 
