@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useStore, verbRoots } from '../store/useStore';
+import { TENSE_COLORS } from '../data/verbs';
 import type { Bab, Tense } from '../data/verbs';
 
 // Forward store setters into child cards via context (avoids prop drilling)
@@ -15,14 +16,6 @@ const PanelCtx = React.createContext<PanelActions>({
   expandedBab: null,
   expandedTense: null,
 });
-
-const TENSE_COLORS: Record<string, string> = {
-  madi: '#ffd700',
-  mudari: '#00d4ff',
-  amr: '#ff6b6b',
-  passive_madi: '#c084fc',
-  passive_mudari: '#86efac',
-};
 
 export const InfoPanel: React.FC = () => {
   const { selectedRoot, expandedBab, expandedTense, setSelectedRoot, setExpandedBab, setExpandedTense } = useStore();

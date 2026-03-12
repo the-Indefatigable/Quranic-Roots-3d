@@ -5,19 +5,31 @@ import { useStore } from './store/useStore';
 import { initData } from './data/verbs';
 import { BootScreen } from './components/BootScreen';
 
+const ErrorScreen: React.FC<{ message: string }> = ({ message }) => (
+  <div style={{ width: '100vw', height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#050510', color: '#ff6b6b', fontFamily: 'sans-serif', gap: '12px' }}>
+    <div style={{ fontSize: '18px', fontWeight: 600 }}>Failed to load verb data</div>
+    <div style={{ fontSize: '13px', color: '#888', maxWidth: '400px', textAlign: 'center' }}>{message}</div>
+    <button onClick={() => window.location.reload()} style={{ marginTop: '12px', padding: '8px 20px', background: 'rgba(255,107,107,0.15)', border: '1px solid rgba(255,107,107,0.4)', borderRadius: '8px', color: '#ff6b6b', cursor: 'pointer', fontSize: '13px' }}>
+      Retry
+    </button>
+  </div>
+);
+
 const TreeView = React.lazy(() => import('./components/TreeView').then(module => ({ default: module.TreeView })));
 const SimulationHUD = React.lazy(() => import('./components/SimulationHUD').then(module => ({ default: module.SimulationHUD })));
 
 const App: React.FC = () => {
   const viewMode = useStore((s) => s.viewMode);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
-    // This blocks the app from rendering UI or accessing the canvas
-    // until the multi-megabyte JSON dictionary is parsed and Search is built
-    initData().then(() => setIsDataLoaded(true));
+    initData()
+      .then(() => setIsDataLoaded(true))
+      .catch((err: unknown) => setLoadError(err instanceof Error ? err.message : String(err)));
   }, []);
 
+  if (loadError) return <ErrorScreen message={loadError} />;
   if (!isDataLoaded) return <BootScreen />;
 
   return (

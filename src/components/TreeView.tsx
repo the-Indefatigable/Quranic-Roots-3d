@@ -4,15 +4,8 @@
  */
 import React, { useState, useEffect } from 'react';
 import { useStore, verbRoots } from '../store/useStore';
+import { TENSE_COLORS } from '../data/verbs';
 import type { Bab, Tense, ConjugationForm } from '../data/verbs';
-
-const TENSE_COLORS: Record<string, string> = {
-  madi: '#ffd700',
-  mudari: '#00d4ff',
-  amr: '#ff6b6b',
-  passive_madi: '#c084fc',
-  passive_mudari: '#86efac',
-};
 
 // ── Generic Org Tree Node ──────────────────────────────────────────────────
 const OrgNode: React.FC<{
