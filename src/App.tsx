@@ -5,7 +5,8 @@ import { NavBar } from './components/NavBar';
 import { useStore } from './store/useStore';
 import { initData } from './data/verbs';
 import { BootScreen } from './components/BootScreen';
-import { useSwipeGesture } from './hooks/useSwipeGesture';
+import { AboutPanel } from './components/AboutPanel';
+
 
 const ErrorScreen: React.FC<{ message: string }> = ({ message }) => (
   <div style={{ width: '100vw', height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#050510', color: '#ff6b6b', fontFamily: 'sans-serif', gap: '12px' }}>
@@ -32,10 +33,10 @@ const FullPageFallback = () => (
 const App: React.FC = () => {
   const viewMode          = useStore(s => s.viewMode);
   const simulationActive  = useStore(s => s.simulationActive);
-  const backToSpace       = useStore(s => s.backToSpace);
 
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const [loadError, setLoadError]       = useState<string | null>(null);
+  const [showAbout, setShowAbout]       = useState(false);
   // Delay the 3D scene mode switch so TreeView fade-in hides the 3D swap
   const [sceneViewMode, setSceneViewMode] = useState<'space' | 'tree'>(viewMode === 'tree' ? 'tree' : 'space');
 
@@ -54,9 +55,6 @@ const App: React.FC = () => {
       setSceneViewMode('space');
     }
   }, [viewMode]);
-
-  // Swipe right → back to space from tree view
-  useSwipeGesture({ onSwipeRight: () => { if (viewMode === 'tree') backToSpace(); } });
 
   if (loadError) return <ErrorScreen message={loadError} />;
   if (!isDataLoaded) return <BootScreen />;
@@ -80,6 +78,32 @@ const App: React.FC = () => {
       {/* Space-mode overlays */}
       {viewMode === 'space' && (
         <>
+          <button
+            onClick={() => setShowAbout(true)}
+            style={{
+              position: 'fixed',
+              top: '20px',
+              left: '20px',
+              zIndex: 1000,
+              width: '40px',
+              height: '40px',
+              borderRadius: '20px',
+              background: 'rgba(5, 8, 30, 0.6)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
+              border: '1px solid rgba(255, 255, 255, 0.15)',
+              color: '#ffffff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '18px',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+            }}
+          >
+            ℹ️
+          </button>
+          
           <SearchPanel />
           <Suspense fallback={null}>
             <SimulationHUD />
@@ -106,6 +130,9 @@ const App: React.FC = () => {
 
       {/* Bottom nav — hidden in tree view (TreeView has its own nav) */}
       {showNavBar && <NavBar />}
+
+      {/* Global About Modal */}
+      {showAbout && <AboutPanel onClose={() => setShowAbout(false)} />}
     </div>
   );
 };

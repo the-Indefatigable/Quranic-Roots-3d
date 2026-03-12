@@ -26,7 +26,7 @@ export function useSwipeGesture(handlers: SwipeHandlers, threshold = 60) {
       const absDy = Math.abs(dy);
       if (Math.max(absDx, absDy) < threshold) return;
       const h = handlersRef.current;
-      if (absDx > absDy) {
+      if (absDx > absDy * 1.5) {
         if (dx > 0) h.onSwipeRight?.();
         else h.onSwipeLeft?.();
       } else {

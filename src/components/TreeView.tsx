@@ -2,7 +2,7 @@
  * TreeView — 2D HTML tree showing root → babs → tenses → conjugations.
  * Full-screen overlay triggered when a root is clicked.
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useStore, verbRoots } from '../store/useStore';
 import { TENSE_COLORS } from '../data/verbs';
 import type { Bab, Tense, ConjugationForm } from '../data/verbs';
@@ -70,6 +70,7 @@ export const TreeView: React.FC = () => {
   const [expandedBabs, setExpandedBabs] = useState<Set<string>>(new Set());
   const [activeTenseModal, setActiveTenseModal] = useState<{ tense: Tense; bab: Bab } | null>(null);
   const [zoom, setZoom] = useState(() => typeof window !== 'undefined' && window.innerWidth < 768 ? 0.6 : 1);
+  const outerRef = useRef<HTMLDivElement>(null);
 
   const root = verbRoots.find((r) => r.id === selectedRoot) ?? null;
 
@@ -87,8 +88,14 @@ export const TreeView: React.FC = () => {
     setZoom(typeof window !== 'undefined' && window.innerWidth < 768 ? 0.6 : 1);
   }, [selectedRoot]);
 
-  // Swipe right = back to space (mobile gesture)
-  useSwipeGesture({ onSwipeRight: () => { if (!activeTenseModal) backToSpace(); } });
+  // Swipe right = back to space (mobile gesture) — only when not scrolled right and no modal open
+  useSwipeGesture({
+    onSwipeRight: () => {
+      if (!activeTenseModal && (outerRef.current?.scrollLeft ?? 0) < 10) {
+        backToSpace();
+      }
+    },
+  });
 
   if (!root) return null;
 
@@ -341,6 +348,7 @@ export const TreeView: React.FC = () => {
 
   return (
     <div
+      ref={outerRef}
       style={{
         position: 'fixed',
         inset: 0,
@@ -390,6 +398,7 @@ export const TreeView: React.FC = () => {
 
       {/* Zoom controls */}
       <div
+        className="tree-zoom-controls"
         style={{
           position: 'fixed',
           bottom: '32px',
@@ -467,6 +476,7 @@ export const TreeView: React.FC = () => {
 
       {/* Quick Actions / Navigation HUD */}
       <div
+        className="tree-actions-bar"
         style={{
           position: 'fixed',
           bottom: '32px',
@@ -590,7 +600,7 @@ export const TreeView: React.FC = () => {
             alignItems: 'center',
             justifyContent: 'center',
             animation: 'fadeIn 0.2s ease-out',
-            padding: '20px',
+            padding: '12px',
           }}
           onClick={() => setActiveTenseModal(null)}
         >
@@ -600,11 +610,12 @@ export const TreeView: React.FC = () => {
               background: 'rgba(15, 15, 30, 0.95)',
               border: `1px solid ${TENSE_COLORS[activeTenseModal.tense.type] ?? '#ccc'}88`,
               borderRadius: '24px',
-              padding: '32px',
+              padding: '24px',
               width: '100%',
               maxWidth: '500px',
-              maxHeight: '90vh',
+              maxHeight: '85vh',
               overflowY: 'auto',
+              WebkitOverflowScrolling: 'touch',
               boxShadow: `0 20px 60px rgba(0,0,0,0.5)`,
               position: 'relative',
               animation: 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
@@ -785,6 +796,18 @@ export const TreeView: React.FC = () => {
       <style>{`
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(40px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        @media (max-width: 768px) {
+          .tree-zoom-controls {
+            bottom: 16px !important;
+            right: 10px !important;
+          }
+          .tree-actions-bar {
+            bottom: 72px !important;
+            right: 10px !important;
+            left: 10px !important;
+            justify-content: center;
+          }
+        }
       `}</style>
     </div>
   );

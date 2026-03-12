@@ -12,12 +12,12 @@ export const SearchPanel: React.FC = () => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
       if (!mobile) setIsExpanded(true); // Always expand on desktop
-      else if (searchQuery.trim().length === 0) setIsExpanded(false); // Default collapse on mobile if no query
     };
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
 
   const hasQuery = searchQuery.trim().length > 0;
   // searchResults is null when no search active, array when searching
@@ -170,11 +170,11 @@ export const SearchPanel: React.FC = () => {
               <div style={{ fontSize: '10px', color: '#555577', marginBottom: '8px', letterSpacing: '0.08em' }}>
                 {matchedRoots.length} root{matchedRoots.length !== 1 ? 's' : ''} found
               </div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', maxHeight: '35vh', overflowY: 'auto' }}>
                 {matchedRoots.map((root) => (
                   <button
                     key={root.id}
-                    onClick={() => setSelectedRoot(root.id)}
+                    onClick={() => { setSelectedRoot(root.id); if (isMobile) setIsExpanded(false); }}
                     style={{
                       background: 'rgba(74,158,255,0.12)',
                       border: '1px solid rgba(74,158,255,0.4)',
