@@ -715,11 +715,11 @@ export const TreeView: React.FC = () => {
             {(() => {
               const conjMap = new Map(activeTenseModal.tense.conjugation.map(c => [c.person, c]));
               const MATRIX_ROWS = [
-                { id: '3m', label: '3rd Masc.', keys: ['3mp', '3md', '3ms'] },
-                { id: '3f', label: '3rd Fem.',  keys: ['3fp', '3fd', '3fs'] },
-                { id: '2m', label: '2nd Masc.', keys: ['2mp', '2md', '2ms'] },
-                { id: '2f', label: '2nd Fem.',  keys: ['2fp', '2fd', '2fs'] },
-                { id: '1',  label: '1st Person', keys: ['1p', null, '1s'] },
+                { id: '3m', label: '3rd Masc.', keys: ['3ms', '3md', '3mp'] },
+                { id: '3f', label: '3rd Fem.',  keys: ['3fs', '3fd', '3fp'] },
+                { id: '2m', label: '2nd Masc.', keys: ['2ms', '2md', '2mp'] },
+                { id: '2f', label: '2nd Fem.',  keys: ['2fs', '2fd', '2fp'] },
+                { id: '1',  label: '1st Person', keys: ['1s', null, '1p'] },
               ];
               
               const isAmr = activeTenseModal.tense.type === 'amr';
@@ -731,9 +731,9 @@ export const TreeView: React.FC = () => {
                   {/* Header Row */}
                   <div style={{ display: 'flex', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '12px', marginBottom: '8px' }}>
                     <div style={{ width: '80px' }}></div>
-                    <div style={{ flex: 1, textAlign: 'center', color: '#888899', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Plural</div>
-                    <div style={{ flex: 1, textAlign: 'center', color: '#888899', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Dual</div>
                     <div style={{ flex: 1, textAlign: 'center', color: '#888899', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Singular</div>
+                    <div style={{ flex: 1, textAlign: 'center', color: '#888899', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Dual</div>
+                    <div style={{ flex: 1, textAlign: 'center', color: '#888899', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Plural</div>
                   </div>
                   
                   {/* Data Rows */}

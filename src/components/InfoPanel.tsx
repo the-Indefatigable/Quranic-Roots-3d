@@ -232,7 +232,7 @@ export const InfoPanel: React.FC = () => {
 };
 
 // ── Bab Card ──────────────────────────────────────────────────────────────────
-const BabCard: React.FC<{ bab: Bab; isActive: boolean }> = ({ bab, isActive }) => {
+const BabCard: React.FC<{ bab: Bab; isActive: boolean }> = React.memo(({ bab, isActive }) => {
   const color = bab.color;
   const totalOccurrences = bab.tenses.reduce((sum, t) => sum + t.occurrences, 0);
   const { setExpandedBab, setExpandedTense } = React.useContext(PanelCtx);
@@ -297,10 +297,10 @@ const BabCard: React.FC<{ bab: Bab; isActive: boolean }> = ({ bab, isActive }) =
       </div>
     </div>
   );
-};
+});
 
 // ── Tense Card ────────────────────────────────────────────────────────────────
-const TenseCard: React.FC<{ tense: Tense; isActive: boolean }> = ({ tense, isActive }) => {
+const TenseCard: React.FC<{ tense: Tense; isActive: boolean }> = React.memo(({ tense, isActive }) => {
   const color = TENSE_COLORS[tense.type] ?? '#aaaaaa';
   const { setExpandedTense } = React.useContext(PanelCtx);
 
@@ -369,10 +369,10 @@ const TenseCard: React.FC<{ tense: Tense; isActive: boolean }> = ({ tense, isAct
       </div>
     </div>
   );
-};
+});
 
 // ── Conjugation Table ─────────────────────────────────────────────────────────
-const ConjugationTable: React.FC<{ tense: Tense }> = ({ tense }) => {
+const ConjugationTable: React.FC<{ tense: Tense }> = React.memo(({ tense }) => {
   const color = TENSE_COLORS[tense.type] ?? '#aaaaaa';
 
   return (
@@ -407,4 +407,4 @@ const ConjugationTable: React.FC<{ tense: Tense }> = ({ tense }) => {
       </tbody>
     </table>
   );
-};
+});

@@ -31,17 +31,18 @@ const Stars: React.FC = () => {
 };
 
 // ── Smooth camera lerp toward clicked node (no auto-drift) ───────────────────
+const TREE_TARGET = new THREE.Vector3(0, 80, 500);
+
 const CameraRig: React.FC = () => {
   const { camera } = useThree();
   const { viewMode } = useStore();
 
   useFrame((_, delta) => {
     const cam = camera as THREE.PerspectiveCamera & { __targetPos?: THREE.Vector3 };
-    
+
     // Smooth reset for tree view
     if (viewMode === 'tree') {
-      const treeTarget = new THREE.Vector3(0, 80, 500);
-      camera.position.lerp(treeTarget, delta * 3.0);
+      camera.position.lerp(TREE_TARGET, delta * 3.0);
     } else if (cam.__targetPos) {
       camera.position.lerp(cam.__targetPos, delta * 2.5);
       if (camera.position.distanceTo(cam.__targetPos) < 0.05) delete cam.__targetPos;

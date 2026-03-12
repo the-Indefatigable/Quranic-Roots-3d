@@ -117,10 +117,10 @@ export const RootsField: React.FC = () => {
       
       state.camera.position.lerp(idealCamPos, delta * 2.5);
       
-      const controls = state.controls as any;
+      const controls = state.controls as { target?: THREE.Vector3; update?: () => void } | null;
       if (controls && controls.target) {
         controls.target.lerp(targetPos, delta * 3.5);
-        controls.update();
+        controls.update?.();
       } else {
         targetObj.position.lerp(targetPos, delta * 3.5);
         state.camera.lookAt(targetObj.position);

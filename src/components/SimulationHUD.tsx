@@ -1,18 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useStore, verbRoots } from '../store/useStore';
 
 export const SimulationHUD: React.FC = () => {
-  const { 
-    simulationActive, 
-    simulationIndex, 
-    startSimulation, 
-    stopSimulation, 
-    nextSimStep, 
+  const {
+    simulationActive,
+    simulationIndex,
+    startSimulation,
+    stopSimulation,
+    nextSimStep,
     prevSimStep,
     jumpToSimStep
   } = useStore();
 
   const total = verbRoots.length;
+  const [startHovered, setStartHovered] = useState(false);
 
   return (
     <>
@@ -52,8 +53,10 @@ export const SimulationHUD: React.FC = () => {
       {!simulationActive ? (
         <button
           onClick={startSimulation}
+          onMouseEnter={() => setStartHovered(true)}
+          onMouseLeave={() => setStartHovered(false)}
           style={{
-            background: 'rgba(74, 158, 255, 0.15)',
+            background: startHovered ? 'rgba(74, 158, 255, 0.25)' : 'rgba(74, 158, 255, 0.15)',
             border: '1px solid rgba(74, 158, 255, 0.3)',
             color: '#4a9eff',
             padding: '8px 24px',
@@ -63,8 +66,6 @@ export const SimulationHUD: React.FC = () => {
             letterSpacing: '0.05em',
             transition: 'all 0.2s ease',
           }}
-          onMouseEnter={e => e.currentTarget.style.background = 'rgba(74, 158, 255, 0.25)'}
-          onMouseLeave={e => e.currentTarget.style.background = 'rgba(74, 158, 255, 0.15)'}
         >
           ▶ START SIMULATION
         </button>
