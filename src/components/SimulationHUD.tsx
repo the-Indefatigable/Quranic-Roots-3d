@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useStore, verbRoots } from '../store/useStore';
 
 export const SimulationHUD: React.FC = () => {
@@ -14,42 +14,37 @@ export const SimulationHUD: React.FC = () => {
 
   const total = verbRoots.length;
   const [startHovered, setStartHovered] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
 
   return (
-    <>
-      <style>{`
-        @media (max-width: 768px) {
-          .mobile-sim-hud {
-            bottom: 80px !important;
-            padding: 8px 12px !important;
-            gap: 6px !important;
-            flex-wrap: wrap !important;
-            justify-content: center !important;
-            max-width: calc(100% - 32px) !important;
-            border-radius: 20px !important;
-          }
-        }
-      `}</style>
-      <div
-        className="mobile-sim-hud"
-        style={{
-          position: 'fixed',
-          bottom: '88px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '12px',
-      background: 'rgba(5, 8, 20, 0.7)',
-      backdropFilter: 'blur(20px)',
-      WebkitBackdropFilter: 'blur(20px)',
-      border: '1px solid rgba(255, 255, 255, 0.1)',
-      borderRadius: '40px',
-      padding: '8px 16px',
-      zIndex: 1000,
-      boxShadow: '0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)',
-      fontFamily: 'system-ui, -apple-system, sans-serif'
-    }}>
+    <div
+      style={{
+        position: 'fixed',
+        bottom: isMobile ? '80px' : '88px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: isMobile ? '6px' : '12px',
+        background: 'rgba(5, 8, 20, 0.7)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
+        borderRadius: '40px',
+        padding: isMobile ? '6px 12px' : '8px 16px',
+        zIndex: 1000,
+        boxShadow: '0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)',
+        fontFamily: 'system-ui, -apple-system, sans-serif',
+        maxWidth: isMobile ? 'calc(100vw - 32px)' : undefined,
+      }}
+    >
       {!simulationActive ? (
         <button
           onClick={startSimulation}
@@ -71,57 +66,61 @@ export const SimulationHUD: React.FC = () => {
         </button>
       ) : (
         <>
-          <button onClick={stopSimulation} style={btnStyle}>⏹ STOP</button>
-          <div style={{ width: '1px', height: '20px', background: 'rgba(255,255,255,0.1)', margin: '0 4px' }} />
-          
+          <button onClick={stopSimulation} style={btnStyle}>⏹{!isMobile && ' STOP'}</button>
+
+          {!isMobile && <div style={{ width: '1px', height: '20px', background: 'rgba(255,255,255,0.1)', margin: '0 4px' }} />}
+
           <button onClick={prevSimStep} disabled={simulationIndex === 0} style={btnStyle}>
-            ‹ PREV
-          </button>
-          
-          <div style={{ 
-            color: '#e2e8f0', 
-            fontSize: '14px', 
-            fontWeight: 500, 
-            minWidth: '100px', 
-            textAlign: 'center',
-            letterSpacing: '0.05em'
-          }}>
-            ROOT {simulationIndex + 1} / {total}
-          </div>
-          
-          <button onClick={nextSimStep} disabled={simulationIndex === total - 1} style={btnStyle}>
-            NEXT ›
+            {isMobile ? '‹' : '‹ PREV'}
           </button>
 
-          <div style={{ width: '1px', height: '20px', background: 'rgba(255,255,255,0.1)', margin: '0 4px' }} />
-          
-          <input 
-            type="number" 
-            min={1} 
-            max={total}
-            placeholder="#"
-            onChange={(e) => {
-              const val = parseInt(e.target.value);
-              if (!isNaN(val) && val >= 1 && val <= total) {
-                jumpToSimStep(val - 1);
-              }
-            }}
-            style={{
-              background: 'rgba(0,0,0,0.3)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              color: '#fff',
-              borderRadius: '8px',
-              padding: '6px 12px',
-              width: '60px',
-              textAlign: 'center',
-              outline: 'none',
-              fontFamily: 'monospace'
-            }}
-          />
+          <div style={{
+            color: '#e2e8f0',
+            fontSize: isMobile ? '12px' : '14px',
+            fontWeight: 500,
+            minWidth: isMobile ? '60px' : '100px',
+            textAlign: 'center',
+            letterSpacing: '0.05em',
+            whiteSpace: 'nowrap',
+          }}>
+            {isMobile ? `${simulationIndex + 1}/${total}` : `ROOT ${simulationIndex + 1} / ${total}`}
+          </div>
+
+          <button onClick={nextSimStep} disabled={simulationIndex === total - 1} style={btnStyle}>
+            {isMobile ? '›' : 'NEXT ›'}
+          </button>
+
+          {!isMobile && (
+            <>
+              <div style={{ width: '1px', height: '20px', background: 'rgba(255,255,255,0.1)', margin: '0 4px' }} />
+              <input
+                type="number"
+                min={1}
+                max={total}
+                placeholder="#"
+                onChange={(e) => {
+                  const val = parseInt(e.target.value);
+                  if (!isNaN(val) && val >= 1 && val <= total) {
+                    jumpToSimStep(val - 1);
+                  }
+                }}
+                style={{
+                  background: 'rgba(0,0,0,0.3)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  color: '#fff',
+                  borderRadius: '8px',
+                  padding: '6px 12px',
+                  width: '60px',
+                  textAlign: 'center',
+                  outline: 'none',
+                  fontFamily: 'monospace'
+                }}
+              />
+            </>
+          )}
         </>
       )}
-      </div>
-    </>
+    </div>
   );
 };
 

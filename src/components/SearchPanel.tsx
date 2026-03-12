@@ -5,7 +5,7 @@ export const SearchPanel: React.FC = () => {
   const { searchQuery, searchResults, setSearch, setSelectedRoot } = useStore();
   const arabicRef = useRef<HTMLInputElement>(null);
   const [isMobile, setIsMobile] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => {
