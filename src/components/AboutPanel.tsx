@@ -76,7 +76,7 @@ export const AboutPanel: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             This project is a work in progress. If you spot any grammatical errors, missing conjugations, or have ideas for new features, please let us know!
           </p>
           <a 
-            href="mailto:contact@example.com" // Placeholder email, user can update
+            href="mailto:alamkhaan3487@gmail.com?subject=Quranic Roots Feedback"
             style={{
               display: 'inline-block',
               padding: '10px 20px',
