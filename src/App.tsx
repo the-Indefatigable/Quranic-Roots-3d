@@ -84,27 +84,6 @@ const App: React.FC = () => {
           <Suspense fallback={null}>
             <SimulationHUD />
           </Suspense>
-
-          {/* Title watermark — hide when simulation running */}
-          {!simulationActive && (
-            <div style={{
-              position: 'fixed',
-              bottom: '88px',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              zIndex: 100,
-              textAlign: 'center',
-              pointerEvents: 'none',
-              userSelect: 'none',
-            }}>
-              <div style={{ fontSize: '13px', color: 'rgba(74,158,255,0.45)', letterSpacing: '0.25em', textTransform: 'uppercase', fontWeight: 500 }}>
-                Quranic Verb Roots — 3D Explorer
-              </div>
-              <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.18)', marginTop: '3px', letterSpacing: '0.1em' }}>
-                Click a root to explore · Drag to orbit · Swipe to navigate
-              </div>
-            </div>
-          )}
         </>
       )}
 

@@ -16,8 +16,9 @@ export const NavBar: React.FC = () => {
     <>
       <style>{`
         @media (max-width: 768px) {
-          .navbar-inner { padding: 0 !important; border-radius: 0 !important; }
-          .navbar-wrap { bottom: 0 !important; left: 0 !important; right: 0 !important; transform: none !important; border-radius: 0 !important; border-left: none !important; border-right: none !important; border-bottom: none !important; }
+          .navbar-inner { padding: 0 !important; border-radius: 0 !important; justify-content: space-around !important; width: 100% !important; }
+          .navbar-wrap { bottom: 0 !important; left: 0 !important; right: 0 !important; transform: none !important; border-radius: 0 !important; border-left: none !important; border-right: none !important; border-bottom: none !important; width: 100%; box-sizing: border-box; }
+          .nav-btn { flex: 1; padding: 14px 0 !important; border-radius: 0 !important; min-width: 0 !important; }
         }
       `}</style>
       <div
@@ -46,6 +47,7 @@ export const NavBar: React.FC = () => {
             return (
               <button
                 key={mode}
+                className="nav-btn"
                 onClick={() => setViewMode(mode)}
                 style={{
                   display: 'flex',

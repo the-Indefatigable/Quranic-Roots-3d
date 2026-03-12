@@ -1,15 +1,59 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useStore, verbRoots } from '../store/useStore';
 
 export const SearchPanel: React.FC = () => {
   const { searchQuery, searchResults, setSearch, setSelectedRoot } = useStore();
   const arabicRef = useRef<HTMLInputElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      if (!mobile) setIsExpanded(true); // Always expand on desktop
+      else if (searchQuery.trim().length === 0) setIsExpanded(false); // Default collapse on mobile if no query
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const hasQuery = searchQuery.trim().length > 0;
   // searchResults is null when no search active, array when searching
   const matchedRoots = hasQuery && searchResults !== null
     ? verbRoots.filter((r) => searchResults.includes(r.id))
     : [];
+
+  if (isMobile && !isExpanded) {
+    return (
+      <button 
+        onClick={() => setIsExpanded(true)}
+        style={{
+          position: 'fixed',
+          top: '20px',
+          right: '20px',
+          zIndex: 1000,
+          width: '48px',
+          height: '48px',
+          borderRadius: '24px',
+          background: 'rgba(5, 8, 30, 0.82)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          border: '1px solid rgba(74, 158, 255, 0.4)',
+          color: '#ffffff',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '20px',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
+          cursor: 'pointer'
+        }}
+      >
+        🔍
+      </button>
+    );
+  }
 
   return (
     <div
@@ -39,17 +83,26 @@ export const SearchPanel: React.FC = () => {
           }
         }
       `}</style>
-      <div
-        style={{
-          fontSize: '11px',
-          color: '#4a9eff',
-          letterSpacing: '0.12em',
-          textTransform: 'uppercase',
-          marginBottom: '12px',
-          fontWeight: 600,
-        }}
-      >
-        Search Quranic Roots
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+        <div
+          style={{
+            fontSize: '11px',
+            color: '#4a9eff',
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            fontWeight: 600,
+          }}
+        >
+          Search Quranic Roots
+        </div>
+        {isMobile && (
+          <button 
+            onClick={() => setIsExpanded(false)} 
+            style={{ background: 'transparent', border: 'none', color: '#888', cursor: 'pointer', padding: '0 4px', fontSize: '18px' }}
+          >
+            ✕
+          </button>
+        )}
       </div>
 
       {/* Arabic input */}

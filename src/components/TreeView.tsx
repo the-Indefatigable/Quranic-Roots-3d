@@ -69,7 +69,7 @@ export const TreeView: React.FC = () => {
   const [visible, setVisible] = useState(false);
   const [expandedBabs, setExpandedBabs] = useState<Set<string>>(new Set());
   const [activeTenseModal, setActiveTenseModal] = useState<{ tense: Tense; bab: Bab } | null>(null);
-  const [zoom, setZoom] = useState(1);
+  const [zoom, setZoom] = useState(() => typeof window !== 'undefined' && window.innerWidth < 768 ? 0.6 : 1);
 
   const root = verbRoots.find((r) => r.id === selectedRoot) ?? null;
 
@@ -84,7 +84,7 @@ export const TreeView: React.FC = () => {
   useEffect(() => {
     setExpandedBabs(new Set());
     setActiveTenseModal(null);
-    setZoom(1);
+    setZoom(typeof window !== 'undefined' && window.innerWidth < 768 ? 0.6 : 1);
   }, [selectedRoot]);
 
   // Swipe right = back to space (mobile gesture)
@@ -99,7 +99,7 @@ export const TreeView: React.FC = () => {
       
       if (isExpanding) {
         next.add(id);
-        if (element) {
+        if (element && typeof window !== 'undefined' && window.innerWidth >= 768) {
           setTimeout(() => {
             element.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
           }, 50); // slight delay to let DOM render children
@@ -119,7 +119,7 @@ export const TreeView: React.FC = () => {
   const collapseAll = () => {
     setExpandedBabs(new Set());
     setActiveTenseModal(null);
-    setZoom(1);
+    setZoom(typeof window !== 'undefined' && window.innerWidth < 768 ? 0.6 : 1);
     recenterTree();
   };
 

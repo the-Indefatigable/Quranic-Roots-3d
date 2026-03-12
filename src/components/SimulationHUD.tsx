@@ -67,7 +67,7 @@ export const SimulationHUD: React.FC = () => {
             transition: 'all 0.2s ease',
           }}
         >
-          ▶ START SIMULATION
+          ▶ START
         </button>
       ) : (
         <>
