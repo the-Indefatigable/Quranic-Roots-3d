@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useStore, verbRoots } from '../store/useStore';
 import { BAB_COLORS } from '../data/verbs';
 import { SURAHS, SURAH_MAP } from '../data/surahs';
@@ -14,25 +14,32 @@ const TENSE_OPTS = [
 
 type SortKey = 'freq' | 'alpha' | 'forms' | 'surah';
 
-// ── Build surah index once roots are loaded ───────────────────────────────────
-// Returns: Map<surahNum, Map<rootId, firstAyah>>
-function buildSurahIndex() {
-  const index = new Map<number, Map<string, number>>();
-  for (const root of verbRoots) {
-    for (const bab of root.babs) {
-      for (const tense of bab.tenses) {
-        for (const ref of tense.references) {
-          const [s, a] = ref.split(':').map(Number);
-          if (!s || !a) continue;
-          if (!index.has(s)) index.set(s, new Map());
-          const rootMap = index.get(s)!;
-          const prev = rootMap.get(root.id);
-          if (prev === undefined || a < prev) rootMap.set(root.id, a);
-        }
+// Precomputed surahIndex loaded from public/data/surahIndex.json
+// Format: { [surahNum]: { [rootId]: firstAyah } }
+type RawSurahIndex = Record<string, Record<string, number>>;
+let cachedSurahIndex: Map<number, Map<string, number>> | null = null;
+let surahIndexLoading = false;
+const surahIndexCallbacks: Array<() => void> = [];
+
+function loadSurahIndex(onReady: () => void) {
+  if (cachedSurahIndex) { onReady(); return; }
+  surahIndexCallbacks.push(onReady);
+  if (surahIndexLoading) return;
+  surahIndexLoading = true;
+  fetch('/data/surahIndex.json')
+    .then(r => r.json() as Promise<RawSurahIndex>)
+    .then(raw => {
+      const idx = new Map<number, Map<string, number>>();
+      for (const [s, roots] of Object.entries(raw)) {
+        const m = new Map<string, number>();
+        for (const [rootId, ayah] of Object.entries(roots)) m.set(rootId, ayah);
+        idx.set(Number(s), m);
       }
-    }
-  }
-  return index;
+      cachedSurahIndex = idx;
+      surahIndexCallbacks.forEach(cb => cb());
+      surahIndexCallbacks.length = 0;
+    })
+    .catch(() => { surahIndexLoading = false; });
 }
 
 export const ExplorePanel: React.FC = () => {
@@ -44,16 +51,23 @@ export const ExplorePanel: React.FC = () => {
   const [sortKey, setSortKey]               = useState<SortKey>('freq');
   const [search, setSearch]                 = useState('');
   const [filtersOpen, setFiltersOpen]       = useState(false);
-  const [surahMode, setSurahMode]           = useState(false);     // show surah picker
+  const [surahMode, setSurahMode]           = useState(false);
   const [selectedSurah, setSelectedSurah]   = useState<number | null>(null);
   const [surahSearch, setSurahSearch]       = useState('');
+  const [surahIndexReady, setSurahIndexReady] = useState(!!cachedSurahIndex);
 
   const toggleSet = (s: Set<string>, key: string) => {
     const next = new Set(s); next.has(key) ? next.delete(key) : next.add(key); return next;
   };
 
-  // Build index (cheap after first call — verbRoots is stable post-load)
-  const surahIndex = useMemo(() => buildSurahIndex(), [verbRoots.length]);
+  // Load surahIndex lazily when user opens surah mode
+  useEffect(() => {
+    if (surahMode && !surahIndexReady) {
+      loadSurahIndex(() => setSurahIndexReady(true));
+    }
+  }, [surahMode, surahIndexReady]);
+
+  const surahIndex = surahIndexReady ? cachedSurahIndex! : new Map<number, Map<string, number>>();
 
   // How many roots appear in each surah (for badge)
   const surahRootCount = useMemo(() => {
@@ -77,7 +91,7 @@ export const ExplorePanel: React.FC = () => {
     if (selectedForms.size > 0)
       roots = roots.filter(r => r.babs.some(b => selectedForms.has(b.form)));
     if (selectedTenses.size > 0)
-      roots = roots.filter(r => r.babs.some(b => b.tenses.some(t => selectedTenses.has(t.type))));
+      roots = roots.filter(r => r.babs.some(b => b.tenses?.some(t => selectedTenses.has(t.type))));
     if (minFreq > 0)
       roots = roots.filter(r => (r.totalFreq ?? 0) >= minFreq);
 

@@ -1,73 +1,57 @@
-# React + TypeScript + Vite
+# Quranic Verb Roots — 3D Explorer
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+An interactive 3D visualization and study tool for Quranic Arabic verb roots, featuring conjugation tables, quiz mode, surah-based filtering, and full offline PWA support.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **3D Space View** — All verb roots rendered as interactive nodes in 3D space, color-coded by bab (form)
+- **Tree View** — Detailed conjugation tables for each root across all verb forms (I–X)
+- **Quiz Mode** — Practice conjugation recognition
+- **Explore Panel** — Filter roots by tense type, verb form, or Surah
+- **Offline PWA** — Works fully offline after first load; all root data is cached automatically in the background
 
-## React Compiler
+## Data
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+The Quranic verb data was collected from publicly available sources on the internet in scattered formats and consolidated into a single structured dataset. The data includes:
 
-## Expanding the ESLint configuration
+- **1,716 verb roots** extracted from the Quranic corpus
+- **Conjugation tables** covering 10 verb forms (أبواب) and 5 tense types (ماضي، مضارع، أمر، مبني للمجهول)
+- **Derivational forms** per bab: masdar (مصدر), active participle (اسم فاعل), passive participle (اسم مفعول)
+- **Quranic references** — every surah:ayah occurrence for each root across all 114 surahs
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### AI Enrichment
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+The dataset was enriched using the **Claude API (Anthropic)**:
+- Irregular masdar forms for Form I verbs (Form I masdars are unpredictable and must be looked up)
+- Derivational forms for weak roots (roots containing و، ي، or doubled letters) where mechanical rules do not apply
+- Validation of root entries to confirm verbal usage in the Quran
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+The enrichment scripts are not included in this repository.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Tech Stack
+
+- **React 18** + **TypeScript**
+- **Three.js** / **@react-three/fiber** — 3D rendering
+- **Zustand** — state management
+- **Fuse.js** — fuzzy search
+- **Vite** + **vite-plugin-pwa** (Workbox) — build tooling and PWA
+
+## Running Locally
+
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Build for production:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run build
+npm run preview
 ```
+
+## Copyright
+
+© 2026 Quranic Verbs Project. All rights reserved.
+
+The source code in this repository is proprietary and may not be copied, modified, or distributed without permission. The Quranic text itself is the revealed word of Allah and is in the public domain. The derived linguistic dataset (conjugation tables, derivational forms, glosses, and Quranic reference mappings) was compiled, structured, and enriched for educational purposes and is covered by this copyright.

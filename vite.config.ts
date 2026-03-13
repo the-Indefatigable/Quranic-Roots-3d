@@ -22,20 +22,41 @@ export default defineConfig({
         ],
       },
       workbox: {
+        // Precache app shell + small always-needed data files
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        additionalManifestEntries: [
+          { url: '/data/index.json',       revision: null },
+          { url: '/data/surahIndex.json',  revision: null },
+          { url: '/data/quizSamples.json', revision: null },
+        ],
         runtimeCaching: [
+          // Per-root detail files — cache on first fetch, serve offline forever after
           {
-            urlPattern: /\/data\/verbsData\.json$/,
+            urlPattern: /\/data\/roots\//,
             handler: 'CacheFirst',
             options: {
-              cacheName: 'verb-data',
-              expiration: { maxEntries: 1, maxAgeSeconds: 60 * 60 * 24 * 30 },
+              cacheName: 'root-details',
+              expiration: { maxEntries: 2000, maxAgeSeconds: 60 * 60 * 24 * 90 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+          // Small data files (index, surahIndex, quizSamples) — belt-and-suspenders
+          {
+            urlPattern: /\/data\/(index|surahIndex|quizSamples)\.json$/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'app-data',
+              expiration: { maxEntries: 5, maxAgeSeconds: 60 * 60 * 24 * 30 },
+              cacheableResponse: { statuses: [0, 200] },
             },
           },
           {
             urlPattern: /fonts\.googleapis\.com|fonts\.gstatic\.com/,
             handler: 'CacheFirst',
-            options: { cacheName: 'google-fonts', expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 } },
+            options: {
+              cacheName: 'google-fonts',
+              expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 },
+            },
           },
         ],
       },

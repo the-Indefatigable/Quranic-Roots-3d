@@ -22,3 +22,15 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Copyright-sensitive raw data sources
+public/data/quranRoots.json
+data/quranRoots.json
+data/verbs_raw.json
+
+# Enrichment scripts (contain API keys / raw corpus data)
+enrich_with_claude.mjs
+
+# Python cache
+data/__pycache__/
+__pycache__/

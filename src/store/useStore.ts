@@ -43,10 +43,12 @@ export function rebuildSearchIndex() {
     fuseItems.push({ rootId: root.id, text: root.meaning });
     root.babs.forEach((bab) => {
       fuseItems.push({ rootId: root.id, text: bab.meaning });
-      fuseItems.push({ rootId: root.id, text: bab.arabicPattern });
-      if (bab.semanticMeaning) {
-        fuseItems.push({ rootId: root.id, text: bab.semanticMeaning });
-      }
+      if (bab.arabicPattern) fuseItems.push({ rootId: root.id, text: bab.arabicPattern });
+      if (bab.semanticMeaning) fuseItems.push({ rootId: root.id, text: bab.semanticMeaning });
+      if (bab.verbMeaning)     fuseItems.push({ rootId: root.id, text: bab.verbMeaning });
+      if (bab.masdar)          fuseItems.push({ rootId: root.id, text: bab.masdar });
+      if (bab.faaeil)          fuseItems.push({ rootId: root.id, text: bab.faaeil });
+      if (bab.mafool)          fuseItems.push({ rootId: root.id, text: bab.mafool });
       if (bab.prepositions) {
         bab.prepositions.forEach(p => {
           fuseItems.push({ rootId: root.id, text: p.preposition });

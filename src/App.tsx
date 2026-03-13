@@ -4,7 +4,7 @@ import { SearchPanel } from './components/SearchPanel';
 import { NavBar } from './components/NavBar';
 import { RootsListView } from './components/RootsListView';
 import { useStore } from './store/useStore';
-import { initData } from './data/verbs';
+import { initData, preloadAllRootsInBackground } from './data/verbs';
 import { BootScreen } from './components/BootScreen';
 import { WelcomeScreen } from './components/WelcomeScreen';
 import { AboutPanel } from './components/AboutPanel';
@@ -47,10 +47,13 @@ const App: React.FC = () => {
   // Delay the 3D scene mode switch so TreeView fade-in hides the 3D swap
   const [sceneViewMode, setSceneViewMode] = useState<'space' | 'tree'>(viewMode === 'tree' ? 'tree' : 'space');
 
-  // Load data silently in background from the start
+  // Load index data, then quietly preload all root files for offline PWA use
   useEffect(() => {
     initData()
-      .then(() => setIsDataLoaded(true))
+      .then(() => {
+        setIsDataLoaded(true);
+        preloadAllRootsInBackground(); // non-blocking background cache fill
+      })
       .catch((err: unknown) => setLoadError(err instanceof Error ? err.message : String(err)));
   }, []);
 

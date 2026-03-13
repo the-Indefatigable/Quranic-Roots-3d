@@ -16,7 +16,17 @@
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { verbRoots } from '../store/useStore';
 import type { VerbRoot, Bab, Tense, ConjugationForm } from '../data/verbs';
-import { TENSE_COLORS } from '../data/verbs';
+import { TENSE_COLORS, loadRootDetail, prefetchRoots } from '../data/verbs';
+
+// ── Quiz conjugation samples (loaded once, used for wrong-answer generation) ──
+type QuizSamples = Record<string, Record<string, string[]>>; // tenseType → person → arabicForms[]
+let quizSamples: QuizSamples | null = null;
+async function getQuizSamples(): Promise<QuizSamples> {
+  if (quizSamples) return quizSamples;
+  const res = await fetch('/data/quizSamples.json');
+  quizSamples = await res.json() as QuizSamples;
+  return quizSamples;
+}
 import { loadStats, saveStats } from './StatsPanel';
 import type { QuizStats } from './StatsPanel';
 import { useSwipeGesture } from '../hooks/useSwipeGesture';
@@ -169,7 +179,7 @@ function randOtherStrings(pool: string[], exclude: string, count: number): strin
 // ── Question builders ─────────────────────────────────────────────────────────
 function buildMeaningQuestion(root: VerbRoot): Question {
   const correct  = root.meaning;
-  const wrongs   = randOtherStrings(verbRoots.map(r => r.meaning), correct, 3);
+  const wrongs   = randOtherStrings(verbRoots.filter(r => r.meaning).map(r => r.meaning), correct, 3);
   const shuffled = shuffle([
     { id: 'c', text: correct },
     ...wrongs.map((w, i) => ({ id: `w${i}`, text: w })),
@@ -193,7 +203,8 @@ function buildBabQuestion(root: VerbRoot, bab: Bab): Question {
     ...wrongs.map((f, i) => ({ id: `w${i}`, text: `Form ${f}`, sub: FORM_MEANINGS[f] ?? '' })),
   ]);
   // Show the actual māḍī 3ms of THIS root in this bāb, not the abstract pattern
-  const madiForm = bab.tenses.find(t => t.type === 'madi')?.conjugation.find(c => c.person === '3ms' && c.arabic !== '-')?.arabic ?? bab.arabicPattern;
+  const madiTense = bab.tenses?.find(t => t.type === 'madi');
+  const madiForm = madiTense?.conjugation?.find(c => c.person === '3ms' && c.arabic !== '-')?.arabic ?? bab.arabicPattern;
   return {
     type: 'bab',
     heading: 'Identify the Bāb',
@@ -209,24 +220,14 @@ function buildConjugationQuestion(root: VerbRoot, bab: Bab, tense: Tense, conj: 
   const cfg     = TENSE_CONFIG[tense.type];
   const correct = conj.arabic;
 
-  // Wrong options: other conjugations from different roots (same tense type if possible)
-  const otherForms: string[] = [];
-  for (const r of verbRoots) {
-    if (r.id === root.id) continue;
-    for (const b of r.babs) {
-      for (const t of b.tenses) {
-        if (t.type === tense.type) {
-          const c = t.conjugation.find(x => x.person === conj.person && x.arabic !== '-');
-          if (c && c.arabic !== correct) otherForms.push(c.arabic);
-        }
-      }
-    }
-    if (otherForms.length >= 20) break;
-  }
-
-  const wrongs   = pickN(otherForms.length >= 3 ? otherForms : otherForms.concat(
-    tense.conjugation.filter(c => c.arabic !== '-' && c.arabic !== correct).map(c => c.arabic)
-  ), 3);
+  // Wrong options: use precomputed samples (avoids iterating all verbRoots conjugation data)
+  const pool = quizSamples?.[tense.type]?.[conj.person] ?? [];
+  const otherForms = pool.filter(f => f !== correct);
+  const wrongs = pickN(
+    otherForms.length >= 3 ? otherForms
+      : otherForms.concat(tense.conjugation.filter(c => c.arabic !== '-' && c.arabic !== correct).map(c => c.arabic)),
+    3
+  );
 
   const shuffled = shuffle([
     { id: 'c', arabic: correct, text: correct },
@@ -257,10 +258,10 @@ function buildRootBatch(root: VerbRoot): Question[] {
   // Q2: bāb
   questions.push(buildBabQuestion(root, bab));
 
-  // Q3–Q7: one per tense in fixed order
+  // Q3–Q7: one per tense in fixed order (requires full detail — conjugation[] must exist)
   for (const tenseType of TENSE_ORDER) {
-    const tense = bab.tenses.find(t => t.type === tenseType);
-    if (!tense) continue;
+    const tense = bab.tenses?.find(t => t.type === tenseType);
+    if (!tense?.conjugation) continue; // index-only babs have no conjugation data
     const cfg   = TENSE_CONFIG[tenseType];
     const conj  = tense.conjugation.find(c => c.person === cfg.person && c.arabic !== '-');
     if (!conj) continue;
@@ -288,8 +289,9 @@ export const QuizMode: React.FC = () => {
   const [rootsCompleted, setRootsCompleted] = useState(0);
   const [srsInfo,        setSrsInfo]        = useState<{ mastery: number; dueLabel: string } | null>(null);
 
-  // Build initial SRS-ordered queue
+  // Build initial SRS-ordered queue + preload quiz samples for wrong answers
   useEffect(() => {
+    getQuizSamples(); // fire-and-forget — will be ready by the time conjugation questions appear
     const s = loadStats();
     statsRef.current = s;
     srsRef.current = loadSRS();
@@ -302,37 +304,42 @@ export const QuizMode: React.FC = () => {
     if (q.length === 0) {
       q = buildSRSQueue(srsRef.current);
     }
-    const root       = q[0];
+    const indexRoot  = q[0];
     const remaining  = q.slice(1);
-    const newBatch   = buildRootBatch(root);
 
-    if (newBatch.length === 0) {
-      loadNextRoot(remaining, completed);
-      return;
-    }
+    // Pre-fetch next 3 roots in background so they're ready
+    prefetchRoots(remaining.slice(0, 3).map(r => r.id));
 
-    // SRS display info
-    const rec = srsRef.current[root.id];
-    const mastery = rec?.mastery ?? 0;
-    const due = rec?.nextReview;
-    let dueLabel = 'New';
-    if (due) {
-      const diff = due - Date.now();
-      if (diff <= 0) dueLabel = 'Due';
-      else if (diff < 86_400_000) dueLabel = 'Due today';
-      else dueLabel = `Due in ${Math.ceil(diff / 86_400_000)}d`;
-    }
-    setSrsInfo({ mastery, dueLabel });
+    // Load full detail for current root (needed for conjugation questions)
+    const hasTenses = indexRoot.babs?.some(b => b.tenses && b.tenses.length > 0);
+    const proceed = (root: VerbRoot) => {
+      const newBatch = buildRootBatch(root);
+      if (newBatch.length === 0) { loadNextRoot(remaining, completed); return; }
 
-    rootQueueRef.current = remaining;
-    setCurrentRoot(root);
-    setBatch(newBatch);
-    setBatchIdx(0);
-    setSelected(null);
-    setRevealed(false);
-    setShowSummary(false);
-    setBatchCorrect(0);
-    setRootsCompleted(completed);
+      const rec = srsRef.current[root.id];
+      const mastery = rec?.mastery ?? 0;
+      const due = rec?.nextReview;
+      let dueLabel = 'New';
+      if (due) {
+        const diff = due - Date.now();
+        if (diff <= 0) dueLabel = 'Due';
+        else if (diff < 86_400_000) dueLabel = 'Due today';
+        else dueLabel = `Due in ${Math.ceil(diff / 86_400_000)}d`;
+      }
+      setSrsInfo({ mastery, dueLabel });
+      rootQueueRef.current = remaining;
+      setCurrentRoot(root);
+      setBatch(newBatch);
+      setBatchIdx(0);
+      setSelected(null);
+      setRevealed(false);
+      setShowSummary(false);
+      setBatchCorrect(0);
+      setRootsCompleted(completed);
+    };
+
+    if (hasTenses) { proceed(indexRoot); return; }
+    loadRootDetail(indexRoot.id).then(detail => proceed(detail ?? indexRoot));
   }, []);
 
   const handleSelect = useCallback((optId: string) => {
