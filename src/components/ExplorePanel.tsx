@@ -21,6 +21,7 @@ export const ExplorePanel: React.FC = () => {
   const [minFreq, setMinFreq]               = useState(0);
   const [sortKey, setSortKey]               = useState<SortKey>('freq');
   const [search, setSearch]                 = useState('');
+  const [filtersOpen, setFiltersOpen]       = useState(false);
 
   const toggleSet = (s: Set<string>, key: string) => {
     const next = new Set(s);
@@ -70,138 +71,108 @@ export const ExplorePanel: React.FC = () => {
       paddingBottom: '80px',
     }}>
       {/* Header */}
-      <div style={{ padding: '24px 24px 0', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '16px' }}>
-        <div style={{ fontSize: '11px', color: '#4a9eff', letterSpacing: '0.15em', textTransform: 'uppercase', fontWeight: 700, marginBottom: '4px' }}>
-          Data Explorer
+      <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: '11px', color: '#4a9eff', letterSpacing: '0.15em', textTransform: 'uppercase', fontWeight: 700, marginBottom: '2px' }}>
+            Data Explorer
+          </div>
+          <div style={{ fontSize: '20px', color: '#fff', fontWeight: 600 }}>
+            {filtered.length} <span style={{ color: '#555577', fontWeight: 400, fontSize: '13px' }}>of {verbRoots.length} roots</span>
+          </div>
         </div>
-        <div style={{ fontSize: '22px', color: '#fff', fontWeight: 600 }}>
-          {filtered.length} <span style={{ color: '#555577', fontWeight: 400, fontSize: '14px' }}>of {verbRoots.length} roots</span>
-        </div>
-      </div>
-
-      {/* Filters */}
-      <div style={{ padding: '16px 24px', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-
-        {/* Search */}
-        <input
-          type="text"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          placeholder="Search Arabic or English..."
+        {/* Active filter count badge */}
+        {(selectedForms.size + selectedTenses.size + (minFreq > 0 ? 1 : 0) + (search ? 1 : 0)) > 0 && (
+          <div style={{ fontSize: '11px', color: '#ffd700', background: 'rgba(255,215,0,0.1)', border: '1px solid rgba(255,215,0,0.25)', borderRadius: '10px', padding: '2px 8px' }}>
+            {selectedForms.size + selectedTenses.size + (minFreq > 0 ? 1 : 0) + (search ? 1 : 0)} active
+          </div>
+        )}
+        <button
+          onClick={() => setFiltersOpen(o => !o)}
           style={{
-            background: 'rgba(255,255,255,0.04)',
-            border: '1px solid rgba(255,255,255,0.1)',
-            borderRadius: '10px',
-            padding: '10px 14px',
-            color: '#fff',
-            fontSize: '14px',
-            outline: 'none',
-            width: '100%',
-            boxSizing: 'border-box',
+            padding: '8px 14px', borderRadius: '20px',
+            border: `1px solid ${filtersOpen ? 'rgba(74,158,255,0.4)' : 'rgba(255,255,255,0.1)'}`,
+            background: filtersOpen ? 'rgba(74,158,255,0.1)' : 'transparent',
+            color: filtersOpen ? '#4a9eff' : '#666688',
+            cursor: 'pointer', fontSize: '12px', fontWeight: 600, transition: 'all 0.15s',
+            display: 'flex', alignItems: 'center', gap: '5px',
           }}
-        />
-
-        {/* Verb Forms */}
-        <div>
-          <div style={{ fontSize: '10px', color: '#555577', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '8px' }}>Filter by Verb Form</div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-            {FORMS.map(f => {
-              const active = selectedForms.has(f);
-              const color = BAB_COLORS[f] ?? '#aaa';
-              return (
-                <button
-                  key={f}
-                  onClick={() => setSelectedForms(toggleSet(selectedForms, f))}
-                  style={{
-                    padding: '5px 12px',
-                    borderRadius: '20px',
-                    border: `1px solid ${active ? color + 'cc' : color + '33'}`,
-                    background: active ? color + '22' : 'transparent',
-                    color: active ? color : '#666688',
-                    cursor: 'pointer',
-                    fontSize: '12px',
-                    fontWeight: active ? 700 : 400,
-                    transition: 'all 0.15s',
-                  }}
-                >
-                  Form {f}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Tenses */}
-        <div>
-          <div style={{ fontSize: '10px', color: '#555577', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '8px' }}>Filter by Tense</div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-            {TENSE_OPTS.map(({ key, label }) => {
-              const active = selectedTenses.has(key);
-              return (
-                <button
-                  key={key}
-                  onClick={() => setSelectedTenses(toggleSet(selectedTenses, key))}
-                  style={{
-                    padding: '5px 12px',
-                    borderRadius: '20px',
-                    border: `1px solid ${active ? 'rgba(74,158,255,0.6)' : 'rgba(255,255,255,0.1)'}`,
-                    background: active ? 'rgba(74,158,255,0.15)' : 'transparent',
-                    color: active ? '#4a9eff' : '#666688',
-                    cursor: 'pointer',
-                    fontSize: '12px',
-                    fontWeight: active ? 700 : 400,
-                    transition: 'all 0.15s',
-                  }}
-                >
-                  {label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Sort + Min Freq row */}
-        <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
-          <div style={{ display: 'flex', gap: '6px' }}>
-            {(['freq','alpha','forms'] as SortKey[]).map(k => (
-              <button
-                key={k}
-                onClick={() => setSortKey(k)}
-                style={{
-                  padding: '5px 12px',
-                  borderRadius: '20px',
-                  border: `1px solid ${sortKey===k ? 'rgba(255,215,0,0.4)' : 'rgba(255,255,255,0.08)'}`,
-                  background: sortKey===k ? 'rgba(255,215,0,0.1)' : 'transparent',
-                  color: sortKey===k ? '#ffd700' : '#555577',
-                  cursor: 'pointer', fontSize: '11px', fontWeight: sortKey===k ? 700 : 400, transition: 'all 0.15s',
-                }}
-              >
-                {k === 'freq' ? '↓ Frequency' : k === 'alpha' ? 'A→Z' : '↓ Forms'}
-              </button>
-            ))}
-          </div>
-          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#555577', fontSize: '11px' }}>
-            Min freq:
-            <input
-              type="number" min={0} value={minFreq}
-              onChange={e => setMinFreq(Math.max(0, parseInt(e.target.value) || 0))}
-              style={{
-                width: '60px', background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px',
-                padding: '4px 8px', color: '#fff', fontSize: '11px', outline: 'none',
-              }}
-            />
-          </label>
-          {(selectedForms.size > 0 || selectedTenses.size > 0 || minFreq > 0 || search) && (
-            <button
-              onClick={() => { setSelectedForms(new Set()); setSelectedTenses(new Set()); setMinFreq(0); setSearch(''); }}
-              style={{ padding: '5px 12px', borderRadius: '20px', border: '1px solid rgba(255,100,100,0.3)', background: 'transparent', color: '#ff6b6b', cursor: 'pointer', fontSize: '11px' }}
-            >
-              Clear filters
-            </button>
-          )}
-        </div>
+        >
+          Filters {filtersOpen ? '▲' : '▼'}
+        </button>
       </div>
+
+      {/* Collapsible Filters */}
+      {filtersOpen && (
+        <div style={{ padding: '12px 20px', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+
+          {/* Search */}
+          <input
+            type="text"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Search Arabic or English..."
+            style={{
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: '10px',
+              padding: '9px 14px',
+              color: '#fff', fontSize: '14px',
+              outline: 'none', width: '100%', boxSizing: 'border-box',
+            }}
+          />
+
+          {/* Verb Forms */}
+          <div>
+            <div style={{ fontSize: '10px', color: '#555577', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '6px' }}>Verb Form</div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+              {FORMS.map(f => {
+                const active = selectedForms.has(f);
+                const color = BAB_COLORS[f] ?? '#aaa';
+                return (
+                  <button key={f} onClick={() => setSelectedForms(toggleSet(selectedForms, f))} style={{ padding: '4px 10px', borderRadius: '16px', border: `1px solid ${active ? color + 'cc' : color + '33'}`, background: active ? color + '22' : 'transparent', color: active ? color : '#666688', cursor: 'pointer', fontSize: '11px', fontWeight: active ? 700 : 400, transition: 'all 0.15s' }}>
+                    Form {f}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Tenses */}
+          <div>
+            <div style={{ fontSize: '10px', color: '#555577', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '6px' }}>Tense</div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+              {TENSE_OPTS.map(({ key, label }) => {
+                const active = selectedTenses.has(key);
+                return (
+                  <button key={key} onClick={() => setSelectedTenses(toggleSet(selectedTenses, key))} style={{ padding: '4px 10px', borderRadius: '16px', border: `1px solid ${active ? 'rgba(74,158,255,0.6)' : 'rgba(255,255,255,0.1)'}`, background: active ? 'rgba(74,158,255,0.15)' : 'transparent', color: active ? '#4a9eff' : '#666688', cursor: 'pointer', fontSize: '11px', fontWeight: active ? 700 : 400, transition: 'all 0.15s' }}>
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Sort + Min Freq + Clear */}
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '5px' }}>
+              {(['freq','alpha','forms'] as SortKey[]).map(k => (
+                <button key={k} onClick={() => setSortKey(k)} style={{ padding: '4px 10px', borderRadius: '16px', border: `1px solid ${sortKey===k ? 'rgba(255,215,0,0.4)' : 'rgba(255,255,255,0.08)'}`, background: sortKey===k ? 'rgba(255,215,0,0.1)' : 'transparent', color: sortKey===k ? '#ffd700' : '#555577', cursor: 'pointer', fontSize: '11px', fontWeight: sortKey===k ? 700 : 400, transition: 'all 0.15s' }}>
+                  {k === 'freq' ? '↓ Freq' : k === 'alpha' ? 'A→Z' : '↓ Forms'}
+                </button>
+              ))}
+            </div>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#555577', fontSize: '11px' }}>
+              Min:
+              <input type="number" min={0} value={minFreq} onChange={e => setMinFreq(Math.max(0, parseInt(e.target.value) || 0))} style={{ width: '52px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', padding: '3px 7px', color: '#fff', fontSize: '11px', outline: 'none' }} />
+            </label>
+            {(selectedForms.size > 0 || selectedTenses.size > 0 || minFreq > 0 || search) && (
+              <button onClick={() => { setSelectedForms(new Set()); setSelectedTenses(new Set()); setMinFreq(0); setSearch(''); }} style={{ padding: '4px 10px', borderRadius: '16px', border: '1px solid rgba(255,100,100,0.3)', background: 'transparent', color: '#ff6b6b', cursor: 'pointer', fontSize: '11px' }}>
+                Clear all
+              </button>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Results list */}
       <div style={{ flex: 1, overflowY: 'auto', padding: '8px 24px' }}>

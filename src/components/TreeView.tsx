@@ -164,6 +164,8 @@ const MobileTreeView: React.FC<{
   const [expandedBabs, setExpandedBabs] = useState<Set<string>>(new Set());
   const [activeModal, setActiveModal] = useState<{ tense: Tense; bab: Bab } | null>(null);
   const [sheetVisible, setSheetVisible] = useState(false);
+  const sheetTouchRef = useRef<{ startY: number; startScrollTop: number }>({ startY: 0, startScrollTop: 0 });
+  const sheetRef = useRef<HTMLDivElement>(null);
 
   // Animate sheet in after mount
   useEffect(() => {
@@ -183,10 +185,9 @@ const MobileTreeView: React.FC<{
     setTimeout(() => setActiveModal(null), 280);
   };
 
-  // Swipe right → back, swipe down on sheet → close sheet
+  // Swipe right → back to space (only when no modal open)
   useSwipeGesture({
     onSwipeRight: () => { if (!activeModal) backToSpace(); },
-    onSwipeDown: () => { if (activeModal) closeModal(); },
   });
 
   const toggleBab = (id: string) => {
@@ -203,6 +204,13 @@ const MobileTreeView: React.FC<{
     if (allExpanded) setExpandedBabs(new Set());
     else setExpandedBabs(new Set(root.babs.map(b => b.id)));
   };
+
+  // Next / prev root sorted by Quranic frequency
+  const { setSelectedRoot } = useStore();
+  const sortedRoots = verbRoots.slice().sort((a, b) => (b.totalFreq ?? 0) - (a.totalFreq ?? 0));
+  const currentIdx = sortedRoots.findIndex(r => r.id === root.id);
+  const goPrev = currentIdx > 0 ? () => setSelectedRoot(sortedRoots[currentIdx - 1].id) : null;
+  const goNext = currentIdx < sortedRoots.length - 1 ? () => setSelectedRoot(sortedRoots[currentIdx + 1].id) : null;
 
   return (
     <div style={{
@@ -251,16 +259,18 @@ const MobileTreeView: React.FC<{
           </div>
         </div>
 
-        {/* Expand / collapse all toggle */}
-        <button onClick={toggleAll} style={{
-          flexShrink: 0,
-          background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
-          borderRadius: '10px', padding: '8px 12px', color: '#778899',
-          cursor: 'pointer', fontSize: '12px', fontWeight: 600,
-          display: 'flex', alignItems: 'center', gap: '4px',
-        }}>
-          {allExpanded ? '⊟' : '⊞'}
-        </button>
+        {/* Expand / collapse all toggle + prev/next */}
+        <div style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
+          <button onClick={toggleAll} style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '8px 10px', color: '#778899', cursor: 'pointer', fontSize: '14px', fontWeight: 600 }}>
+            {allExpanded ? '⊟' : '⊞'}
+          </button>
+          <button onClick={goPrev ?? undefined} disabled={!goPrev} style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '8px 10px', color: goPrev ? '#aabbdd' : '#333355', cursor: goPrev ? 'pointer' : 'default', fontSize: '14px' }}>
+            ‹
+          </button>
+          <button onClick={goNext ?? undefined} disabled={!goNext} style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '8px 10px', color: goNext ? '#aabbdd' : '#333355', cursor: goNext ? 'pointer' : 'default', fontSize: '14px' }}>
+            ›
+          </button>
+        </div>
       </div>
 
       {/* ── Root letter tiles ── */}
@@ -380,7 +390,19 @@ const MobileTreeView: React.FC<{
       {/* ── Bottom sheet ── */}
       {activeModal && (
         <div
+          ref={sheetRef}
           onClick={e => e.stopPropagation()}
+          onTouchStart={e => {
+            sheetTouchRef.current = {
+              startY: e.touches[0].clientY,
+              startScrollTop: sheetRef.current?.scrollTop ?? 0,
+            };
+          }}
+          onTouchEnd={e => {
+            const dy = e.changedTouches[0].clientY - sheetTouchRef.current.startY;
+            // Close only on hard downward swipe (>100px) starting from near top of sheet
+            if (dy > 100 && sheetTouchRef.current.startScrollTop <= 4) closeModal();
+          }}
           style={{
             position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 2000,
             background: 'rgba(10,10,25,0.97)',

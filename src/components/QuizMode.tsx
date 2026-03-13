@@ -64,6 +64,90 @@ interface Question {
   correctId: string;
 }
 
+// ── Spaced-Repetition System ─────────────────────────────────────────────────
+const SRS_KEY = 'quranic_srs_v1';
+
+interface SRSRecord {
+  mastery: number;      // 0–5
+  nextReview: number;   // epoch ms
+}
+
+type SRSData = Record<string, SRSRecord>;
+
+// Intervals in ms by mastery level
+const SRS_INTERVALS = [
+  0,                  // 0 — immediate / unseen
+  1  * 86_400_000,    // 1 — 1 day
+  3  * 86_400_000,    // 2 — 3 days
+  7  * 86_400_000,    // 3 — 1 week
+  14 * 86_400_000,    // 4 — 2 weeks
+  30 * 86_400_000,    // 5 — 1 month
+];
+
+function loadSRS(): SRSData {
+  try {
+    const raw = localStorage.getItem(SRS_KEY);
+    if (raw) return JSON.parse(raw) as SRSData;
+  } catch { /* ignore */ }
+  return {};
+}
+
+function saveSRS(data: SRSData) {
+  try { localStorage.setItem(SRS_KEY, JSON.stringify(data)); } catch { /* ignore */ }
+}
+
+function updateSRS(data: SRSData, rootId: string, correct: number, total: number): SRSData {
+  const rec = data[rootId] ?? { mastery: 0, nextReview: 0 };
+  const ratio = correct / Math.max(total, 1);
+  let newMastery: number;
+  let intervalMultiplier: number;
+
+  if (ratio === 1) {
+    newMastery = Math.min(5, rec.mastery + 1);
+    intervalMultiplier = 1;
+  } else if (ratio >= 0.5) {
+    newMastery = rec.mastery;
+    intervalMultiplier = 0.5;
+  } else {
+    newMastery = Math.max(0, rec.mastery - 1);
+    intervalMultiplier = 0; // 1-hour retry
+  }
+
+  const interval = newMastery === 0 && intervalMultiplier === 0
+    ? 3_600_000
+    : Math.round(SRS_INTERVALS[newMastery] * intervalMultiplier || SRS_INTERVALS[newMastery]);
+
+  return {
+    ...data,
+    [rootId]: { mastery: newMastery, nextReview: Date.now() + interval },
+  };
+}
+
+/** Sort roots by SRS priority: overdue → new → upcoming */
+function buildSRSQueue(srsData: SRSData): VerbRoot[] {
+  const now = Date.now();
+  const overdue: VerbRoot[] = [];
+  const unseen:  VerbRoot[] = [];
+  const upcoming: VerbRoot[] = [];
+
+  for (const root of verbRoots) {
+    const rec = srsData[root.id];
+    if (!rec) {
+      unseen.push(root);
+    } else if (rec.nextReview <= now) {
+      overdue.push(root);
+    } else {
+      upcoming.push(root);
+    }
+  }
+
+  // Sort overdue by most overdue first; upcoming by soonest first
+  overdue.sort((a, b) => (srsData[a.id]?.nextReview ?? 0) - (srsData[b.id]?.nextReview ?? 0));
+  upcoming.sort((a, b) => (srsData[a.id]?.nextReview ?? 0) - (srsData[b.id]?.nextReview ?? 0));
+
+  return [...overdue, ...shuffle(unseen), ...upcoming];
+}
+
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -108,12 +192,14 @@ function buildBabQuestion(root: VerbRoot, bab: Bab): Question {
     { id: 'c', text: `Form ${correctForm}`, sub: FORM_MEANINGS[correctForm] ?? '' },
     ...wrongs.map((f, i) => ({ id: `w${i}`, text: `Form ${f}`, sub: FORM_MEANINGS[f] ?? '' })),
   ]);
+  // Show the actual māḍī 3ms of THIS root in this bāb, not the abstract pattern
+  const madiForm = bab.tenses.find(t => t.type === 'madi')?.conjugation.find(c => c.person === '3ms' && c.arabic !== '-')?.arabic ?? bab.arabicPattern;
   return {
     type: 'bab',
     heading: 'Identify the Bāb',
-    arabicDisplay: bab.arabicPattern,
-    subtitle: `Root: ${root.root} — ${root.meaning}`,
-    question: 'Which verb form (bāb) is this Arabic pattern?',
+    arabicDisplay: madiForm,
+    subtitle: `Root: ${root.root} — ${root.meaning} · Pattern: ${bab.arabicPattern}`,
+    question: 'Which verb form (bāb) is this?',
     options: shuffled,
     correctId: shuffled.find(o => o.text === `Form ${correctForm}`)!.id,
   };
@@ -188,6 +274,7 @@ function buildRootBatch(root: VerbRoot): Question[] {
 export const QuizMode: React.FC = () => {
   const rootQueueRef  = useRef<VerbRoot[]>([]);
   const statsRef      = useRef<QuizStats>(loadStats());
+  const srsRef        = useRef<SRSData>(loadSRS());
 
   // Current root batch state
   const [currentRoot,    setCurrentRoot]    = useState<VerbRoot | null>(null);
@@ -199,29 +286,43 @@ export const QuizMode: React.FC = () => {
   const [batchCorrect,   setBatchCorrect]   = useState(0);
   const [score,          setScore]          = useState({ answered: 0, correct: 0, streak: 0, best: 0 });
   const [rootsCompleted, setRootsCompleted] = useState(0);
+  const [srsInfo,        setSrsInfo]        = useState<{ mastery: number; dueLabel: string } | null>(null);
 
-  // Build initial queue
+  // Build initial SRS-ordered queue
   useEffect(() => {
     const s = loadStats();
     statsRef.current = s;
+    srsRef.current = loadSRS();
     setScore({ answered: s.totalAnswered, correct: s.totalCorrect, streak: s.currentStreak, best: s.bestStreak });
-    loadNextRoot(shuffle([...verbRoots]), 0);
+    loadNextRoot(buildSRSQueue(srsRef.current), 0);
   }, []);
 
   const loadNextRoot = useCallback((queue: VerbRoot[], completed: number) => {
     let q = queue;
     if (q.length === 0) {
-      q = shuffle([...verbRoots]);
+      q = buildSRSQueue(srsRef.current);
     }
     const root       = q[0];
     const remaining  = q.slice(1);
     const newBatch   = buildRootBatch(root);
 
     if (newBatch.length === 0) {
-      // skip roots with no data
       loadNextRoot(remaining, completed);
       return;
     }
+
+    // SRS display info
+    const rec = srsRef.current[root.id];
+    const mastery = rec?.mastery ?? 0;
+    const due = rec?.nextReview;
+    let dueLabel = 'New';
+    if (due) {
+      const diff = due - Date.now();
+      if (diff <= 0) dueLabel = 'Due';
+      else if (diff < 86_400_000) dueLabel = 'Due today';
+      else dueLabel = `Due in ${Math.ceil(diff / 86_400_000)}d`;
+    }
+    setSrsInfo({ mastery, dueLabel });
 
     rootQueueRef.current = remaining;
     setCurrentRoot(root);
@@ -276,8 +377,14 @@ export const QuizMode: React.FC = () => {
   }, [revealed, batchIdx, batch.length]);
 
   const handleNextRoot = useCallback(() => {
+    // Update SRS for the just-completed root
+    if (currentRoot) {
+      const updated = updateSRS(srsRef.current, currentRoot.id, batchCorrect, batch.length);
+      srsRef.current = updated;
+      saveSRS(updated);
+    }
     loadNextRoot(rootQueueRef.current, rootsCompleted + 1);
-  }, [loadNextRoot, rootsCompleted]);
+  }, [loadNextRoot, rootsCompleted, currentRoot, batchCorrect, batch.length]);
 
   // Swipe right = next after reveal
   useSwipeGesture({
@@ -339,19 +446,25 @@ export const QuizMode: React.FC = () => {
         </div>
         <div style={{ fontSize: '18px', color: '#aabbdd', fontStyle: 'italic', marginBottom: '24px' }}>{currentRoot.meaning}</div>
 
-        <div style={{ display: 'flex', gap: '16px', marginBottom: '28px' }}>
-          <div style={{ textAlign: 'center', padding: '16px 24px', background: 'rgba(255,255,255,0.03)', borderRadius: '14px', border: '1px solid rgba(255,255,255,0.07)' }}>
-            <div style={{ fontSize: '28px', fontWeight: 700, color: perfect ? '#22c55e' : '#ffd700' }}>{batchCorrect}/{batch.length}</div>
+        <div style={{ display: 'flex', gap: '12px', marginBottom: '28px', flexWrap: 'wrap', justifyContent: 'center' }}>
+          <div style={{ textAlign: 'center', padding: '14px 20px', background: 'rgba(255,255,255,0.03)', borderRadius: '14px', border: '1px solid rgba(255,255,255,0.07)' }}>
+            <div style={{ fontSize: '26px', fontWeight: 700, color: perfect ? '#22c55e' : '#ffd700' }}>{batchCorrect}/{batch.length}</div>
             <div style={{ fontSize: '11px', color: '#555577', marginTop: '4px' }}>this root</div>
           </div>
-          <div style={{ textAlign: 'center', padding: '16px 24px', background: 'rgba(255,255,255,0.03)', borderRadius: '14px', border: '1px solid rgba(255,255,255,0.07)' }}>
-            <div style={{ fontSize: '28px', fontWeight: 700, color: '#f97316' }}>{score.streak} 🔥</div>
+          <div style={{ textAlign: 'center', padding: '14px 20px', background: 'rgba(255,255,255,0.03)', borderRadius: '14px', border: '1px solid rgba(255,255,255,0.07)' }}>
+            <div style={{ fontSize: '26px', fontWeight: 700, color: '#f97316' }}>{score.streak} 🔥</div>
             <div style={{ fontSize: '11px', color: '#555577', marginTop: '4px' }}>streak</div>
           </div>
-          <div style={{ textAlign: 'center', padding: '16px 24px', background: 'rgba(255,255,255,0.03)', borderRadius: '14px', border: '1px solid rgba(255,255,255,0.07)' }}>
-            <div style={{ fontSize: '28px', fontWeight: 700, color: '#4a9eff' }}>{rootsCompleted + 1}</div>
+          <div style={{ textAlign: 'center', padding: '14px 20px', background: 'rgba(255,255,255,0.03)', borderRadius: '14px', border: '1px solid rgba(255,255,255,0.07)' }}>
+            <div style={{ fontSize: '26px', fontWeight: 700, color: '#4a9eff' }}>{rootsCompleted + 1}</div>
             <div style={{ fontSize: '11px', color: '#555577', marginTop: '4px' }}>roots done</div>
           </div>
+          {srsInfo && (
+            <div style={{ textAlign: 'center', padding: '14px 20px', background: 'rgba(255,255,255,0.03)', borderRadius: '14px', border: '1px solid rgba(255,255,255,0.07)' }}>
+              <div style={{ fontSize: '18px', letterSpacing: '2px' }}>{'★'.repeat(srsInfo.mastery + (perfect ? 1 : 0) > 5 ? 5 : srsInfo.mastery + (perfect ? 1 : 0))+'☆'.repeat(5 - Math.min(5, srsInfo.mastery + (perfect ? 1 : 0)))}</div>
+              <div style={{ fontSize: '11px', color: '#555577', marginTop: '4px' }}>mastery</div>
+            </div>
+          )}
         </div>
 
         <button
@@ -405,7 +518,14 @@ export const QuizMode: React.FC = () => {
           <span style={{ fontFamily: "'Scheherazade New', serif", fontSize: '28px', color: '#ffd700', direction: 'rtl' }}>
             {currentRoot.root}
           </span>
-          <span style={{ fontSize: '13px', color: '#666688', fontStyle: 'italic' }}>{currentRoot.meaning}</span>
+          <div>
+            <span style={{ fontSize: '13px', color: '#666688', fontStyle: 'italic' }}>{currentRoot.meaning}</span>
+            {srsInfo && (
+              <div style={{ fontSize: '10px', color: srsInfo.dueLabel === 'New' ? '#4a9eff' : srsInfo.dueLabel === 'Due' ? '#f97316' : '#555577', marginTop: '2px' }}>
+                {srsInfo.dueLabel} · {'★'.repeat(srsInfo.mastery)}{'☆'.repeat(5 - srsInfo.mastery)}
+              </div>
+            )}
+          </div>
         </div>
         {/* Progress dots */}
         <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>

@@ -4,9 +4,11 @@ import { verbRoots } from '../data/verbs';
 import type { VerbRoot } from '../data/verbs';
 
 export type ViewMode = 'space' | 'tree' | 'quiz' | 'explore' | 'stats';
+export type SpaceView = '3d' | 'list';
 
 interface Store {
   viewMode: ViewMode;
+  spaceView: SpaceView;
   selectedRoot: string | null;
   expandedBab: string | null;
   expandedTense: string | null;
@@ -17,6 +19,7 @@ interface Store {
   simulationIndex: number;
 
   setViewMode: (mode: ViewMode) => void;
+  setSpaceView: (v: SpaceView) => void;
   setSelectedRoot: (id: string | null) => void;
   setExpandedBab: (id: string | null) => void;
   setExpandedTense: (id: string | null) => void;
@@ -92,17 +95,19 @@ const initialRoot = params.get('root') ?? null;
 
 export const useStore = create<Store>((set) => ({
   viewMode: initialRoot ? 'tree' : 'space',
+  spaceView: typeof window !== 'undefined' && window.innerWidth < 768 ? 'list' : '3d',
   selectedRoot: initialRoot,
 
   expandedBab: null,
   expandedTense: null,
   searchQuery: '',
   searchResults: null,
-  
+
   simulationActive: false,
   simulationIndex: 0,
 
   setViewMode: (mode) => set({ viewMode: mode, selectedRoot: null, expandedBab: null, expandedTense: null, simulationActive: false }),
+  setSpaceView: (v) => set({ spaceView: v }),
 
   setSelectedRoot: (id) =>
     set((state) => {

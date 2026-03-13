@@ -2,6 +2,7 @@ import React, { Suspense, useState, useEffect } from 'react';
 import { Scene } from './components/Scene';
 import { SearchPanel } from './components/SearchPanel';
 import { NavBar } from './components/NavBar';
+import { RootsListView } from './components/RootsListView';
 import { useStore } from './store/useStore';
 import { initData } from './data/verbs';
 import { BootScreen } from './components/BootScreen';
@@ -35,6 +36,8 @@ const FullPageFallback = () => (
 
 const App: React.FC = () => {
   const viewMode          = useStore(s => s.viewMode);
+  const spaceView         = useStore(s => s.spaceView);
+  const setSpaceView      = useStore(s => s.setSpaceView);
   const simulationActive  = useStore(s => s.simulationActive);
 
   const [isDataLoaded, setIsDataLoaded] = useState(false);
@@ -76,14 +79,17 @@ const App: React.FC = () => {
   if (appState === 'welcome') return <WelcomeScreen onStart={handleStart} />;
   if (appState === 'loading') return <BootScreen />;
 
-  const showCanvas  = viewMode === 'space' || viewMode === 'tree';
+  const showCanvas  = (viewMode === 'space' && spaceView === '3d') || viewMode === 'tree';
   const showNavBar  = viewMode !== 'tree';
 
   return (
     <div style={{ width: '100vw', height: '100vh', overflow: 'hidden', background: '#050510' }}>
 
-      {/* 3D canvas — only in space/tree modes */}
+      {/* 3D canvas — only in space(3d)/tree modes */}
       {showCanvas && <Scene sceneViewMode={sceneViewMode} />}
+
+      {/* List view — space mode, list toggle */}
+      {viewMode === 'space' && spaceView === 'list' && <RootsListView />}
 
       {/* Tree view overlay */}
       {viewMode === 'tree' && (
@@ -95,33 +101,40 @@ const App: React.FC = () => {
       {/* Space-mode overlays */}
       {viewMode === 'space' && (
         <>
-          <button
-            onClick={() => setShowAbout(true)}
-            style={{
-              position: 'fixed',
-              top: '20px',
-              left: '20px',
-              zIndex: 1000,
-              width: '40px',
-              height: '40px',
-              borderRadius: '20px',
-              background: 'rgba(5, 8, 30, 0.6)',
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
-              border: '1px solid rgba(255, 255, 255, 0.15)',
-              color: '#ffffff',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '18px',
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-            }}
-          >
-            ℹ️
-          </button>
-          
-          <SearchPanel />
+          {/* Top-left controls: about + view toggle */}
+          <div style={{ position: 'fixed', top: '20px', left: '20px', zIndex: 1000, display: 'flex', gap: '8px' }}>
+            <button
+              onClick={() => setShowAbout(true)}
+              style={{
+                width: '40px', height: '40px', borderRadius: '20px',
+                background: 'rgba(5,8,30,0.6)', backdropFilter: 'blur(8px)',
+                WebkitBackdropFilter: 'blur(8px)',
+                border: '1px solid rgba(255,255,255,0.15)',
+                color: '#ffffff', display: 'flex', alignItems: 'center',
+                justifyContent: 'center', fontSize: '18px', cursor: 'pointer',
+              }}
+            >
+              ℹ️
+            </button>
+            <button
+              onClick={() => setSpaceView(spaceView === '3d' ? 'list' : '3d')}
+              title={spaceView === '3d' ? 'Switch to list view' : 'Switch to 3D view'}
+              style={{
+                height: '40px', borderRadius: '20px',
+                padding: '0 14px',
+                background: 'rgba(5,8,30,0.6)', backdropFilter: 'blur(8px)',
+                WebkitBackdropFilter: 'blur(8px)',
+                border: '1px solid rgba(255,255,255,0.15)',
+                color: '#aabbdd', display: 'flex', alignItems: 'center',
+                gap: '6px', cursor: 'pointer', fontSize: '13px', fontWeight: 600,
+                transition: 'all 0.2s', whiteSpace: 'nowrap',
+              }}
+            >
+              {spaceView === '3d' ? '☰ List' : '✦ 3D'}
+            </button>
+          </div>
+
+          {spaceView === '3d' && <SearchPanel />}
           <Suspense fallback={null}>
             <SimulationHUD />
           </Suspense>
