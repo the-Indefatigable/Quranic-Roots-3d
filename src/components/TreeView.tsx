@@ -8,6 +8,7 @@ import { useStore, verbRoots } from '../store/useStore';
 import { TENSE_COLORS } from '../data/verbs';
 import type { Bab, Tense } from '../data/verbs';
 import { useSwipeGesture } from '../hooks/useSwipeGesture';
+import { MobileDrillDown } from './TreeViewMobile';
 
 // ── Generic Org Tree Node (desktop only) ──────────────────────────────────────
 const OrgNode: React.FC<{
@@ -663,6 +664,6 @@ export const TreeView: React.FC = () => {
   if (!root) return null;
 
   return isMobile
-    ? <MobileTreeView root={root} backToSpace={backToSpace} visible={visible} />
+    ? <MobileDrillDown root={root} backToSpace={backToSpace} visible={visible} />
     : <DesktopTreeView root={root} backToSpace={backToSpace} visible={visible} />;
 };

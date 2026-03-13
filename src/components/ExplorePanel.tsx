@@ -190,7 +190,7 @@ export const ExplorePanel: React.FC = () => {
             {/* Active surah pill */}
             {selectedSurah !== null ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 14px', background: 'rgba(167,139,250,0.1)', border: '1px solid rgba(167,139,250,0.4)', borderRadius: '12px' }}>
-                <span style={{ fontSize: '13px', color: '#a78bfa', fontFamily: "'Scheherazade New', serif", fontSize: '20px', direction: 'rtl' }}>
+                <span style={{ color: '#a78bfa', fontFamily: "'Scheherazade New', serif", fontSize: '20px', direction: 'rtl' }}>
                   {SURAH_MAP.get(selectedSurah)?.arabic}
                 </span>
                 <div style={{ flex: 1 }}>
