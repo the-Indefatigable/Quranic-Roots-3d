@@ -15,6 +15,7 @@ interface Store {
   searchQuery: string;
   searchResults: string[] | null; // null means show all
   previousViewMode: ViewMode | null; // where we came from before entering tree
+  filteredRootIds: string[] | null; // current filtered list from ExplorePanel (null = all)
 
   simulationActive: boolean;
   simulationIndex: number;
@@ -25,6 +26,7 @@ interface Store {
   setExpandedBab: (id: string | null) => void;
   setExpandedTense: (id: string | null) => void;
   setSearch: (q: string) => void;
+  setFilteredRoots: (ids: string[] | null) => void;
   backToSpace: () => void;
 
   startSimulation: () => void;
@@ -107,6 +109,7 @@ export const useStore = create<Store>((set) => ({
   searchQuery: '',
   searchResults: null,
   previousViewMode: null,
+  filteredRootIds: null,
 
   simulationActive: false,
   simulationIndex: 0,
@@ -155,6 +158,8 @@ export const useStore = create<Store>((set) => ({
       searchQuery: q,
       searchResults: searchRoots(q),
     })),
+
+  setFilteredRoots: (ids) => set({ filteredRootIds: ids }),
 
   backToSpace: () =>
     set((state) => {

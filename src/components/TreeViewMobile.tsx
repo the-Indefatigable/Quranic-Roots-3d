@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { TENSE_COLORS, verbRoots } from '../data/verbs';
-import type { Bab, Tense } from '../data/verbs';
+import type { Bab, Tense, VerbRoot } from '../data/verbs';
 import { useSwipeGesture } from '../hooks/useSwipeGesture';
 import { useStore } from '../store/useStore';
 
@@ -8,12 +8,19 @@ export const MobileDrillDown: React.FC<{ root: any; backToSpace: () => void; vis
   const [selectedBab, setSelectedBab] = useState<Bab | null>(null);
   const [selectedTense, setSelectedTense] = useState<{ tense: Tense; bab: Bab } | null>(null);
   const { setSelectedRoot } = useStore();
+  const filteredRootIds  = useStore(s => s.filteredRootIds);
+  const previousViewMode = useStore(s => s.previousViewMode);
 
-  // Prev / next root sorted by Quranic frequency
-  const sortedRoots = verbRoots.slice().sort((a, b) => (b.totalFreq ?? 0) - (a.totalFreq ?? 0));
-  const currentIdx = sortedRoots.findIndex(r => r.id === root.id);
-  const goPrev = currentIdx > 0 ? () => setSelectedRoot(sortedRoots[currentIdx - 1].id) : null;
-  const goNext = currentIdx < sortedRoots.length - 1 ? () => setSelectedRoot(sortedRoots[currentIdx + 1].id) : null;
+  // Prev / next — use filtered list if came from explore, else all by frequency
+  const navigationRoots = useMemo(() => {
+    if (filteredRootIds && previousViewMode === 'explore') {
+      return filteredRootIds.map(id => verbRoots.find(r => r.id === id)).filter((r): r is VerbRoot => !!r);
+    }
+    return verbRoots.slice().sort((a, b) => (b.totalFreq ?? 0) - (a.totalFreq ?? 0));
+  }, [filteredRootIds, previousViewMode]);
+  const currentIdx = navigationRoots.findIndex(r => r.id === root.id);
+  const goPrev = currentIdx > 0 ? () => setSelectedRoot(navigationRoots[currentIdx - 1].id) : null;
+  const goNext = currentIdx < navigationRoots.length - 1 ? () => setSelectedRoot(navigationRoots[currentIdx + 1].id) : null;
 
   // Swipe handlers for navigating back
   useSwipeGesture({
