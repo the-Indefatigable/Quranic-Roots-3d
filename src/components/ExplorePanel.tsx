@@ -154,6 +154,13 @@ export const ExplorePanel: React.FC = () => {
     setQuickFilter('all');
   };
 
+  const [showFilterSheet, setShowFilterSheet] = useState(false);
+  const activeFilterCount =
+    selectedForms.size + selectedTenses.size +
+    (quickFilter !== 'all' ? 1 : 0) +
+    (selectedSurah !== null ? 1 : 0) +
+    (search ? 1 : 0);
+
   return (
     <div style={{
       position: 'fixed', inset: 0, zIndex: 700,
@@ -167,7 +174,7 @@ export const ExplorePanel: React.FC = () => {
       <div style={{
         padding: '14px 20px 12px',
         borderBottom: '1px solid rgba(255,255,255,0.06)',
-        display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0,
+        display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0,
         background: 'rgba(2,5,15,0.95)', backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
       }}>
@@ -178,18 +185,33 @@ export const ExplorePanel: React.FC = () => {
           <div style={{ fontSize: '18px', color: '#fff', fontWeight: 600, marginTop: '1px' }}>
             {filtered.length}
             <span style={{ color: '#444466', fontWeight: 400, fontSize: '12px' }}> / {verbRoots.length} roots</span>
-            {selectedSurah !== null && (
-              <span style={{ fontSize: '12px', color: '#a78bfa', fontWeight: 400, marginLeft: '8px' }}>
-                · {SURAH_MAP.get(selectedSurah)?.english}
-              </span>
-            )}
           </div>
         </div>
+
+        {/* Filter button */}
+        <button
+          onClick={() => setShowFilterSheet(true)}
+          style={{
+            height: '36px', padding: '0 14px', borderRadius: '18px', cursor: 'pointer',
+            border: `1px solid ${activeFilterCount > 0 ? 'rgba(74,158,255,0.5)' : 'rgba(255,255,255,0.12)'}`,
+            background: activeFilterCount > 0 ? 'rgba(74,158,255,0.12)' : 'rgba(255,255,255,0.04)',
+            color: activeFilterCount > 0 ? '#4a9eff' : '#888899',
+            fontSize: '13px', fontWeight: 600, flexShrink: 0, display: 'flex', alignItems: 'center', gap: '6px',
+          }}>
+          ⊞ Filter
+          {activeFilterCount > 0 && (
+            <span style={{ background: '#4a9eff', color: '#000', borderRadius: '10px', fontSize: '10px', fontWeight: 700, padding: '1px 6px', lineHeight: 1.4 }}>
+              {activeFilterCount}
+            </span>
+          )}
+        </button>
+
         {hasFilters && (
           <button onClick={clearAll} style={{ fontSize: '11px', color: '#ff6b6b', background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.25)', borderRadius: '10px', padding: '4px 10px', cursor: 'pointer', flexShrink: 0 }}>
-            Clear ✕
+            ✕
           </button>
         )}
+
         <button
           onClick={() => { setSpaceView('3d'); setViewMode('space'); }}
           style={{ height: '36px', padding: '0 14px', borderRadius: '18px', border: '1px solid rgba(74,158,255,0.3)', background: 'rgba(74,158,255,0.08)', color: '#4a9eff', cursor: 'pointer', fontSize: '12px', fontWeight: 600, flexShrink: 0, display: 'flex', alignItems: 'center', gap: '5px' }}>
@@ -197,175 +219,11 @@ export const ExplorePanel: React.FC = () => {
         </button>
       </div>
 
-      {/* ── Scrollable filter area ── */}
-      <div style={{ flexShrink: 0, overflowY: 'auto', maxHeight: '52vh', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-
-        {/* Search */}
-        <div style={{ padding: '12px 20px 0' }}>
-          <div style={{ position: 'relative' }}>
-            <span style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', fontSize: '15px', opacity: 0.4 }}>🔍</span>
-            <input
-              ref={searchRef}
-              type="text" value={search} onChange={e => setSearch(e.target.value)}
-              placeholder="Search a root or meaning…"
-              style={{ width: '100%', boxSizing: 'border-box', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '10px 14px 10px 36px', color: '#fff', fontSize: '14px', outline: 'none', fontFamily: 'inherit' }}
-              onFocus={e => e.target.style.borderColor = 'rgba(74,158,255,0.5)'}
-              onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
-            />
-            {search && (
-              <button onClick={() => setSearch('')} style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#666', cursor: 'pointer', fontSize: '16px', padding: '0 4px' }}>✕</button>
-            )}
-          </div>
-        </div>
-
-        {/* Quick filters */}
-        <div style={{ padding: '10px 20px 0', display: 'flex', gap: '7px' }}>
-          {(['all', 50, 100, 300] as QuickFilter[]).map(f => {
-            const active = quickFilter === f;
-            return (
-              <button key={String(f)} onClick={() => setQuickFilter(f)}
-                style={{ padding: '5px 14px', borderRadius: '16px', border: `1px solid ${active ? 'rgba(74,158,255,0.5)' : 'rgba(255,255,255,0.08)'}`, background: active ? 'rgba(74,158,255,0.12)' : 'transparent', color: active ? '#4a9eff' : '#555577', cursor: 'pointer', fontSize: '12px', fontWeight: active ? 700 : 400, transition: 'all 0.15s', whiteSpace: 'nowrap' }}>
-                {f === 'all' ? 'All roots' : `Top ${f}`}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Verb Form section */}
-        <div style={{ padding: '12px 20px 0' }}>
-          <button onClick={() => setShowForms(o => !o)}
-            style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 8px', color: '#fff' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '11px', color: '#555577', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 700 }}>Verb Form</span>
-              {selectedForms.size > 0 && (
-                <span style={{ fontSize: '10px', color: '#4a9eff', background: 'rgba(74,158,255,0.15)', borderRadius: '8px', padding: '1px 7px', fontWeight: 700 }}>
-                  {selectedForms.size} selected
-                </span>
-              )}
-            </div>
-            <span style={{ fontSize: '12px', color: '#444466', transform: showForms ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>▼</span>
-          </button>
-
-          {showForms && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))', gap: '8px', paddingBottom: '12px' }}>
-              {Object.entries(FORM_INFO).map(([form, info]) => {
-                const active = selectedForms.has(form);
-                const color = BAB_COLORS[form] ?? '#aaa';
-                return (
-                  <button key={form} onClick={() => setSelectedForms(toggleSet(selectedForms, form))}
-                    style={{
-                      padding: '10px 8px', borderRadius: '12px', cursor: 'pointer', transition: 'all 0.15s',
-                      border: `1px solid ${active ? color + 'cc' : color + '28'}`,
-                      background: active ? color + '18' : 'rgba(255,255,255,0.02)',
-                      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px',
-                      boxShadow: active ? `0 0 12px ${color}22` : 'none',
-                    }}>
-                    <span style={{ fontFamily: "'Scheherazade New', serif", fontSize: '18px', color: active ? '#fff' : '#aaabb8', direction: 'rtl', lineHeight: 1.3 }}>
-                      {info.pattern}
-                    </span>
-                    <span style={{ fontSize: '10px', color: active ? color : '#555577', fontWeight: 700, letterSpacing: '0.05em' }}>
-                      Form {form}
-                    </span>
-                    <span style={{ fontSize: '9px', color: active ? '#aabbdd' : '#3a3a55', textAlign: 'center', lineHeight: 1.2 }}>
-                      {info.desc}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        {/* By Surah section */}
-        <div style={{ padding: '8px 20px 0' }}>
-          <button onClick={() => setSurahPickerOpen(o => !o)}
-            style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 8px', color: '#fff' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '11px', color: '#555577', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 700 }}>By Surah</span>
-              {selectedSurah !== null && (
-                <span style={{ fontSize: '10px', color: '#a78bfa', background: 'rgba(167,139,250,0.15)', borderRadius: '8px', padding: '1px 7px', fontWeight: 700 }}>
-                  {SURAH_MAP.get(selectedSurah)?.english}
-                </span>
-              )}
-            </div>
-            <span style={{ fontSize: '12px', color: '#444466', transform: surahPickerOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>▼</span>
-          </button>
-
-          {surahPickerOpen && (
-            <>
-              {selectedSurah !== null && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 14px', background: 'rgba(167,139,250,0.08)', border: '1px solid rgba(167,139,250,0.3)', borderRadius: '12px', marginBottom: '8px' }}>
-                  <span style={{ fontFamily: "'Scheherazade New', serif", fontSize: '20px', color: '#a78bfa', direction: 'rtl' }}>{SURAH_MAP.get(selectedSurah)?.arabic}</span>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: '13px', color: '#c4b5fd', fontWeight: 600 }}>{SURAH_MAP.get(selectedSurah)?.english}</div>
-                    <div style={{ fontSize: '10px', color: '#555577' }}>Surah {selectedSurah} · {surahRootCount.get(selectedSurah) ?? 0} roots</div>
-                  </div>
-                  <button onClick={() => { setSelectedSurah(null); setSurahSearch(''); }} style={{ background: 'none', border: 'none', color: '#ff6b6b', cursor: 'pointer', fontSize: '16px', padding: '0 2px' }}>✕</button>
-                </div>
-              )}
-              <div style={{ marginBottom: '8px', background: 'rgba(5,5,20,0.98)', border: '1px solid rgba(167,139,250,0.2)', borderRadius: '14px', overflow: 'hidden' }}>
-                <div style={{ padding: '10px 12px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                  <input autoFocus type="text" value={surahSearch} onChange={e => setSurahSearch(e.target.value)}
-                    placeholder="Search surah…"
-                    style={{ width: '100%', boxSizing: 'border-box', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '8px 12px', color: '#fff', fontSize: '13px', outline: 'none' }} />
-                </div>
-                <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
-                  {filteredSurahs.map(surah => {
-                    const count = surahRootCount.get(surah.number) ?? 0;
-                    if (count === 0) return null;
-                    const isSel = selectedSurah === surah.number;
-                    return (
-                      <div key={surah.number}
-                        onClick={() => { setSelectedSurah(surah.number); setSurahPickerOpen(false); setSurahSearch(''); }}
-                        style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '9px 14px', cursor: 'pointer', background: isSel ? 'rgba(167,139,250,0.12)' : 'transparent', borderBottom: '1px solid rgba(255,255,255,0.03)', transition: 'background 0.1s' }}
-                        onMouseEnter={e => e.currentTarget.style.background = 'rgba(167,139,250,0.07)'}
-                        onMouseLeave={e => e.currentTarget.style.background = isSel ? 'rgba(167,139,250,0.12)' : 'transparent'}>
-                        <span style={{ fontSize: '10px', color: '#444466', fontFamily: 'monospace', minWidth: '22px', textAlign: 'right' }}>{surah.number}</span>
-                        <span style={{ fontFamily: "'Scheherazade New', serif", fontSize: '17px', color: '#fff', direction: 'rtl', minWidth: '60px', textAlign: 'right' }}>{surah.arabic}</span>
-                        <div style={{ flex: 1, fontSize: '13px', color: isSel ? '#c4b5fd' : '#ccd' }}>{surah.english}</div>
-                        <span style={{ fontSize: '10px', color: '#a78bfa', background: 'rgba(167,139,250,0.1)', borderRadius: '6px', padding: '1px 6px' }}>{count}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </>
-          )}
-        </div>
-
-        {/* Advanced: Tense filter */}
-        <div style={{ padding: '10px 20px 12px' }}>
-          <button onClick={() => setShowAdvanced(o => !o)}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', padding: 0, color: '#444466', fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 700 }}>
-            <span style={{ display: 'inline-block', transform: showAdvanced ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s', fontSize: '10px' }}>▶</span>
-            Advanced
-            {selectedTenses.size > 0 && <span style={{ color: '#4a9eff', background: 'rgba(74,158,255,0.15)', borderRadius: '8px', padding: '1px 7px', fontSize: '10px' }}>{selectedTenses.size}</span>}
-          </button>
-          {showAdvanced && (
-            <div style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <div style={{ fontSize: '10px', color: '#444466', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Filter by Tense</div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                {TENSE_OPTS.map(({ key, label, arabic }) => {
-                  const active = selectedTenses.has(key);
-                  return (
-                    <button key={key} onClick={() => setSelectedTenses(toggleSet(selectedTenses, key))}
-                      style={{ padding: '5px 12px', borderRadius: '16px', border: `1px solid ${active ? 'rgba(74,158,255,0.5)' : 'rgba(255,255,255,0.08)'}`, background: active ? 'rgba(74,158,255,0.12)' : 'transparent', color: active ? '#4a9eff' : '#555577', cursor: 'pointer', fontSize: '11px', fontWeight: active ? 700 : 400, display: 'flex', alignItems: 'center', gap: '5px' }}>
-                      <span style={{ fontFamily: "'Scheherazade New', serif", fontSize: '13px', direction: 'rtl' }}>{arabic}</span>
-                      {label}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* ── Results header ── */}
-      <div style={{ padding: '10px 20px', display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0, borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+      {/* ── Results sub-header (sort + count) ── */}
+      <div style={{ padding: '8px 20px', display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0, borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
         <span style={{ fontSize: '12px', color: '#444466', flex: 1 }}>
           {filtered.length} root{filtered.length !== 1 ? 's' : ''}
-          {selectedSurah !== null && <span style={{ color: '#a78bfa' }}> · sorted by ayah</span>}
+          {selectedSurah !== null && <span style={{ color: '#a78bfa' }}> · {SURAH_MAP.get(selectedSurah)?.english} · sorted by ayah</span>}
         </span>
         {selectedSurah === null && (
           <div style={{ display: 'flex', gap: '4px' }}>
@@ -394,7 +252,6 @@ export const ExplorePanel: React.FC = () => {
               onTouchStart={e => e.currentTarget.style.background = 'rgba(255,255,255,0.04)'}
               onTouchEnd={e => e.currentTarget.style.background = 'transparent'}>
 
-              {/* Index / ayah marker */}
               <div style={{ minWidth: '30px', textAlign: 'right', flexShrink: 0 }}>
                 {firstAyah !== undefined ? (
                   <div style={{ fontSize: '10px', color: '#a78bfa', background: 'rgba(167,139,250,0.1)', borderRadius: '5px', padding: '1px 5px', fontFamily: 'monospace' }}>:{firstAyah}</div>
@@ -403,12 +260,10 @@ export const ExplorePanel: React.FC = () => {
                 )}
               </div>
 
-              {/* Arabic root */}
               <span style={{ fontSize: '28px', fontFamily: "'Scheherazade New', serif", color: '#fff', direction: 'rtl', minWidth: '72px', textAlign: 'right', flexShrink: 0 }}>
                 {root.root}
               </span>
 
-              {/* Meaning + form badges */}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: '13px', color: '#ccd', marginBottom: '4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {root.meaning}
@@ -422,7 +277,6 @@ export const ExplorePanel: React.FC = () => {
                 </div>
               </div>
 
-              {/* Frequency */}
               <div style={{ textAlign: 'right', minWidth: '40px', flexShrink: 0 }}>
                 <div style={{ fontSize: '13px', color: '#ffd700', fontWeight: 600 }}>{root.totalFreq ?? 0}</div>
                 <div style={{ fontSize: '9px', color: '#2a2a44' }}>times</div>
@@ -431,6 +285,186 @@ export const ExplorePanel: React.FC = () => {
           );
         })}
       </div>
+
+      {/* ── Filter Sheet (full-screen overlay) ── */}
+      {showFilterSheet && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 800,
+          background: '#02050f',
+          display: 'flex', flexDirection: 'column',
+          fontFamily: 'system-ui, -apple-system, sans-serif',
+          animation: 'slideUp 0.25s ease',
+        }}>
+          <style>{`@keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }`}</style>
+
+          {/* Sheet header */}
+          <div style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '12px', borderBottom: '1px solid rgba(255,255,255,0.06)', flexShrink: 0 }}>
+            <div style={{ flex: 1, fontSize: '16px', fontWeight: 700, color: '#fff' }}>Filters</div>
+            {hasFilters && (
+              <button onClick={clearAll} style={{ fontSize: '11px', color: '#ff6b6b', background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.25)', borderRadius: '10px', padding: '4px 10px', cursor: 'pointer' }}>
+                Clear all
+              </button>
+            )}
+            <button onClick={() => setShowFilterSheet(false)}
+              style={{ height: '36px', padding: '0 18px', borderRadius: '18px', border: '1px solid rgba(74,158,255,0.4)', background: 'rgba(74,158,255,0.12)', color: '#4a9eff', cursor: 'pointer', fontSize: '13px', fontWeight: 700 }}>
+              Done
+            </button>
+          </div>
+
+          {/* Sheet body — scrollable */}
+          <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
+
+            {/* Search */}
+            <div style={{ padding: '16px 20px 0' }}>
+              <div style={{ fontSize: '11px', color: '#555577', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 700, marginBottom: '8px' }}>Search</div>
+              <div style={{ position: 'relative' }}>
+                <span style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', fontSize: '15px', opacity: 0.4 }}>🔍</span>
+                <input
+                  ref={searchRef}
+                  type="text" value={search} onChange={e => setSearch(e.target.value)}
+                  placeholder="Search a root or meaning…"
+                  style={{ width: '100%', boxSizing: 'border-box', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '10px 14px 10px 36px', color: '#fff', fontSize: '14px', outline: 'none', fontFamily: 'inherit' }}
+                  onFocus={e => e.target.style.borderColor = 'rgba(74,158,255,0.5)'}
+                  onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
+                />
+                {search && (
+                  <button onClick={() => setSearch('')} style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#666', cursor: 'pointer', fontSize: '16px', padding: '0 4px' }}>✕</button>
+                )}
+              </div>
+            </div>
+
+            {/* Quick filters */}
+            <div style={{ padding: '16px 20px 0' }}>
+              <div style={{ fontSize: '11px', color: '#555577', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 700, marginBottom: '8px' }}>Show</div>
+              <div style={{ display: 'flex', gap: '7px', flexWrap: 'wrap' }}>
+                {(['all', 50, 100, 300] as QuickFilter[]).map(f => {
+                  const active = quickFilter === f;
+                  return (
+                    <button key={String(f)} onClick={() => setQuickFilter(f)}
+                      style={{ padding: '7px 16px', borderRadius: '16px', border: `1px solid ${active ? 'rgba(74,158,255,0.5)' : 'rgba(255,255,255,0.08)'}`, background: active ? 'rgba(74,158,255,0.12)' : 'transparent', color: active ? '#4a9eff' : '#555577', cursor: 'pointer', fontSize: '13px', fontWeight: active ? 700 : 400, transition: 'all 0.15s' }}>
+                      {f === 'all' ? 'All roots' : `Top ${f}`}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Verb Form */}
+            <div style={{ padding: '16px 20px 0' }}>
+              <button onClick={() => setShowForms(o => !o)}
+                style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 10px', color: '#fff' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '11px', color: '#555577', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 700 }}>Verb Form</span>
+                  {selectedForms.size > 0 && (
+                    <span style={{ fontSize: '10px', color: '#4a9eff', background: 'rgba(74,158,255,0.15)', borderRadius: '8px', padding: '1px 7px', fontWeight: 700 }}>
+                      {selectedForms.size} selected
+                    </span>
+                  )}
+                </div>
+                <span style={{ fontSize: '12px', color: '#444466', transform: showForms ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>▼</span>
+              </button>
+              {showForms && (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))', gap: '8px', paddingBottom: '12px' }}>
+                  {Object.entries(FORM_INFO).map(([form, info]) => {
+                    const active = selectedForms.has(form);
+                    const color = BAB_COLORS[form] ?? '#aaa';
+                    return (
+                      <button key={form} onClick={() => setSelectedForms(toggleSet(selectedForms, form))}
+                        style={{ padding: '10px 8px', borderRadius: '12px', cursor: 'pointer', transition: 'all 0.15s', border: `1px solid ${active ? color + 'cc' : color + '28'}`, background: active ? color + '18' : 'rgba(255,255,255,0.02)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', boxShadow: active ? `0 0 12px ${color}22` : 'none' }}>
+                        <span style={{ fontFamily: "'Scheherazade New', serif", fontSize: '18px', color: active ? '#fff' : '#aaabb8', direction: 'rtl', lineHeight: 1.3 }}>{info.pattern}</span>
+                        <span style={{ fontSize: '10px', color: active ? color : '#555577', fontWeight: 700, letterSpacing: '0.05em' }}>Form {form}</span>
+                        <span style={{ fontSize: '9px', color: active ? '#aabbdd' : '#3a3a55', textAlign: 'center', lineHeight: 1.2 }}>{info.desc}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* By Surah */}
+            <div style={{ padding: '16px 20px 0' }}>
+              <button onClick={() => setSurahPickerOpen(o => !o)}
+                style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 10px', color: '#fff' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '11px', color: '#555577', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 700 }}>By Surah</span>
+                  {selectedSurah !== null && (
+                    <span style={{ fontSize: '10px', color: '#a78bfa', background: 'rgba(167,139,250,0.15)', borderRadius: '8px', padding: '1px 7px', fontWeight: 700 }}>
+                      {SURAH_MAP.get(selectedSurah)?.english}
+                    </span>
+                  )}
+                </div>
+                <span style={{ fontSize: '12px', color: '#444466', transform: surahPickerOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>▼</span>
+              </button>
+              {surahPickerOpen && (
+                <>
+                  {selectedSurah !== null && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 14px', background: 'rgba(167,139,250,0.08)', border: '1px solid rgba(167,139,250,0.3)', borderRadius: '12px', marginBottom: '8px' }}>
+                      <span style={{ fontFamily: "'Scheherazade New', serif", fontSize: '20px', color: '#a78bfa', direction: 'rtl' }}>{SURAH_MAP.get(selectedSurah)?.arabic}</span>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: '13px', color: '#c4b5fd', fontWeight: 600 }}>{SURAH_MAP.get(selectedSurah)?.english}</div>
+                        <div style={{ fontSize: '10px', color: '#555577' }}>Surah {selectedSurah} · {surahRootCount.get(selectedSurah) ?? 0} roots</div>
+                      </div>
+                      <button onClick={() => { setSelectedSurah(null); setSurahSearch(''); }} style={{ background: 'none', border: 'none', color: '#ff6b6b', cursor: 'pointer', fontSize: '16px', padding: '0 2px' }}>✕</button>
+                    </div>
+                  )}
+                  <div style={{ marginBottom: '8px', background: 'rgba(5,5,20,0.98)', border: '1px solid rgba(167,139,250,0.2)', borderRadius: '14px', overflow: 'hidden' }}>
+                    <div style={{ padding: '10px 12px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                      <input autoFocus type="text" value={surahSearch} onChange={e => setSurahSearch(e.target.value)}
+                        placeholder="Search surah…"
+                        style={{ width: '100%', boxSizing: 'border-box', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '8px 12px', color: '#fff', fontSize: '13px', outline: 'none' }} />
+                    </div>
+                    <div style={{ maxHeight: '220px', overflowY: 'auto' }}>
+                      {filteredSurahs.map(surah => {
+                        const count = surahRootCount.get(surah.number) ?? 0;
+                        if (count === 0) return null;
+                        const isSel = selectedSurah === surah.number;
+                        return (
+                          <div key={surah.number}
+                            onClick={() => { setSelectedSurah(surah.number); setSurahPickerOpen(false); setSurahSearch(''); }}
+                            style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '9px 14px', cursor: 'pointer', background: isSel ? 'rgba(167,139,250,0.12)' : 'transparent', borderBottom: '1px solid rgba(255,255,255,0.03)', transition: 'background 0.1s' }}
+                            onMouseEnter={e => e.currentTarget.style.background = 'rgba(167,139,250,0.07)'}
+                            onMouseLeave={e => e.currentTarget.style.background = isSel ? 'rgba(167,139,250,0.12)' : 'transparent'}>
+                            <span style={{ fontSize: '10px', color: '#444466', fontFamily: 'monospace', minWidth: '22px', textAlign: 'right' }}>{surah.number}</span>
+                            <span style={{ fontFamily: "'Scheherazade New', serif", fontSize: '17px', color: '#fff', direction: 'rtl', minWidth: '60px', textAlign: 'right' }}>{surah.arabic}</span>
+                            <div style={{ flex: 1, fontSize: '13px', color: isSel ? '#c4b5fd' : '#ccd' }}>{surah.english}</div>
+                            <span style={{ fontSize: '10px', color: '#a78bfa', background: 'rgba(167,139,250,0.1)', borderRadius: '6px', padding: '1px 6px' }}>{count}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Advanced: Tense filter */}
+            <div style={{ padding: '16px 20px 24px' }}>
+              <button onClick={() => setShowAdvanced(o => !o)}
+                style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 10px', color: '#fff' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '11px', color: '#555577', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 700 }}>Tense</span>
+                  {selectedTenses.size > 0 && <span style={{ color: '#4a9eff', background: 'rgba(74,158,255,0.15)', borderRadius: '8px', padding: '1px 7px', fontSize: '10px', fontWeight: 700 }}>{selectedTenses.size}</span>}
+                </div>
+                <span style={{ fontSize: '12px', color: '#444466', transform: showAdvanced ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>▼</span>
+              </button>
+              {showAdvanced && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                  {TENSE_OPTS.map(({ key, label, arabic }) => {
+                    const active = selectedTenses.has(key);
+                    return (
+                      <button key={key} onClick={() => setSelectedTenses(toggleSet(selectedTenses, key))}
+                        style={{ padding: '7px 14px', borderRadius: '16px', border: `1px solid ${active ? 'rgba(74,158,255,0.5)' : 'rgba(255,255,255,0.08)'}`, background: active ? 'rgba(74,158,255,0.12)' : 'transparent', color: active ? '#4a9eff' : '#555577', cursor: 'pointer', fontSize: '12px', fontWeight: active ? 700 : 400, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span style={{ fontFamily: "'Scheherazade New', serif", fontSize: '14px', direction: 'rtl' }}>{arabic}</span>
+                        {label}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
