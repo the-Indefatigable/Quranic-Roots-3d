@@ -23,10 +23,12 @@ dist-ssr
 *.sln
 *.sw?
 
-# Copyright-sensitive raw data sources
+# Copyright-sensitive raw data sources (never push these)
 public/data/quranRoots.json
 data/quranRoots.json
 data/verbs_raw.json
+quranic-corpus-morphology*.txt
+*.corpus.txt
 
 # Enrichment scripts (contain API keys / raw corpus data)
 enrich_with_claude.mjs

@@ -1,11 +1,19 @@
 import React, { useState } from 'react';
-import { TENSE_COLORS } from '../data/verbs';
+import { TENSE_COLORS, verbRoots } from '../data/verbs';
 import type { Bab, Tense } from '../data/verbs';
 import { useSwipeGesture } from '../hooks/useSwipeGesture';
+import { useStore } from '../store/useStore';
 
 export const MobileDrillDown: React.FC<{ root: any; backToSpace: () => void; visible: boolean }> = ({ root, backToSpace, visible }) => {
   const [selectedBab, setSelectedBab] = useState<Bab | null>(null);
   const [selectedTense, setSelectedTense] = useState<{ tense: Tense; bab: Bab } | null>(null);
+  const { setSelectedRoot } = useStore();
+
+  // Prev / next root sorted by Quranic frequency
+  const sortedRoots = verbRoots.slice().sort((a, b) => (b.totalFreq ?? 0) - (a.totalFreq ?? 0));
+  const currentIdx = sortedRoots.findIndex(r => r.id === root.id);
+  const goPrev = currentIdx > 0 ? () => setSelectedRoot(sortedRoots[currentIdx - 1].id) : null;
+  const goNext = currentIdx < sortedRoots.length - 1 ? () => setSelectedRoot(sortedRoots[currentIdx + 1].id) : null;
 
   // Swipe handlers for navigating back
   useSwipeGesture({
@@ -33,19 +41,33 @@ export const MobileDrillDown: React.FC<{ root: any; backToSpace: () => void; vis
       <div style={{
         position: 'sticky', top: 0, zIndex: 10, background: 'rgba(2, 5, 15, 0.9)',
         backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.05)',
-        padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '16px'
+        padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '10px'
       }}>
         {selectedTense ? (
-          <button onClick={() => setSelectedTense(null)} style={{ background: 'transparent', border: 'none', color: '#4a9eff', fontSize: '24px', padding: 0 }}>←</button>
+          <button onClick={() => setSelectedTense(null)} style={{ background: 'transparent', border: 'none', color: '#4a9eff', fontSize: '24px', padding: 0, flexShrink: 0 }}>←</button>
         ) : selectedBab ? (
-          <button onClick={() => setSelectedBab(null)} style={{ background: 'transparent', border: 'none', color: '#4a9eff', fontSize: '24px', padding: 0 }}>←</button>
+          <button onClick={() => setSelectedBab(null)} style={{ background: 'transparent', border: 'none', color: '#4a9eff', fontSize: '24px', padding: 0, flexShrink: 0 }}>←</button>
         ) : (
-          <button onClick={backToSpace} style={{ background: 'transparent', border: 'none', color: '#4a9eff', fontSize: '24px', padding: 0 }}>←</button>
+          <button onClick={backToSpace} style={{ background: 'transparent', border: 'none', color: '#4a9eff', fontSize: '24px', padding: 0, flexShrink: 0 }}>←</button>
         )}
-        <div style={{ flex: 1, textAlign: 'center', fontSize: '18px', fontWeight: 600, letterSpacing: '2px', fontFamily: "'Scheherazade New', serif", direction: 'rtl' }}>
+        <div style={{ flex: 1, textAlign: 'center', fontSize: '18px', fontWeight: 600, letterSpacing: '2px', fontFamily: "'Scheherazade New', serif", direction: 'rtl', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {selectedTense ? selectedTense.tense.arabicName : selectedBab ? selectedBab.arabicPattern : root.root}
         </div>
-        <div style={{ width: '24px' }} /> {/* Spacer */}
+        {/* Prev / Next — only on root view */}
+        {!selectedBab && !selectedTense ? (
+          <div style={{ display: 'flex', gap: '4px', flexShrink: 0 }}>
+            <button onClick={goPrev ?? undefined} disabled={!goPrev}
+              style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '6px 10px', color: goPrev ? '#aabbdd' : '#333355', cursor: goPrev ? 'pointer' : 'default', fontSize: '16px' }}>
+              ‹
+            </button>
+            <button onClick={goNext ?? undefined} disabled={!goNext}
+              style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '6px 10px', color: goNext ? '#aabbdd' : '#333355', cursor: goNext ? 'pointer' : 'default', fontSize: '16px' }}>
+              ›
+            </button>
+          </div>
+        ) : (
+          <div style={{ width: '24px' }} />
+        )}
       </div>
 
       <div style={{ padding: '20px', animation: 'fadeIn 0.3s ease-out' }}>
@@ -103,6 +125,50 @@ export const MobileDrillDown: React.FC<{ root: any; backToSpace: () => void; vis
                  </div>
                );
             })}
+
+            {/* Nouns section */}
+            {(selectedBab.masdar || selectedBab.faaeil || selectedBab.mafool ||
+              selectedBab.masdarNeedsApi || selectedBab.faaeilNeedsApi || selectedBab.mafoolNeedsApi ||
+              (selectedBab.prepositions && selectedBab.prepositions.length > 0)) && (
+              <div style={{ marginTop: '4px', padding: '14px', background: 'rgba(255,255,255,0.02)', borderRadius: '14px', border: `1px solid ${selectedBab.color}22` }}>
+                <div style={{ fontSize: '11px', color: selectedBab.color, textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 700, marginBottom: '12px' }}>
+                  Nouns (الأسماء)
+                </div>
+                {[
+                  { arabic: 'مصدر', label: 'Verbal Noun', value: selectedBab.masdar, needsApi: selectedBab.masdarNeedsApi },
+                  { arabic: 'اسم فاعل', label: 'Active Participle', value: selectedBab.faaeil, needsApi: selectedBab.faaeilNeedsApi },
+                  { arabic: 'اسم مفعول', label: 'Passive Participle', value: selectedBab.mafool, needsApi: selectedBab.mafoolNeedsApi },
+                ].map(({ arabic, label, value, needsApi }) => {
+                  if (!value && !needsApi) return null;
+                  return (
+                    <div key={label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                      <div>
+                        <span style={{ fontFamily: "'Scheherazade New', serif", fontSize: '14px', color: '#aaaacc', direction: 'rtl' }}>{arabic}</span>
+                        <span style={{ fontSize: '11px', color: '#555577', marginLeft: '6px' }}>{label}</span>
+                      </div>
+                      {value ? (
+                        <span style={{ fontFamily: "'Scheherazade New', serif", fontSize: '24px', color: '#fff', direction: 'rtl' }}>{value}</span>
+                      ) : (
+                        <span style={{ fontSize: '11px', color: '#444466', fontStyle: 'italic' }}>varies by root</span>
+                      )}
+                    </div>
+                  );
+                })}
+                {selectedBab.prepositions && selectedBab.prepositions.length > 0 && (
+                  <div style={{ paddingTop: '10px' }}>
+                    <div style={{ fontSize: '10px', color: '#555577', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px' }}>Particles (صِلَة)</div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                      {selectedBab.prepositions.map((prep: { preposition: string; meaning: string }, i: number) => (
+                        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(74,158,255,0.07)', border: '1px solid rgba(74,158,255,0.2)', borderRadius: '8px', padding: '5px 10px' }}>
+                          <span style={{ fontFamily: "'Scheherazade New', serif", fontSize: '17px', color: '#4a9eff', direction: 'rtl' }}>{prep.preposition}</span>
+                          <span style={{ fontSize: '11px', color: '#888899' }}>→ "{prep.meaning}"</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
 

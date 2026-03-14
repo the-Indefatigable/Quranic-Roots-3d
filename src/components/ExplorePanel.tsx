@@ -43,7 +43,7 @@ function loadSurahIndex(onReady: () => void) {
 }
 
 export const ExplorePanel: React.FC = () => {
-  const { setSelectedRoot } = useStore();
+  const { setSelectedRoot, setViewMode, setSpaceView } = useStore();
 
   const [selectedForms, setSelectedForms]   = useState<Set<string>>(new Set());
   const [selectedTenses, setSelectedTenses] = useState<Set<string>>(new Set());
@@ -164,6 +164,21 @@ export const ExplorePanel: React.FC = () => {
             {activeFilterCount} active
           </div>
         )}
+        {/* 3D toggle */}
+        <button
+          onClick={() => { setSpaceView('3d'); setViewMode('space'); }}
+          title="Switch to 3D view"
+          style={{
+            padding: '8px 14px', borderRadius: '20px', flexShrink: 0,
+            border: '1px solid rgba(74,158,255,0.3)',
+            background: 'rgba(74,158,255,0.08)',
+            color: '#4a9eff',
+            cursor: 'pointer', fontSize: '12px', fontWeight: 600, transition: 'all 0.15s',
+            display: 'flex', alignItems: 'center', gap: '5px',
+          }}
+        >
+          ✦ 3D
+        </button>
         <button
           onClick={() => setFiltersOpen(o => !o)}
           style={{

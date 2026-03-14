@@ -14,6 +14,7 @@ interface Store {
   expandedTense: string | null;
   searchQuery: string;
   searchResults: string[] | null; // null means show all
+  previousViewMode: ViewMode | null; // where we came from before entering tree
 
   simulationActive: boolean;
   simulationIndex: number;
@@ -94,42 +95,47 @@ function searchRoots(query: string): string[] | null {
 // Read initial root from URL if present
 const params = new URLSearchParams(window.location.search);
 const initialRoot = params.get('root') ?? null;
+const isMobileInit = typeof window !== 'undefined' && window.innerWidth < 768;
 
 export const useStore = create<Store>((set) => ({
-  viewMode: initialRoot ? 'tree' : 'space',
-  spaceView: typeof window !== 'undefined' && window.innerWidth < 768 ? 'list' : '3d',
+  viewMode: initialRoot ? 'tree' : (isMobileInit ? 'explore' : 'space'),
+  spaceView: '3d',
   selectedRoot: initialRoot,
 
   expandedBab: null,
   expandedTense: null,
   searchQuery: '',
   searchResults: null,
+  previousViewMode: null,
 
   simulationActive: false,
   simulationIndex: 0,
 
-  setViewMode: (mode) => set({ viewMode: mode, selectedRoot: null, expandedBab: null, expandedTense: null, simulationActive: false }),
+  setViewMode: (mode) => set({ viewMode: mode, selectedRoot: null, expandedBab: null, expandedTense: null, simulationActive: false, previousViewMode: null }),
   setSpaceView: (v) => set({ spaceView: v }),
 
   setSelectedRoot: (id) =>
     set((state) => {
       if (id === null) {
         window.history.pushState({}, '', window.location.pathname);
-        return { selectedRoot: null, expandedBab: null, expandedTense: null, simulationActive: false, viewMode: 'space' };
+        const target = state.previousViewMode ?? 'explore';
+        return { selectedRoot: null, expandedBab: null, expandedTense: null, simulationActive: false, viewMode: target, previousViewMode: null };
       }
       const toggled = state.selectedRoot === id ? null : id;
-      
+
       if (toggled) {
         window.history.pushState({}, '', `?root=${toggled}`);
       } else {
         window.history.pushState({}, '', window.location.pathname);
       }
-      
+
       return {
         selectedRoot: toggled,
         expandedBab: null,
         expandedTense: null,
-        viewMode: toggled ? 'tree' : 'space',
+        viewMode: toggled ? 'tree' : (state.previousViewMode ?? 'explore'),
+        // Only record previousViewMode when entering tree, not when navigating within tree (prev/next)
+        previousViewMode: toggled ? (state.viewMode !== 'tree' ? state.viewMode : state.previousViewMode) : null,
       };
     }),
 
@@ -150,16 +156,19 @@ export const useStore = create<Store>((set) => ({
       searchResults: searchRoots(q),
     })),
 
-  backToSpace: () => {
-    window.history.pushState({}, '', window.location.pathname);
-    return set(() => ({
-      viewMode: 'space',
-      selectedRoot: null,
-      expandedBab: null,
-      expandedTense: null,
-      simulationActive: false,
-    }));
-  },
+  backToSpace: () =>
+    set((state) => {
+      const target = state.previousViewMode ?? 'explore';
+      window.history.pushState({}, '', window.location.pathname);
+      return {
+        viewMode: target,
+        selectedRoot: null,
+        expandedBab: null,
+        expandedTense: null,
+        simulationActive: false,
+        previousViewMode: null,
+      };
+    }),
 
   startSimulation: () => set({ simulationActive: true, selectedRoot: null }),
   stopSimulation: () => set({ simulationActive: false }),
@@ -178,11 +187,13 @@ export const useStore = create<Store>((set) => ({
 window.addEventListener('popstate', () => {
   const params = new URLSearchParams(window.location.search);
   const rootId = params.get('root') ?? null;
-  
+
   if (rootId) {
     useStore.setState({ selectedRoot: rootId, viewMode: 'tree', expandedBab: null, expandedTense: null, simulationActive: false });
   } else {
-    useStore.setState({ selectedRoot: null, viewMode: 'space', expandedBab: null, expandedTense: null, simulationActive: false });
+    const currentState = useStore.getState();
+    const target = currentState.previousViewMode ?? 'explore';
+    useStore.setState({ selectedRoot: null, viewMode: target, expandedBab: null, expandedTense: null, simulationActive: false, previousViewMode: null });
   }
 });
 

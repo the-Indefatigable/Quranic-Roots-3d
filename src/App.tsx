@@ -2,7 +2,6 @@ import React, { Suspense, useState, useEffect } from 'react';
 import { Scene } from './components/Scene';
 import { SearchPanel } from './components/SearchPanel';
 import { NavBar } from './components/NavBar';
-import { RootsListView } from './components/RootsListView';
 import { useStore } from './store/useStore';
 import { initData, preloadAllRootsInBackground } from './data/verbs';
 import { BootScreen } from './components/BootScreen';
@@ -37,13 +36,15 @@ const FullPageFallback = () => (
 const App: React.FC = () => {
   const viewMode          = useStore(s => s.viewMode);
   const spaceView         = useStore(s => s.spaceView);
-  const setSpaceView      = useStore(s => s.setSpaceView);
+  const setViewMode       = useStore(s => s.setViewMode);
   const simulationActive  = useStore(s => s.simulationActive);
 
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const [loadError, setLoadError]       = useState<string | null>(null);
   const [appState, setAppState]         = useState<'welcome' | 'loading' | 'app'>('welcome');
   const [showAbout, setShowAbout]       = useState(false);
+  // Keep ExplorePanel mounted once visited so filter state persists
+  const [exploreMounted, setExploreMounted] = useState(viewMode === 'explore');
   // Delay the 3D scene mode switch so TreeView fade-in hides the 3D swap
   const [sceneViewMode, setSceneViewMode] = useState<'space' | 'tree'>(viewMode === 'tree' ? 'tree' : 'space');
 
@@ -61,6 +62,11 @@ const App: React.FC = () => {
   useEffect(() => {
     if (isDataLoaded && appState === 'loading') setAppState('app');
   }, [isDataLoaded, appState]);
+
+  // Mount ExplorePanel once first visited, keep it mounted to preserve filter state
+  useEffect(() => {
+    if (viewMode === 'explore') setExploreMounted(true);
+  }, [viewMode]);
 
   const handleStart = () => {
     if (loadError) return;
@@ -82,17 +88,14 @@ const App: React.FC = () => {
   if (appState === 'welcome') return <WelcomeScreen onStart={handleStart} />;
   if (appState === 'loading') return <BootScreen />;
 
-  const showCanvas  = (viewMode === 'space' && spaceView === '3d') || viewMode === 'tree';
+  const showCanvas  = viewMode === 'space' || viewMode === 'tree';
   const showNavBar  = viewMode !== 'tree';
 
   return (
     <div style={{ width: '100vw', height: '100vh', overflow: 'hidden', background: '#050510' }}>
 
-      {/* 3D canvas — only in space(3d)/tree modes */}
+      {/* 3D canvas — space/tree modes */}
       {showCanvas && <Scene sceneViewMode={sceneViewMode} />}
-
-      {/* List view — space mode, list toggle */}
-      {viewMode === 'space' && spaceView === 'list' && <RootsListView />}
 
       {/* Tree view overlay */}
       {viewMode === 'tree' && (
@@ -120,8 +123,8 @@ const App: React.FC = () => {
               ℹ️
             </button>
             <button
-              onClick={() => setSpaceView(spaceView === '3d' ? 'list' : '3d')}
-              title={spaceView === '3d' ? 'Switch to list view' : 'Switch to 3D view'}
+              onClick={() => setViewMode('explore')}
+              title="Switch to Explore view"
               style={{
                 height: '40px', borderRadius: '20px',
                 padding: '0 14px',
@@ -133,7 +136,7 @@ const App: React.FC = () => {
                 transition: 'all 0.2s', whiteSpace: 'nowrap',
               }}
             >
-              {spaceView === '3d' ? '☰ List' : '✦ 3D'}
+              ☰ Explore
             </button>
           </div>
 
@@ -144,7 +147,7 @@ const App: React.FC = () => {
         </>
       )}
 
-      {/* Quiz / Stats / Explore pages */}
+      {/* Quiz / Stats pages */}
       {viewMode === 'quiz' && (
         <Suspense fallback={<FullPageFallback />}>
           <QuizMode />
@@ -155,10 +158,14 @@ const App: React.FC = () => {
           <StatsPanel />
         </Suspense>
       )}
-      {viewMode === 'explore' && (
-        <Suspense fallback={<FullPageFallback />}>
-          <ExplorePanel />
-        </Suspense>
+
+      {/* Explore page — keep mounted once visited to preserve filter state */}
+      {exploreMounted && (
+        <div style={{ display: viewMode === 'explore' ? undefined : 'none' }}>
+          <Suspense fallback={viewMode === 'explore' ? <FullPageFallback /> : null}>
+            <ExplorePanel />
+          </Suspense>
+        </div>
       )}
 
       {/* Bottom nav — hidden in tree view (TreeView has its own nav) */}

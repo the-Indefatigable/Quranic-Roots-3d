@@ -338,7 +338,7 @@ const MobileTreeView: React.FC<{
                 </div>
               </div>
 
-              {/* Tense chips — shown when expanded */}
+              {/* Tense chips + Nouns — shown when expanded */}
               {isExpanded && (
                 <div style={{ padding: '0 14px 16px', borderTop: `1px solid ${color}22` }}>
                   {bab.semanticMeaning && (
@@ -367,6 +367,7 @@ const MobileTreeView: React.FC<{
                       );
                     })}
                   </div>
+                  <NounsSection bab={bab} color={color} />
                 </div>
               )}
             </div>
@@ -444,8 +445,60 @@ const MobileTreeView: React.FC<{
   );
 };
 
+// ── Nouns section (shared between desktop and mobile) ─────────────────────────
+const NounsSection: React.FC<{ bab: Bab; color: string }> = ({ bab, color }) => {
+  const hasNouns = bab.masdar || bab.faaeil || bab.mafool ||
+    bab.masdarNeedsApi || bab.faaeilNeedsApi || bab.mafoolNeedsApi ||
+    (bab.prepositions && bab.prepositions.length > 0);
+
+  if (!hasNouns) return null;
+
+  const NounItem: React.FC<{ label: string; arabic: string; value: string | null | undefined; needsApi?: boolean }> = ({ label, arabic, value, needsApi }) => {
+    if (!value && !needsApi) return null;
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '6px 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+        <div style={{ minWidth: '120px', fontSize: '11px', color: '#666688' }}>
+          <span style={{ fontFamily: "'Scheherazade New', serif", fontSize: '13px', color: '#aaaacc', direction: 'rtl' }}>{arabic}</span>
+          {' '}{label}
+        </div>
+        {value ? (
+          <span style={{ fontFamily: "'Scheherazade New', serif", fontSize: '22px', color: '#fff', direction: 'rtl', textShadow: `0 0 8px ${color}66` }}>{value}</span>
+        ) : (
+          <span style={{ fontSize: '11px', color: '#444466', fontStyle: 'italic' }}>varies by root</span>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <div style={{ marginTop: '14px', padding: '12px 14px', background: 'rgba(255,255,255,0.02)', borderRadius: '10px', border: `1px solid ${color}22` }}>
+      <div style={{ fontSize: '10px', color: color, textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 700, marginBottom: '8px' }}>
+        Nouns (الأسماء)
+      </div>
+      <NounItem label="Verbal Noun" arabic="مصدر" value={bab.masdar} needsApi={bab.masdarNeedsApi} />
+      <NounItem label="Active Participle" arabic="اسم فاعل" value={bab.faaeil} needsApi={bab.faaeilNeedsApi} />
+      <NounItem label="Passive Participle" arabic="اسم مفعول" value={bab.mafool} needsApi={bab.mafoolNeedsApi} />
+      {bab.prepositions && bab.prepositions.length > 0 && (
+        <div style={{ paddingTop: '6px' }}>
+          <div style={{ fontSize: '10px', color: '#555577', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '5px' }}>
+            Particles (صِلَة)
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+            {bab.prepositions.map((prep, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(74,158,255,0.07)', border: '1px solid rgba(74,158,255,0.2)', borderRadius: '8px', padding: '4px 10px' }}>
+                <span style={{ fontFamily: "'Scheherazade New', serif", fontSize: '17px', color: '#4a9eff', direction: 'rtl' }}>{prep.preposition}</span>
+                <span style={{ fontSize: '11px', color: '#888899' }}>→ "{prep.meaning}"</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 // ═════════════════════════════════════════════════════════════════════════════
-//  DESKTOP LAYOUT (unchanged)
+//  DESKTOP LAYOUT
 // ═════════════════════════════════════════════════════════════════════════════
 const DesktopTreeView: React.FC<{
   root: NonNullable<ReturnType<typeof verbRoots.find>>;
@@ -456,6 +509,13 @@ const DesktopTreeView: React.FC<{
   const [activeTenseModal, setActiveTenseModal] = useState<{ tense: Tense; bab: Bab } | null>(null);
   const [zoom, setZoom] = useState(1);
   const outerRef = useRef<HTMLDivElement>(null);
+  const { setSelectedRoot } = useStore();
+
+  // Prev / next root sorted by Quranic frequency
+  const sortedRoots = verbRoots.slice().sort((a, b) => (b.totalFreq ?? 0) - (a.totalFreq ?? 0));
+  const currentIdx = sortedRoots.findIndex(r => r.id === root.id);
+  const goPrev = currentIdx > 0 ? () => setSelectedRoot(sortedRoots[currentIdx - 1].id) : null;
+  const goNext = currentIdx < sortedRoots.length - 1 ? () => setSelectedRoot(sortedRoots[currentIdx + 1].id) : null;
 
   useEffect(() => {
     setExpandedBabs(new Set());
@@ -564,6 +624,7 @@ const DesktopTreeView: React.FC<{
             </div>
           );
         })}
+        <NounsSection bab={bab} color={color} />
       </div>
     );
 
@@ -575,12 +636,27 @@ const DesktopTreeView: React.FC<{
   return (
     <div ref={outerRef} style={{ position: 'fixed', inset: 0, zIndex: 900, background: '#02050f', backdropFilter: 'blur(30px)', WebkitBackdropFilter: 'blur(30px)', overflow: 'auto', opacity: visible ? 1 : 0, transform: visible ? 'none' : 'translateY(20px)', transition: 'opacity 0.4s ease, transform 0.4s ease', scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,153,0,0.3) transparent' }}>
 
-      <button onClick={backToSpace} style={{ position: 'fixed', top: '24px', left: '24px', zIndex: 1001, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '12px', padding: '10px 20px', color: '#aabbdd', cursor: 'pointer', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.2s' }}
-        onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(74,158,255,0.15)'; e.currentTarget.style.borderColor = 'rgba(74,158,255,0.4)'; }}
-        onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; }}
-      >
-        <span style={{ fontSize: '18px' }}>←</span> Back to Space
-      </button>
+      {/* Back + Prev/Next nav */}
+      <div style={{ position: 'fixed', top: '24px', left: '24px', zIndex: 1001, display: 'flex', gap: '8px', alignItems: 'center' }}>
+        <button onClick={backToSpace} style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '12px', padding: '10px 20px', color: '#aabbdd', cursor: 'pointer', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.2s' }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(74,158,255,0.15)'; e.currentTarget.style.borderColor = 'rgba(74,158,255,0.4)'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; }}
+        >
+          <span style={{ fontSize: '18px' }}>←</span> Back
+        </button>
+        <button onClick={goPrev ?? undefined} disabled={!goPrev}
+          title="Previous root"
+          style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '12px', padding: '10px 16px', color: goPrev ? '#aabbdd' : '#333355', cursor: goPrev ? 'pointer' : 'default', fontSize: '18px', transition: 'all 0.2s' }}
+          onMouseEnter={(e) => { if (goPrev) e.currentTarget.style.background = 'rgba(255,255,255,0.12)'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; }}
+        >‹</button>
+        <button onClick={goNext ?? undefined} disabled={!goNext}
+          title="Next root"
+          style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '12px', padding: '10px 16px', color: goNext ? '#aabbdd' : '#333355', cursor: goNext ? 'pointer' : 'default', fontSize: '18px', transition: 'all 0.2s' }}
+          onMouseEnter={(e) => { if (goNext) e.currentTarget.style.background = 'rgba(255,255,255,0.12)'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; }}
+        >›</button>
+      </div>
 
       {/* Zoom controls */}
       <div style={{ position: 'fixed', bottom: '32px', right: '32px', zIndex: 1001, display: 'flex', gap: '8px', background: 'rgba(5,5,20,0.6)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '20px', padding: '6px' }}>

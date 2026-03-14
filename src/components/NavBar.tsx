@@ -3,8 +3,7 @@ import { useStore } from '../store/useStore';
 import type { ViewMode } from '../store/useStore';
 
 const TABS: { mode: ViewMode; icon: string; label: string }[] = [
-  { mode: 'space',   icon: '🌌', label: 'Explore' },
-  { mode: 'explore', icon: '🔍', label: 'Filter'  },
+  { mode: 'explore', icon: '🌌', label: 'Explore' },
   { mode: 'quiz',    icon: '🎯', label: 'Quiz'    },
   { mode: 'stats',   icon: '📊', label: 'Stats'   },
 ];
@@ -43,7 +42,7 @@ export const NavBar: React.FC = () => {
           style={{ display: 'flex', alignItems: 'center', gap: '2px', padding: '0 4px' }}
         >
           {TABS.map(({ mode, icon, label }) => {
-            const active = viewMode === mode;
+            const active = viewMode === mode || (mode === 'explore' && viewMode === 'space');
             return (
               <button
                 key={mode}
