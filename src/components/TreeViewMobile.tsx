@@ -38,7 +38,7 @@ export const MobileDrillDown: React.FC<{ root: any; backToSpace: () => void; vis
   return (
     <div style={{
       position: 'fixed', inset: 0, zIndex: 900, background: '#02050f',
-      overflowY: 'auto', overflowX: 'hidden', paddingBottom: '40px',
+      overflowY: 'auto', overflowX: 'hidden', paddingBottom: '150px',
       color: '#fff', scrollbarWidth: 'none',
       opacity: visible ? 1 : 0,
       transform: visible ? 'none' : 'translateY(20px)',
@@ -60,21 +60,7 @@ export const MobileDrillDown: React.FC<{ root: any; backToSpace: () => void; vis
         <div style={{ flex: 1, textAlign: 'center', fontSize: '18px', fontWeight: 600, letterSpacing: '2px', fontFamily: "'Scheherazade New', serif", direction: 'rtl', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {selectedTense ? selectedTense.tense.arabicName : selectedBab ? selectedBab.arabicPattern : root.root}
         </div>
-        {/* Prev / Next — only on root view */}
-        {!selectedBab && !selectedTense ? (
-          <div style={{ display: 'flex', gap: '4px', flexShrink: 0 }}>
-            <button onClick={goPrev ?? undefined} disabled={!goPrev}
-              style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '6px 10px', color: goPrev ? '#aabbdd' : '#333355', cursor: goPrev ? 'pointer' : 'default', fontSize: '16px' }}>
-              ‹
-            </button>
-            <button onClick={goNext ?? undefined} disabled={!goNext}
-              style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '6px 10px', color: goNext ? '#aabbdd' : '#333355', cursor: goNext ? 'pointer' : 'default', fontSize: '16px' }}>
-              ›
-            </button>
-          </div>
-        ) : (
-          <div style={{ width: '24px' }} />
-        )}
+        <div style={{ width: '24px' }} />
       </div>
 
       <div style={{ padding: '20px', animation: 'fadeIn 0.3s ease-out' }}>
@@ -247,6 +233,20 @@ export const MobileDrillDown: React.FC<{ root: any; backToSpace: () => void; vis
       <style>{`
         @keyframes slideLeft { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
       `}</style>
+
+      {/* Prev / Next — fixed bottom-right, only on root view */}
+      {!selectedBab && !selectedTense && (
+        <div style={{ position: 'fixed', bottom: '88px', right: '16px', zIndex: 950, display: 'flex', gap: '8px' }}>
+          <button onClick={goPrev ?? undefined} disabled={!goPrev}
+            style={{ width: '44px', height: '44px', borderRadius: '22px', background: goPrev ? 'rgba(10,15,40,0.92)' : 'rgba(10,15,40,0.5)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: `1px solid ${goPrev ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.05)'}`, color: goPrev ? '#aabbdd' : '#2a2a44', cursor: goPrev ? 'pointer' : 'default', fontSize: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            ‹
+          </button>
+          <button onClick={goNext ?? undefined} disabled={!goNext}
+            style={{ width: '44px', height: '44px', borderRadius: '22px', background: goNext ? 'rgba(10,15,40,0.92)' : 'rgba(10,15,40,0.5)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: `1px solid ${goNext ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.05)'}`, color: goNext ? '#aabbdd' : '#2a2a44', cursor: goNext ? 'pointer' : 'default', fontSize: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            ›
+          </button>
+        </div>
+      )}
     </div>
   );
 };

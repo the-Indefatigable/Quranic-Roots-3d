@@ -278,28 +278,33 @@ export const ExplorePanel: React.FC = () => {
 
         {/* By Surah section */}
         <div style={{ padding: '8px 20px 0' }}>
-          <div style={{ fontSize: '11px', color: '#555577', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 700, marginBottom: '8px' }}>By Surah</div>
-          {selectedSurah !== null ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 14px', background: 'rgba(167,139,250,0.08)', border: '1px solid rgba(167,139,250,0.3)', borderRadius: '12px' }}>
-              <span style={{ fontFamily: "'Scheherazade New', serif", fontSize: '20px', color: '#a78bfa', direction: 'rtl' }}>{SURAH_MAP.get(selectedSurah)?.arabic}</span>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: '13px', color: '#c4b5fd', fontWeight: 600 }}>{SURAH_MAP.get(selectedSurah)?.english}</div>
-                <div style={{ fontSize: '10px', color: '#555577' }}>Surah {selectedSurah} · {surahRootCount.get(selectedSurah) ?? 0} roots</div>
-              </div>
-              <button onClick={() => setSurahPickerOpen(o => !o)} style={{ fontSize: '11px', color: '#a78bfa', background: 'transparent', border: '1px solid rgba(167,139,250,0.3)', borderRadius: '8px', padding: '3px 8px', cursor: 'pointer' }}>
-                {surahPickerOpen ? 'Close' : 'Change'}
-              </button>
-              <button onClick={() => { setSelectedSurah(null); setSurahPickerOpen(false); }} style={{ background: 'none', border: 'none', color: '#ff6b6b', cursor: 'pointer', fontSize: '16px', padding: '0 2px' }}>✕</button>
+          <button onClick={() => setSurahPickerOpen(o => !o)}
+            style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 8px', color: '#fff' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '11px', color: '#555577', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 700 }}>By Surah</span>
+              {selectedSurah !== null && (
+                <span style={{ fontSize: '10px', color: '#a78bfa', background: 'rgba(167,139,250,0.15)', borderRadius: '8px', padding: '1px 7px', fontWeight: 700 }}>
+                  {SURAH_MAP.get(selectedSurah)?.english}
+                </span>
+              )}
             </div>
-          ) : (
-            <button onClick={() => setSurahPickerOpen(o => !o)}
-              style={{ width: '100%', padding: '10px 14px', borderRadius: '12px', border: `1px solid ${surahPickerOpen ? 'rgba(167,139,250,0.4)' : 'rgba(255,255,255,0.08)'}`, background: surahPickerOpen ? 'rgba(167,139,250,0.08)' : 'transparent', color: surahPickerOpen ? '#a78bfa' : '#555577', cursor: 'pointer', fontSize: '13px', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.15s' }}>
-              <span>📖</span> Browse roots by Surah…
-            </button>
-          )}
+            <span style={{ fontSize: '12px', color: '#444466', transform: surahPickerOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>▼</span>
+          </button>
 
-          {/* Surah picker */}
           {surahPickerOpen && (
+            <>
+            {selectedSurah !== null && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 14px', background: 'rgba(167,139,250,0.08)', border: '1px solid rgba(167,139,250,0.3)', borderRadius: '12px', marginBottom: '8px' }}>
+                <span style={{ fontFamily: "'Scheherazade New', serif", fontSize: '20px', color: '#a78bfa', direction: 'rtl' }}>{SURAH_MAP.get(selectedSurah)?.arabic}</span>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: '13px', color: '#c4b5fd', fontWeight: 600 }}>{SURAH_MAP.get(selectedSurah)?.english}</div>
+                  <div style={{ fontSize: '10px', color: '#555577' }}>Surah {selectedSurah} · {surahRootCount.get(selectedSurah) ?? 0} roots</div>
+                </div>
+                <button onClick={() => { setSelectedSurah(null); setSurahSearch(''); }} style={{ background: 'none', border: 'none', color: '#ff6b6b', cursor: 'pointer', fontSize: '16px', padding: '0 2px' }}>✕</button>
+              </div>
+            )}
+            {/* Surah picker */}
+            <div style={{ marginBottom: '8px', background: 'rgba(5,5,20,0.98)', border: '1px solid rgba(167,139,250,0.2)', borderRadius: '14px', overflow: 'hidden' }}>
             <div style={{ marginTop: '8px', background: 'rgba(5,5,20,0.98)', border: '1px solid rgba(167,139,250,0.2)', borderRadius: '14px', overflow: 'hidden' }}>
               <div style={{ padding: '10px 12px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
                 <input autoFocus type="text" value={surahSearch} onChange={e => setSurahSearch(e.target.value)}
@@ -326,6 +331,7 @@ export const ExplorePanel: React.FC = () => {
                 })}
               </div>
             </div>
+            </>
           )}
         </div>
 
