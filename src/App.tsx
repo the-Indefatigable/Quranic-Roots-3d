@@ -42,6 +42,7 @@ const App: React.FC = () => {
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const [loadError, setLoadError]       = useState<string | null>(null);
   const [appState, setAppState]         = useState<'welcome' | 'loading' | 'app'>('welcome');
+  const [sceneReady, setSceneReady]     = useState(false);
   const [showAbout, setShowAbout]       = useState(false);
   // Delay the 3D scene mode switch so TreeView fade-in hides the 3D swap
   const [sceneViewMode, setSceneViewMode] = useState<'space' | 'tree'>(viewMode === 'tree' ? 'tree' : 'space');
@@ -88,7 +89,16 @@ const App: React.FC = () => {
     <div style={{ width: '100vw', height: '100vh', overflow: 'hidden', background: '#050510' }}>
 
       {/* 3D canvas — space/tree modes */}
-      {showCanvas && <Scene sceneViewMode={sceneViewMode} />}
+      {showCanvas && <Scene sceneViewMode={sceneViewMode} onReady={() => setSceneReady(true)} />}
+
+      {/* Fade-out overlay while WebGL initialises — prevents black flash */}
+      {!sceneReady && (
+        <div style={{ position: 'fixed', inset: 0, background: '#020208', zIndex: 9998, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
+          <span style={{ fontFamily: "'Scheherazade New', serif", fontSize: '28px', color: 'rgba(255,208,80,0.5)', direction: 'rtl', letterSpacing: '3px' }}>
+            بِسْمِ اللَّهِ
+          </span>
+        </div>
+      )}
 
       {/* Tree view overlay */}
       {viewMode === 'tree' && (

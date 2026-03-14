@@ -75,7 +75,7 @@ const SceneContents: React.FC<{ sceneViewMode: 'space' | 'tree' }> = ({ sceneVie
 };
 
 // ── Canvas ─────────────────────────────────────────────────────────────────────
-export const Scene: React.FC<{ sceneViewMode: 'space' | 'tree' }> = ({ sceneViewMode }) => {
+export const Scene: React.FC<{ sceneViewMode: 'space' | 'tree'; onReady?: () => void }> = ({ sceneViewMode, onReady }) => {
   const { setSelectedRoot, viewMode } = useStore();
 
   return (
@@ -85,6 +85,7 @@ export const Scene: React.FC<{ sceneViewMode: 'space' | 'tree' }> = ({ sceneView
       gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
       dpr={Math.min(window.devicePixelRatio, 2)}
       onPointerMissed={() => setSelectedRoot(null)}
+      onCreated={() => onReady?.()}
     >
       <color attach="background" args={['#02050f']} />
       <fog attach="fog" args={['#050510', 100, 300]} />
