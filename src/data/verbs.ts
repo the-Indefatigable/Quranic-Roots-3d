@@ -84,8 +84,8 @@ export async function initData(): Promise<void> {
   // Load lightweight index only (~490KB vs 28MB full file)
   const res = await fetch('/data/index.json');
   if (!res.ok) throw new Error(`Failed to load index: ${res.status} ${res.statusText}`);
-  const jsonData = await res.json() as { roots: VerbRoot[] };
-  const roots = jsonData.roots;
+  const jsonData = await res.json() as { roots: (VerbRoot & { isVerb?: boolean })[] };
+  const roots = jsonData.roots.filter(r => r.isVerb !== false);
 
   // Sort by pre-computed frequency (already set in index)
   roots.sort((a, b) => (b.totalFreq ?? 0) - (a.totalFreq ?? 0));
