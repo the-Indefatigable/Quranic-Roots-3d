@@ -56,7 +56,10 @@ function loadSurahIndex(onReady: () => void) {
 }
 
 export const ExplorePanel: React.FC = () => {
-  const { setSelectedRoot, setViewMode, setSpaceView, setFilteredRoots } = useStore();
+  const setSelectedRoot  = useStore(s => s.setSelectedRoot);
+  const setViewMode      = useStore(s => s.setViewMode);
+  const setSpaceView     = useStore(s => s.setSpaceView);
+  const setFilteredRoots = useStore(s => s.setFilteredRoots);
 
   const [selectedForms, setSelectedForms]   = useState<Set<string>>(new Set());
   const [selectedTenses, setSelectedTenses] = useState<Set<string>>(new Set());
