@@ -94,9 +94,14 @@ function searchRoots(query: string): string[] | null {
   return ids;
 }
 
-// Read initial root from URL if present
-const params = new URLSearchParams(window.location.search);
-const initialRoot = params.get('root') ?? null;
+// Read initial root from URL — SSR-safe
+function getInitialRoot(): string | null {
+  if (typeof window === 'undefined') return null;
+  const pathMatch = window.location.pathname.match(/^\/root\/(.+)/);
+  if (pathMatch) return decodeURIComponent(pathMatch[1]);
+  return new URLSearchParams(window.location.search).get('root');
+}
+const initialRoot = getInitialRoot();
 const isMobileInit = typeof window !== 'undefined' && window.innerWidth < 768;
 
 export const useStore = create<Store>((set) => ({
@@ -126,10 +131,12 @@ export const useStore = create<Store>((set) => ({
       }
       const toggled = state.selectedRoot === id ? null : id;
 
-      if (toggled) {
-        window.history.pushState({}, '', `?root=${toggled}`);
-      } else {
-        window.history.pushState({}, '', window.location.pathname);
+      if (typeof window !== 'undefined') {
+        if (toggled) {
+          window.history.pushState({}, '', `/root/${encodeURIComponent(toggled)}`);
+        } else {
+          window.history.pushState({}, '', '/');
+        }
       }
 
       return {
@@ -164,7 +171,7 @@ export const useStore = create<Store>((set) => ({
   backToSpace: () =>
     set((state) => {
       const target = state.previousViewMode ?? 'explore';
-      window.history.pushState({}, '', window.location.pathname);
+      if (typeof window !== 'undefined') window.history.pushState({}, '', '/');
       return {
         viewMode: target,
         selectedRoot: null,
@@ -189,18 +196,20 @@ export const useStore = create<Store>((set) => ({
 }));
 
 // Setup event listener to handle browser native "Back" and "Forward" buttons
-window.addEventListener('popstate', () => {
-  const params = new URLSearchParams(window.location.search);
-  const rootId = params.get('root') ?? null;
+if (typeof window !== 'undefined') {
+  window.addEventListener('popstate', () => {
+    const pathMatch = window.location.pathname.match(/^\/root\/(.+)/);
+    const rootId = pathMatch ? decodeURIComponent(pathMatch[1]) : null;
 
-  if (rootId) {
-    useStore.setState({ selectedRoot: rootId, viewMode: 'tree', expandedBab: null, expandedTense: null, simulationActive: false });
-  } else {
-    const currentState = useStore.getState();
-    const target = currentState.previousViewMode ?? 'explore';
-    useStore.setState({ selectedRoot: null, viewMode: target, expandedBab: null, expandedTense: null, simulationActive: false, previousViewMode: null });
-  }
-});
+    if (rootId) {
+      useStore.setState({ selectedRoot: rootId, viewMode: 'tree', expandedBab: null, expandedTense: null, simulationActive: false });
+    } else {
+      const currentState = useStore.getState();
+      const target = currentState.previousViewMode ?? 'explore';
+      useStore.setState({ selectedRoot: null, viewMode: target, expandedBab: null, expandedTense: null, simulationActive: false, previousViewMode: null });
+    }
+  });
+}
 
 export { verbRoots };
 export type { VerbRoot };

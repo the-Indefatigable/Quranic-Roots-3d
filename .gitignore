@@ -36,3 +36,4 @@ enrich_with_claude.mjs
 # Python cache
 data/__pycache__/
 __pycache__/
+.next/
