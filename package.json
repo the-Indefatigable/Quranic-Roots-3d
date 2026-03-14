@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "generate-data": "node scripts/generate-data.mjs"
+    "generate-data": "node scripts/generate-data.mjs",
+    "watch-data": "node scripts/watch-data.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",

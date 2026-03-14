@@ -85,7 +85,7 @@ export async function initData(): Promise<void> {
   const res = await fetch('/data/index.json');
   if (!res.ok) throw new Error(`Failed to load index: ${res.status} ${res.statusText}`);
   const jsonData = await res.json() as { roots: (VerbRoot & { isVerb?: boolean })[] };
-  const roots = jsonData.roots.filter(r => r.isVerb !== false);
+  const roots = jsonData.roots.filter(r => r.isVerb !== false && r.babs && r.babs.length > 0);
 
   // Sort by pre-computed frequency (already set in index)
   roots.sort((a, b) => (b.totalFreq ?? 0) - (a.totalFreq ?? 0));
