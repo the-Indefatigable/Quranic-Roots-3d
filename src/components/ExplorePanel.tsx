@@ -293,44 +293,42 @@ export const ExplorePanel: React.FC = () => {
 
           {surahPickerOpen && (
             <>
-            {selectedSurah !== null && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 14px', background: 'rgba(167,139,250,0.08)', border: '1px solid rgba(167,139,250,0.3)', borderRadius: '12px', marginBottom: '8px' }}>
-                <span style={{ fontFamily: "'Scheherazade New', serif", fontSize: '20px', color: '#a78bfa', direction: 'rtl' }}>{SURAH_MAP.get(selectedSurah)?.arabic}</span>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '13px', color: '#c4b5fd', fontWeight: 600 }}>{SURAH_MAP.get(selectedSurah)?.english}</div>
-                  <div style={{ fontSize: '10px', color: '#555577' }}>Surah {selectedSurah} · {surahRootCount.get(selectedSurah) ?? 0} roots</div>
+              {selectedSurah !== null && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 14px', background: 'rgba(167,139,250,0.08)', border: '1px solid rgba(167,139,250,0.3)', borderRadius: '12px', marginBottom: '8px' }}>
+                  <span style={{ fontFamily: "'Scheherazade New', serif", fontSize: '20px', color: '#a78bfa', direction: 'rtl' }}>{SURAH_MAP.get(selectedSurah)?.arabic}</span>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: '13px', color: '#c4b5fd', fontWeight: 600 }}>{SURAH_MAP.get(selectedSurah)?.english}</div>
+                    <div style={{ fontSize: '10px', color: '#555577' }}>Surah {selectedSurah} · {surahRootCount.get(selectedSurah) ?? 0} roots</div>
+                  </div>
+                  <button onClick={() => { setSelectedSurah(null); setSurahSearch(''); }} style={{ background: 'none', border: 'none', color: '#ff6b6b', cursor: 'pointer', fontSize: '16px', padding: '0 2px' }}>✕</button>
                 </div>
-                <button onClick={() => { setSelectedSurah(null); setSurahSearch(''); }} style={{ background: 'none', border: 'none', color: '#ff6b6b', cursor: 'pointer', fontSize: '16px', padding: '0 2px' }}>✕</button>
+              )}
+              <div style={{ marginBottom: '8px', background: 'rgba(5,5,20,0.98)', border: '1px solid rgba(167,139,250,0.2)', borderRadius: '14px', overflow: 'hidden' }}>
+                <div style={{ padding: '10px 12px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                  <input autoFocus type="text" value={surahSearch} onChange={e => setSurahSearch(e.target.value)}
+                    placeholder="Search surah…"
+                    style={{ width: '100%', boxSizing: 'border-box', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '8px 12px', color: '#fff', fontSize: '13px', outline: 'none' }} />
+                </div>
+                <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                  {filteredSurahs.map(surah => {
+                    const count = surahRootCount.get(surah.number) ?? 0;
+                    if (count === 0) return null;
+                    const isSel = selectedSurah === surah.number;
+                    return (
+                      <div key={surah.number}
+                        onClick={() => { setSelectedSurah(surah.number); setSurahPickerOpen(false); setSurahSearch(''); }}
+                        style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '9px 14px', cursor: 'pointer', background: isSel ? 'rgba(167,139,250,0.12)' : 'transparent', borderBottom: '1px solid rgba(255,255,255,0.03)', transition: 'background 0.1s' }}
+                        onMouseEnter={e => e.currentTarget.style.background = 'rgba(167,139,250,0.07)'}
+                        onMouseLeave={e => e.currentTarget.style.background = isSel ? 'rgba(167,139,250,0.12)' : 'transparent'}>
+                        <span style={{ fontSize: '10px', color: '#444466', fontFamily: 'monospace', minWidth: '22px', textAlign: 'right' }}>{surah.number}</span>
+                        <span style={{ fontFamily: "'Scheherazade New', serif", fontSize: '17px', color: '#fff', direction: 'rtl', minWidth: '60px', textAlign: 'right' }}>{surah.arabic}</span>
+                        <div style={{ flex: 1, fontSize: '13px', color: isSel ? '#c4b5fd' : '#ccd' }}>{surah.english}</div>
+                        <span style={{ fontSize: '10px', color: '#a78bfa', background: 'rgba(167,139,250,0.1)', borderRadius: '6px', padding: '1px 6px' }}>{count}</span>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            )}
-            {/* Surah picker */}
-            <div style={{ marginBottom: '8px', background: 'rgba(5,5,20,0.98)', border: '1px solid rgba(167,139,250,0.2)', borderRadius: '14px', overflow: 'hidden' }}>
-            <div style={{ marginTop: '8px', background: 'rgba(5,5,20,0.98)', border: '1px solid rgba(167,139,250,0.2)', borderRadius: '14px', overflow: 'hidden' }}>
-              <div style={{ padding: '10px 12px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                <input autoFocus type="text" value={surahSearch} onChange={e => setSurahSearch(e.target.value)}
-                  placeholder="Search surah…"
-                  style={{ width: '100%', boxSizing: 'border-box', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '8px 12px', color: '#fff', fontSize: '13px', outline: 'none' }} />
-              </div>
-              <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
-                {filteredSurahs.map(surah => {
-                  const count = surahRootCount.get(surah.number) ?? 0;
-                  if (count === 0) return null;
-                  const isSel = selectedSurah === surah.number;
-                  return (
-                    <div key={surah.number}
-                      onClick={() => { setSelectedSurah(surah.number); setSurahPickerOpen(false); setSurahSearch(''); }}
-                      style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '9px 14px', cursor: 'pointer', background: isSel ? 'rgba(167,139,250,0.12)' : 'transparent', borderBottom: '1px solid rgba(255,255,255,0.03)', transition: 'background 0.1s' }}
-                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(167,139,250,0.07)'}
-                      onMouseLeave={e => e.currentTarget.style.background = isSel ? 'rgba(167,139,250,0.12)' : 'transparent'}>
-                      <span style={{ fontSize: '10px', color: '#444466', fontFamily: 'monospace', minWidth: '22px', textAlign: 'right' }}>{surah.number}</span>
-                      <span style={{ fontFamily: "'Scheherazade New', serif", fontSize: '17px', color: '#fff', direction: 'rtl', minWidth: '60px', textAlign: 'right' }}>{surah.arabic}</span>
-                      <div style={{ flex: 1, fontSize: '13px', color: isSel ? '#c4b5fd' : '#ccd' }}>{surah.english}</div>
-                      <span style={{ fontSize: '10px', color: '#a78bfa', background: 'rgba(167,139,250,0.1)', borderRadius: '6px', padding: '1px 6px' }}>{count}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
             </>
           )}
         </div>
