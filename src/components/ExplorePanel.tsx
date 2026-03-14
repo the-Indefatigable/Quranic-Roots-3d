@@ -128,7 +128,8 @@ export const ExplorePanel: React.FC = () => {
     else if (sk === 'forms')   roots.sort((a, b) => b.babs.length - a.babs.length);
 
     return { filtered: roots, surahFirstAyah };
-  }, [search, selectedForms, selectedTenses, sortKey, selectedSurah, surahIndex, topNIds]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search, selectedForms, selectedTenses, sortKey, selectedSurah, surahIndex, topNIds, verbRoots.length]);
 
   // Publish filtered list to store so TreeView can use it for prev/next
   useEffect(() => {

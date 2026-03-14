@@ -43,8 +43,6 @@ const App: React.FC = () => {
   const [loadError, setLoadError]       = useState<string | null>(null);
   const [appState, setAppState]         = useState<'welcome' | 'loading' | 'app'>('welcome');
   const [showAbout, setShowAbout]       = useState(false);
-  // Keep ExplorePanel mounted once visited so filter state persists
-  const [exploreMounted, setExploreMounted] = useState(viewMode === 'explore');
   // Delay the 3D scene mode switch so TreeView fade-in hides the 3D swap
   const [sceneViewMode, setSceneViewMode] = useState<'space' | 'tree'>(viewMode === 'tree' ? 'tree' : 'space');
 
@@ -62,11 +60,6 @@ const App: React.FC = () => {
   useEffect(() => {
     if (isDataLoaded && appState === 'loading') setAppState('app');
   }, [isDataLoaded, appState]);
-
-  // Mount ExplorePanel once first visited, keep it mounted to preserve filter state
-  useEffect(() => {
-    if (viewMode === 'explore') setExploreMounted(true);
-  }, [viewMode]);
 
   const handleStart = () => {
     if (loadError) return;
@@ -159,14 +152,12 @@ const App: React.FC = () => {
         </Suspense>
       )}
 
-      {/* Explore page — keep mounted once visited to preserve filter state */}
-      {exploreMounted && (
-        <div style={{ display: viewMode === 'explore' ? undefined : 'none' }}>
-          <Suspense fallback={viewMode === 'explore' ? <FullPageFallback /> : null}>
-            <ExplorePanel />
-          </Suspense>
-        </div>
-      )}
+      {/* Explore page — always mounted so filter state persists across navigation */}
+      <div style={{ display: viewMode === 'explore' ? undefined : 'none' }}>
+        <Suspense fallback={viewMode === 'explore' ? <FullPageFallback /> : null}>
+          <ExplorePanel />
+        </Suspense>
+      </div>
 
       {/* Bottom nav — hidden in tree view (TreeView has its own nav) */}
       {showNavBar && <NavBar />}
