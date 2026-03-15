@@ -71,9 +71,13 @@ export const BAB_COLORS: Record<string, string> = {
 };
 
 // ─── Real data loaded from parsed Quranic corpus ────────────────────────────────
-import { rebuildSearchIndex } from '../store/useStore';
 
 export const verbRoots: VerbRoot[] = [];
+
+// Callback registered by the store to rebuild Fuse index after data loads.
+// This avoids a circular import (verbs.ts ↔ useStore.ts).
+let _onDataLoaded: (() => void) | null = null;
+export function onDataLoaded(cb: () => void) { _onDataLoaded = cb; }
 
 // Cache of fully-loaded root details (fetched on demand)
 const detailCache = new Map<string, VerbRoot>();
@@ -91,7 +95,7 @@ export async function initData(): Promise<void> {
   roots.sort((a, b) => (b.totalFreq ?? 0) - (a.totalFreq ?? 0));
 
   verbRoots.push(...roots);
-  rebuildSearchIndex();
+  _onDataLoaded?.();
 }
 
 /** Fetch and cache the full detail for a single root (conjugations, references, etc.) */

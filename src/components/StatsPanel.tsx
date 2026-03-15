@@ -28,11 +28,9 @@ export function resetStats() {
 }
 
 const TYPE_LABELS: Record<string, string> = {
-  root_meaning:   'Root Meaning',
-  bab_pattern:    'Identify Bāb Pattern',
-  tense_id:       'Identify Tense',
-  person_id:      'Identify Person',
-  form_from_desc: 'Find the Conjugation',
+  meaning:     'Root Meaning',
+  bab:         'Identify Bāb',
+  conjugation: 'Conjugation',
 };
 
 const StatCard: React.FC<{ label: string; value: string | number; sub?: string; color?: string }> = ({ label, value, sub, color = '#4a9eff' }) => (

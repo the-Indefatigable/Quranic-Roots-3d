@@ -8,11 +8,33 @@ import { initData, preloadAllRootsInBackground } from '../data/verbs';
 import { BootScreen } from './BootScreen';
 import { WelcomeScreen } from './WelcomeScreen';
 import { AboutPanel } from './AboutPanel';
+import { useUrlSync } from '../hooks/useUrlSync';
+import '../styles/shared.css';
 
+// ── Error Boundary — catches component crashes instead of white-screening ────
+class ErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { error: Error | null }
+> {
+  state: { error: Error | null } = { error: null };
+
+  static getDerivedStateFromError(error: Error) {
+    return { error };
+  }
+
+  render() {
+    if (this.state.error) {
+      return (
+        <ErrorScreen message={this.state.error.message} />
+      );
+    }
+    return this.props.children;
+  }
+}
 
 const ErrorScreen: React.FC<{ message: string }> = ({ message }) => (
   <div style={{ width: '100vw', height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#050510', color: '#ff6b6b', fontFamily: 'sans-serif', gap: '12px' }}>
-    <div style={{ fontSize: '18px', fontWeight: 600 }}>Failed to load verb data</div>
+    <div style={{ fontSize: '18px', fontWeight: 600 }}>Something went wrong</div>
     <div style={{ fontSize: '13px', color: '#888', maxWidth: '400px', textAlign: 'center' }}>{message}</div>
     <button onClick={() => window.location.reload()} style={{ marginTop: '12px', padding: '8px 20px', background: 'rgba(255,107,107,0.15)', border: '1px solid rgba(255,107,107,0.4)', borderRadius: '8px', color: '#ff6b6b', cursor: 'pointer', fontSize: '13px' }}>
       Retry
@@ -40,6 +62,7 @@ const App: React.FC = () => {
   const setViewMode       = useStore(s => s.setViewMode);
   const simulationActive  = useStore(s => s.simulationActive);
 
+  useUrlSync();
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const [loadError, setLoadError]       = useState<string | null>(null);
   const [appState, setAppState]         = useState<'welcome' | 'loading' | 'app'>('welcome');
@@ -179,4 +202,10 @@ const App: React.FC = () => {
   );
 };
 
-export default App;
+const AppWithErrorBoundary: React.FC = () => (
+  <ErrorBoundary>
+    <App />
+  </ErrorBoundary>
+);
+
+export default AppWithErrorBoundary;

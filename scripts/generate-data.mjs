@@ -1,5 +1,5 @@
 /**
- * Single source of truth: public/data/verbsData.json
+ * Single source of truth: data/verbsData.json (NOT in public/ — never served directly)
  *
  * This script generates:
  *   public/data/index.json          — lightweight index (no conjugations)
@@ -15,7 +15,7 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
 
-const SOURCE = join(ROOT, 'public/data/verbsData.json');
+const SOURCE = join(ROOT, 'data/verbsData.json');
 const INDEX_OUT = join(ROOT, 'public/data/index.json');
 const ROOTS_DIR = join(ROOT, 'public/data/roots');
 

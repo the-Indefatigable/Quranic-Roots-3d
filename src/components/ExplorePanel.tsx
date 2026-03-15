@@ -28,31 +28,30 @@ const TENSE_OPTS = [
 type SortKey = 'freq' | 'alpha' | 'forms' | 'surah';
 type QuickFilter = 'all' | 50 | 100 | 300;
 
-// ── Surah index (lazy-loaded) ────────────────────────────────────────────────
+// ── Surah index (lazy-loaded, promise-cached) ────────────────────────────────
 type RawSurahIndex = Record<string, Record<string, number>>;
-let cachedSurahIndex: Map<number, Map<string, number>> | null = null;
-let surahIndexLoading = false;
-const surahIndexCallbacks: Array<() => void> = [];
+type SurahIndex = Map<number, Map<string, number>>;
+let surahIndexPromise: Promise<SurahIndex> | null = null;
 
-function loadSurahIndex(onReady: () => void) {
-  if (cachedSurahIndex) { onReady(); return; }
-  surahIndexCallbacks.push(onReady);
-  if (surahIndexLoading) return;
-  surahIndexLoading = true;
-  fetch('/data/surahIndex.json')
-    .then(r => r.json() as Promise<RawSurahIndex>)
-    .then(raw => {
-      const idx = new Map<number, Map<string, number>>();
-      for (const [s, roots] of Object.entries(raw)) {
-        const m = new Map<string, number>();
-        for (const [rootId, ayah] of Object.entries(roots)) m.set(rootId, ayah);
-        idx.set(Number(s), m);
-      }
-      cachedSurahIndex = idx;
-      surahIndexCallbacks.forEach(cb => cb());
-      surahIndexCallbacks.length = 0;
-    })
-    .catch(() => { surahIndexLoading = false; });
+function fetchSurahIndex(): Promise<SurahIndex> {
+  if (!surahIndexPromise) {
+    surahIndexPromise = fetch('/data/surahIndex.json')
+      .then(r => r.json() as Promise<RawSurahIndex>)
+      .then(raw => {
+        const idx: SurahIndex = new Map();
+        for (const [s, roots] of Object.entries(raw)) {
+          const m = new Map<string, number>();
+          for (const [rootId, ayah] of Object.entries(roots)) m.set(rootId, ayah);
+          idx.set(Number(s), m);
+        }
+        return idx;
+      })
+      .catch(() => {
+        surahIndexPromise = null; // allow retry on failure
+        return new Map() as SurahIndex;
+      });
+  }
+  return surahIndexPromise;
 }
 
 export const ExplorePanel: React.FC = () => {
@@ -71,7 +70,7 @@ export const ExplorePanel: React.FC = () => {
   const [surahPickerOpen, setSurahPickerOpen] = useState(false);
   const [selectedSurah, setSelectedSurah]   = useState<number | null>(null);
   const [surahSearch, setSurahSearch]       = useState('');
-  const [surahIndexReady, setSurahIndexReady] = useState(!!cachedSurahIndex);
+  const [surahIndex, setSurahIndex] = useState<SurahIndex>(new Map());
   const searchRef = useRef<HTMLInputElement>(null);
 
   const toggleSet = (s: Set<string>, key: string) => {
@@ -79,12 +78,10 @@ export const ExplorePanel: React.FC = () => {
   };
 
   useEffect(() => {
-    if (surahPickerOpen && !surahIndexReady) {
-      loadSurahIndex(() => setSurahIndexReady(true));
+    if (surahPickerOpen && surahIndex.size === 0) {
+      fetchSurahIndex().then(idx => { if (idx.size > 0) setSurahIndex(idx); });
     }
-  }, [surahPickerOpen, surahIndexReady]);
-
-  const surahIndex = surahIndexReady ? cachedSurahIndex! : new Map<number, Map<string, number>>();
+  }, [surahPickerOpen, surahIndex.size]);
 
   const surahRootCount = useMemo(() => {
     const counts = new Map<number, number>();

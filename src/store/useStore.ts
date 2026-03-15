@@ -1,21 +1,27 @@
 import { create } from 'zustand';
 import Fuse from 'fuse.js';
-import { verbRoots } from '../data/verbs';
+import { verbRoots, onDataLoaded } from '../data/verbs';
 import type { VerbRoot } from '../data/verbs';
+import { nounsList } from '../data/nouns';
+import type { Noun } from '../data/nouns';
 
 export type ViewMode = 'space' | 'tree' | 'quiz' | 'explore' | 'stats';
 export type SpaceView = '3d' | 'list';
+export type ExplorerTab = 'verbs' | 'nouns';
 
 interface Store {
   viewMode: ViewMode;
   spaceView: SpaceView;
   selectedRoot: string | null;
+  selectedNoun: string | null;
+  explorerTab: ExplorerTab;
   expandedBab: string | null;
   expandedTense: string | null;
   searchQuery: string;
   searchResults: string[] | null; // null means show all
   previousViewMode: ViewMode | null; // where we came from before entering tree
   filteredRootIds: string[] | null; // current filtered list from ExplorePanel (null = all)
+  filteredNounIds: string[] | null;
 
   simulationActive: boolean;
   simulationIndex: number;
@@ -23,10 +29,13 @@ interface Store {
   setViewMode: (mode: ViewMode) => void;
   setSpaceView: (v: SpaceView) => void;
   setSelectedRoot: (id: string | null) => void;
+  setSelectedNoun: (id: string | null) => void;
+  setExplorerTab: (tab: ExplorerTab) => void;
   setExpandedBab: (id: string | null) => void;
   setExpandedTense: (id: string | null) => void;
   setSearch: (q: string) => void;
   setFilteredRoots: (ids: string[] | null) => void;
+  setFilteredNouns: (ids: string[] | null) => void;
   backToSpace: () => void;
 
   startSimulation: () => void;
@@ -125,26 +134,16 @@ export const useStore = create<Store>((set) => ({
   setSelectedRoot: (id) =>
     set((state) => {
       if (id === null) {
-        window.history.pushState({}, '', window.location.pathname);
         const target = state.previousViewMode ?? 'explore';
         return { selectedRoot: null, expandedBab: null, expandedTense: null, simulationActive: false, viewMode: target, previousViewMode: null };
       }
       const toggled = state.selectedRoot === id ? null : id;
-
-      if (typeof window !== 'undefined') {
-        if (toggled) {
-          window.history.pushState({}, '', `/root/${encodeURIComponent(toggled)}`);
-        } else {
-          window.history.pushState({}, '', '/');
-        }
-      }
 
       return {
         selectedRoot: toggled,
         expandedBab: null,
         expandedTense: null,
         viewMode: toggled ? 'tree' : (state.previousViewMode ?? 'explore'),
-        // Only record previousViewMode when entering tree, not when navigating within tree (prev/next)
         previousViewMode: toggled ? (state.viewMode !== 'tree' ? state.viewMode : state.previousViewMode) : null,
       };
     }),
@@ -171,7 +170,6 @@ export const useStore = create<Store>((set) => ({
   backToSpace: () =>
     set((state) => {
       const target = state.previousViewMode ?? 'explore';
-      if (typeof window !== 'undefined') window.history.pushState({}, '', '/');
       return {
         viewMode: target,
         selectedRoot: null,
@@ -195,21 +193,9 @@ export const useStore = create<Store>((set) => ({
   }),
 }));
 
-// Setup event listener to handle browser native "Back" and "Forward" buttons
-if (typeof window !== 'undefined') {
-  window.addEventListener('popstate', () => {
-    const pathMatch = window.location.pathname.match(/^\/root\/(.+)/);
-    const rootId = pathMatch ? decodeURIComponent(pathMatch[1]) : null;
-
-    if (rootId) {
-      useStore.setState({ selectedRoot: rootId, viewMode: 'tree', expandedBab: null, expandedTense: null, simulationActive: false });
-    } else {
-      const currentState = useStore.getState();
-      const target = currentState.previousViewMode ?? 'explore';
-      useStore.setState({ selectedRoot: null, viewMode: target, expandedBab: null, expandedTense: null, simulationActive: false, previousViewMode: null });
-    }
-  });
-}
+// Register callback so verbs.ts rebuilds search index after data loads
+// (avoids circular import — verbs.ts no longer imports from this file)
+onDataLoaded(rebuildSearchIndex);
 
 export { verbRoots };
 export type { VerbRoot };

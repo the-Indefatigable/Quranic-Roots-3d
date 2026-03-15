@@ -1,5 +1,5 @@
 /**
- * Watches public/data/verbsData.json and re-runs generate-data.mjs on change.
+ * Watches data/verbsData.json and re-runs generate-data.mjs on change.
  * Auto-started by next.config.mjs in dev mode — no manual step needed.
  */
 
@@ -10,7 +10,7 @@ import { execSync } from 'child_process';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
-const TARGET = join(ROOT, 'public/data/verbsData.json');
+const TARGET = join(ROOT, 'data/verbsData.json');
 
 function generate() {
   try {

@@ -33,7 +33,18 @@ quranic-corpus-morphology*.txt
 # Enrichment scripts (contain API keys / raw corpus data)
 enrich_with_claude.mjs
 
-# Python cache
+# Python cache / virtualenv
 data/__pycache__/
 __pycache__/
+venv/
+
+# Build artifacts
 .next/
+
+# Backup files
+*.backup_*
+
+# Script output artifacts
+scripts/*.report.txt
+scripts/*_report.txt
+scripts/*_errors.json

@@ -4,7 +4,7 @@ import type { Bab, Tense, VerbRoot } from '../data/verbs';
 import { useSwipeGesture } from '../hooks/useSwipeGesture';
 import { useStore } from '../store/useStore';
 
-export const MobileDrillDown: React.FC<{ root: any; backToSpace: () => void; visible: boolean }> = ({ root, backToSpace, visible }) => {
+export const MobileDrillDown: React.FC<{ root: VerbRoot; backToSpace: () => void; visible: boolean }> = ({ root, backToSpace, visible }) => {
   const [selectedBab, setSelectedBab] = useState<Bab | null>(null);
   const [selectedTense, setSelectedTense] = useState<{ tense: Tense; bab: Bab } | null>(null);
   const { setSelectedRoot } = useStore();

@@ -4,11 +4,15 @@ import type { Metadata } from 'next';
 import ClientApp from '../../../src/components/ClientApp';
 import type { VerbRoot } from '../../../src/data/verbs';
 
-// Read the lightweight index at build time (490KB, has all root data we need for SEO)
+// Read the lightweight index at build time — cached so we don't re-read 2.2MB per root page
+let _cachedRoots: VerbRoot[] | null = null;
 function getAllRoots(): VerbRoot[] {
-  const filePath = path.join(process.cwd(), 'public', 'data', 'index.json');
-  const raw = fs.readFileSync(filePath, 'utf-8');
-  return (JSON.parse(raw) as { roots: VerbRoot[] }).roots;
+  if (!_cachedRoots) {
+    const filePath = path.join(process.cwd(), 'public', 'data', 'index.json');
+    const raw = fs.readFileSync(filePath, 'utf-8');
+    _cachedRoots = (JSON.parse(raw) as { roots: VerbRoot[] }).roots;
+  }
+  return _cachedRoots;
 }
 
 function findRoot(id: string): VerbRoot | undefined {
@@ -36,16 +40,10 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
     openGraph: {
       title: `${root.root} (${root.meaning}) — Quranic Verb Root`,
       description: `Study the Quranic Arabic root ${root.root} — "${root.meaning}". ${freq} occurrences, ${formCount} forms.`,
-      url: `https://quranicroots.com/root/${params.id}`,
+      url: `https://quroots.com/root/${params.id}`,
     },
   };
 }
-
-const BAB_COLORS: Record<string, string> = {
-  I: '#4a9eff', II: '#f97316', III: '#a855f7', IV: '#22c55e',
-  V: '#ec4899', VI: '#14b8a6', VII: '#f59e0b', VIII: '#64748b',
-  IX: '#ef4444', X: '#8b5cf6',
-};
 
 export default function RootPage({ params }: { params: { id: string } }) {
   const id = decodeURIComponent(params.id);

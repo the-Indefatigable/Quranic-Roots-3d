@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, RefObject } from 'react';
 
 interface SwipeHandlers {
   onSwipeLeft?: () => void;
@@ -7,21 +7,33 @@ interface SwipeHandlers {
   onSwipeDown?: () => void;
 }
 
-export function useSwipeGesture(handlers: SwipeHandlers, threshold = 60) {
+/**
+ * Detects swipe gestures on a target element (or document if no ref provided).
+ * Passing an elementRef scopes the listener so multiple swipe handlers don't conflict.
+ */
+export function useSwipeGesture(
+  handlers: SwipeHandlers,
+  threshold = 60,
+  elementRef?: RefObject<HTMLElement | null>,
+) {
   const startX = useRef(0);
   const startY = useRef(0);
   const handlersRef = useRef(handlers);
   handlersRef.current = handlers;
 
   useEffect(() => {
-    const onTouchStart = (e: TouchEvent) => {
-      startX.current = e.touches[0].clientX;
-      startY.current = e.touches[0].clientY;
+    const target = elementRef?.current ?? document;
+
+    const onTouchStart = (e: Event) => {
+      const te = e as TouchEvent;
+      startX.current = te.touches[0].clientX;
+      startY.current = te.touches[0].clientY;
     };
 
-    const onTouchEnd = (e: TouchEvent) => {
-      const dx = e.changedTouches[0].clientX - startX.current;
-      const dy = e.changedTouches[0].clientY - startY.current;
+    const onTouchEnd = (e: Event) => {
+      const te = e as TouchEvent;
+      const dx = te.changedTouches[0].clientX - startX.current;
+      const dy = te.changedTouches[0].clientY - startY.current;
       const absDx = Math.abs(dx);
       const absDy = Math.abs(dy);
       if (Math.max(absDx, absDy) < threshold) return;
@@ -35,11 +47,11 @@ export function useSwipeGesture(handlers: SwipeHandlers, threshold = 60) {
       }
     };
 
-    document.addEventListener('touchstart', onTouchStart, { passive: true });
-    document.addEventListener('touchend', onTouchEnd, { passive: true });
+    target.addEventListener('touchstart', onTouchStart, { passive: true });
+    target.addEventListener('touchend', onTouchEnd, { passive: true });
     return () => {
-      document.removeEventListener('touchstart', onTouchStart);
-      document.removeEventListener('touchend', onTouchEnd);
+      target.removeEventListener('touchstart', onTouchStart);
+      target.removeEventListener('touchend', onTouchEnd);
     };
-  }, [threshold]);
+  }, [threshold, elementRef]);
 }
