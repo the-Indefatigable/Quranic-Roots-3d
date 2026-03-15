@@ -1,6 +1,6 @@
 /**
  * Watches public/data/verbsData.json and re-runs generate-data.mjs on change.
- * Usage: node scripts/watch-data.mjs
+ * Auto-started by next.config.mjs in dev mode — no manual step needed.
  */
 
 import { watch } from 'fs';
@@ -12,18 +12,24 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
 const TARGET = join(ROOT, 'public/data/verbsData.json');
 
-console.log('Watching verbsData.json for changes...');
+function generate() {
+  try {
+    execSync('node scripts/generate-data.mjs', { cwd: ROOT, stdio: 'inherit' });
+  } catch (e) {
+    console.error('[watch-data] generate-data failed:', e.message);
+  }
+}
+
+// Run once immediately so derived files are always fresh on dev start
+console.log('[watch-data] initial generate...');
+generate();
+console.log('[watch-data] watching verbsData.json for changes...');
 
 let debounce = null;
 watch(TARGET, () => {
   clearTimeout(debounce);
   debounce = setTimeout(() => {
-    console.log('\nverbsData.json changed — regenerating...');
-    try {
-      execSync('node scripts/generate-data.mjs', { cwd: ROOT, stdio: 'inherit' });
-      console.log('Done.\n');
-    } catch (e) {
-      console.error('generate-data failed:', e.message);
-    }
+    console.log('[watch-data] verbsData.json changed — regenerating...');
+    generate();
   }, 300);
 });
