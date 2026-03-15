@@ -10,11 +10,11 @@ export const metadata: Metadata = {
   description: 'Explore 943 Quranic Arabic verb roots in an interactive 3D space. Study Arabic verb conjugations, morphology (sarf), and meanings from the Quran. Learn Quranic vocabulary with full conjugation tables for all verb forms.',
   keywords: ['Quranic Arabic', 'Arabic verb roots', 'learn Quran Arabic', 'Arabic conjugation', 'Arabic morphology', 'sarf', 'Arabic verb forms', 'Quranic vocabulary', 'Arabic grammar', 'verb conjugation tables', 'Islamic Arabic', 'Quran study'],
   authors: [{ name: 'Quranic Roots Explorer' }],
-  metadataBase: new URL('https://quranicroots.com'),
+  metadataBase: new URL('https://quroots.com'),
   alternates: { canonical: '/' },
   openGraph: {
     type: 'website',
-    url: 'https://quranicroots.com/',
+    url: 'https://quroots.com/',
     siteName: 'Quranic Roots Explorer',
     title: 'Quranic Verb Roots — Interactive 3D Arabic Verb Explorer',
     description: 'Explore 943 Quranic Arabic verb roots in an interactive 3D space. Study verb conjugations, morphology, and meanings directly from the Quran.',
@@ -50,8 +50,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     '@graph': [
       {
         '@type': 'WebSite',
-        '@id': 'https://quranicroots.com/#website',
-        'url': 'https://quranicroots.com/',
+        '@id': 'https://quroots.com/#website',
+        'url': 'https://quroots.com/',
         'name': 'Quranic Roots Explorer',
         'description': 'Explore 943 Quranic Arabic verb roots in an interactive 3D space.',
         'publisher': {
@@ -59,13 +59,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           'name': 'Quranic Roots Explorer',
           'logo': {
             '@type': 'ImageObject',
-            'url': 'https://quranicroots.com/icon-512.png'
+            'url': 'https://quroots.com/icon-512.png'
           }
         }
       },
       {
         '@type': 'SoftwareApplication',
-        '@id': 'https://quranicroots.com/#application',
+        '@id': 'https://quroots.com/#application',
         'name': 'Quranic Verb Roots — Interactive 3D Arabic Verb Explorer',
         'applicationCategory': 'EducationalApplication',
         'operatingSystem': 'Any',

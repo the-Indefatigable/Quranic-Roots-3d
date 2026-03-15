@@ -14,7 +14,7 @@ def main():
     print(f"Found {len(roots)} roots.")
 
     # Using a placeholder domain. The user can update this once they purchase one.
-    DOMAIN = "https://quranicroots.com"
+    DOMAIN = "https://quroots.com"
 
     xml = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
 
