@@ -1,6 +1,6 @@
 /**
- * TreeView — orchestrator that picks mobile vs desktop layout.
- * All sub-components live in ./tree/ and ./TreeViewMobile.
+ * TreeView — orchestrator that picks mobile vs desktop layout,
+ * and routes between verb detail and noun detail.
  */
 import React, { useState, useEffect } from 'react';
 import { useStore, verbRoots } from '../store/useStore';
@@ -8,9 +8,10 @@ import { loadRootDetail } from '../data/verbs';
 import type { VerbRoot } from '../data/verbs';
 import { MobileDrillDown } from './TreeViewMobile';
 import { DesktopTreeView } from './tree/DesktopTreeView';
+import { NounDetailView } from './NounDetailView';
 
 export const TreeView: React.FC = () => {
-  const { selectedRoot, backToSpace } = useStore();
+  const { selectedRoot, selectedNoun, backToSpace } = useStore();
   const [visible, setVisible] = useState(false);
   const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 768);
   const [rootDetail, setRootDetail] = useState<VerbRoot | null>(null);
@@ -26,7 +27,6 @@ export const TreeView: React.FC = () => {
   useEffect(() => {
     if (!selectedRoot) { setRootDetail(null); return; }
 
-    // Check if index entry already has full data (has tenses)
     const indexEntry = verbRoots.find(r => r.id === selectedRoot) ?? null;
     const alreadyFull = indexEntry?.babs?.some(b => b.tenses && b.tenses.length > 0) ?? false;
     if (alreadyFull) { setRootDetail(indexEntry); return; }
@@ -38,11 +38,23 @@ export const TreeView: React.FC = () => {
     });
   }, [selectedRoot]);
 
+  // Noun detail — no lazy loading needed
+  useEffect(() => {
+    if (selectedNoun) requestAnimationFrame(() => setVisible(true));
+    return () => { if (selectedNoun) setVisible(false); };
+  }, [selectedNoun]);
+
   useEffect(() => {
     if (rootDetail) requestAnimationFrame(() => setVisible(true));
     return () => setVisible(false);
   }, [rootDetail]);
 
+  // ── Noun route ──
+  if (selectedNoun) {
+    return <NounDetailView nounId={selectedNoun} backToSpace={backToSpace} visible={visible} />;
+  }
+
+  // ── Verb route ──
   if (!selectedRoot) return null;
 
   if (loading || !rootDetail) {

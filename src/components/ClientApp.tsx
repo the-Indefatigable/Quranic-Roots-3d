@@ -5,6 +5,7 @@ import { SearchPanel } from './SearchPanel';
 import { NavBar } from './NavBar';
 import { useStore } from '../store/useStore';
 import { initData, preloadAllRootsInBackground } from '../data/verbs';
+import { initNounData } from '../data/nouns';
 import { BootScreen } from './BootScreen';
 import { WelcomeScreen } from './WelcomeScreen';
 import { AboutPanel } from './AboutPanel';
@@ -71,9 +72,9 @@ const App: React.FC = () => {
   // Delay the 3D scene mode switch so TreeView fade-in hides the 3D swap
   const [sceneViewMode, setSceneViewMode] = useState<'space' | 'tree'>(viewMode === 'tree' ? 'tree' : 'space');
 
-  // Load index data, then quietly preload all root files for offline PWA use
+  // Load verb + noun data in parallel, then preload root files for offline PWA
   useEffect(() => {
-    initData()
+    Promise.all([initData(), initNounData()])
       .then(() => {
         setIsDataLoaded(true);
         preloadAllRootsInBackground(); // non-blocking background cache fill

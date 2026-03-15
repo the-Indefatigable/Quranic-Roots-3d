@@ -117,6 +117,8 @@ export const useStore = create<Store>((set) => ({
   viewMode: initialRoot ? 'tree' : (isMobileInit ? 'explore' : 'space'),
   spaceView: '3d',
   selectedRoot: initialRoot,
+  selectedNoun: null,
+  explorerTab: 'verbs',
 
   expandedBab: null,
   expandedTense: null,
@@ -124,27 +126,46 @@ export const useStore = create<Store>((set) => ({
   searchResults: null,
   previousViewMode: null,
   filteredRootIds: null,
+  filteredNounIds: null,
 
   simulationActive: false,
   simulationIndex: 0,
 
-  setViewMode: (mode) => set({ viewMode: mode, selectedRoot: null, expandedBab: null, expandedTense: null, simulationActive: false, previousViewMode: null }),
+  setViewMode: (mode) => set({ viewMode: mode, selectedRoot: null, selectedNoun: null, expandedBab: null, expandedTense: null, simulationActive: false, previousViewMode: null }),
   setSpaceView: (v) => set({ spaceView: v }),
+  setExplorerTab: (tab) => set({ explorerTab: tab }),
 
   setSelectedRoot: (id) =>
     set((state) => {
       if (id === null) {
         const target = state.previousViewMode ?? 'explore';
-        return { selectedRoot: null, expandedBab: null, expandedTense: null, simulationActive: false, viewMode: target, previousViewMode: null };
+        return { selectedRoot: null, selectedNoun: null, expandedBab: null, expandedTense: null, simulationActive: false, viewMode: target, previousViewMode: null };
       }
       const toggled = state.selectedRoot === id ? null : id;
 
       return {
         selectedRoot: toggled,
+        selectedNoun: null,
         expandedBab: null,
         expandedTense: null,
         viewMode: toggled ? 'tree' : (state.previousViewMode ?? 'explore'),
         previousViewMode: toggled ? (state.viewMode !== 'tree' ? state.viewMode : state.previousViewMode) : null,
+      };
+    }),
+
+  setSelectedNoun: (id) =>
+    set((state) => {
+      if (id === null) {
+        const target = state.previousViewMode ?? 'explore';
+        return { selectedNoun: null, selectedRoot: null, expandedBab: null, expandedTense: null, simulationActive: false, viewMode: target, previousViewMode: null };
+      }
+      return {
+        selectedNoun: id,
+        selectedRoot: null,
+        expandedBab: null,
+        expandedTense: null,
+        viewMode: 'tree',
+        previousViewMode: state.viewMode !== 'tree' ? state.viewMode : state.previousViewMode,
       };
     }),
 
@@ -166,6 +187,7 @@ export const useStore = create<Store>((set) => ({
     })),
 
   setFilteredRoots: (ids) => set({ filteredRootIds: ids }),
+  setFilteredNouns: (ids) => set({ filteredNounIds: ids }),
 
   backToSpace: () =>
     set((state) => {
@@ -173,6 +195,7 @@ export const useStore = create<Store>((set) => ({
       return {
         viewMode: target,
         selectedRoot: null,
+        selectedNoun: null,
         expandedBab: null,
         expandedTense: null,
         simulationActive: false,
@@ -182,14 +205,14 @@ export const useStore = create<Store>((set) => ({
 
   startSimulation: () => set({ simulationActive: true, selectedRoot: null }),
   stopSimulation: () => set({ simulationActive: false }),
-  nextSimStep: () => set(state => ({ 
-    simulationIndex: Math.min(state.simulationIndex + 1, verbRoots.length - 1) 
+  nextSimStep: () => set(state => ({
+    simulationIndex: Math.min(state.simulationIndex + 1, verbRoots.length - 1)
   })),
-  prevSimStep: () => set(state => ({ 
-    simulationIndex: Math.max(state.simulationIndex - 1, 0) 
+  prevSimStep: () => set(state => ({
+    simulationIndex: Math.max(state.simulationIndex - 1, 0)
   })),
-  jumpToSimStep: (idx) => set({ 
-    simulationIndex: Math.max(0, Math.min(idx, verbRoots.length - 1)) 
+  jumpToSimStep: (idx) => set({
+    simulationIndex: Math.max(0, Math.min(idx, verbRoots.length - 1))
   }),
 }));
 
@@ -199,3 +222,5 @@ onDataLoaded(rebuildSearchIndex);
 
 export { verbRoots };
 export type { VerbRoot };
+export { nounsList };
+export type { Noun };

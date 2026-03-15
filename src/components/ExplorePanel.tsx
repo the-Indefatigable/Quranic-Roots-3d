@@ -1,6 +1,9 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useStore, verbRoots } from '../store/useStore';
 import { BAB_COLORS } from '../data/verbs';
+import type { VerbRoot } from '../data/verbs';
+import { nounsList, nounSurahIndex, NOUN_TYPE_COLORS, NOUN_TYPE_LABELS } from '../data/nouns';
+import type { Noun } from '../data/nouns';
 import { SURAHS, SURAH_MAP } from '../data/surahs';
 
 // Form info: Arabic pattern + beginner-friendly description
@@ -25,10 +28,17 @@ const TENSE_OPTS = [
   { key: 'passive_mudari',label: 'Pass. Present',arabic: 'مجهول مضارع'   },
 ];
 
+const NOUN_TYPE_OPTS = Object.entries(NOUN_TYPE_LABELS).map(([key, { en }]) => ({ key, label: en }));
+
 type SortKey = 'freq' | 'alpha' | 'forms' | 'surah';
 type QuickFilter = 'all' | 50 | 100 | 300;
 
-// ── Surah index (lazy-loaded, promise-cached) ────────────────────────────────
+// Discriminated union for mixed surah view
+type ExploreItem =
+  | { kind: 'verb'; data: VerbRoot; firstAyah?: number }
+  | { kind: 'noun'; data: Noun; firstAyah?: number };
+
+// ── Surah index for verbs (lazy-loaded, promise-cached) ────────────────────
 type RawSurahIndex = Record<string, Record<string, number>>;
 type SurahIndex = Map<number, Map<string, number>>;
 let surahIndexPromise: Promise<SurahIndex> | null = null;
@@ -47,7 +57,7 @@ function fetchSurahIndex(): Promise<SurahIndex> {
         return idx;
       })
       .catch(() => {
-        surahIndexPromise = null; // allow retry on failure
+        surahIndexPromise = null;
         return new Map() as SurahIndex;
       });
   }
@@ -56,17 +66,23 @@ function fetchSurahIndex(): Promise<SurahIndex> {
 
 export const ExplorePanel: React.FC = () => {
   const setSelectedRoot  = useStore(s => s.setSelectedRoot);
+  const setSelectedNoun  = useStore(s => s.setSelectedNoun);
   const setViewMode      = useStore(s => s.setViewMode);
   const setSpaceView     = useStore(s => s.setSpaceView);
   const setFilteredRoots = useStore(s => s.setFilteredRoots);
+  const setFilteredNouns = useStore(s => s.setFilteredNouns);
+  const explorerTab      = useStore(s => s.explorerTab);
+  const setExplorerTab   = useStore(s => s.setExplorerTab);
 
   const [selectedForms, setSelectedForms]   = useState<Set<string>>(new Set());
   const [selectedTenses, setSelectedTenses] = useState<Set<string>>(new Set());
+  const [selectedNounTypes, setSelectedNounTypes] = useState<Set<string>>(new Set());
   const [sortKey, setSortKey]               = useState<SortKey>('freq');
   const [search, setSearch]                 = useState('');
   const [quickFilter, setQuickFilter]       = useState<QuickFilter>('all');
   const [showAdvanced, setShowAdvanced]     = useState(false);
   const [showForms, setShowForms]           = useState(false);
+  const [showNounTypes, setShowNounTypes]   = useState(false);
   const [surahPickerOpen, setSurahPickerOpen] = useState(false);
   const [selectedSurah, setSelectedSurah]   = useState<number | null>(null);
   const [surahSearch, setSurahSearch]       = useState('');
@@ -85,20 +101,98 @@ export const ExplorePanel: React.FC = () => {
 
   const surahRootCount = useMemo(() => {
     const counts = new Map<number, number>();
-    surahIndex.forEach((rootMap, s) => counts.set(s, rootMap.size));
+    surahIndex.forEach((rootMap, s) => {
+      const nounMap = nounSurahIndex.get(s);
+      counts.set(s, rootMap.size + (nounMap?.size ?? 0));
+    });
+    // Add surahs that only have nouns
+    nounSurahIndex.forEach((nounMap, s) => {
+      if (!counts.has(s)) counts.set(s, nounMap.size);
+    });
     return counts;
   }, [surahIndex]);
 
-  // Top-N roots by frequency for quick filter
+  // ── Filtering logic ──
+  const isNounTab = explorerTab === 'nouns';
+  const isSurahMode = selectedSurah !== null;
+
+  // Top-N by frequency
   const topNIds = useMemo(() => {
     if (quickFilter === 'all') return null;
+    if (isNounTab && !isSurahMode) {
+      const sorted = [...nounsList].sort((a, b) => (b.totalFreq ?? 0) - (a.totalFreq ?? 0)).slice(0, quickFilter);
+      return new Set(sorted.map(n => n.id));
+    }
     const sorted = [...verbRoots].sort((a, b) => (b.totalFreq ?? 0) - (a.totalFreq ?? 0)).slice(0, quickFilter);
     return new Set(sorted.map(r => r.id));
-  }, [quickFilter]);
+  }, [quickFilter, isNounTab, isSurahMode]);
 
-  const { filtered, surahFirstAyah } = useMemo(() => {
+  // Build the items list
+  const { items, verbCount, nounCount } = useMemo(() => {
+    // ── Surah mode: mixed verbs + nouns ──
+    if (isSurahMode) {
+      const verbMap = surahIndex.get(selectedSurah!) ?? new Map<string, number>();
+      const nounMap = nounSurahIndex.get(selectedSurah!) ?? new Map<string, number>();
+
+      const mixed: ExploreItem[] = [];
+
+      // Verbs in this surah
+      for (const [rootId, ayah] of verbMap) {
+        const root = verbRoots.find(r => r.id === rootId);
+        if (!root) continue;
+        if (search.trim()) {
+          const q = search.trim().toLowerCase();
+          if (!root.root.includes(search.trim()) && !root.meaning.toLowerCase().includes(q)) continue;
+        }
+        mixed.push({ kind: 'verb', data: root, firstAyah: ayah });
+      }
+
+      // Nouns in this surah
+      for (const [nounId, ayah] of nounMap) {
+        const noun = nounsList.find(n => n.id === nounId);
+        if (!noun) continue;
+        if (search.trim()) {
+          const q = search.trim().toLowerCase();
+          if (!noun.lemmaClean.includes(search.trim()) && !noun.meaning.toLowerCase().includes(q)) continue;
+        }
+        mixed.push({ kind: 'noun', data: noun, firstAyah: ayah });
+      }
+
+      // Sort by ayah order
+      mixed.sort((a, b) => (a.firstAyah ?? 999) - (b.firstAyah ?? 999));
+
+      return {
+        items: mixed,
+        verbCount: mixed.filter(i => i.kind === 'verb').length,
+        nounCount: mixed.filter(i => i.kind === 'noun').length,
+      };
+    }
+
+    // ── Non-surah: verbs or nouns depending on tab ──
+    if (isNounTab) {
+      let nouns = [...nounsList];
+      if (topNIds) nouns = nouns.filter(n => topNIds.has(n.id));
+      if (search.trim()) {
+        const q = search.trim().toLowerCase();
+        nouns = nouns.filter(n =>
+          n.lemmaClean.includes(search.trim()) ||
+          n.lemma.includes(search.trim()) ||
+          n.meaning.toLowerCase().includes(q) ||
+          n.root.includes(search.trim())
+        );
+      }
+      if (selectedNounTypes.size > 0)
+        nouns = nouns.filter(n => selectedNounTypes.has(n.type));
+
+      if (sortKey === 'freq') nouns.sort((a, b) => (b.totalFreq ?? 0) - (a.totalFreq ?? 0));
+      else if (sortKey === 'alpha') nouns.sort((a, b) => a.lemmaClean.localeCompare(b.lemmaClean));
+
+      const nounItems: ExploreItem[] = nouns.map(n => ({ kind: 'noun', data: n }));
+      return { items: nounItems, verbCount: 0, nounCount: nouns.length };
+    }
+
+    // Verbs tab
     let roots = [...verbRoots];
-
     if (topNIds) roots = roots.filter(r => topNIds.has(r.id));
     if (search.trim()) {
       const q = search.trim().toLowerCase();
@@ -113,28 +207,22 @@ export const ExplorePanel: React.FC = () => {
     if (selectedTenses.size > 0)
       roots = roots.filter(r => r.babs.some(b => b.tenses?.some(t => selectedTenses.has(t.type))));
 
-    let surahFirstAyah: Map<string, number> | null = null;
-    if (selectedSurah !== null) {
-      const rootMap = surahIndex.get(selectedSurah) ?? new Map<string, number>();
-      surahFirstAyah = rootMap;
-      roots = roots.filter(r => rootMap.has(r.id));
-    }
+    if (sortKey === 'freq') roots.sort((a, b) => (b.totalFreq ?? 0) - (a.totalFreq ?? 0));
+    else if (sortKey === 'alpha') roots.sort((a, b) => a.root.localeCompare(b.root));
+    else if (sortKey === 'forms') roots.sort((a, b) => b.babs.length - a.babs.length);
 
-    const sk = selectedSurah !== null ? 'surah' : sortKey;
-    if (sk === 'surah' && surahFirstAyah) {
-      roots.sort((a, b) => (surahFirstAyah!.get(a.id) ?? 999) - (surahFirstAyah!.get(b.id) ?? 999));
-    } else if (sk === 'freq')  roots.sort((a, b) => (b.totalFreq ?? 0) - (a.totalFreq ?? 0));
-    else if (sk === 'alpha')   roots.sort((a, b) => a.root.localeCompare(b.root));
-    else if (sk === 'forms')   roots.sort((a, b) => b.babs.length - a.babs.length);
-
-    return { filtered: roots, surahFirstAyah };
+    const verbItems: ExploreItem[] = roots.map(r => ({ kind: 'verb', data: r }));
+    return { items: verbItems, verbCount: roots.length, nounCount: 0 };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, selectedForms, selectedTenses, sortKey, selectedSurah, surahIndex, topNIds, verbRoots.length]);
+  }, [search, selectedForms, selectedTenses, selectedNounTypes, sortKey, selectedSurah, surahIndex, topNIds, isNounTab, verbRoots.length, nounsList.length]);
 
-  // Publish filtered list to store so TreeView can use it for prev/next
+  // Publish filtered lists to store for prev/next navigation
   useEffect(() => {
-    setFilteredRoots(filtered.map(r => r.id));
-  }, [filtered, setFilteredRoots]);
+    const verbIds = items.filter(i => i.kind === 'verb').map(i => i.data.id);
+    const nounIds = items.filter(i => i.kind === 'noun').map(i => i.data.id);
+    setFilteredRoots(verbIds.length > 0 ? verbIds : null);
+    setFilteredNouns(nounIds.length > 0 ? nounIds : null);
+  }, [items, setFilteredRoots, setFilteredNouns]);
 
   const filteredSurahs = useMemo(() => {
     const q = surahSearch.trim().toLowerCase();
@@ -143,20 +231,22 @@ export const ExplorePanel: React.FC = () => {
     );
   }, [surahSearch]);
 
-  const hasFilters = selectedForms.size > 0 || selectedTenses.size > 0 || search || selectedSurah !== null || quickFilter !== 'all';
+  const hasFilters = selectedForms.size > 0 || selectedTenses.size > 0 || selectedNounTypes.size > 0 || search || selectedSurah !== null || quickFilter !== 'all';
 
   const clearAll = () => {
-    setSelectedForms(new Set()); setSelectedTenses(new Set());
+    setSelectedForms(new Set()); setSelectedTenses(new Set()); setSelectedNounTypes(new Set());
     setSearch(''); setSelectedSurah(null); setSurahSearch(''); setSurahPickerOpen(false);
     setQuickFilter('all');
   };
 
   const [showFilterSheet, setShowFilterSheet] = useState(false);
   const activeFilterCount =
-    selectedForms.size + selectedTenses.size +
+    selectedForms.size + selectedTenses.size + selectedNounTypes.size +
     (quickFilter !== 'all' ? 1 : 0) +
     (selectedSurah !== null ? 1 : 0) +
     (search ? 1 : 0);
+
+  const totalCount = isSurahMode ? items.length : (isNounTab ? nounsList.length : verbRoots.length);
 
   return (
     <div style={{
@@ -180,8 +270,8 @@ export const ExplorePanel: React.FC = () => {
             Explore
           </div>
           <div style={{ fontSize: '18px', color: '#fff', fontWeight: 600, marginTop: '1px' }}>
-            {filtered.length}
-            <span style={{ color: '#444466', fontWeight: 400, fontSize: '12px' }}> / {verbRoots.length} roots</span>
+            {items.length}
+            <span style={{ color: '#444466', fontWeight: 400, fontSize: '12px' }}> / {totalCount} {isSurahMode ? 'items' : (isNounTab ? 'nouns' : 'roots')}</span>
           </div>
         </div>
 
@@ -216,15 +306,53 @@ export const ExplorePanel: React.FC = () => {
         </button>
       </div>
 
+      {/* ── Verbs / Nouns toggle (hidden in surah mode) ── */}
+      {!isSurahMode && (
+        <div style={{ padding: '10px 20px 0', display: 'flex', gap: '0', flexShrink: 0 }}>
+          <div style={{
+            display: 'flex', borderRadius: '12px', overflow: 'hidden',
+            border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.03)',
+          }}>
+            {(['verbs', 'nouns'] as const).map(tab => {
+              const active = explorerTab === tab;
+              return (
+                <button key={tab} onClick={() => setExplorerTab(tab)} style={{
+                  padding: '7px 20px', border: 'none', cursor: 'pointer',
+                  background: active ? 'rgba(74,158,255,0.15)' : 'transparent',
+                  color: active ? '#4a9eff' : '#555577',
+                  fontSize: '13px', fontWeight: active ? 700 : 400,
+                  transition: 'all 0.15s',
+                  borderRight: tab === 'verbs' ? '1px solid rgba(255,255,255,0.08)' : 'none',
+                }}>
+                  {tab === 'verbs' ? 'Verbs' : 'Nouns'}
+                  <span style={{ fontSize: '10px', color: '#444466', marginLeft: '5px' }}>
+                    {tab === 'verbs' ? verbRoots.length : nounsList.length}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* ── Results sub-header (sort + count) ── */}
       <div style={{ padding: '8px 20px', display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0, borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
         <span style={{ fontSize: '12px', color: '#444466', flex: 1 }}>
-          {filtered.length} root{filtered.length !== 1 ? 's' : ''}
-          {selectedSurah !== null && <span style={{ color: '#a78bfa' }}> · {SURAH_MAP.get(selectedSurah)?.english} · sorted by ayah</span>}
+          {isSurahMode ? (
+            <>
+              {verbCount} verb{verbCount !== 1 ? 's' : ''} + {nounCount} noun{nounCount !== 1 ? 's' : ''}
+              <span style={{ color: '#a78bfa' }}> · {SURAH_MAP.get(selectedSurah!)?.english} · sorted by ayah</span>
+            </>
+          ) : (
+            <>{items.length} {isNounTab ? 'noun' : 'root'}{items.length !== 1 ? 's' : ''}</>
+          )}
         </span>
-        {selectedSurah === null && (
+        {!isSurahMode && (
           <div style={{ display: 'flex', gap: '4px' }}>
-            {([['freq', '↓ Freq'], ['alpha', 'A→Z'], ['forms', '⊞ Forms']] as [SortKey, string][]).map(([k, lbl]) => (
+            {(isNounTab
+              ? [['freq', '↓ Freq'], ['alpha', 'A→Z']] as [SortKey, string][]
+              : [['freq', '↓ Freq'], ['alpha', 'A→Z'], ['forms', '⊞ Forms']] as [SortKey, string][]
+            ).map(([k, lbl]) => (
               <button key={k} onClick={() => setSortKey(k)}
                 style={{ padding: '4px 10px', borderRadius: '12px', border: `1px solid ${sortKey === k ? 'rgba(255,215,0,0.4)' : 'rgba(255,255,255,0.07)'}`, background: sortKey === k ? 'rgba(255,215,0,0.08)' : 'transparent', color: sortKey === k ? '#ffd700' : '#444466', cursor: 'pointer', fontSize: '11px', fontWeight: sortKey === k ? 700 : 400, transition: 'all 0.15s' }}>
                 {lbl}
@@ -236,47 +364,94 @@ export const ExplorePanel: React.FC = () => {
 
       {/* ── Results list ── */}
       <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
-        {filtered.length === 0 && (
-          <div style={{ textAlign: 'center', color: '#333355', padding: '48px 0', fontSize: '14px' }}>No roots match</div>
+        {items.length === 0 && (
+          <div style={{ textAlign: 'center', color: '#333355', padding: '48px 0', fontSize: '14px' }}>No results match</div>
         )}
-        {filtered.map((root, idx) => {
-          const firstAyah = selectedSurah !== null ? surahFirstAyah?.get(root.id) : undefined;
+        {items.map((item, idx) => {
+          if (item.kind === 'verb') {
+            const root = item.data;
+            return (
+              <div key={`v-${root.id}`} onClick={() => setSelectedRoot(root.id)}
+                className="hover-row"
+                style={{ display: 'flex', alignItems: 'center', gap: '14px', padding: '11px 20px', borderBottom: '1px solid rgba(255,255,255,0.03)', cursor: 'pointer' }}>
+
+                <div style={{ minWidth: '30px', textAlign: 'right', flexShrink: 0 }}>
+                  {item.firstAyah !== undefined ? (
+                    <div style={{ fontSize: '10px', color: '#a78bfa', background: 'rgba(167,139,250,0.1)', borderRadius: '5px', padding: '1px 5px', fontFamily: 'monospace' }}>:{item.firstAyah}</div>
+                  ) : (
+                    <span style={{ color: '#2a2a44', fontSize: '10px', fontFamily: 'monospace' }}>#{idx + 1}</span>
+                  )}
+                </div>
+
+                {/* V badge in surah mode */}
+                {isSurahMode && (
+                  <span style={{ fontSize: '9px', fontWeight: 700, color: '#4a9eff', background: 'rgba(74,158,255,0.15)', border: '1px solid rgba(74,158,255,0.3)', borderRadius: '4px', padding: '1px 5px', flexShrink: 0 }}>V</span>
+                )}
+
+                <span className="arabic" style={{ fontSize: '28px', color: '#fff', minWidth: '72px', textAlign: 'right', flexShrink: 0 }}>
+                  {root.root}
+                </span>
+
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: '13px', color: '#ccd', marginBottom: '4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {root.meaning}
+                  </div>
+                  <div style={{ display: 'flex', gap: '3px', flexWrap: 'wrap' }}>
+                    {root.babs.map(b => (
+                      <span key={b.id} style={{ fontSize: '9px', padding: '1px 5px', borderRadius: '4px', border: `1px solid ${b.color}44`, color: b.color, background: b.color + '11' }}>
+                        {b.romanNumeral}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div style={{ textAlign: 'right', minWidth: '40px', flexShrink: 0 }}>
+                  <div style={{ fontSize: '13px', color: '#ffd700', fontWeight: 600 }}>{root.totalFreq ?? 0}</div>
+                  <div style={{ fontSize: '9px', color: '#2a2a44' }}>times</div>
+                </div>
+              </div>
+            );
+          }
+
+          // Noun item
+          const noun = item.data;
+          const typeColor = NOUN_TYPE_COLORS[noun.type] ?? '#4a9eff';
+          const typeLabel = NOUN_TYPE_LABELS[noun.type]?.en ?? noun.type;
+
           return (
-            <div key={root.id} onClick={() => setSelectedRoot(root.id)}
-              style={{ display: 'flex', alignItems: 'center', gap: '14px', padding: '11px 20px', borderBottom: '1px solid rgba(255,255,255,0.03)', cursor: 'pointer', transition: 'background 0.1s' }}
-              onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'}
-              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-              onTouchStart={e => e.currentTarget.style.background = 'rgba(255,255,255,0.04)'}
-              onTouchEnd={e => e.currentTarget.style.background = 'transparent'}>
+            <div key={`n-${noun.id}-${noun.root}`} onClick={() => setSelectedNoun(noun.id)}
+              className="hover-row"
+              style={{ display: 'flex', alignItems: 'center', gap: '14px', padding: '11px 20px', borderBottom: '1px solid rgba(255,255,255,0.03)', cursor: 'pointer' }}>
 
               <div style={{ minWidth: '30px', textAlign: 'right', flexShrink: 0 }}>
-                {firstAyah !== undefined ? (
-                  <div style={{ fontSize: '10px', color: '#a78bfa', background: 'rgba(167,139,250,0.1)', borderRadius: '5px', padding: '1px 5px', fontFamily: 'monospace' }}>:{firstAyah}</div>
+                {item.firstAyah !== undefined ? (
+                  <div style={{ fontSize: '10px', color: '#a78bfa', background: 'rgba(167,139,250,0.1)', borderRadius: '5px', padding: '1px 5px', fontFamily: 'monospace' }}>:{item.firstAyah}</div>
                 ) : (
                   <span style={{ color: '#2a2a44', fontSize: '10px', fontFamily: 'monospace' }}>#{idx + 1}</span>
                 )}
               </div>
 
-              <span style={{ fontSize: '28px', fontFamily: "'Scheherazade New', serif", color: '#fff', direction: 'rtl', minWidth: '72px', textAlign: 'right', flexShrink: 0 }}>
-                {root.root}
+              {/* N badge in surah mode */}
+              {isSurahMode && (
+                <span style={{ fontSize: '9px', fontWeight: 700, color: '#22c55e', background: 'rgba(34,197,94,0.15)', border: '1px solid rgba(34,197,94,0.3)', borderRadius: '4px', padding: '1px 5px', flexShrink: 0 }}>N</span>
+              )}
+
+              <span className="arabic" style={{ fontSize: '28px', color: '#fff', minWidth: '72px', textAlign: 'right', flexShrink: 0 }}>
+                {noun.lemma}
               </span>
 
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: '13px', color: '#ccd', marginBottom: '4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {root.meaning}
+                  {noun.meaning}
                 </div>
-                <div style={{ display: 'flex', gap: '3px', flexWrap: 'wrap' }}>
-                  {root.babs.map(b => (
-                    <span key={b.id} style={{ fontSize: '9px', padding: '1px 5px', borderRadius: '4px', border: `1px solid ${b.color}44`, color: b.color, background: b.color + '11' }}>
-                      {b.romanNumeral}
-                    </span>
-                  ))}
-                </div>
+                <span style={{ fontSize: '9px', padding: '1px 6px', borderRadius: '4px', border: `1px solid ${typeColor}44`, color: typeColor, background: typeColor + '11' }}>
+                  {typeLabel}
+                </span>
               </div>
 
               <div style={{ textAlign: 'right', minWidth: '40px', flexShrink: 0 }}>
-                <div style={{ fontSize: '13px', color: '#ffd700', fontWeight: 600 }}>{root.totalFreq ?? 0}</div>
-                <div style={{ fontSize: '9px', color: '#2a2a44' }}>times</div>
+                <div style={{ fontSize: '13px', color: '#ffd700', fontWeight: 600 }}>{noun.totalFreq ?? 0}</div>
+                <div style={{ fontSize: '9px', color: '#2a2a44' }}>verses</div>
               </div>
             </div>
           );
@@ -319,7 +494,7 @@ export const ExplorePanel: React.FC = () => {
                 <input
                   ref={searchRef}
                   type="text" value={search} onChange={e => setSearch(e.target.value)}
-                  placeholder="Search a root or meaning…"
+                  placeholder={isNounTab ? 'Search a noun or meaning…' : 'Search a root or meaning…'}
                   style={{ width: '100%', boxSizing: 'border-box', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '10px 14px 10px 36px', color: '#fff', fontSize: '14px', outline: 'none', fontFamily: 'inherit' }}
                   onFocus={e => e.target.style.borderColor = 'rgba(74,158,255,0.5)'}
                   onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
@@ -339,44 +514,78 @@ export const ExplorePanel: React.FC = () => {
                   return (
                     <button key={String(f)} onClick={() => setQuickFilter(f)}
                       style={{ padding: '7px 16px', borderRadius: '16px', border: `1px solid ${active ? 'rgba(74,158,255,0.5)' : 'rgba(255,255,255,0.08)'}`, background: active ? 'rgba(74,158,255,0.12)' : 'transparent', color: active ? '#4a9eff' : '#555577', cursor: 'pointer', fontSize: '13px', fontWeight: active ? 700 : 400, transition: 'all 0.15s' }}>
-                      {f === 'all' ? 'All roots' : `Top ${f}`}
+                      {f === 'all' ? `All ${isNounTab ? 'nouns' : 'roots'}` : `Top ${f}`}
                     </button>
                   );
                 })}
               </div>
             </div>
 
-            {/* Verb Form */}
-            <div style={{ padding: '16px 20px 0' }}>
-              <button onClick={() => setShowForms(o => !o)}
-                style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 10px', color: '#fff' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontSize: '11px', color: '#555577', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 700 }}>Verb Form</span>
-                  {selectedForms.size > 0 && (
-                    <span style={{ fontSize: '10px', color: '#4a9eff', background: 'rgba(74,158,255,0.15)', borderRadius: '8px', padding: '1px 7px', fontWeight: 700 }}>
-                      {selectedForms.size} selected
-                    </span>
-                  )}
-                </div>
-                <span style={{ fontSize: '12px', color: '#444466', transform: showForms ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>▼</span>
-              </button>
-              {showForms && (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))', gap: '8px', paddingBottom: '12px' }}>
-                  {Object.entries(FORM_INFO).map(([form, info]) => {
-                    const active = selectedForms.has(form);
-                    const color = BAB_COLORS[form] ?? '#aaa';
-                    return (
-                      <button key={form} onClick={() => setSelectedForms(toggleSet(selectedForms, form))}
-                        style={{ padding: '10px 8px', borderRadius: '12px', cursor: 'pointer', transition: 'all 0.15s', border: `1px solid ${active ? color + 'cc' : color + '28'}`, background: active ? color + '18' : 'rgba(255,255,255,0.02)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', boxShadow: active ? `0 0 12px ${color}22` : 'none' }}>
-                        <span style={{ fontFamily: "'Scheherazade New', serif", fontSize: '18px', color: active ? '#fff' : '#aaabb8', direction: 'rtl', lineHeight: 1.3 }}>{info.pattern}</span>
-                        <span style={{ fontSize: '10px', color: active ? color : '#555577', fontWeight: 700, letterSpacing: '0.05em' }}>Form {form}</span>
-                        <span style={{ fontSize: '9px', color: active ? '#aabbdd' : '#3a3a55', textAlign: 'center', lineHeight: 1.2 }}>{info.desc}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
+            {/* Verb Form — only shown on verbs tab */}
+            {!isNounTab && (
+              <div style={{ padding: '16px 20px 0' }}>
+                <button onClick={() => setShowForms(o => !o)}
+                  style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 10px', color: '#fff' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '11px', color: '#555577', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 700 }}>Verb Form</span>
+                    {selectedForms.size > 0 && (
+                      <span style={{ fontSize: '10px', color: '#4a9eff', background: 'rgba(74,158,255,0.15)', borderRadius: '8px', padding: '1px 7px', fontWeight: 700 }}>
+                        {selectedForms.size} selected
+                      </span>
+                    )}
+                  </div>
+                  <span style={{ fontSize: '12px', color: '#444466', transform: showForms ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>▼</span>
+                </button>
+                {showForms && (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))', gap: '8px', paddingBottom: '12px' }}>
+                    {Object.entries(FORM_INFO).map(([form, info]) => {
+                      const active = selectedForms.has(form);
+                      const color = BAB_COLORS[form] ?? '#aaa';
+                      return (
+                        <button key={form} onClick={() => setSelectedForms(toggleSet(selectedForms, form))}
+                          style={{ padding: '10px 8px', borderRadius: '12px', cursor: 'pointer', transition: 'all 0.15s', border: `1px solid ${active ? color + 'cc' : color + '28'}`, background: active ? color + '18' : 'rgba(255,255,255,0.02)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', boxShadow: active ? `0 0 12px ${color}22` : 'none' }}>
+                          <span className="arabic" style={{ fontSize: '18px', color: active ? '#fff' : '#aaabb8', lineHeight: 1.3 }}>{info.pattern}</span>
+                          <span style={{ fontSize: '10px', color: active ? color : '#555577', fontWeight: 700, letterSpacing: '0.05em' }}>Form {form}</span>
+                          <span style={{ fontSize: '9px', color: active ? '#aabbdd' : '#3a3a55', textAlign: 'center', lineHeight: 1.2 }}>{info.desc}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Noun Type — only shown on nouns tab */}
+            {isNounTab && (
+              <div style={{ padding: '16px 20px 0' }}>
+                <button onClick={() => setShowNounTypes(o => !o)}
+                  style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 10px', color: '#fff' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '11px', color: '#555577', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 700 }}>Noun Type</span>
+                    {selectedNounTypes.size > 0 && (
+                      <span style={{ fontSize: '10px', color: '#4a9eff', background: 'rgba(74,158,255,0.15)', borderRadius: '8px', padding: '1px 7px', fontWeight: 700 }}>
+                        {selectedNounTypes.size} selected
+                      </span>
+                    )}
+                  </div>
+                  <span style={{ fontSize: '12px', color: '#444466', transform: showNounTypes ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>▼</span>
+                </button>
+                {showNounTypes && (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', paddingBottom: '12px' }}>
+                    {NOUN_TYPE_OPTS.map(({ key, label }) => {
+                      const active = selectedNounTypes.has(key);
+                      const color = NOUN_TYPE_COLORS[key] ?? '#aaa';
+                      return (
+                        <button key={key} onClick={() => setSelectedNounTypes(toggleSet(selectedNounTypes, key))}
+                          style={{ padding: '7px 14px', borderRadius: '16px', border: `1px solid ${active ? color + 'cc' : color + '28'}`, background: active ? color + '18' : 'transparent', color: active ? color : '#555577', cursor: 'pointer', fontSize: '12px', fontWeight: active ? 700 : 400, transition: 'all 0.15s' }}>
+                          {label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* By Surah */}
             <div style={{ padding: '16px 20px 0' }}>
@@ -396,10 +605,10 @@ export const ExplorePanel: React.FC = () => {
                 <>
                   {selectedSurah !== null && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 14px', background: 'rgba(167,139,250,0.08)', border: '1px solid rgba(167,139,250,0.3)', borderRadius: '12px', marginBottom: '8px' }}>
-                      <span style={{ fontFamily: "'Scheherazade New', serif", fontSize: '20px', color: '#a78bfa', direction: 'rtl' }}>{SURAH_MAP.get(selectedSurah)?.arabic}</span>
+                      <span className="arabic" style={{ fontSize: '20px', color: '#a78bfa' }}>{SURAH_MAP.get(selectedSurah)?.arabic}</span>
                       <div style={{ flex: 1 }}>
                         <div style={{ fontSize: '13px', color: '#c4b5fd', fontWeight: 600 }}>{SURAH_MAP.get(selectedSurah)?.english}</div>
-                        <div style={{ fontSize: '10px', color: '#555577' }}>Surah {selectedSurah} · {surahRootCount.get(selectedSurah) ?? 0} roots</div>
+                        <div style={{ fontSize: '10px', color: '#555577' }}>Surah {selectedSurah} · {surahRootCount.get(selectedSurah) ?? 0} items</div>
                       </div>
                       <button onClick={() => { setSelectedSurah(null); setSurahSearch(''); }} style={{ background: 'none', border: 'none', color: '#ff6b6b', cursor: 'pointer', fontSize: '16px', padding: '0 2px' }}>✕</button>
                     </div>
@@ -418,11 +627,10 @@ export const ExplorePanel: React.FC = () => {
                         return (
                           <div key={surah.number}
                             onClick={() => { setSelectedSurah(surah.number); setSurahPickerOpen(false); setSurahSearch(''); }}
-                            style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '9px 14px', cursor: 'pointer', background: isSel ? 'rgba(167,139,250,0.12)' : 'transparent', borderBottom: '1px solid rgba(255,255,255,0.03)', transition: 'background 0.1s' }}
-                            onMouseEnter={e => e.currentTarget.style.background = 'rgba(167,139,250,0.07)'}
-                            onMouseLeave={e => e.currentTarget.style.background = isSel ? 'rgba(167,139,250,0.12)' : 'transparent'}>
+                            className="hover-row"
+                            style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '9px 14px', cursor: 'pointer', background: isSel ? 'rgba(167,139,250,0.12)' : 'transparent', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
                             <span style={{ fontSize: '10px', color: '#444466', fontFamily: 'monospace', minWidth: '22px', textAlign: 'right' }}>{surah.number}</span>
-                            <span style={{ fontFamily: "'Scheherazade New', serif", fontSize: '17px', color: '#fff', direction: 'rtl', minWidth: '60px', textAlign: 'right' }}>{surah.arabic}</span>
+                            <span className="arabic" style={{ fontSize: '17px', color: '#fff', minWidth: '60px', textAlign: 'right' }}>{surah.arabic}</span>
                             <div style={{ flex: 1, fontSize: '13px', color: isSel ? '#c4b5fd' : '#ccd' }}>{surah.english}</div>
                             <span style={{ fontSize: '10px', color: '#a78bfa', background: 'rgba(167,139,250,0.1)', borderRadius: '6px', padding: '1px 6px' }}>{count}</span>
                           </div>
@@ -434,31 +642,36 @@ export const ExplorePanel: React.FC = () => {
               )}
             </div>
 
-            {/* Advanced: Tense filter */}
-            <div style={{ padding: '16px 20px 24px' }}>
-              <button onClick={() => setShowAdvanced(o => !o)}
-                style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 10px', color: '#fff' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontSize: '11px', color: '#555577', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 700 }}>Tense</span>
-                  {selectedTenses.size > 0 && <span style={{ color: '#4a9eff', background: 'rgba(74,158,255,0.15)', borderRadius: '8px', padding: '1px 7px', fontSize: '10px', fontWeight: 700 }}>{selectedTenses.size}</span>}
-                </div>
-                <span style={{ fontSize: '12px', color: '#444466', transform: showAdvanced ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>▼</span>
-              </button>
-              {showAdvanced && (
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                  {TENSE_OPTS.map(({ key, label, arabic }) => {
-                    const active = selectedTenses.has(key);
-                    return (
-                      <button key={key} onClick={() => setSelectedTenses(toggleSet(selectedTenses, key))}
-                        style={{ padding: '7px 14px', borderRadius: '16px', border: `1px solid ${active ? 'rgba(74,158,255,0.5)' : 'rgba(255,255,255,0.08)'}`, background: active ? 'rgba(74,158,255,0.12)' : 'transparent', color: active ? '#4a9eff' : '#555577', cursor: 'pointer', fontSize: '12px', fontWeight: active ? 700 : 400, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <span style={{ fontFamily: "'Scheherazade New', serif", fontSize: '14px', direction: 'rtl' }}>{arabic}</span>
-                        {label}
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
+            {/* Advanced: Tense filter — only for verbs tab */}
+            {!isNounTab && (
+              <div style={{ padding: '16px 20px 24px' }}>
+                <button onClick={() => setShowAdvanced(o => !o)}
+                  style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 10px', color: '#fff' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '11px', color: '#555577', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 700 }}>Tense</span>
+                    {selectedTenses.size > 0 && <span style={{ color: '#4a9eff', background: 'rgba(74,158,255,0.15)', borderRadius: '8px', padding: '1px 7px', fontSize: '10px', fontWeight: 700 }}>{selectedTenses.size}</span>}
+                  </div>
+                  <span style={{ fontSize: '12px', color: '#444466', transform: showAdvanced ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>▼</span>
+                </button>
+                {showAdvanced && (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                    {TENSE_OPTS.map(({ key, label, arabic }) => {
+                      const active = selectedTenses.has(key);
+                      return (
+                        <button key={key} onClick={() => setSelectedTenses(toggleSet(selectedTenses, key))}
+                          style={{ padding: '7px 14px', borderRadius: '16px', border: `1px solid ${active ? 'rgba(74,158,255,0.5)' : 'rgba(255,255,255,0.08)'}`, background: active ? 'rgba(74,158,255,0.12)' : 'transparent', color: active ? '#4a9eff' : '#555577', cursor: 'pointer', fontSize: '12px', fontWeight: active ? 700 : 400, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span className="arabic" style={{ fontSize: '14px' }}>{arabic}</span>
+                          {label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Spacer for nouns tab when no tense filter */}
+            {isNounTab && <div style={{ height: '24px' }} />}
           </div>
         </div>
       )}
