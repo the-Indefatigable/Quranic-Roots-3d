@@ -47,45 +47,47 @@ export function ConjugationGrid({ tense }: { tense: TenseData }) {
   const accent = TENSE_ACCENTS[tense.type] || 'text-white';
 
   return (
-    <div className="mt-4">
-      {/* Column headers */}
-      <div className="flex border-b border-white/[0.06] pb-3 mb-2">
-        <div className="w-20" />
-        {['Singular', 'Dual', 'Plural'].map((h) => (
-          <div key={h} className="flex-1 text-center text-[10px] text-muted-more uppercase tracking-widest">
-            {h}
+    <div className="mt-4 -mx-4 px-4 overflow-x-auto">
+      <div className="min-w-[340px]">
+        {/* Column headers */}
+        <div className="flex border-b border-white/[0.06] pb-3 mb-2">
+          <div className="w-16 sm:w-20 shrink-0" />
+          {['Singular', 'Dual', 'Plural'].map((h) => (
+            <div key={h} className="flex-1 text-center text-[10px] text-muted-more uppercase tracking-widest">
+              {h}
+            </div>
+          ))}
+        </div>
+
+        {/* Rows */}
+        {rows.map((row) => (
+          <div key={row.id} className="flex items-center border-b border-white/[0.02] py-2.5 sm:py-3">
+            <div className="w-16 sm:w-20 shrink-0 text-[10px] text-muted-more uppercase tracking-wider leading-tight">
+              {row.label}
+            </div>
+            {row.keys.map((key, i) => {
+              const c = key ? conjMap.get(key) : null;
+              const isEmpty = !c || c.arabic === '-';
+              return (
+                <div key={key || `empty-${i}`} className="flex-1 flex flex-col items-center justify-center min-w-0">
+                  {c && !isEmpty ? (
+                    <>
+                      <span className={`font-arabic text-lg sm:text-xl ${accent} leading-relaxed`} dir="rtl">
+                        {c.arabic}
+                      </span>
+                      <span className="text-[10px] text-white/30 italic mt-0.5 truncate max-w-full">
+                        {c.transliteration}
+                      </span>
+                    </>
+                  ) : (
+                    <span className="text-white/[0.06] text-sm">—</span>
+                  )}
+                </div>
+              );
+            })}
           </div>
         ))}
       </div>
-
-      {/* Rows */}
-      {rows.map((row) => (
-        <div key={row.id} className="flex items-center border-b border-white/[0.02] py-3">
-          <div className="w-20 text-[10px] text-muted-more uppercase tracking-wider leading-tight">
-            {row.label}
-          </div>
-          {row.keys.map((key, i) => {
-            const c = key ? conjMap.get(key) : null;
-            const isEmpty = !c || c.arabic === '-';
-            return (
-              <div key={key || `empty-${i}`} className="flex-1 flex flex-col items-center justify-center">
-                {c && !isEmpty ? (
-                  <>
-                    <span className={`font-arabic text-xl ${accent} leading-relaxed`} dir="rtl">
-                      {c.arabic}
-                    </span>
-                    <span className="text-[10px] text-white/30 italic mt-0.5">
-                      {c.transliteration}
-                    </span>
-                  </>
-                ) : (
-                  <span className="text-white/[0.06] text-sm">—</span>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      ))}
     </div>
   );
 }

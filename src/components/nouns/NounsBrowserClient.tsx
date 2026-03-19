@@ -76,7 +76,7 @@ export function NounsBrowserClient({ nouns }: { nouns: NounSummary[] }) {
           <button
             key={opt.key}
             onClick={() => setSortBy(opt.key)}
-            className={`text-xs px-2.5 py-1 rounded-lg transition-colors ${
+            className={`text-xs px-3 py-1.5 sm:px-2.5 sm:py-1 rounded-lg transition-colors ${
               sortBy === opt.key
                 ? 'bg-gold-dim text-gold'
                 : 'bg-white/[0.03] text-muted-more hover:text-white'

@@ -58,7 +58,7 @@ export function SurahReaderClient({ ayahs, surahNumber, hasWords, hasTafsir }: P
 
       {/* Settings panel */}
       {showSettings && (
-        <div className="bg-card border border-border rounded-2xl p-5 mb-8 flex flex-wrap items-center gap-6">
+        <div className="bg-card border border-border rounded-2xl p-4 sm:p-5 mb-8 flex flex-wrap items-center gap-4 sm:gap-6">
           <div className="flex items-center gap-3">
             <span className="text-xs text-muted-more">Font size</span>
             <div className="flex items-center gap-1">
@@ -102,7 +102,7 @@ export function SurahReaderClient({ ayahs, surahNumber, hasWords, hasTafsir }: P
           <div key={ayah.number} className="group">
             {/* Ayah number */}
             <div className="flex items-start gap-3">
-              <span className="shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-gold-dim text-gold text-xs font-medium mt-1">
+              <span className="shrink-0 w-9 h-9 sm:w-8 sm:h-8 flex items-center justify-center rounded-full bg-gold-dim text-gold text-xs font-medium mt-1">
                 {ayah.number}
               </span>
 

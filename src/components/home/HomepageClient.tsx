@@ -227,14 +227,14 @@ export function HomepageClient() {
         className="relative border-y border-white/[0.04] py-16 sm:py-20"
       >
         <div className="absolute inset-0 bg-gradient-to-b from-white/[0.01] to-transparent pointer-events-none" />
-        <div className="max-w-5xl mx-auto grid grid-cols-3 gap-4 px-6">
+        <div className="max-w-5xl mx-auto grid grid-cols-3 gap-2 sm:gap-4 px-6">
           {[
             { value: roots.count.toLocaleString(), label: 'Quranic Roots', suffix: '' },
             { value: ayahs.count.toLocaleString(), label: 'Ayahs', suffix: '' },
             { value: words.count.toLocaleString(), label: 'Words Analyzed', suffix: '+' },
           ].map((stat) => (
             <div key={stat.label} className="text-center">
-              <p className="text-3xl sm:text-5xl font-extralight tracking-tight text-white tabular-nums">
+              <p className="text-2xl sm:text-5xl font-extralight tracking-tight text-white tabular-nums">
                 {stat.value}{stat.suffix}
               </p>
               <p className="text-xs sm:text-sm text-white/35 mt-2 tracking-wide">{stat.label}</p>

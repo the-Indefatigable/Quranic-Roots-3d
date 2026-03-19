@@ -140,11 +140,11 @@ export default async function SurahPage({ params }: Props) {
     <div>
       {/* Surah Header */}
       <div className="text-center mb-10">
-        <div className="flex items-center justify-center gap-8 mb-4">
+        <div className="flex items-center justify-center gap-4 sm:gap-8 mb-4">
           {prevSurah ? (
             <Link
               href={`/quran/${prevSurah.number}`}
-              className="flex items-center gap-1.5 text-muted-more hover:text-white transition-colors text-sm"
+              className="flex items-center gap-1.5 text-muted-more hover:text-white transition-colors text-sm p-2 -m-2"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
@@ -154,8 +154,8 @@ export default async function SurahPage({ params }: Props) {
           ) : <div className="w-16" />}
 
           <div>
-            <p className="font-arabic text-3xl text-gold mb-1">{surah.arabicName}</p>
-            <h1 className="text-xl font-light text-white">{surah.englishName}</h1>
+            <p className="font-arabic text-2xl sm:text-3xl text-gold mb-1">{surah.arabicName}</p>
+            <h1 className="text-lg sm:text-xl font-light text-white">{surah.englishName}</h1>
             <p className="text-sm text-muted mt-1">
               {surah.versesCount} Ayahs
               {surah.revelationType && (
@@ -167,7 +167,7 @@ export default async function SurahPage({ params }: Props) {
           {nextSurah ? (
             <Link
               href={`/quran/${nextSurah.number}`}
-              className="flex items-center gap-1.5 text-muted-more hover:text-white transition-colors text-sm"
+              className="flex items-center gap-1.5 text-muted-more hover:text-white transition-colors text-sm p-2 -m-2"
             >
               <span className="hidden sm:inline">{nextSurah.englishName}</span>
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
