@@ -48,11 +48,19 @@ export const NounDetailView: React.FC<{
     onSwipeRight: () => backToSpace(),
   });
 
-  // Check if this noun's root matches a verb root
+  // Check if this noun's root matches a verb root (O(1) via Map)
+  const verbRootsByLetters = useMemo(() => {
+    const m = new Map<string, typeof verbRoots[0]>();
+    for (const r of verbRoots) {
+      m.set(r.root, r);
+      m.set(r.rootLetters.join(''), r);
+    }
+    return m;
+  }, []);
   const matchingVerbRoot = useMemo(() => {
     if (!noun) return null;
-    return verbRoots.find(r => r.root === noun.root || r.rootLetters.join('') === noun.root) ?? null;
-  }, [noun]);
+    return verbRootsByLetters.get(noun.root) ?? null;
+  }, [noun, verbRootsByLetters]);
 
   if (!noun) return null;
 

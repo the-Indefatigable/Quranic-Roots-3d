@@ -28,7 +28,7 @@ export const TreeView: React.FC = () => {
     if (!selectedRoot) { setRootDetail(null); return; }
 
     const indexEntry = verbRoots.find(r => r.id === selectedRoot) ?? null;
-    const alreadyFull = indexEntry?.babs?.some(b => b.tenses && b.tenses.length > 0) ?? false;
+    const alreadyFull = indexEntry?.babs?.some(b => b.tenses?.length > 0 && b.tenses[0]?.conjugation?.length > 0) ?? false;
     if (alreadyFull) { setRootDetail(indexEntry); return; }
 
     setLoading(true);

@@ -44,9 +44,16 @@ let _onNounDataLoaded: (() => void) | null = null;
 export function onNounDataLoaded(cb: () => void) { _onNounDataLoaded = cb; }
 
 export async function initNounData(): Promise<void> {
-  const res = await fetch('/data/nounsData.json');
-  if (!res.ok) throw new Error(`Failed to load nouns: ${res.status}`);
-  const data = await res.json() as { nouns: Noun[] };
+  let data: { nouns: Noun[] };
+  try {
+    const res = await fetch('/api/nouns');
+    if (!res.ok) throw new Error(`API ${res.status}`);
+    data = await res.json();
+  } catch {
+    const res = await fetch('/data/nounsData.json');
+    if (!res.ok) throw new Error(`Failed to load nouns: ${res.status}`);
+    data = await res.json();
+  }
 
   for (const noun of data.nouns) {
     noun.totalFreq = noun.references.length;

@@ -127,6 +127,10 @@ export const ExplorePanel: React.FC = () => {
     return new Set(sorted.map(r => r.id));
   }, [quickFilter, isNounTab, isSurahMode]);
 
+  // O(1) lookup maps — rebuilt only when data changes
+  const verbsById = useMemo(() => new Map(verbRoots.map(r => [r.id, r])), [verbRoots.length]);
+  const nounsById = useMemo(() => new Map(nounsList.map(n => [n.id, n])), [nounsList.length]);
+
   // Build the items list
   const { items, verbCount, nounCount } = useMemo(() => {
     // ── Surah mode: mixed verbs + nouns ──
@@ -138,7 +142,7 @@ export const ExplorePanel: React.FC = () => {
 
       // Verbs in this surah
       for (const [rootId, ayah] of verbMap) {
-        const root = verbRoots.find(r => r.id === rootId);
+        const root = verbsById.get(rootId);
         if (!root) continue;
         if (search.trim()) {
           const q = search.trim().toLowerCase();
@@ -149,7 +153,7 @@ export const ExplorePanel: React.FC = () => {
 
       // Nouns in this surah
       for (const [nounId, ayah] of nounMap) {
-        const noun = nounsList.find(n => n.id === nounId);
+        const noun = nounsById.get(nounId);
         if (!noun) continue;
         if (search.trim()) {
           const q = search.trim().toLowerCase();
@@ -214,7 +218,7 @@ export const ExplorePanel: React.FC = () => {
     const verbItems: ExploreItem[] = roots.map(r => ({ kind: 'verb', data: r }));
     return { items: verbItems, verbCount: roots.length, nounCount: 0 };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, selectedForms, selectedTenses, selectedNounTypes, sortKey, selectedSurah, surahIndex, topNIds, isNounTab, verbRoots.length, nounsList.length]);
+  }, [search, selectedForms, selectedTenses, selectedNounTypes, sortKey, selectedSurah, surahIndex, topNIds, isNounTab, verbsById, nounsById]);
 
   // Publish filtered lists to store for prev/next navigation
   useEffect(() => {

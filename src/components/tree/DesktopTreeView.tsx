@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useStore, verbRoots } from '../../store/useStore';
 import { TENSE_COLORS } from '../../data/verbs';
 import type { Bab, Tense, VerbRoot } from '../../data/verbs';
@@ -7,6 +7,7 @@ import { OrgNode } from './OrgNode';
 import { ConjugationGrid } from './ConjugationGrid';
 import { ModalHeader } from './ModalHeader';
 import { NounsSection } from './NounsSection';
+import { AdminEditableText } from './AdminEditableText';
 
 export const DesktopTreeView: React.FC<{
   root: VerbRoot;
@@ -58,8 +59,16 @@ export const DesktopTreeView: React.FC<{
     });
   };
 
+  const isAdmin = useStore(s => s.isAdmin);
   const expandAll  = () => setExpandedBabs(new Set(root.babs.map(b => b.id)));
   const collapseAll = () => { setExpandedBabs(new Set()); setActiveTenseModal(null); setZoom(1); recenterTree(); };
+  const downloadRootJson = useCallback(() => {
+    const blob = new Blob([JSON.stringify(root, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `${root.id}.json`; a.click();
+    URL.revokeObjectURL(url);
+  }, [root]);
   const recenterTree = () => {
     const c = document.getElementById('tree-scroll-container');
     if (c) c.scrollTo({ top: 0, left: (c.scrollWidth - c.clientWidth) / 2, behavior: 'smooth' });
@@ -70,7 +79,15 @@ export const DesktopTreeView: React.FC<{
       <div className="arabic" style={{ fontSize: '72px', color: '#ffffff', letterSpacing: '12px', textShadow: '0 0 30px #ff9900, 0 0 60px #ff990044', lineHeight: 1.2 }}>
         {root.root}
       </div>
-      <div style={{ fontSize: '22px', color: '#ddddff', marginTop: '8px', fontStyle: 'italic' }}>{root.meaning}</div>
+      <div style={{ fontSize: '22px', color: '#ddddff', marginTop: '8px', fontStyle: 'italic' }}>
+        <AdminEditableText value={root.meaning} onSave={v => {
+          root.meaning = v;
+          fetch(`/api/roots/${encodeURIComponent(root.id)}`, {
+            method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ meaning: v }),
+          }).catch(console.error);
+        }} style={{ color: '#ddddff' }} />
+      </div>
       <div style={{ display: 'flex', justifyContent: 'center', gap: '14px', marginTop: '20px', direction: 'rtl' }}>
         {root.rootLetters.map((letter, i) => (
           <div key={i} className="arabic" style={{ width: '52px', height: '52px', background: 'rgba(255,153,0,0.1)', border: '1px solid rgba(255,153,0,0.35)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '30px', color: '#ffd080', textShadow: '0 0 10px rgba(255,153,0,0.6)' }}>
@@ -101,9 +118,29 @@ export const DesktopTreeView: React.FC<{
           </div>
         </div>
         {bab.verbMeaning ? (
-          <div style={{ fontSize: '15px', color: '#e8eeff', marginTop: '8px', fontStyle: 'italic', fontWeight: 500 }}>"{bab.verbMeaning}"</div>
+          <div style={{ fontSize: '15px', color: '#e8eeff', marginTop: '8px', fontStyle: 'italic', fontWeight: 500 }}>
+            "<AdminEditableText value={bab.verbMeaning} onSave={v => {
+              bab.verbMeaning = v;
+              if ((bab as unknown as Record<string, unknown>)._formDbId) {
+                fetch(`/api/forms/${(bab as unknown as Record<string, unknown>)._formDbId}`, {
+                  method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ verbMeaning: v }),
+                }).catch(console.error);
+              }
+            }} style={{ color: '#e8eeff' }} />"
+          </div>
         ) : (
-          <div style={{ fontSize: '13px', color: '#999abb', marginTop: '6px' }}>{bab.meaning}</div>
+          <div style={{ fontSize: '13px', color: '#999abb', marginTop: '6px' }}>
+            <AdminEditableText value={bab.meaning} onSave={v => {
+              bab.meaning = v;
+              if ((bab as unknown as Record<string, unknown>)._formDbId) {
+                fetch(`/api/forms/${(bab as unknown as Record<string, unknown>)._formDbId}`, {
+                  method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ meaning: v }),
+                }).catch(console.error);
+              }
+            }} style={{ color: '#999abb' }} />
+          </div>
         )}
         {bab.semanticMeaning && !bab.verbMeaning && (
           <div style={{ fontSize: '11px', color: '#bbf', marginTop: '4px', background: 'rgba(100,100,255,0.1)', padding: '2px 8px', borderRadius: '4px', display: 'inline-block' }}>{bab.semanticMeaning}</div>
@@ -169,6 +206,11 @@ export const DesktopTreeView: React.FC<{
           <button key={label} onClick={action} className="btn-subtle" style={{ padding: '8px 16px', borderRadius: '14px', fontSize: '12px', fontWeight: 600, letterSpacing: '0.05em' }}>{label}</button>
         ))}
         <button onClick={recenterTree} className="btn-accent" style={{ padding: '8px 16px', borderRadius: '14px', fontSize: '12px', fontWeight: 600, letterSpacing: '0.05em' }}>Recenter</button>
+        {isAdmin && (
+          <button onClick={downloadRootJson} style={{ padding: '8px 16px', borderRadius: '14px', fontSize: '12px', fontWeight: 600, letterSpacing: '0.05em', background: 'rgba(34,197,94,0.15)', border: '1px solid rgba(34,197,94,0.3)', color: '#22c55e', cursor: 'pointer' }}>
+            Download JSON
+          </button>
+        )}
       </div>
 
       {/* Canvas */}

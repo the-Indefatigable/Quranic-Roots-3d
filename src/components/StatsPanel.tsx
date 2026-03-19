@@ -54,7 +54,7 @@ export const StatsPanel: React.FC = () => {
   const totalRoots    = verbRoots.length;
   const totalForms    = verbRoots.reduce((s, r) => s + r.babs.length, 0);
   const totalTenses   = verbRoots.reduce((s, r) => s + r.babs.reduce((b, bab) => b + bab.tenses.length, 0), 0);
-  const totalConj     = verbRoots.reduce((s, r) => s + r.babs.reduce((b, bab) => b + bab.tenses.reduce((t, tense) => t + tense.conjugation.filter(c => c.arabic !== '-').length, 0), 0), 0);
+  const totalConj     = verbRoots.reduce((s, r) => s + r.babs.reduce((b, bab) => b + bab.tenses.reduce((t, tense) => t + (tense.conjugation ?? []).filter(c => c.arabic !== '-').length, 0), 0), 0);
 
   return (
     <div style={{

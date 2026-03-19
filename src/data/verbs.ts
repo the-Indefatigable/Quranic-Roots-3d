@@ -85,10 +85,18 @@ const detailCache = new Map<string, VerbRoot>();
 const inFlight = new Map<string, Promise<VerbRoot | null>>();
 
 export async function initData(): Promise<void> {
-  // Load lightweight index only (~490KB vs 28MB full file)
-  const res = await fetch('/data/index.json');
-  if (!res.ok) throw new Error(`Failed to load index: ${res.status} ${res.statusText}`);
-  const jsonData = await res.json() as { roots: (VerbRoot & { isVerb?: boolean })[] };
+  // Load from API (database-backed) with static JSON fallback
+  let jsonData: { roots: (VerbRoot & { isVerb?: boolean })[] };
+  try {
+    const res = await fetch('/api/roots');
+    if (!res.ok) throw new Error(`API ${res.status}`);
+    jsonData = await res.json();
+  } catch {
+    // Fallback to static JSON if API is unavailable
+    const res = await fetch('/data/index.json');
+    if (!res.ok) throw new Error(`Failed to load index: ${res.status} ${res.statusText}`);
+    jsonData = await res.json();
+  }
   const roots = jsonData.roots.filter(r => r.isVerb !== false && r.babs && r.babs.length > 0);
 
   // Sort by pre-computed frequency (already set in index)
@@ -110,10 +118,18 @@ export async function loadRootDetail(rootId: string): Promise<VerbRoot | null> {
 
   const promise = (async () => {
     try {
-      const url = `/data/roots/${encodeURIComponent(rootId)}.json`;
-      const res = await fetch(url);
-      if (!res.ok) return null;
-      const detail = await res.json() as VerbRoot;
+      // Try API first, fall back to static JSON
+      let detail: VerbRoot;
+      try {
+        const apiRes = await fetch(`/api/roots/${encodeURIComponent(rootId)}`);
+        if (!apiRes.ok) throw new Error(`API ${apiRes.status}`);
+        detail = await apiRes.json() as VerbRoot;
+      } catch {
+        const url = `/data/roots/${encodeURIComponent(rootId)}.json`;
+        const res = await fetch(url);
+        if (!res.ok) return null;
+        detail = await res.json() as VerbRoot;
+      }
       detailCache.set(rootId, detail);
       // Patch the verbRoots entry so components using verbRoots get updated data
       const idx = verbRoots.findIndex(r => r.id === rootId);

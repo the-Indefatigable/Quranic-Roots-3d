@@ -3,11 +3,13 @@ import { TENSE_COLORS, verbRoots } from '../data/verbs';
 import type { Bab, Tense, VerbRoot } from '../data/verbs';
 import { useSwipeGesture } from '../hooks/useSwipeGesture';
 import { useStore } from '../store/useStore';
+import { AdminEditableText } from './tree/AdminEditableText';
 
 export const MobileDrillDown: React.FC<{ root: VerbRoot; backToSpace: () => void; visible: boolean }> = ({ root, backToSpace, visible }) => {
   const [selectedBab, setSelectedBab] = useState<Bab | null>(null);
   const [selectedTense, setSelectedTense] = useState<{ tense: Tense; bab: Bab } | null>(null);
   const { setSelectedRoot } = useStore();
+  const isAdmin = useStore(s => s.isAdmin);
   const filteredRootIds  = useStore(s => s.filteredRootIds);
   const previousViewMode = useStore(s => s.previousViewMode);
 
@@ -70,8 +72,22 @@ export const MobileDrillDown: React.FC<{ root: VerbRoot; backToSpace: () => void
             {/* Root Info */}
             <div style={{ textAlign: 'center', marginBottom: '20px' }}>
               <div style={{ fontSize: '64px', fontFamily: "'Scheherazade New', serif", color: '#fff', direction: 'rtl', textShadow: '0 0 20px rgba(255,153,0,0.5)', lineHeight: 1 }}>{root.root}</div>
-              <div style={{ fontSize: '18px', color: '#ddddff', marginTop: '12px', fontStyle: 'italic' }}>{root.meaning}</div>
+              <div style={{ fontSize: '18px', color: '#ddddff', marginTop: '12px', fontStyle: 'italic' }}>
+                <AdminEditableText value={root.meaning} onSave={v => { root.meaning = v; }} style={{ color: '#ddddff' }} />
+              </div>
             </div>
+
+            {isAdmin && (
+              <button onClick={() => {
+                const blob = new Blob([JSON.stringify(root, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url; a.download = `${root.id}.json`; a.click();
+                URL.revokeObjectURL(url);
+              }} style={{ padding: '8px 16px', borderRadius: '10px', border: '1px solid rgba(34,197,94,0.3)', background: 'rgba(34,197,94,0.1)', color: '#22c55e', fontSize: '12px', fontWeight: 600, cursor: 'pointer', width: '100%' }}>
+                Download JSON
+              </button>
+            )}
 
             <div style={{ fontSize: '12px', color: '#888899', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 600, paddingLeft: '4px' }}>Forms (Babs)</div>
             
@@ -84,7 +100,9 @@ export const MobileDrillDown: React.FC<{ root: VerbRoot; backToSpace: () => void
                 <div>
                   <div style={{ fontSize: '12px', color: bab.color, fontWeight: 600, marginBottom: '4px' }}>Form {bab.romanNumeral}</div>
                   <div style={{ fontSize: '28px', fontFamily: "'Scheherazade New', serif", direction: 'rtl' }}>{bab.arabicPattern}</div>
-                  <div style={{ fontSize: '14px', color: '#ccc', marginTop: '4px' }}>{bab.verbMeaning || bab.meaning}</div>
+                  <div style={{ fontSize: '14px', color: '#ccc', marginTop: '4px' }}>
+                    <AdminEditableText value={bab.verbMeaning || bab.meaning} onSave={v => { bab.verbMeaning = v; }} style={{ color: '#ccc' }} />
+                  </div>
                 </div>
                 <div style={{ color: '#666', fontSize: '20px' }}>›</div>
               </div>
@@ -98,7 +116,9 @@ export const MobileDrillDown: React.FC<{ root: VerbRoot; backToSpace: () => void
             <div style={{ textAlign: 'center', marginBottom: '10px', padding: '20px', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: `1px solid ${selectedBab.color}33` }}>
                <div style={{ fontSize: '12px', color: selectedBab.color, fontWeight: 600, marginBottom: '8px' }}>Form {selectedBab.romanNumeral}</div>
                <div style={{ fontSize: '48px', fontFamily: "'Scheherazade New', serif", direction: 'rtl', color: '#fff' }}>{selectedBab.arabicPattern}</div>
-               <div style={{ fontSize: '16px', color: '#e8eeff', marginTop: '12px', fontStyle: 'italic' }}>"{selectedBab.verbMeaning || selectedBab.meaning}"</div>
+               <div style={{ fontSize: '16px', color: '#e8eeff', marginTop: '12px', fontStyle: 'italic' }}>
+                 "<AdminEditableText value={selectedBab.verbMeaning || selectedBab.meaning} onSave={v => { selectedBab.verbMeaning = v; }} style={{ color: '#e8eeff' }} />"
+               </div>
             </div>
 
             <div style={{ fontSize: '12px', color: '#888899', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 600, paddingLeft: '4px' }}>Tenses</div>
@@ -178,7 +198,7 @@ export const MobileDrillDown: React.FC<{ root: VerbRoot; backToSpace: () => void
             </div>
 
             {(() => {
-              const conjMap = new Map(selectedTense.tense.conjugation.map(c => [c.person, c]));
+              const conjMap = new Map((selectedTense.tense.conjugation ?? []).map(c => [c.person, c]));
               const MATRIX_ROWS = [
                 { id: '3m', label: '3rd Masc.', keys: ['3ms', '3md', '3mp'] },
                 { id: '3f', label: '3rd Fem.',  keys: ['3fs', '3fd', '3fp'] },

@@ -26,6 +26,10 @@ interface Store {
   simulationActive: boolean;
   simulationIndex: number;
 
+  isAdmin: boolean;
+  adminLogin: (password: string) => boolean;
+  adminLogout: () => void;
+
   setViewMode: (mode: ViewMode) => void;
   setSpaceView: (v: SpaceView) => void;
   setSelectedRoot: (id: string | null) => void;
@@ -130,6 +134,16 @@ export const useStore = create<Store>((set) => ({
 
   simulationActive: false,
   simulationIndex: 0,
+
+  isAdmin: false,
+  adminLogin: (password: string) => {
+    if (password === 'admin') {
+      set({ isAdmin: true });
+      return true;
+    }
+    return false;
+  },
+  adminLogout: () => set({ isAdmin: false }),
 
   setViewMode: (mode) => set({ viewMode: mode, selectedRoot: null, selectedNoun: null, expandedBab: null, expandedTense: null, simulationActive: false, previousViewMode: null }),
   setSpaceView: (v) => set({ spaceView: v }),
