@@ -17,12 +17,8 @@ interface Props {
 
 export const revalidate = 86400; // 24h — root data is immutable
 
-export const dynamicParams = true; // fallback to SSR for pages not pre-rendered
-
-export async function generateStaticParams() {
-  const allRoots = await db.select({ root: roots.root }).from(roots);
-  return allRoots.map((r) => ({ rootId: r.root }));
-}
+// No generateStaticParams — 1,716 pages overwhelm Railway during build.
+// Pages render on-demand via SSR, then cached 24h by ISR. Same performance, zero build failures.
 
 export async function generateMetadata({ params }: Props) {
   const rootName = decodeURIComponent(params.rootId).replace(/\s/g, '');
