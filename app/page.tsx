@@ -1,5 +1,6 @@
-import ClientApp from '../src/components/ClientApp';
+import Link from 'next/link';
+import { HomepageClient } from '@/components/home/HomepageClient';
 
-export default function Home() {
-  return <ClientApp />;
+export default function HomePage() {
+  return <HomepageClient />;
 }

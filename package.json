@@ -4,24 +4,35 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "next dev",
+    "dev:clean": "rm -rf .next && next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "migrate-db": "node scripts/migrate-to-db.mjs",
     "generate-data": "node scripts/generate-data.mjs",
-    "watch-data": "node scripts/watch-data.mjs"
+    "watch-data": "node scripts/watch-data.mjs",
+    "populate:surahs": "node scripts/populate-surahs.mjs",
+    "populate:ayahs": "node scripts/populate-ayahs.mjs",
+    "populate:translations": "node scripts/populate-translations.mjs",
+    "populate:words": "node scripts/populate-words.mjs",
+    "populate:all": "node scripts/populate-surahs.mjs && node scripts/populate-ayahs.mjs && node scripts/populate-translations.mjs && node scripts/populate-words.mjs",
+    "populate:roots-backfill": "node scripts/backfill-word-roots.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",
-    "@react-three/drei": "^9.122.0",
-    "@react-three/fiber": "^8.18.0",
+    "@tailwindcss/postcss": "^4.2.2",
+    "autoprefixer": "^10.4.27",
+    "clsx": "^2.1.1",
     "drizzle-orm": "^0.45.1",
+    "framer-motion": "^12.38.0",
     "fuse.js": "^7.1.0",
-    "next": "14.2.29",
+    "next": "^14.2.35",
+    "postcss": "^8.5.8",
     "postgres": "^3.4.8",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "three": "^0.161.0",
+    "tailwind-merge": "^3.5.0",
+    "tailwindcss": "^4.2.2",
     "zustand": "^4.5.7"
   },
   "devDependencies": {
@@ -29,7 +40,6 @@
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
-    "@types/three": "^0.161.2",
     "eslint": "^9.39.1",
     "globals": "^16.5.0",
     "typescript": "^5.9.3"

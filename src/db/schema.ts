@@ -65,6 +65,84 @@ export const nouns = pgTable('nouns', {
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
 });
 
+// ── Particles (rootless Quranic words) ─────────────
+export const particles = pgTable('particles', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  form: text('form').notNull(),
+  formBuckwalter: text('form_buckwalter').notNull(),
+  type: text('type').notNull(),
+  meaning: text('meaning'),
+  frequency: integer('frequency').default(0),
+  exampleLocation: text('example_location'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+}, (table) => [
+  uniqueIndex('particles_form_type_unique').on(table.form, table.type),
+]);
+
+// ── Surahs ──────────────────────────────────────────
+export const surahs = pgTable('surahs', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  number: integer('number').unique().notNull(),
+  arabicName: text('arabic_name').notNull(),
+  englishName: text('english_name').notNull(),
+  revelationType: text('revelation_type'), // 'meccan' | 'medinan'
+  versesCount: integer('verses_count').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+});
+
+// ── Ayahs ───────────────────────────────────────────
+export const ayahs = pgTable('ayahs', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  surahNumber: integer('surah_number').notNull(),
+  ayahNumber: integer('ayah_number').notNull(),
+  textUthmani: text('text_uthmani').notNull(),
+  textSimple: text('text_simple'),
+  juzNumber: integer('juz_number'),
+  hizbQuarter: integer('hizb_quarter'),
+  pageNumber: integer('page_number'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+}, (table) => [
+  uniqueIndex('ayahs_surah_ayah_unique').on(table.surahNumber, table.ayahNumber),
+]);
+
+// ── Translations ────────────────────────────────────
+export const translations = pgTable('translations', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: text('name').notNull(),
+  authorName: text('author_name'),
+  languageCode: text('language_code').default('en'),
+  resourceId: integer('resource_id'), // quran.com resource id
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+});
+
+export const translationEntries = pgTable('translation_entries', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  translationId: uuid('translation_id').notNull().references(() => translations.id, { onDelete: 'cascade' }),
+  surahNumber: integer('surah_number').notNull(),
+  ayahNumber: integer('ayah_number').notNull(),
+  text: text('text').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+}, (table) => [
+  uniqueIndex('trans_entry_unique').on(table.translationId, table.surahNumber, table.ayahNumber),
+]);
+
+// ── Quran Words ─────────────────────────────────────
+export const quranWords = pgTable('quran_words', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  surahNumber: integer('surah_number').notNull(),
+  ayahNumber: integer('ayah_number').notNull(),
+  position: integer('position').notNull(),
+  textUthmani: text('text_uthmani').notNull(),
+  textSimple: text('text_simple'),
+  transliteration: text('transliteration'),
+  translation: text('translation'),
+  rootArabic: text('root_arabic'),         // e.g. "ع ل م" — matches roots.root
+  charType: text('char_type').default('word'), // 'word' | 'end' | 'pause'
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+}, (table) => [
+  uniqueIndex('quran_words_verse_pos').on(table.surahNumber, table.ayahNumber, table.position),
+]);
+
 // ── Edit History ───────────────────────────────────
 export const editHistory = pgTable('edit_history', {
   id: uuid('id').primaryKey().defaultRandom(),

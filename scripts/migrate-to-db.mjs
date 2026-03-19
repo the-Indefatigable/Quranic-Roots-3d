@@ -6,7 +6,11 @@ import fs from 'fs';
 import path from 'path';
 import postgres from 'postgres';
 
-const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://postgres:fksaqftYCfNRapsIoTUHopIpCKZNVGyC@shinkansen.proxy.rlwy.net:34283/railway';
+const DATABASE_URL = process.env.DATABASE_URL;
+if (!DATABASE_URL) {
+  console.error('ERROR: DATABASE_URL environment variable is required.\nRun: DATABASE_URL=your_url node scripts/migrate-to-db.mjs');
+  process.exit(1);
+}
 
 function connect() {
   return postgres(DATABASE_URL, { max: 1, idle_timeout: 5, connect_timeout: 30 });

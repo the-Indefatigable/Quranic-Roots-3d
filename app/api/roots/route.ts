@@ -3,6 +3,7 @@ import { db } from '../../../src/db';
 import { roots, forms, tenses } from '../../../src/db/schema';
 import { asc } from 'drizzle-orm';
 import { cacheGet, cacheSet } from '../../../src/db/cache';
+import { withRetry } from '../../../src/db/retry';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,17 +27,17 @@ export async function GET() {
   }
 
   try {
-    // 3 sequential queries (avoids connection pool pressure on Railway proxy)
-    const allRoots = await db.select().from(roots);
-    const allForms = await db.select().from(forms).orderBy(asc(forms.sortOrder));
-    const allTenses = await db.select({
+    // 3 sequential queries with retry (handles Railway cold starts)
+    const allRoots = await withRetry(() => db.select().from(roots));
+    const allForms = await withRetry(() => db.select().from(forms).orderBy(asc(forms.sortOrder)));
+    const allTenses = await withRetry(() => db.select({
       id: tenses.id,
       formId: tenses.formId,
       type: tenses.type,
       arabicName: tenses.arabicName,
       englishName: tenses.englishName,
       occurrences: tenses.occurrences,
-    }).from(tenses);
+    }).from(tenses));
 
     // Index tenses by formId
     const tensesByForm = new Map<string, typeof allTenses>();

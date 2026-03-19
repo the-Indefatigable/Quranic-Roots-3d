@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { db } from '../../../src/db';
 import { nouns, roots } from '../../../src/db/schema';
 import { cacheGet, cacheSet } from '../../../src/db/cache';
+import { withRetry } from '../../../src/db/retry';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,7 +13,7 @@ export async function GET() {
   if (cached) return NextResponse.json(cached);
 
   try {
-    const allNouns = await db.select({
+    const allNouns = await withRetry(() => db.select({
       id: nouns.id,
       lemma: nouns.lemma,
       lemmaClean: nouns.lemmaClean,
@@ -23,9 +24,9 @@ export async function GET() {
       meaning: nouns.meaning,
       totalFreq: nouns.totalFreq,
       references: nouns.references,
-    }).from(nouns);
+    }).from(nouns));
 
-    const rootRows = await db.select({ id: roots.id, root: roots.root }).from(roots);
+    const rootRows = await withRetry(() => db.select({ id: roots.id, root: roots.root }).from(roots));
     const rootMap = new Map(rootRows.map(r => [r.id, r.root]));
 
     const result = allNouns.map(n => ({
