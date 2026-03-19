@@ -80,7 +80,7 @@ export function RootsBrowserClient({ roots }: { roots: RootSummary[] }) {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {filtered.map((root) => (
-          <Link key={root.id} href={`/roots/${encodeURIComponent(root.root)}`}>
+          <Link key={root.id} href={`/roots/${encodeURIComponent(root.root)}`} prefetch={false}>
             <Card className="h-full">
               <div className="flex items-start justify-between mb-2">
                 <ArabicText size="2xl" className="text-gold">

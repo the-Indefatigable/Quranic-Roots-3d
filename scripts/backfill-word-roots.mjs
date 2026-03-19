@@ -61,7 +61,7 @@ async function main() {
 
   let nounRefs = new Map();
   try {
-    const nounsData = JSON.parse(fs.readFileSync('public/data/nounsData.json', 'utf8'));
+    const nounsData = JSON.parse(fs.readFileSync('data/nounsData.json', 'utf8'));
     const nouns = nounsData.nouns || nounsData;
     if (Array.isArray(nouns)) {
       for (const noun of nouns) {

@@ -3,7 +3,7 @@ import { roots } from '@/db/schema';
 import { asc, sql } from 'drizzle-orm';
 import { RootsBrowserClient } from '@/components/roots/RootsBrowserClient';
 
-export const revalidate = 3600;
+export const revalidate = 86400; // 24h — root data is immutable
 
 export const metadata = {
   title: 'Quranic Roots — QuRoots',

@@ -1,11 +1,10 @@
 import { NextResponse } from 'next/server';
-import { db } from '../../../src/db';
+import { db, dbQuery } from '../../../src/db';
 import { roots, forms, tenses } from '../../../src/db/schema';
 import { asc } from 'drizzle-orm';
 import { cacheGet, cacheSet } from '../../../src/db/cache';
-import { withRetry } from '../../../src/db/retry';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 86400; // ISR: 24h — root data rarely changes
 
 const BAB_COLORS: Record<string, string> = {
   I: '#4a9eff', II: '#f97316', III: '#a855f7', IV: '#22c55e', V: '#ec4899',
@@ -28,9 +27,9 @@ export async function GET() {
 
   try {
     // 3 sequential queries with retry (handles Railway cold starts)
-    const allRoots = await withRetry(() => db.select().from(roots));
-    const allForms = await withRetry(() => db.select().from(forms).orderBy(asc(forms.sortOrder)));
-    const allTenses = await withRetry(() => db.select({
+    const allRoots = await dbQuery(() => db.select().from(roots));
+    const allForms = await dbQuery(() => db.select().from(forms).orderBy(asc(forms.sortOrder)));
+    const allTenses = await dbQuery(() => db.select({
       id: tenses.id,
       formId: tenses.formId,
       type: tenses.type,
@@ -85,16 +84,16 @@ export async function GET() {
               color: TENSE_COLORS[t.type] || '#aaa',
               occurrences: t.occurrences || 0,
             })),
-            _formDbId: f.id,
           };
         }),
-        _dbId: r.id,
       };
     });
 
     const payload = { roots: result };
-    cacheSet(CACHE_KEY, payload); // Cache for 5 min
-    return NextResponse.json(payload);
+    cacheSet(CACHE_KEY, payload);
+    return NextResponse.json(payload, {
+      headers: { 'Cache-Control': 'public, s-maxage=86400, stale-while-revalidate=604800' },
+    });
   } catch (err) {
     console.error('[/api/roots] DB error:', err);
     return NextResponse.json(

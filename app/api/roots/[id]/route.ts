@@ -1,10 +1,8 @@
 import { NextResponse } from 'next/server';
-import { db } from '../../../../src/db';
+import { db, dbQuery } from '../../../../src/db';
 import { roots, forms, tenses, editHistory } from '../../../../src/db/schema';
-import { eq, asc } from 'drizzle-orm';
+import { eq, asc, inArray } from 'drizzle-orm';
 import { cacheGet, cacheSet, cacheInvalidate } from '../../../../src/db/cache';
-
-export const dynamic = 'force-dynamic';
 
 const BAB_COLORS: Record<string, string> = {
   I: '#4a9eff', II: '#f97316', III: '#a855f7', IV: '#22c55e', V: '#ec4899',
@@ -28,21 +26,24 @@ export async function GET(
   if (cached) return NextResponse.json(cached);
 
   try {
-    const [root] = await db.select().from(roots).where(eq(roots.root, rootId)).limit(1);
+    const [root] = await dbQuery(() => db.select().from(roots).where(eq(roots.root, rootId)).limit(1));
     if (!root) {
       return NextResponse.json({ error: 'Root not found' }, { status: 404 });
     }
 
-    const rootForms = await db.select().from(forms)
+    const rootForms = await dbQuery(() => db.select().from(forms)
       .where(eq(forms.rootId, root.id))
-      .orderBy(asc(forms.sortOrder));
+      .orderBy(asc(forms.sortOrder)));
 
-    // Fetch tenses per form (small number per root, ~2-10 forms max)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const tensesByForm = new Map<string, any[]>();
-    for (const f of rootForms) {
-      const formTenses = await db.select().from(tenses).where(eq(tenses.formId, f.id));
-      tensesByForm.set(f.id, formTenses);
+    // Batch fetch all tenses for all forms (fixes N+1)
+    const formIds = rootForms.map((f) => f.id);
+    const allTenses = formIds.length > 0
+      ? await dbQuery(() => db.select().from(tenses).where(inArray(tenses.formId, formIds)))
+      : [];
+    const tensesByForm = new Map<string, typeof allTenses>();
+    for (const t of allTenses) {
+      if (!tensesByForm.has(t.formId)) tensesByForm.set(t.formId, []);
+      tensesByForm.get(t.formId)!.push(t);
     }
 
     const babs = rootForms.map(f => {
@@ -70,9 +71,7 @@ export async function GET(
           occurrences: t.occurrences || 0,
           references: (t.references as string[]) || [],
           conjugation: (t.conjugations as unknown[]) || [],
-          _tenseDbId: t.id,
         })),
-        _formDbId: f.id,
       };
     });
 
@@ -85,11 +84,12 @@ export async function GET(
       enriched: true,
       allReferences: (root.allReferences as string[]) || [],
       babs,
-      _dbId: root.id,
     };
 
-    cacheSet(cacheKey, payload); // Cache for 5 min
-    return NextResponse.json(payload);
+    cacheSet(cacheKey, payload);
+    return NextResponse.json(payload, {
+      headers: { 'Cache-Control': 'public, s-maxage=86400, stale-while-revalidate=604800' },
+    });
   } catch (err) {
     console.error(`[/api/roots/${rootId}] DB error:`, err);
     return NextResponse.json(

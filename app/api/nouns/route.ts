@@ -1,10 +1,9 @@
 import { NextResponse } from 'next/server';
-import { db } from '../../../src/db';
+import { db, dbQuery } from '../../../src/db';
 import { nouns, roots } from '../../../src/db/schema';
 import { cacheGet, cacheSet } from '../../../src/db/cache';
-import { withRetry } from '../../../src/db/retry';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 86400; // 24h — noun data rarely changes
 
 const CACHE_KEY = 'api:nouns';
 
@@ -13,7 +12,7 @@ export async function GET() {
   if (cached) return NextResponse.json(cached);
 
   try {
-    const allNouns = await withRetry(() => db.select({
+    const allNouns = await dbQuery(() => db.select({
       id: nouns.id,
       lemma: nouns.lemma,
       lemmaClean: nouns.lemmaClean,
@@ -26,7 +25,7 @@ export async function GET() {
       references: nouns.references,
     }).from(nouns));
 
-    const rootRows = await withRetry(() => db.select({ id: roots.id, root: roots.root }).from(roots));
+    const rootRows = await dbQuery(() => db.select({ id: roots.id, root: roots.root }).from(roots));
     const rootMap = new Map(rootRows.map(r => [r.id, r.root]));
 
     const result = allNouns.map(n => ({
@@ -41,12 +40,13 @@ export async function GET() {
       lookupRef: ((n.references as string[]) || [])[0] || '',
       references: (n.references as string[]) || [],
       totalFreq: n.totalFreq || 0,
-      _dbId: n.id,
     }));
 
     const payload = { nouns: result };
     cacheSet(CACHE_KEY, payload);
-    return NextResponse.json(payload);
+    return NextResponse.json(payload, {
+      headers: { 'Cache-Control': 'public, s-maxage=86400, stale-while-revalidate=604800' },
+    });
   } catch (err) {
     console.error('[/api/nouns] DB error:', err);
     return NextResponse.json(

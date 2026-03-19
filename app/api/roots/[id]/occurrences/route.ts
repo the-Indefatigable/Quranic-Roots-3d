@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/db';
-import { quranWords, ayahs, surahs, translationEntries } from '@/db/schema';
+import { db, dbQuery } from '@/db';
+import { quranWords, surahs, translationEntries } from '@/db/schema';
 import { eq, asc, sql, inArray } from 'drizzle-orm';
 
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
@@ -101,7 +101,9 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
       };
     });
 
-    return NextResponse.json({ occurrences });
+    return NextResponse.json({ occurrences }, {
+      headers: { 'Cache-Control': 'public, s-maxage=86400, stale-while-revalidate=604800' },
+    });
   } catch (err) {
     console.error('[/api/roots/occurrences] Error:', err);
     return NextResponse.json({ error: 'Failed to fetch occurrences' }, { status: 503 });

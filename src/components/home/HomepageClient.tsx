@@ -394,6 +394,7 @@ export function HomepageClient() {
               <motion.div key={root.root} variants={fadeUp} custom={i}>
                 <Link
                   href={`/roots/${encodeURIComponent(root.root)}`}
+                  prefetch={false}
                   className="group flex flex-col items-center text-center bg-white/[0.02] border border-white/[0.04] rounded-2xl p-5 transition-all duration-300 hover:border-gold/20 hover:bg-gold/[0.03]"
                 >
                   <span className="font-arabic text-2xl text-gold mb-2 group-hover:scale-105 transition-transform">

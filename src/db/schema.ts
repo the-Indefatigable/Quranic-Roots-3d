@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, integer, jsonb, timestamp, uniqueIndex } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, text, integer, jsonb, timestamp, uniqueIndex, index } from 'drizzle-orm/pg-core';
 
 // ── Roots ──────────────────────────────────────────
 export const roots = pgTable('roots', {
@@ -63,7 +63,9 @@ export const nouns = pgTable('nouns', {
   references: jsonb('references').default([]),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
-});
+}, (table) => [
+  index('nouns_root_id_idx').on(table.rootId),
+]);
 
 // ── Particles (rootless Quranic words) ─────────────
 export const particles = pgTable('particles', {
@@ -141,6 +143,8 @@ export const quranWords = pgTable('quran_words', {
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 }, (table) => [
   uniqueIndex('quran_words_verse_pos').on(table.surahNumber, table.ayahNumber, table.position),
+  index('quran_words_root_arabic_idx').on(table.rootArabic),
+  index('quran_words_surah_idx').on(table.surahNumber),
 ]);
 
 // ── Edit History ───────────────────────────────────

@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { db, dbQuery } from '@/db';
 import { roots, forms, tenses, nouns, quranWords, ayahs, surahs, translationEntries } from '@/db/schema';
@@ -5,6 +6,7 @@ import { eq, asc, inArray, and, sql } from 'drizzle-orm';
 import { ArabicText } from '@/components/ui/ArabicText';
 import { Badge } from '@/components/ui/Badge';
 import { Card } from '@/components/ui/Card';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { RootDetailClient } from '@/components/roots/RootDetailClient';
 import { QuranicOccurrences } from '@/components/roots/QuranicOccurrences';
 import Link from 'next/link';
@@ -13,7 +15,14 @@ interface Props {
   params: { rootId: string };
 }
 
-export const revalidate = 3600;
+export const revalidate = 86400; // 24h — root data is immutable
+
+export const dynamicParams = true; // fallback to SSR for pages not pre-rendered
+
+export async function generateStaticParams() {
+  const allRoots = await db.select({ root: roots.root }).from(roots);
+  return allRoots.map((r) => ({ rootId: r.root }));
+}
 
 export async function generateMetadata({ params }: Props) {
   const rootName = decodeURIComponent(params.rootId).replace(/\s/g, '');
@@ -295,17 +304,19 @@ export default async function RootDetailPage({ params }: Props) {
         </section>
       )}
 
-      {/* Quranic Occurrences */}
-      {occurrences.length > 0 && (
+      {/* Quranic Occurrences — streamed with Suspense */}
+      {totalAyahs > 0 && (
         <section className="mb-12">
           <h2 className="text-sm text-muted-more uppercase tracking-widest mb-4">
             Quranic Occurrences
           </h2>
-          <QuranicOccurrences
-            occurrences={occurrences}
-            totalAyahs={totalAyahs}
-            rootArabic={root.root}
-          />
+          <Suspense fallback={<div className="space-y-3">{[1,2,3].map(i => <Skeleton key={i} className="h-32 rounded-2xl" />)}</div>}>
+            <QuranicOccurrences
+              occurrences={occurrences}
+              totalAyahs={totalAyahs}
+              rootArabic={root.root}
+            />
+          </Suspense>
         </section>
       )}
 
