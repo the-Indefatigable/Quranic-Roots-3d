@@ -172,9 +172,16 @@ export function TafsirPanel({ surahNumber, ayahNumber, onClose }: Props) {
                       Commentary from ayah {entry.ayahNumber}
                     </p>
                   )}
-                  <div className="text-sm text-white/80 leading-relaxed whitespace-pre-line tafsir-content">
-                    {entry.text}
-                  </div>
+                  <div 
+                    className="text-sm text-white/80 leading-relaxed whitespace-pre-line tafsir-content"
+                    dangerouslySetInnerHTML={{
+                      __html: entry.text
+                        // Bold
+                        .replace(/\*\*(.*?)\*\*/g, '<strong class="text-white font-medium">$1</strong>')
+                        // H3 Headers (###)
+                        .replace(/^###\s+(.*)$/gm, '<h3 class="text-base text-gold mt-6 mb-2 font-medium">$1</h3>')
+                    }}
+                  />
                 </div>
               )}
             </div>
