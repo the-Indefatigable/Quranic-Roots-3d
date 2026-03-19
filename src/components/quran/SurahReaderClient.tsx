@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useAppStore } from '@/store/useAppStore';
 import { WordPopover, type WordData } from './WordPopover';
+import { TafsirPanel } from './TafsirPanel';
 
 interface AyahData {
   number: number;
@@ -15,13 +16,15 @@ interface Props {
   ayahs: AyahData[];
   surahNumber: number;
   hasWords: boolean;
+  hasTafsir?: boolean;
 }
 
-export function SurahReaderClient({ ayahs, surahNumber, hasWords }: Props) {
+export function SurahReaderClient({ ayahs, surahNumber, hasWords, hasTafsir }: Props) {
   const { quranSettings, updateQuranSettings } = useAppStore();
   const [showSettings, setShowSettings] = useState(false);
   const [selectedWord, setSelectedWord] = useState<WordData | null>(null);
   const [wordByWord, setWordByWord] = useState(hasWords);
+  const [tafsirAyah, setTafsirAyah] = useState<number | null>(null);
 
   return (
     <div>
@@ -149,6 +152,21 @@ export function SurahReaderClient({ ayahs, surahNumber, hasWords }: Props) {
               </div>
             </div>
 
+            {/* Ayah actions */}
+            {hasTafsir && (
+              <div className="flex justify-end mt-2">
+                <button
+                  onClick={() => setTafsirAyah(ayah.number)}
+                  className="flex items-center gap-1 text-[10px] text-muted-more hover:text-gold transition-colors uppercase tracking-wider"
+                >
+                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+                  </svg>
+                  Tafsir
+                </button>
+              </div>
+            )}
+
             {/* Divider */}
             <div className="border-b border-white/[0.03] mt-6" />
           </div>
@@ -165,6 +183,13 @@ export function SurahReaderClient({ ayahs, surahNumber, hasWords }: Props) {
 
       {/* Word popover */}
       <WordPopover word={selectedWord} onClose={() => setSelectedWord(null)} />
+
+      {/* Tafsir panel */}
+      <TafsirPanel
+        surahNumber={surahNumber}
+        ayahNumber={tafsirAyah}
+        onClose={() => setTafsirAyah(null)}
+      />
     </div>
   );
 }

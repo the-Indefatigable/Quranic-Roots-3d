@@ -147,6 +147,29 @@ export const quranWords = pgTable('quran_words', {
   index('quran_words_surah_idx').on(table.surahNumber),
 ]);
 
+// ── Tafsirs ────────────────────────────────────────
+export const tafsirs = pgTable('tafsirs', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: text('name').notNull(),
+  authorName: text('author_name'),
+  languageCode: text('language_code').default('en'),
+  resourceId: integer('resource_id'), // quran.com resource id
+  slug: text('slug'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+});
+
+export const tafsirEntries = pgTable('tafsir_entries', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  tafsirId: uuid('tafsir_id').notNull().references(() => tafsirs.id, { onDelete: 'cascade' }),
+  surahNumber: integer('surah_number').notNull(),
+  ayahNumber: integer('ayah_number').notNull(),
+  text: text('text').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+}, (table) => [
+  uniqueIndex('tafsir_entry_unique').on(table.tafsirId, table.surahNumber, table.ayahNumber),
+  index('tafsir_entries_surah_idx').on(table.surahNumber),
+]);
+
 // ── Edit History ───────────────────────────────────
 export const editHistory = pgTable('edit_history', {
   id: uuid('id').primaryKey().defaultRandom(),

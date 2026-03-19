@@ -16,7 +16,8 @@
     "populate:translations": "node scripts/populate-translations.mjs",
     "populate:words": "node scripts/populate-words.mjs",
     "populate:all": "node scripts/populate-surahs.mjs && node scripts/populate-ayahs.mjs && node scripts/populate-translations.mjs && node scripts/populate-words.mjs",
-    "populate:roots-backfill": "node scripts/backfill-word-roots.mjs"
+    "populate:roots-backfill": "node scripts/backfill-word-roots.mjs",
+    "populate:tafsirs": "node scripts/populate-tafsirs.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",
