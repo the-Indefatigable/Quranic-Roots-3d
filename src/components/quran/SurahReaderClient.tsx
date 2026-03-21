@@ -125,7 +125,7 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, hasWords, has
 
         {/* Audio mode toggle */}
         <button
-          onClick={audioMode ? closeAudioMode : openAudioMode}
+          onClick={() => audioMode ? closeAudioMode() : openAudioMode()}
           className={`flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg transition-colors ${
             audioMode
               ? 'bg-gold-dim text-gold'
