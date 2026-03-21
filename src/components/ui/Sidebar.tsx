@@ -7,7 +7,6 @@ import { cn } from '@/lib/cn';
 const navItems = [
   { href: '/quran', label: 'Quran', icon: BookIcon },
   { href: '/roots', label: 'Roots', icon: RootIcon },
-  { href: '/nouns', label: 'Nouns', icon: NounIcon },
   { href: '/search', label: 'Search', icon: SearchIcon },
   { href: '/review', label: 'Review', icon: ReviewIcon },
   { href: '/bookmarks', label: 'Bookmarks', icon: BookmarkIcon },
@@ -64,14 +63,6 @@ function RootIcon({ className }: { className?: string }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" />
-    </svg>
-  );
-}
-
-function NounIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" />
     </svg>
   );
 }

@@ -9,6 +9,7 @@ interface AyahAudio {
 }
 
 interface Props {
+  audioElement: HTMLAudioElement;
   surahNumber: number;
   surahName: string;
   totalAyahs: number;
@@ -19,6 +20,7 @@ interface Props {
 }
 
 export function AudioPlayer({
+  audioElement,
   surahNumber,
   surahName,
   totalAyahs,
@@ -27,7 +29,6 @@ export function AudioPlayer({
   onWordChange,
   onClose,
 }: Props) {
-  const audioRef = useRef<HTMLAudioElement>(null);
   const ayahDataRef = useRef<Map<number, AyahAudio>>(new Map());
   const onAyahChangeRef = useRef(onAyahChange);
   const onWordChangeRef = useRef(onWordChange);
@@ -53,17 +54,14 @@ export function AudioPlayer({
       })
       .catch(() => {
         setTimingsError(true);
-        setTimingsLoaded(true); // still allow play — just no word highlighting
+        setTimingsLoaded(true);
       });
   }, [surahNumber]);
 
   // Load and play a specific ayah
   const playAyah = useCallback((ayahNumber: number) => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
+    const audio = audioElement;
     const ayahData = ayahDataRef.current.get(ayahNumber);
-    // Fall back to EveryAyah.com if no URL from API
     const src = ayahData?.url
       ?? `https://everyayah.com/data/Alafasy_128kbps/${String(surahNumber).padStart(3, '0')}${String(ayahNumber).padStart(3, '0')}.mp3`;
 
@@ -75,55 +73,23 @@ export function AudioPlayer({
     setProgress(0);
     onAyahChangeRef.current(ayahNumber);
     onWordChangeRef.current(null);
-  }, [surahNumber]);
+  }, [audioElement, surahNumber]);
 
-  // Start playback immediately on mount using fallback URL (user gesture is still active),
-  // then timings will be available for word highlighting once loaded.
-  const hasStartedRef = useRef(false);
+  // On mount: the audio element was already unlocked by the click handler in
+  // SurahReaderClient, so we can safely load a src and play now.
   useEffect(() => {
-    if (hasStartedRef.current) return;
-    hasStartedRef.current = true;
-    const audio = audioRef.current;
-    if (!audio) return;
-    const fallbackSrc = `https://everyayah.com/data/Alafasy_128kbps/${String(surahNumber).padStart(3, '0')}${String(startAyah).padStart(3, '0')}.mp3`;
-    audio.src = fallbackSrc;
-    audio.load();
-    audio.play().catch(() => setIsPlaying(false));
-    setIsPlaying(true);
-    onAyahChangeRef.current(startAyah);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    playAyah(startAyah);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // Once timings load, upgrade the src to the quran.com URL (if different) without interrupting playback
-  useEffect(() => {
-    if (!timingsLoaded) return;
-    const audio = audioRef.current;
-    if (!audio) return;
-    const ayahData = ayahDataRef.current.get(currentAyah);
-    if (!ayahData?.url) return;
-    const newSrc = ayahData.url.startsWith('//') ? `https:${ayahData.url}` : ayahData.url;
-    if (audio.src !== newSrc) {
-      const currentTime = audio.currentTime;
-      const wasPlaying = !audio.paused;
-      audio.src = newSrc;
-      audio.load();
-      audio.currentTime = currentTime;
-      if (wasPlaying) audio.play().catch(() => {});
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [timingsLoaded]);
 
   // Audio event handlers
   useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
+    const audio = audioElement;
 
     function handleTimeUpdate() {
-      if (!audio) return;
       const pct = audio.duration ? audio.currentTime / audio.duration : 0;
       setProgress(pct);
 
-      // Word highlighting
       const ms = audio.currentTime * 1000;
       const segments = ayahDataRef.current.get(currentAyah)?.segments ?? [];
       const active = segments.find(([, start, end]) => ms >= start && ms < end);
@@ -136,7 +102,6 @@ export function AudioPlayer({
       setCurrentAyah((prev) => {
         const next = prev < totalAyahs ? prev + 1 : prev;
         if (next !== prev) {
-          // slight delay so the state update propagates before loading next
           setTimeout(() => playAyah(next), 300);
         }
         return next;
@@ -156,11 +121,10 @@ export function AudioPlayer({
       audio.removeEventListener('play', handlePlay);
       audio.removeEventListener('pause', handlePause);
     };
-  }, [currentAyah, totalAyahs, playAyah]);
+  }, [audioElement, currentAyah, totalAyahs, playAyah]);
 
   function togglePlay() {
-    const audio = audioRef.current;
-    if (!audio) return;
+    const audio = audioElement;
     if (audio.src) {
       isPlaying ? audio.pause() : audio.play().catch(() => {});
     } else {
@@ -182,8 +146,6 @@ export function AudioPlayer({
 
   return (
     <>
-      <audio ref={audioRef} preload="auto" />
-
       {/* Floating player bar */}
       <div className="fixed bottom-16 left-0 right-0 lg:bottom-0 lg:left-60 z-30">
         {/* Progress bar */}
@@ -209,15 +171,9 @@ export function AudioPlayer({
 
             <button
               onClick={togglePlay}
-              disabled={!timingsLoaded}
-              className="w-9 h-9 flex items-center justify-center rounded-full bg-gold text-black hover:brightness-110 transition-all disabled:opacity-40"
+              className="w-9 h-9 flex items-center justify-center rounded-full bg-gold text-black hover:brightness-110 transition-all"
             >
-              {!timingsLoaded ? (
-                <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-                </svg>
-              ) : isPlaying ? (
+              {isPlaying ? (
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
                 </svg>
@@ -261,7 +217,7 @@ export function AudioPlayer({
           {/* Close */}
           <button
             onClick={() => {
-              audioRef.current?.pause();
+              audioElement.pause();
               onClose();
             }}
             className="w-7 h-7 flex items-center justify-center text-muted-more hover:text-white transition-colors"

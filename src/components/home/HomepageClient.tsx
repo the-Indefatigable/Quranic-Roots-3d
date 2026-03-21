@@ -144,7 +144,6 @@ export function HomepageClient() {
             {[
               { href: '/quran', label: 'Quran' },
               { href: '/roots', label: 'Roots' },
-              { href: '/nouns', label: 'Nouns' },
             ].map((link) => (
               <Link
                 key={link.href}
@@ -252,7 +251,7 @@ export function HomepageClient() {
           </h2>
         </div>
 
-        <div data-reveal-group className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div data-reveal-group className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {[
             {
               href: '/quran',
@@ -267,13 +266,6 @@ export function HomepageClient() {
               description: 'Browse 1,716 Arabic verb roots with complete conjugation tables across all ten verb forms and tense patterns.',
               icon: RootIcon,
               accent: 'from-gold/10 to-transparent',
-            },
-            {
-              href: '/nouns',
-              title: 'Study Nouns',
-              description: 'Discover derived nouns, active and passive participles, masdars, and adjectives — all linked to their root verbs.',
-              icon: NounIcon,
-              accent: 'from-purple-500/10 to-transparent',
             },
             {
               href: '/bookmarks',
@@ -480,7 +472,6 @@ export function HomepageClient() {
                 {[
                   { href: '/quran', label: 'Read Quran' },
                   { href: '/roots', label: 'Browse Roots' },
-                  { href: '/nouns', label: 'Study Nouns' },
                   { href: '/bookmarks', label: 'Bookmarks' },
                 ].map((link) => (
                   <Link key={link.href} href={link.href} className="text-sm text-white/30 hover:text-white transition-colors">
@@ -528,14 +519,6 @@ function RootIcon({ className }: { className?: string }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" />
-    </svg>
-  );
-}
-
-function NounIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" />
     </svg>
   );
 }

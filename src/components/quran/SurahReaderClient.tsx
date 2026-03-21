@@ -68,6 +68,10 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, hasWords, has
   const [audioCurrentAyah, setAudioCurrentAyah] = useState<number | null>(null);
   const [audioCurrentWordPos, setAudioCurrentWordPos] = useState<number | null>(null);
 
+  // Shared audio element — must exist before AudioPlayer mounts so we can
+  // unlock it synchronously inside the click handler (iOS Safari autoplay gate)
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
   // Auto-scroll to active ayah during playback
   const scrolledAyahRef = useRef<number | null>(null);
   useEffect(() => {
@@ -79,6 +83,11 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, hasWords, has
   }, [audioCurrentAyah, audioMode]);
 
   const openAudioMode = useCallback(() => {
+    // Unlock the audio element RIGHT HERE inside the user gesture —
+    // iOS Safari only allows play() when called synchronously from a click.
+    if (audioRef.current) {
+      audioRef.current.play().catch(() => {});
+    }
     const startAyah = getVisibleAyahNumber(ayahs);
     setAudioStartAyah(startAyah);
     setAudioCurrentAyah(startAyah);
@@ -94,6 +103,8 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, hasWords, has
 
   return (
     <div className={audioMode ? 'pb-28 lg:pb-20' : ''}>
+      {/* Always-mounted audio element so we can unlock it in the click handler */}
+      <audio ref={audioRef} className="hidden" />
       {/* Toolbar */}
       <div className="flex justify-end gap-2 mb-6">
         {hasWords && (
@@ -317,6 +328,7 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, hasWords, has
       {/* Audio player */}
       {audioMode && (
         <AudioPlayer
+          audioElement={audioRef.current!}
           surahNumber={surahNumber}
           surahName={surahName}
           totalAyahs={ayahs.length}
