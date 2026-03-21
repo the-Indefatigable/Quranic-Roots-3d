@@ -1,8 +1,8 @@
 import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
 import { db, dbQuery } from '@/db';
-import { ayahs, translationEntries, translations, surahs } from '@/db/schema';
-import { eq, and } from 'drizzle-orm';
+import { ayahs, quranWords, surahs } from '@/db/schema';
+import { eq, and, asc } from 'drizzle-orm';
 
 export const runtime = 'nodejs';
 
@@ -26,20 +26,17 @@ export async function GET(request: NextRequest) {
       .limit(1)
   );
 
-  const [transRow] = await dbQuery(async () => {
-    const [t] = await db.select({ id: translations.id }).from(translations).limit(1);
-    if (!t) return [];
-    return db.select({ text: translationEntries.text })
-      .from(translationEntries)
-      .where(and(
-        eq(translationEntries.translationId, t.id),
-        eq(translationEntries.surahNumber, s),
-        eq(translationEntries.ayahNumber, a)
-      ))
-      .limit(1);
-  });
+  const words = await dbQuery(() =>
+    db.select({ translation: quranWords.translation, charType: quranWords.charType })
+      .from(quranWords)
+      .where(and(eq(quranWords.surahNumber, s), eq(quranWords.ayahNumber, a)))
+      .orderBy(asc(quranWords.position))
+  );
 
-  const translation = transRow?.text ?? '';
+  const translation = words
+    .filter(w => w.charType === 'word' && w.translation)
+    .map(w => w.translation)
+    .join(' ');
   const maxLen = 130;
   const displayTrans = translation.length > maxLen
     ? translation.slice(0, maxLen) + '…'
