@@ -11,7 +11,7 @@ export async function GET(
 
   try {
     const res = await fetch(
-      `https://api.quran.com/api/v4/recitations/7/by_chapter/${surahNumber}?per_page=300`,
+      `https://api.quran.com/api/v4/recitations/7/by_chapter/${surahNumber}?per_page=300&fields=segments`,
       { headers: { Accept: 'application/json' }, next: { revalidate: false } }
     );
 
@@ -20,16 +20,24 @@ export async function GET(
     const data = await res.json();
 
     // Normalize audio_files into { ayahNumber, url, segments }
+    // Quran.com segments format: [wordIndex, wordPosition, startMs, endMs]
     const ayahs = (data.audio_files ?? []).map((f: {
       verse_key: string;
       url: string;
       segments?: number[][];
     }) => {
       const [, ayahStr] = f.verse_key.split(':');
-      const url = f.url.startsWith('//') ? `https:${f.url}` : f.url;
-      // segments: [[wordPos, startMs, endMs], ...]
+      // URLs can be relative (e.g. "Alafasy/mp3/001001.mp3") or protocol-relative
+      let url = f.url;
+      if (url.startsWith('//')) {
+        url = `https:${url}`;
+      } else if (!url.startsWith('http')) {
+        url = `https://verses.quran.com/${url}`;
+      }
+      // Quran.com segments: [wordIndex(0-based), wordPosition(1-based), startMs, endMs]
+      // Map to [wordPosition(1-based), startMs, endMs] to match our DB positions
       const segments: [number, number, number][] = (f.segments ?? []).map(
-        (s: number[]) => [s[0], s[1], s[2]] as [number, number, number]
+        (s: number[]) => [s[1], s[2], s[3]] as [number, number, number]
       );
       return { ayahNumber: parseInt(ayahStr), url, segments };
     });
