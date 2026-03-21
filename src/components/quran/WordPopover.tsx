@@ -41,8 +41,8 @@ export function WordPopover({ word, onClose }: Props) {
           >
             <div className="bg-card border border-border rounded-t-2xl sm:rounded-2xl p-5 sm:p-4 shadow-2xl max-w-sm mx-auto sm:mx-0 w-full sm:w-72">
               {/* Word */}
-              <div className="text-center sm:text-right mb-3">
-                <p className="font-arabic text-3xl text-gold leading-relaxed" dir="rtl">
+              <div className="text-center sm:text-right mb-4">
+                <p className="font-arabic text-4xl text-gold leading-relaxed" dir="rtl">
                   {word.textUthmani}
                 </p>
               </div>
@@ -52,14 +52,14 @@ export function WordPopover({ word, onClose }: Props) {
                 {word.transliteration && (
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] text-muted-more uppercase tracking-wider">Transliteration</span>
-                    <span className="text-sm text-white/70 italic">{word.transliteration}</span>
+                    <span className="text-sm text-slate-300 italic">{word.transliteration}</span>
                   </div>
                 )}
 
                 {word.translation && (
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] text-muted-more uppercase tracking-wider">Meaning</span>
-                    <span className="text-sm text-white">{word.translation}</span>
+                    <span className="text-sm text-slate-200">{word.translation}</span>
                   </div>
                 )}
 

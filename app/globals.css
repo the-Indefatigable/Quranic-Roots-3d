@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #000000;
-  --color-card: #111111;
-  --color-elevated: #1A1A1A;
+  --color-background: #020617;
+  --color-card: #0F172A;
+  --color-elevated: #1E293B;
   --color-gold: #D4A574;
   --color-gold-light: #E8C9A0;
   --color-gold-dim: rgba(212,165,116,0.15);
@@ -32,7 +32,7 @@ html, body {
   width: 100%;
   min-height: 100vh;
   background: var(--color-background);
-  color: #ffffff;
+  color: #e2e8f0; /* Soft off-white */
 }
 
 /* Custom scrollbar */

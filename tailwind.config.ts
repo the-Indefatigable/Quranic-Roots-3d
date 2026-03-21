@@ -8,9 +8,9 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: '#000000',
-        card: '#111111',
-        elevated: '#1A1A1A',
+        background: '#020617', // slate-950
+        card: '#0F172A',       // slate-900
+        elevated: '#1E293B',   // slate-800
         gold: {
           DEFAULT: '#D4A574',
           light: '#E8C9A0',

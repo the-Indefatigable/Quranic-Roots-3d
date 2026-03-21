@@ -24,10 +24,13 @@ export function BottomNav() {
               key={item.href}
               href={item.href}
               className={cn(
-                'flex flex-col items-center gap-1 px-3 py-1.5 transition-colors',
-                isActive ? 'text-gold' : 'text-muted-more'
+                'relative flex flex-col items-center gap-1 px-3 py-1.5 transition-colors',
+                isActive ? 'text-gold' : 'text-muted-more hover:text-white'
               )}
             >
+              {isActive && (
+                <div className="absolute -top-[1px] left-1/2 -translate-x-1/2 w-8 h-[2px] bg-gold shadow-[0_1px_8px_rgba(212,165,116,0.6)] rounded-b-full" />
+              )}
               <item.icon className="w-5 h-5" />
               <span className="text-[10px] font-medium">{item.label}</span>
             </Link>

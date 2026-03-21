@@ -11,13 +11,14 @@ interface TafsirEntry {
 interface Props {
   surahNumber: number;
   ayahNumber: number | null;
+  ayahs: { number: number; textUthmani: string }[];
   onClose: () => void;
 }
 
 // Client-side cache — survives across open/close within the same page
 const tafsirCache = new Map<string, { entries: TafsirEntry[]; tafsirName: string; authorName: string }>();
 
-export function TafsirPanel({ surahNumber, ayahNumber, onClose }: Props) {
+export function TafsirPanel({ surahNumber, ayahNumber, ayahs, onClose }: Props) {
   const [entry, setEntry] = useState<TafsirEntry | null>(null);
   const [meta, setMeta] = useState<{ tafsirName: string; authorName: string } | null>(null);
   const [loading, setLoading] = useState(false);
@@ -36,8 +37,10 @@ export function TafsirPanel({ surahNumber, ayahNumber, onClose }: Props) {
         const res = await fetch(`/api/tafsir/${surahNumber}`);
         if (!res.ok) throw new Error('Failed');
         const data = await res.json();
+        // Ensure entries are sorted by ayah ASC for range calculation
+        const entries = (data.entries || []).sort((a: TafsirEntry, b: TafsirEntry) => a.ayahNumber - b.ayahNumber);
         cached = {
-          entries: data.entries || [],
+          entries,
           tafsirName: data.tafsirName || '',
           authorName: data.authorName || '',
         };
@@ -86,6 +89,31 @@ export function TafsirPanel({ surahNumber, ayahNumber, onClose }: Props) {
 
   const isOpen = ayahNumber !== null;
 
+  // Calculate the ayah range covered by this tafsir entry
+  let endAyah = ayahNumber || 0;
+  if (entry) {
+    const cached = tafsirCache.get(`${surahNumber}`);
+    if (cached) {
+      const nextEntry = cached.entries.find((e) => e.ayahNumber > entry.ayahNumber);
+      if (nextEntry) {
+        endAyah = nextEntry.ayahNumber - 1;
+      } else {
+        endAyah = ayahs[ayahs.length - 1]?.number || entry.ayahNumber;
+      }
+    } else {
+      endAyah = entry.ayahNumber;
+    }
+  }
+
+  const coveredAyahs = entry
+    ? ayahs.filter((a) => a.number >= entry.ayahNumber && a.number <= endAyah)
+    : [];
+
+  const ayahRangeText =
+    entry && endAyah > entry.ayahNumber
+      ? `${entry.ayahNumber}-${endAyah}`
+      : `${ayahNumber}`;
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -120,7 +148,7 @@ export function TafsirPanel({ surahNumber, ayahNumber, onClose }: Props) {
               </div>
               <div className="flex items-center gap-3">
                 <span className="text-xs text-gold bg-gold-dim px-2 py-1 rounded-lg">
-                  {surahNumber}:{ayahNumber}
+                  Ayah {ayahRangeText}
                 </span>
                 <button
                   onClick={onClose}
@@ -167,11 +195,20 @@ export function TafsirPanel({ surahNumber, ayahNumber, onClose }: Props) {
 
               {!loading && !error && entry && (
                 <div>
-                  {entry.ayahNumber !== ayahNumber && (
-                    <p className="text-[10px] text-muted-more mb-4 uppercase tracking-wider">
-                      Commentary from ayah {entry.ayahNumber}
-                    </p>
+                  {/* Arabic text for the covered ayahs */}
+                  {coveredAyahs.length > 0 && (
+                    <div className="bg-white/[0.02] border border-white/[0.04] rounded-xl p-5 mb-6 space-y-4">
+                      {coveredAyahs.map((a) => (
+                        <p key={a.number} className="font-arabic text-2xl text-white leading-loose text-right" dir="rtl">
+                          {a.textUthmani}
+                          <span className="inline-block shrink-0 w-8 h-8 ml-2 text-center rounded-full bg-gold-dim text-gold text-[10px] font-sans font-medium">
+                            <span className="flex items-center justify-center h-full pt-[2px]">{a.number}</span>
+                          </span>
+                        </p>
+                      ))}
+                    </div>
                   )}
+
                   <div 
                     className="text-sm text-white/80 leading-relaxed whitespace-pre-line tafsir-content"
                     dangerouslySetInnerHTML={{

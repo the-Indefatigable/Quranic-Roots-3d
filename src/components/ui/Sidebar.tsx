@@ -30,9 +30,9 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               className={cn(
-                'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors',
+                'relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors overflow-hidden',
                 isActive
-                  ? 'bg-gold-dim text-gold'
+                  ? 'bg-white/[0.06] text-gold before:absolute before:inset-y-0 before:left-0 before:w-1 before:bg-gold'
                   : 'text-muted hover:text-white hover:bg-white/[0.04]'
               )}
             >

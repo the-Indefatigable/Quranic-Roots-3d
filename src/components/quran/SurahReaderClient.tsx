@@ -119,13 +119,13 @@ export function SurahReaderClient({ ayahs, surahNumber, hasWords, hasTafsir }: P
                           className="flex flex-col items-center gap-1 px-2 py-1.5 rounded-xl hover:bg-gold-dim active:bg-gold-dim transition-colors cursor-pointer group/word border border-transparent hover:border-gold/20"
                         >
                           <span
-                            className="font-arabic text-white group-hover/word:text-gold transition-colors leading-relaxed"
+                            className="font-arabic text-slate-200 group-hover/word:text-gold transition-colors leading-loose"
                             style={{ fontSize: `${quranSettings.fontSize}px` }}
                           >
                             {word.textUthmani}
                           </span>
                           {word.translation && (
-                            <span className="text-[10px] text-muted-more leading-tight max-w-[80px] text-center truncate">
+                            <span className="text-[10px] text-muted leading-tight max-w-[80px] text-center truncate">
                               {word.translation}
                             </span>
                           )}
@@ -135,7 +135,7 @@ export function SurahReaderClient({ ayahs, surahNumber, hasWords, hasTafsir }: P
                 ) : (
                   /* Full ayah mode */
                   <p
-                    className="font-arabic text-white leading-[2.2] text-right"
+                    className="font-arabic text-slate-200 leading-[2.4] text-right"
                     dir="rtl"
                     style={{ fontSize: `${quranSettings.fontSize}px` }}
                   >
@@ -188,6 +188,7 @@ export function SurahReaderClient({ ayahs, surahNumber, hasWords, hasTafsir }: P
       <TafsirPanel
         surahNumber={surahNumber}
         ayahNumber={tafsirAyah}
+        ayahs={ayahs}
         onClose={() => setTafsirAyah(null)}
       />
     </div>
