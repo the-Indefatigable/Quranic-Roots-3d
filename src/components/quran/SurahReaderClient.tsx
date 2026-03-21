@@ -222,9 +222,9 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, hasWords, has
                             <button
                               key={word.position}
                               onClick={(e) => { e.stopPropagation(); setSelectedWord(word); }}
-                              className={`flex flex-col items-center gap-1 px-2 py-1.5 rounded-xl transition-colors cursor-pointer group/word border ${
+                              className={`flex flex-col items-center gap-1 px-2 py-1.5 rounded-xl cursor-pointer group/word border transition-all duration-200 ${
                                 isActiveWord
-                                  ? 'bg-gold-dim border-gold/30'
+                                  ? 'bg-gold-dim border-gold/30 -translate-y-1.5 scale-105'
                                   : 'border-transparent hover:bg-gold-dim hover:border-gold/20'
                               }`}
                             >
