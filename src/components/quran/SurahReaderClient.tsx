@@ -82,13 +82,13 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, hasWords, has
     el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }, [audioCurrentAyah, audioMode]);
 
-  const openAudioMode = useCallback(() => {
+  const openAudioMode = useCallback((fromAyah?: number) => {
     // Unlock the audio element RIGHT HERE inside the user gesture —
     // iOS Safari only allows play() when called synchronously from a click.
     if (audioRef.current) {
       audioRef.current.play().catch(() => {});
     }
-    const startAyah = getVisibleAyahNumber(ayahs);
+    const startAyah = fromAyah ?? getVisibleAyahNumber(ayahs);
     setAudioStartAyah(startAyah);
     setAudioCurrentAyah(startAyah);
     setAudioMode(true);
@@ -267,6 +267,19 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, hasWords, has
 
               {/* Ayah actions */}
               <div className="flex justify-end gap-2 mt-3 pb-1">
+                <button
+                  onClick={() => openAudioMode(ayah.number)}
+                  className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg transition-colors ${
+                    isActiveAyah
+                      ? 'text-gold bg-gold/[0.12]'
+                      : 'text-white/30 hover:text-white/70 bg-white/[0.03] hover:bg-white/[0.06]'
+                  }`}
+                >
+                  <svg className="w-3.5 h-3.5" fill={isActiveAyah ? 'currentColor' : 'none'} viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" />
+                  </svg>
+                  Listen
+                </button>
                 {hasTafsir && (
                   <button
                     onClick={() => setTafsirAyah(ayah.number)}
@@ -328,6 +341,7 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, hasWords, has
       {/* Audio player */}
       {audioMode && (
         <AudioPlayer
+          key={audioStartAyah}
           audioElement={audioRef.current!}
           surahNumber={surahNumber}
           surahName={surahName}
