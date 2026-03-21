@@ -7,6 +7,7 @@ import { cn } from '@/lib/cn';
 const navItems = [
   { href: '/quran', label: 'Quran', icon: BookIcon },
   { href: '/roots', label: 'Roots', icon: RootIcon },
+  { href: '/search', label: 'Search', icon: SearchIcon },
   { href: '/nouns', label: 'Nouns', icon: NounIcon },
   { href: '/bookmarks', label: 'Saved', icon: BookmarkIcon },
 ];
@@ -69,6 +70,14 @@ function BookmarkIcon({ className }: { className?: string }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+    </svg>
+  );
+}
+
+function SearchIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
     </svg>
   );
 }
