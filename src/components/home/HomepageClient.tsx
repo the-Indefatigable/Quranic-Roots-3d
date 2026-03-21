@@ -2,7 +2,33 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+
+// --- Scroll-reveal via IntersectionObserver (no JS on scroll path) ---
+function useScrollReveal() {
+  useEffect(() => {
+    const groups = document.querySelectorAll('[data-reveal-group]');
+    const observers: IntersectionObserver[] = [];
+
+    groups.forEach((group) => {
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            group.querySelectorAll<HTMLElement>('.reveal').forEach((el) => {
+              el.classList.add('revealed');
+            });
+            observer.disconnect();
+          }
+        },
+        { rootMargin: '-60px 0px', threshold: 0 }
+      );
+      observer.observe(group);
+      observers.push(observer);
+    });
+
+    return () => observers.forEach((o) => o.disconnect());
+  }, []);
+}
 
 // --- Animated counter hook ---
 function useCounter(end: number, duration = 2000) {
@@ -16,7 +42,7 @@ function useCounter(end: number, duration = 2000) {
     const step = (timestamp: number) => {
       if (!startTime) startTime = timestamp;
       const progress = Math.min((timestamp - startTime) / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+      const eased = 1 - Math.pow(1 - progress, 3);
       setCount(Math.floor(eased * end));
       if (progress < 1) frame = requestAnimationFrame(step);
     };
@@ -71,27 +97,39 @@ const SAMPLE_ROOTS = [
   { root: 'ر ح م', meaning: 'to have mercy', freq: 339, forms: 3 },
 ];
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * 0.1, duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] as const },
-  }),
-};
-
-const stagger = {
-  visible: { transition: { staggerChildren: 0.08 } },
-};
-
 export function HomepageClient() {
+  useScrollReveal();
+
   const roots = useCounter(1716);
   const ayahs = useCounter(6236);
   const words = useCounter(77429);
-  // Pick verse based on day of year to avoid hydration mismatch
+
+  // Stats section ref — trigger counters via IntersectionObserver too
+  const statsRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const el = statsRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          roots.start();
+          ayahs.start();
+          words.start();
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '-80px', threshold: 0 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const [verse] = useState(() => {
     const now = new Date();
-    const dayOfYear = Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000);
+    const dayOfYear = Math.floor(
+      (now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000
+    );
     return FEATURED_VERSES[dayOfYear % FEATURED_VERSES.length];
   });
 
@@ -127,7 +165,7 @@ export function HomepageClient() {
         </div>
       </nav>
 
-      {/* ===== HERO ===== */}
+      {/* ===== HERO — Framer Motion runs once on load, not scroll-driven ===== */}
       <section className="relative flex flex-col items-center justify-center min-h-screen px-6 text-center pt-14">
         {/* Ambient background glow */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -146,25 +184,25 @@ export function HomepageClient() {
         <motion.p
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
+          transition={{ duration: 0.7, delay: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
           className="font-arabic text-2xl sm:text-3xl text-gold/50 mb-8 leading-relaxed"
         >
           بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ
         </motion.p>
 
         <motion.h1
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
+          transition={{ duration: 0.7, delay: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
           className="text-5xl sm:text-7xl font-extralight tracking-[-0.04em] text-white mb-6"
         >
           Qu<span className="text-gold">Roots</span>
         </motion.h1>
 
         <motion.p
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
+          transition={{ duration: 0.7, delay: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
           className="text-base sm:text-lg text-white/50 max-w-lg mb-4 leading-relaxed"
         >
           A comprehensive platform to explore the linguistic roots of the Quran.
@@ -174,16 +212,16 @@ export function HomepageClient() {
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.8 }}
+          transition={{ duration: 0.7, delay: 0.65, ease: [0.25, 0.46, 0.45, 0.94] }}
           className="text-xs text-white/25 tracking-widest uppercase mb-10"
         >
           Read &middot; Explore &middot; Understand
         </motion.p>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 1.0 }}
+          transition={{ duration: 0.7, delay: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
           className="flex flex-col sm:flex-row items-center gap-3"
         >
           <Link
@@ -203,27 +241,22 @@ export function HomepageClient() {
           </Link>
         </motion.div>
 
-        {/* Scroll indicator */}
+        {/* Scroll indicator — pure CSS animation, no JS */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 1.5 }}
+          transition={{ delay: 1.4, duration: 0.6 }}
           className="absolute bottom-8 left-1/2 -translate-x-1/2"
         >
-          <motion.div
-            animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-            className="w-5 h-8 rounded-full border border-white/10 flex items-start justify-center p-1.5"
-          >
+          <div className="animate-scroll-bounce w-5 h-8 rounded-full border border-white/10 flex items-start justify-center p-1.5">
             <div className="w-1 h-1.5 rounded-full bg-white/30" />
-          </motion.div>
+          </div>
         </motion.div>
       </section>
 
       {/* ===== STATS ===== */}
-      <motion.section
-        onViewportEnter={() => { roots.start(); ayahs.start(); words.start(); }}
-        viewport={{ once: true, margin: '-100px' }}
+      <section
+        ref={statsRef}
         className="relative border-y border-white/[0.04] py-16 sm:py-20"
       >
         <div className="absolute inset-0 bg-gradient-to-b from-white/[0.01] to-transparent pointer-events-none" />
@@ -241,32 +274,20 @@ export function HomepageClient() {
             </div>
           ))}
         </div>
-      </motion.section>
+      </section>
 
       {/* ===== FEATURE CARDS ===== */}
       <section className="max-w-5xl mx-auto px-6 py-20 sm:py-28">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-80px' }}
-          variants={stagger}
-          className="text-center mb-14"
-        >
-          <motion.p variants={fadeUp} custom={0} className="text-xs text-gold tracking-widest uppercase mb-3">
+        <div data-reveal-group className="text-center mb-14">
+          <p className="reveal text-xs text-gold tracking-widest uppercase mb-3" style={{ '--reveal-delay': '0s' } as React.CSSProperties}>
             Everything you need
-          </motion.p>
-          <motion.h2 variants={fadeUp} custom={1} className="text-3xl sm:text-4xl font-extralight tracking-tight text-white">
+          </p>
+          <h2 className="reveal text-3xl sm:text-4xl font-extralight tracking-tight text-white" style={{ '--reveal-delay': '0.08s' } as React.CSSProperties}>
             One platform for Quranic study
-          </motion.h2>
-        </motion.div>
+          </h2>
+        </div>
 
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-80px' }}
-          variants={stagger}
-          className="grid grid-cols-1 sm:grid-cols-2 gap-4"
-        >
+        <div data-reveal-group className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {[
             {
               href: '/quran',
@@ -297,7 +318,11 @@ export function HomepageClient() {
               accent: 'from-blue-500/10 to-transparent',
             },
           ].map((feature, i) => (
-            <motion.div key={feature.title} variants={fadeUp} custom={i}>
+            <div
+              key={feature.title}
+              className="reveal"
+              style={{ '--reveal-delay': `${i * 0.08}s` } as React.CSSProperties}
+            >
               <Link
                 href={feature.href}
                 className="group relative flex flex-col h-full bg-white/[0.02] border border-white/[0.04] rounded-2xl p-7 sm:p-8 transition-all duration-300 hover:border-white/[0.08] hover:bg-white/[0.03]"
@@ -317,28 +342,21 @@ export function HomepageClient() {
                   </div>
                 </div>
               </Link>
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
       </section>
 
       {/* ===== VERSE OF THE DAY ===== */}
       <section className="relative py-20 sm:py-28">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-gold/[0.02] to-transparent pointer-events-none" />
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-80px' }}
-          variants={stagger}
-          className="max-w-3xl mx-auto px-6 text-center"
-        >
-          <motion.p variants={fadeUp} custom={0} className="text-xs text-gold/50 tracking-widest uppercase mb-10">
+        <div data-reveal-group className="max-w-3xl mx-auto px-6 text-center">
+          <p className="reveal text-xs text-gold/50 tracking-widest uppercase mb-10" style={{ '--reveal-delay': '0s' } as React.CSSProperties}>
             Verse of the moment
-          </motion.p>
+          </p>
 
-          <motion.div variants={fadeUp} custom={1}>
+          <div className="reveal" style={{ '--reveal-delay': '0.1s' } as React.CSSProperties}>
             <div className="relative">
-              {/* Decorative quotation marks */}
               <span className="absolute -top-4 left-0 text-5xl text-gold/10 font-serif leading-none select-none">&ldquo;</span>
               <span className="absolute -bottom-6 right-0 text-5xl text-gold/10 font-serif leading-none select-none">&rdquo;</span>
 
@@ -358,40 +376,34 @@ export function HomepageClient() {
                 </svg>
               </Link>
             </div>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       </section>
 
       {/* ===== POPULAR ROOTS PREVIEW ===== */}
       <section className="max-w-5xl mx-auto px-6 py-20 sm:py-28">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-80px' }}
-          variants={stagger}
-        >
+        <div data-reveal-group>
           <div className="flex items-end justify-between mb-10">
             <div>
-              <motion.p variants={fadeUp} custom={0} className="text-xs text-gold tracking-widest uppercase mb-3">
+              <p className="reveal text-xs text-gold tracking-widest uppercase mb-3" style={{ '--reveal-delay': '0s' } as React.CSSProperties}>
                 Most frequent
-              </motion.p>
-              <motion.h2 variants={fadeUp} custom={1} className="text-2xl sm:text-3xl font-extralight tracking-tight text-white">
+              </p>
+              <h2 className="reveal text-2xl sm:text-3xl font-extralight tracking-tight text-white" style={{ '--reveal-delay': '0.08s' } as React.CSSProperties}>
                 Popular roots in the Quran
-              </motion.h2>
+              </h2>
             </div>
-            <motion.div variants={fadeUp} custom={2}>
-              <Link href="/roots" className="text-xs text-white/30 hover:text-white transition-colors hidden sm:block">
-                View all roots &rarr;
-              </Link>
-            </motion.div>
+            <Link href="/roots" className="reveal text-xs text-white/30 hover:text-white transition-colors hidden sm:block" style={{ '--reveal-delay': '0.16s' } as React.CSSProperties}>
+              View all roots &rarr;
+            </Link>
           </div>
 
-          <motion.div
-            variants={stagger}
-            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3"
-          >
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
             {SAMPLE_ROOTS.map((root, i) => (
-              <motion.div key={root.root} variants={fadeUp} custom={i}>
+              <div
+                key={root.root}
+                className="reveal"
+                style={{ '--reveal-delay': `${0.24 + i * 0.06}s` } as React.CSSProperties}
+              >
                 <Link
                   href={`/roots/${encodeURIComponent(root.root)}`}
                   prefetch={false}
@@ -403,38 +415,26 @@ export function HomepageClient() {
                   <span className="text-xs text-white/50 mb-1">{root.meaning}</span>
                   <span className="text-[10px] text-white/20">{root.freq}x in Quran</span>
                 </Link>
-              </motion.div>
+              </div>
             ))}
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       </section>
 
       {/* ===== HOW IT WORKS ===== */}
       <section className="relative py-20 sm:py-28 border-y border-white/[0.04]">
         <div className="absolute inset-0 bg-gradient-to-b from-white/[0.01] to-transparent pointer-events-none" />
         <div className="max-w-5xl mx-auto px-6">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: '-80px' }}
-            variants={stagger}
-            className="text-center mb-14"
-          >
-            <motion.p variants={fadeUp} custom={0} className="text-xs text-gold tracking-widest uppercase mb-3">
+          <div data-reveal-group className="text-center mb-14">
+            <p className="reveal text-xs text-gold tracking-widest uppercase mb-3" style={{ '--reveal-delay': '0s' } as React.CSSProperties}>
               Simple &amp; powerful
-            </motion.p>
-            <motion.h2 variants={fadeUp} custom={1} className="text-3xl sm:text-4xl font-extralight tracking-tight text-white">
+            </p>
+            <h2 className="reveal text-3xl sm:text-4xl font-extralight tracking-tight text-white" style={{ '--reveal-delay': '0.08s' } as React.CSSProperties}>
               How QuRoots works
-            </motion.h2>
-          </motion.div>
+            </h2>
+          </div>
 
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: '-80px' }}
-            variants={stagger}
-            className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-6"
-          >
+          <div data-reveal-group className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-6">
             {[
               {
                 step: '01',
@@ -452,38 +452,36 @@ export function HomepageClient() {
                 description: 'Explore the full root page with all verb forms, derived nouns, and every Quranic occurrence.',
               },
             ].map((item, i) => (
-              <motion.div key={item.step} variants={fadeUp} custom={i} className="relative text-center sm:text-left">
+              <div
+                key={item.step}
+                className="reveal relative text-center sm:text-left"
+                style={{ '--reveal-delay': `${i * 0.1}s` } as React.CSSProperties}
+              >
                 <span className="text-4xl sm:text-5xl font-extralight text-gold/10 mb-3 block">
                   {item.step}
                 </span>
                 <h3 className="text-base font-medium text-white mb-2">{item.title}</h3>
                 <p className="text-sm text-white/35 leading-relaxed">{item.description}</p>
-              </motion.div>
+              </div>
             ))}
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* ===== CTA ===== */}
       <section className="py-20 sm:py-28">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-80px' }}
-          variants={stagger}
-          className="max-w-2xl mx-auto px-6 text-center"
-        >
-          <motion.div variants={fadeUp} custom={0}>
-            <p className="font-arabic text-xl text-gold/30 mb-6">رَبِّ زِدْنِى عِلْمًا</p>
-          </motion.div>
-          <motion.h2 variants={fadeUp} custom={1} className="text-3xl sm:text-4xl font-extralight tracking-tight text-white mb-4">
+        <div data-reveal-group className="max-w-2xl mx-auto px-6 text-center">
+          <p className="reveal font-arabic text-xl text-gold/30 mb-6" style={{ '--reveal-delay': '0s' } as React.CSSProperties}>
+            رَبِّ زِدْنِى عِلْمًا
+          </p>
+          <h2 className="reveal text-3xl sm:text-4xl font-extralight tracking-tight text-white mb-4" style={{ '--reveal-delay': '0.08s' } as React.CSSProperties}>
             Begin your journey
-          </motion.h2>
-          <motion.p variants={fadeUp} custom={2} className="text-white/40 mb-10 leading-relaxed">
+          </h2>
+          <p className="reveal text-white/40 mb-10 leading-relaxed" style={{ '--reveal-delay': '0.16s' } as React.CSSProperties}>
             Whether you are a student of Arabic, a hafiz deepening your understanding,
             or simply curious about the language of the Quran — QuRoots is built for you.
-          </motion.p>
-          <motion.div variants={fadeUp} custom={3}>
+          </p>
+          <div className="reveal" style={{ '--reveal-delay': '0.24s' } as React.CSSProperties}>
             <Link
               href="/quran"
               className="inline-flex items-center gap-2 bg-gold text-black px-10 py-4 rounded-xl text-sm font-semibold hover:bg-gold-light transition-all hover:shadow-[0_0_40px_rgba(212,165,116,0.15)]"
@@ -493,15 +491,14 @@ export function HomepageClient() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
               </svg>
             </Link>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       </section>
 
       {/* ===== FOOTER ===== */}
       <footer className="border-t border-white/[0.04] py-12 sm:py-16">
         <div className="max-w-5xl mx-auto px-6">
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-10 sm:gap-8 mb-12">
-            {/* Brand */}
             <div className="sm:col-span-2">
               <p className="text-lg font-light tracking-tight text-white mb-3">
                 Qu<span className="text-gold">Roots</span>
@@ -512,7 +509,6 @@ export function HomepageClient() {
               </p>
             </div>
 
-            {/* Navigate */}
             <div>
               <p className="text-xs text-white/20 tracking-widest uppercase mb-4">Navigate</p>
               <div className="flex flex-col gap-2.5">
@@ -529,7 +525,6 @@ export function HomepageClient() {
               </div>
             </div>
 
-            {/* Resources */}
             <div>
               <p className="text-xs text-white/20 tracking-widest uppercase mb-4">Resources</p>
               <div className="flex flex-col gap-2.5">
