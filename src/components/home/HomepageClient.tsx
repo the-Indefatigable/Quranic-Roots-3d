@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 
 // --- Scroll-reveal via IntersectionObserver (no JS on scroll path) ---
@@ -136,7 +135,7 @@ export function HomepageClient() {
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
       {/* ===== TOP NAV ===== */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-background/60 backdrop-blur-2xl border-b border-white/[0.04]">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-background/60 backdrop-blur-xl border-b border-white/[0.04]">
         <div className="max-w-6xl mx-auto flex items-center justify-between h-14 px-6">
           <Link href="/" className="text-lg font-light tracking-tight text-white">
             Qu<span className="text-gold">Roots</span>
@@ -165,65 +164,35 @@ export function HomepageClient() {
         </div>
       </nav>
 
-      {/* ===== HERO — Framer Motion runs once on load, not scroll-driven ===== */}
+      {/* ===== HERO — Pure CSS animations, no JS on the animation path ===== */}
       <section className="relative flex flex-col items-center justify-center min-h-screen px-6 text-center pt-14">
-        {/* Ambient background glow */}
+        {/* Ambient background glow — reduced blur for mobile GPU perf */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-gold/[0.04] rounded-full blur-[120px]" />
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-gold/[0.02] rounded-full blur-[100px]" />
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-gold/[0.04] rounded-full blur-[80px]" />
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-gold/[0.02] rounded-full blur-[60px]" />
         </div>
 
         {/* Decorative line */}
-        <motion.div
-          initial={{ scaleX: 0 }}
-          animate={{ scaleX: 1 }}
-          transition={{ duration: 1.2, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="w-16 h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent mb-8"
-        />
+        <div className="hero-line w-16 h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent mb-8" />
 
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="font-arabic text-2xl sm:text-3xl text-gold/50 mb-8 leading-relaxed"
-        >
+        <p className="hero-bismillah font-arabic text-2xl sm:text-3xl text-gold/50 mb-8 leading-relaxed">
           بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ
-        </motion.p>
+        </p>
 
-        <motion.h1
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="text-5xl sm:text-7xl font-extralight tracking-[-0.04em] text-white mb-6"
-        >
+        <h1 className="hero-title text-5xl sm:text-7xl font-extralight tracking-[-0.04em] text-white mb-6">
           Qu<span className="text-gold">Roots</span>
-        </motion.h1>
+        </h1>
 
-        <motion.p
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="text-base sm:text-lg text-white/50 max-w-lg mb-4 leading-relaxed"
-        >
+        <p className="hero-subtitle text-base sm:text-lg text-white/50 max-w-lg mb-4 leading-relaxed">
           A comprehensive platform to explore the linguistic roots of the Quran.
           Read, study, and understand every word.
-        </motion.p>
+        </p>
 
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.7, delay: 0.65, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="text-xs text-white/25 tracking-widest uppercase mb-10"
-        >
+        <p className="hero-tagline text-xs text-white/25 tracking-widest uppercase mb-10">
           Read &middot; Explore &middot; Understand
-        </motion.p>
+        </p>
 
-        <motion.div
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="flex flex-col sm:flex-row items-center gap-3"
-        >
+        <div className="hero-cta flex flex-col sm:flex-row items-center gap-3">
           <Link
             href="/quran"
             className="inline-flex items-center gap-2 bg-gold text-black px-8 py-3.5 rounded-xl text-sm font-semibold hover:bg-gold-light transition-all hover:shadow-[0_0_30px_rgba(212,165,116,0.2)]"
@@ -239,19 +208,14 @@ export function HomepageClient() {
           >
             Explore Roots
           </Link>
-        </motion.div>
+        </div>
 
         {/* Scroll indicator — pure CSS animation, no JS */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.4, duration: 0.6 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2"
-        >
+        <div className="hero-scroll absolute bottom-8 left-1/2 -translate-x-1/2">
           <div className="animate-scroll-bounce w-5 h-8 rounded-full border border-white/10 flex items-start justify-center p-1.5">
             <div className="w-1 h-1.5 rounded-full bg-white/30" />
           </div>
-        </motion.div>
+        </div>
       </section>
 
       {/* ===== STATS ===== */}

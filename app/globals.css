@@ -65,6 +65,83 @@ html, body {
   animation: scroll-bounce 2s ease-in-out infinite;
 }
 
+/* ===== Hero entrance animations (pure CSS, GPU-composited) ===== */
+@keyframes hero-fade-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes hero-scale-x {
+  from {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes hero-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.hero-line {
+  opacity: 0;
+  will-change: transform, opacity;
+  animation: hero-scale-x 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation-delay: 0s;
+}
+
+.hero-bismillah {
+  opacity: 0;
+  will-change: transform, opacity;
+  animation: hero-fade-up 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation-delay: 0.2s;
+}
+
+.hero-title {
+  opacity: 0;
+  will-change: transform, opacity;
+  animation: hero-fade-up 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation-delay: 0.35s;
+}
+
+.hero-subtitle {
+  opacity: 0;
+  will-change: transform, opacity;
+  animation: hero-fade-up 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation-delay: 0.5s;
+}
+
+.hero-tagline {
+  opacity: 0;
+  will-change: transform, opacity;
+  animation: hero-fade-in 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation-delay: 0.65s;
+}
+
+.hero-cta {
+  opacity: 0;
+  will-change: transform, opacity;
+  animation: hero-fade-up 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation-delay: 0.8s;
+}
+
+.hero-scroll {
+  opacity: 0;
+  will-change: opacity;
+  animation: hero-fade-in 0.6s ease forwards;
+  animation-delay: 1.4s;
+}
+
 /* Base element styles */
 a { text-decoration: none; color: inherit; }
 

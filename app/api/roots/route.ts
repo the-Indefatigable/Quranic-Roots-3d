@@ -52,7 +52,10 @@ export async function GET() {
       formsByRoot.get(f.rootId)!.push(f);
     }
 
-    const result = allRoots.map(r => {
+    // Only include roots that have at least one verb form
+    const verbRoots = allRoots.filter(r => formsByRoot.has(r.id) && formsByRoot.get(r.id)!.length > 0);
+
+    const result = verbRoots.map(r => {
       const rootForms = formsByRoot.get(r.id) || [];
       return {
         id: r.root,

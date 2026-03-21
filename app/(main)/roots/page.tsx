@@ -11,7 +11,7 @@ export const metadata = {
 };
 
 export default async function RootsPage() {
-  // Fetch all roots with form counts in a single query
+  // Fetch only roots that have at least one verb form
   const rootRows = await dbQuery(() =>
     db.select({
       id: roots.id,
@@ -19,7 +19,9 @@ export default async function RootsPage() {
       meaning: roots.meaning,
       totalFreq: roots.totalFreq,
       formCount: sql<number>`(SELECT COUNT(*) FROM forms WHERE forms.root_id = ${roots.id})`.as('form_count'),
-    }).from(roots).orderBy(asc(roots.root))
+    }).from(roots)
+      .where(sql`EXISTS (SELECT 1 FROM forms WHERE forms.root_id = ${roots.id})`)
+      .orderBy(asc(roots.root))
   );
 
   const data = rootRows.map((r) => ({
