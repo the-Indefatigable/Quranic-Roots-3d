@@ -77,10 +77,40 @@ export function AudioPlayer({
     onWordChangeRef.current(null);
   }, [surahNumber]);
 
-  // Auto-play on mount once timings are ready
+  // Start playback immediately on mount using fallback URL (user gesture is still active),
+  // then timings will be available for word highlighting once loaded.
+  const hasStartedRef = useRef(false);
   useEffect(() => {
-    if (timingsLoaded) playAyah(startAyah);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (hasStartedRef.current) return;
+    hasStartedRef.current = true;
+    const audio = audioRef.current;
+    if (!audio) return;
+    const fallbackSrc = `https://everyayah.com/data/Alafasy_128kbps/${String(surahNumber).padStart(3, '0')}${String(startAyah).padStart(3, '0')}.mp3`;
+    audio.src = fallbackSrc;
+    audio.load();
+    audio.play().catch(() => setIsPlaying(false));
+    setIsPlaying(true);
+    onAyahChangeRef.current(startAyah);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Once timings load, upgrade the src to the quran.com URL (if different) without interrupting playback
+  useEffect(() => {
+    if (!timingsLoaded) return;
+    const audio = audioRef.current;
+    if (!audio) return;
+    const ayahData = ayahDataRef.current.get(currentAyah);
+    if (!ayahData?.url) return;
+    const newSrc = ayahData.url.startsWith('//') ? `https:${ayahData.url}` : ayahData.url;
+    if (audio.src !== newSrc) {
+      const currentTime = audio.currentTime;
+      const wasPlaying = !audio.paused;
+      audio.src = newSrc;
+      audio.load();
+      audio.currentTime = currentTime;
+      if (wasPlaying) audio.play().catch(() => {});
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timingsLoaded]);
 
   // Audio event handlers
