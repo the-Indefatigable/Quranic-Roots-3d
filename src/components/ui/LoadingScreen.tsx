@@ -2,17 +2,13 @@
 
 import { motion } from 'framer-motion';
 
-const LOADING_VERSES = [
-  { arabic: 'رَبِّ زِدْنِى عِلْمًا', translation: 'My Lord, increase me in knowledge' },
-  { arabic: 'فَإِنَّ مَعَ ٱلْعُسْرِ يُسْرًا', translation: 'For indeed, with hardship comes ease' },
-  { arabic: 'وَعَلَّمَكَ مَا لَمْ تَكُن تَعْلَمُ', translation: 'And taught you that which you did not know' },
-  { arabic: 'ٱقْرَأْ بِٱسْمِ رَبِّكَ ٱلَّذِى خَلَقَ', translation: 'Read in the name of your Lord who created' },
-];
+const VERSE = {
+  arabic: 'يَٰٓأَيُّهَا ٱلَّذِينَ ءَامَنُوا۟ ٱسْتَعِينُوا۟ بِٱلصَّبْرِ وَٱلصَّلَوٰةِ ۚ إِنَّ ٱللَّهَ مَعَ ٱلصَّٰبِرِينَ',
+  translation: 'Seek help through patience and prayer. Indeed, Allah is with the patient.',
+  reference: 'Al-Baqarah 2:153',
+};
 
 export function LoadingScreen({ message }: { message?: string }) {
-  // Pick based on current minute to be stable across renders
-  const verse = LOADING_VERSES[new Date().getMinutes() % LOADING_VERSES.length];
-
   return (
     <div className="flex flex-col items-center justify-center py-32">
       {/* Animated dots */}
@@ -37,17 +33,25 @@ export function LoadingScreen({ message }: { message?: string }) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, delay: 0.3 }}
-        className="font-arabic text-xl text-gold/40 mb-3 text-center"
+        className="font-arabic text-2xl sm:text-3xl text-gold/60 mb-3 text-center leading-[2] px-4"
       >
-        {verse.arabic}
+        {VERSE.arabic}
       </motion.p>
       <motion.p
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, delay: 0.5 }}
-        className="text-xs text-white/20 italic text-center"
+        className="text-sm text-white/30 italic text-center mb-2"
       >
-        {verse.translation}
+        &ldquo;{VERSE.translation}&rdquo;
+      </motion.p>
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8, delay: 0.6 }}
+        className="text-xs text-white/15 tracking-widest"
+      >
+        {VERSE.reference}
       </motion.p>
 
       {message && (

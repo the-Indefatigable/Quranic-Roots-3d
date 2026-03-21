@@ -10,7 +10,7 @@ export const metadata = {
   description: 'Browse all 114 surahs of the Quran with word-by-word analysis',
 };
 
-export const revalidate = 86400; // 24h — surah list is immutable
+export const revalidate = false; // Quran data never changes — cache forever, invalidate on redeploy
 
 export default async function QuranPage() {
   const allSurahs = await dbQuery(() =>
@@ -29,7 +29,6 @@ export default async function QuranPage() {
           <Link
             key={surah.number}
             href={`/quran/${surah.number}`}
-            prefetch={false}
             className="group flex items-center gap-4 bg-card border border-border rounded-2xl px-5 py-4 transition-colors hover:border-white/[0.12] hover:bg-elevated"
           >
             <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gold-dim text-gold text-sm font-medium">

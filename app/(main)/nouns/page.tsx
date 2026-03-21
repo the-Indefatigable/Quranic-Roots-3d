@@ -3,7 +3,7 @@ import { nouns, roots } from '@/db/schema';
 import { asc } from 'drizzle-orm';
 import { NounsBrowserClient } from '@/components/nouns/NounsBrowserClient';
 
-export const revalidate = 86400; // 24h — noun data is immutable
+export const revalidate = false; // Noun data never changes — cache forever, invalidate on redeploy
 
 export const metadata = {
   title: 'Quranic Nouns — QuRoots',

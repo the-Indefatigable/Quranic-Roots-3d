@@ -10,7 +10,7 @@ interface Props {
   params: { surahId: string };
 }
 
-export const revalidate = 86400; // 24h — Quran data is immutable
+export const revalidate = false; // Quran data never changes — cache forever, invalidate on redeploy
 
 export function generateStaticParams() {
   return Array.from({ length: 114 }, (_, i) => ({ surahId: String(i + 1) }));
