@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   description: 'Explore Quranic Arabic roots, read the Quran word-by-word, and study verb conjugations and morphology. A comprehensive platform for learning Quranic Arabic.',
   keywords: ['Quranic Arabic', 'Arabic verb roots', 'learn Quran Arabic', 'Arabic conjugation', 'Arabic morphology', 'sarf', 'Quran reader', 'word by word Quran', 'Quranic vocabulary'],
   authors: [{ name: 'QuRoots' }],
-  metadataBase: new URL('https://quroots.com'),
+  metadataBase: new URL('https://www.quroots.com'),
   alternates: { canonical: '/' },
   openGraph: {
     type: 'website',
