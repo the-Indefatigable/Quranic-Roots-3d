@@ -19,12 +19,28 @@ interface Props {
   hasTafsir?: boolean;
 }
 
+async function shareAyah(surahNumber: number, ayahNumber: number, setCopied: (n: number | null) => void) {
+  const shareUrl = `${window.location.origin}/share/${surahNumber}/${ayahNumber}`;
+  if (navigator.share) {
+    try {
+      await navigator.share({ url: shareUrl });
+      return;
+    } catch {
+      // fell through to clipboard
+    }
+  }
+  await navigator.clipboard.writeText(shareUrl);
+  setCopied(ayahNumber);
+  setTimeout(() => setCopied(null), 2000);
+}
+
 export function SurahReaderClient({ ayahs, surahNumber, hasWords, hasTafsir }: Props) {
   const { quranSettings, updateQuranSettings } = useAppStore();
   const [showSettings, setShowSettings] = useState(false);
   const [selectedWord, setSelectedWord] = useState<WordData | null>(null);
   const [wordByWord, setWordByWord] = useState(hasWords);
   const [tafsirAyah, setTafsirAyah] = useState<number | null>(null);
+  const [copiedAyah, setCopiedAyah] = useState<number | null>(null);
 
   return (
     <div>
@@ -153,8 +169,8 @@ export function SurahReaderClient({ ayahs, surahNumber, hasWords, hasTafsir }: P
             </div>
 
             {/* Ayah actions */}
-            {hasTafsir && (
-              <div className="flex justify-end mt-3">
+            <div className="flex justify-end gap-2 mt-3">
+              {hasTafsir && (
                 <button
                   onClick={() => setTafsirAyah(ayah.number)}
                   className="flex items-center gap-1.5 text-xs text-gold/70 hover:text-gold active:text-gold bg-gold/[0.08] hover:bg-gold/[0.12] px-3 py-1.5 rounded-lg transition-colors"
@@ -164,8 +180,28 @@ export function SurahReaderClient({ ayahs, surahNumber, hasWords, hasTafsir }: P
                   </svg>
                   Tafsir
                 </button>
-              </div>
-            )}
+              )}
+              <button
+                onClick={() => shareAyah(surahNumber, ayah.number, setCopiedAyah)}
+                className="flex items-center gap-1.5 text-xs text-white/30 hover:text-white/70 bg-white/[0.03] hover:bg-white/[0.06] px-3 py-1.5 rounded-lg transition-colors"
+              >
+                {copiedAyah === ayah.number ? (
+                  <>
+                    <svg className="w-3.5 h-3.5 text-emerald" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                    </svg>
+                    <span className="text-emerald">Copied</span>
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
+                    </svg>
+                    Share
+                  </>
+                )}
+              </button>
+            </div>
 
             {/* Divider */}
             <div className="border-b border-white/[0.03] mt-6" />
