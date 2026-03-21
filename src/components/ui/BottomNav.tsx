@@ -8,7 +8,7 @@ const navItems = [
   { href: '/quran', label: 'Quran', icon: BookIcon },
   { href: '/roots', label: 'Roots', icon: RootIcon },
   { href: '/search', label: 'Search', icon: SearchIcon },
-  { href: '/nouns', label: 'Nouns', icon: NounIcon },
+  { href: '/review', label: 'Review', icon: ReviewIcon },
   { href: '/bookmarks', label: 'Saved', icon: BookmarkIcon },
 ];
 
@@ -78,6 +78,14 @@ function SearchIcon({ className }: { className?: string }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+    </svg>
+  );
+}
+
+function ReviewIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z" />
     </svg>
   );
 }
