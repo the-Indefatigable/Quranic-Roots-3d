@@ -211,8 +211,8 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, hasWords, has
                 </span>
 
                 <div className="flex-1">
-                  {/* Word-by-word mode */}
-                  {wordByWord && ayah.words.length > 0 ? (
+                  {/* Word-by-word mode (also forced on when audio is playing this ayah) */}
+                  {(wordByWord || isActiveAyah) && ayah.words.length > 0 ? (
                     <div className="flex flex-wrap gap-x-3 gap-y-4 justify-end" dir="rtl">
                       {ayah.words
                         .filter((w) => w.charType === 'word')

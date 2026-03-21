@@ -99,13 +99,11 @@ export function AudioPlayer({
     function handleEnded() {
       setIsPlaying(false);
       onWordChangeRef.current(null);
-      setCurrentAyah((prev) => {
-        const next = prev < totalAyahs ? prev + 1 : prev;
-        if (next !== prev) {
-          setTimeout(() => playAyah(next), 300);
-        }
-        return next;
-      });
+      if (currentAyah < totalAyahs) {
+        const next = currentAyah + 1;
+        setCurrentAyah(next);
+        setTimeout(() => playAyah(next), 300);
+      }
     }
 
     function handlePlay() { setIsPlaying(true); }
