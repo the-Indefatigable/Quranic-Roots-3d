@@ -183,7 +183,7 @@ export default async function SurahPage({ params }: Props) {
       </div>
 
       {/* Reader */}
-      <SurahReaderClient ayahs={ayahData} surahNumber={surahNumber} hasWords={hasWords} hasTafsir={hasTafsir} />
+      <SurahReaderClient ayahs={ayahData} surahNumber={surahNumber} surahName={surah.englishName} hasWords={hasWords} hasTafsir={hasTafsir} />
 
       {/* Bottom navigation */}
       <div className="flex items-center justify-between mt-12 pt-8 border-t border-border">
