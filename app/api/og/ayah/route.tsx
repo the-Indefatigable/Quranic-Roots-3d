@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
 import { db, dbQuery } from '@/db';
-import { ayahs, translationEntries, translations, surahs } from '@/db/schema';
+import { translationEntries, translations, surahs } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
 
 export const runtime = 'nodejs';
@@ -17,13 +17,6 @@ export async function GET(request: NextRequest) {
   const [surahRow] = await dbQuery(() =>
     db.select({ englishName: surahs.englishName })
       .from(surahs).where(eq(surahs.number, s)).limit(1)
-  );
-
-  const [ayahRow] = await dbQuery(() =>
-    db.select({ textUthmani: ayahs.textUthmani })
-      .from(ayahs)
-      .where(and(eq(ayahs.surahNumber, s), eq(ayahs.ayahNumber, a)))
-      .limit(1)
   );
 
   const [t] = await dbQuery(() =>
@@ -43,8 +36,8 @@ export async function GET(request: NextRequest) {
     : [];
 
   const translation = transRow?.text ?? '';
-  const displayTrans = translation.length > 120
-    ? translation.slice(0, 120) + '\u2026'
+  const displayTrans = translation.length > 140
+    ? translation.slice(0, 140) + '\u2026'
     : translation;
 
   const surahName = surahRow?.englishName ?? `Surah ${s}`;
@@ -60,71 +53,39 @@ export async function GET(request: NextRequest) {
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          padding: '80px',
+          padding: '100px',
         }}
       >
         {/* Gold top line */}
+        <div style={{ width: '48px', height: '2px', background: '#D4A574', marginBottom: '48px' }} />
+
+        {/* Translation — the main content */}
         <div style={{
-          width: '56px',
-          height: '1px',
-          background: 'rgba(212,165,116,0.6)',
-          marginBottom: '40px',
-        }} />
-
-        {/* Arabic text */}
-        {ayahRow?.textUthmani ? (
-          <div style={{
-            fontSize: '44px',
-            color: '#e2e8f0',
-            textAlign: 'center',
-            lineHeight: 1.9,
-            marginBottom: '28px',
-            direction: 'rtl',
-            maxWidth: '920px',
-          }}>
-            {ayahRow.textUthmani}
-          </div>
-        ) : null}
-
-        {/* Translation */}
-        {displayTrans ? (
-          <div style={{
-            fontSize: '20px',
-            color: 'rgba(255,255,255,0.5)',
-            textAlign: 'center',
-            lineHeight: 1.6,
-            maxWidth: '860px',
-            marginBottom: '36px',
-          }}>
-            {'\u201C'}{displayTrans}{'\u201D'}
-          </div>
-        ) : null}
+          fontSize: '32px',
+          color: 'rgba(255,255,255,0.85)',
+          textAlign: 'center',
+          lineHeight: 1.65,
+          maxWidth: '900px',
+          marginBottom: '48px',
+          fontStyle: 'italic',
+        }}>
+          {displayTrans ? `\u201C${displayTrans}\u201D` : `${surahName} \u00B7 ${s}:${a}`}
+        </div>
 
         {/* Reference */}
         <div style={{
-          fontSize: '12px',
+          fontSize: '14px',
           color: '#D4A574',
-          letterSpacing: '2px',
-          marginBottom: '36px',
+          letterSpacing: '3px',
+          marginBottom: '48px',
         }}>
-          {surahName.toUpperCase()} {'\u00B7'} {s}:{a}
+          {`${surahName.toUpperCase()} \u00B7 ${s}:${a}`}
         </div>
 
-        {/* Bottom divider */}
-        <div style={{
-          width: '36px',
-          height: '1px',
-          background: 'rgba(255,255,255,0.1)',
-          marginBottom: '12px',
-        }} />
-
-        {/* Branding */}
-        <div style={{
-          fontSize: '14px',
-          color: 'rgba(255,255,255,0.2)',
-          letterSpacing: '1px',
-        }}>
-          QuRoots
+        {/* Bottom divider + branding */}
+        <div style={{ width: '32px', height: '1px', background: 'rgba(255,255,255,0.12)', marginBottom: '14px' }} />
+        <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.2)', letterSpacing: '2px' }}>
+          QUROOTS.COM
         </div>
       </div>
     ),
