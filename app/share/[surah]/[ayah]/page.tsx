@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import { db, dbQuery } from '@/db';
-import { ayahs, quranWords, surahs } from '@/db/schema';
-import { eq, and, asc } from 'drizzle-orm';
+import { ayahs, translationEntries, translations, surahs } from '@/db/schema';
+import { eq, and } from 'drizzle-orm';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
@@ -22,20 +22,23 @@ async function getData(s: number, a: number) {
       .limit(1)
   );
 
-  // Build translation from word-level data
-  const words = await dbQuery(() =>
-    db.select({ translation: quranWords.translation, charType: quranWords.charType })
-      .from(quranWords)
-      .where(and(eq(quranWords.surahNumber, s), eq(quranWords.ayahNumber, a)))
-      .orderBy(asc(quranWords.position))
+  const [t] = await dbQuery(() =>
+    db.select({ id: translations.id }).from(translations).limit(1)
   );
+  const [transRow] = t
+    ? await dbQuery(() =>
+        db.select({ text: translationEntries.text })
+          .from(translationEntries)
+          .where(and(
+            eq(translationEntries.translationId, t.id),
+            eq(translationEntries.surahNumber, s),
+            eq(translationEntries.ayahNumber, a)
+          ))
+          .limit(1)
+      )
+    : [];
 
-  const translation = words
-    .filter(w => w.charType === 'word' && w.translation)
-    .map(w => w.translation)
-    .join(' ');
-
-  return { surahRow, ayahRow, translation };
+  return { surahRow, ayahRow, translation: transRow?.text ?? '' };
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
