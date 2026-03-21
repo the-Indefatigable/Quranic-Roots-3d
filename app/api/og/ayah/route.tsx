@@ -14,157 +14,137 @@ export async function GET(request: NextRequest) {
     return new Response('Invalid params', { status: 400 });
   }
 
-  const [surahRow] = await dbQuery(() =>
-    db.select({ englishName: surahs.englishName, arabicName: surahs.arabicName })
-      .from(surahs).where(eq(surahs.number, s)).limit(1)
-  );
-
-  const [ayahRow] = await dbQuery(() =>
-    db.select({ textUthmani: ayahs.textUthmani })
-      .from(ayahs)
-      .where(and(eq(ayahs.surahNumber, s), eq(ayahs.ayahNumber, a)))
-      .limit(1)
-  );
-
-  const [t] = await dbQuery(() =>
-    db.select({ id: translations.id }).from(translations).limit(1)
-  );
-  const [transRow] = t
-    ? await dbQuery(() =>
-        db.select({ text: translationEntries.text })
-          .from(translationEntries)
-          .where(and(
-            eq(translationEntries.translationId, t.id),
-            eq(translationEntries.surahNumber, s),
-            eq(translationEntries.ayahNumber, a)
-          ))
-          .limit(1)
-      )
-    : [];
-
-  const translation = transRow?.text ?? '';
-  const maxLen = 130;
-  const displayTrans = translation.length > maxLen
-    ? translation.slice(0, maxLen) + '…'
-    : translation;
-
-  // Try to load Arabic font for proper rendering
-  let arabicFont: ArrayBuffer | undefined;
   try {
-    const res = await fetch(
-      'https://cdn.jsdelivr.net/npm/@fontsource/amiri@5.0.3/files/amiri-arabic-400-normal.woff',
-      { signal: AbortSignal.timeout(3000) }
+    const [surahRow] = await dbQuery(() =>
+      db.select({ englishName: surahs.englishName })
+        .from(surahs).where(eq(surahs.number, s)).limit(1)
     );
-    if (res.ok) arabicFont = await res.arrayBuffer();
-  } catch {
-    // Fall back — Arabic text may not render on all systems
-  }
 
-  return new ImageResponse(
-    (
-      <div
-        style={{
-          width: '1200px',
-          height: '630px',
-          background: '#020617',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '80px',
-          position: 'relative',
-          overflow: 'hidden',
-        }}
-      >
-        {/* Glow */}
-        <div style={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          width: '900px',
-          height: '600px',
-          background: 'radial-gradient(ellipse, rgba(212,165,116,0.14) 0%, transparent 65%)',
-          transform: 'translate(-50%, -50%)',
-        }} />
+    const [ayahRow] = await dbQuery(() =>
+      db.select({ textUthmani: ayahs.textUthmani })
+        .from(ayahs)
+        .where(and(eq(ayahs.surahNumber, s), eq(ayahs.ayahNumber, a)))
+        .limit(1)
+    );
 
-        {/* Top line */}
-        <div style={{
-          width: '64px',
-          height: '1px',
-          background: 'rgba(212,165,116,0.5)',
-          marginBottom: '48px',
-        }} />
+    const [t] = await dbQuery(() =>
+      db.select({ id: translations.id }).from(translations).limit(1)
+    );
+    const [transRow] = t
+      ? await dbQuery(() =>
+          db.select({ text: translationEntries.text })
+            .from(translationEntries)
+            .where(and(
+              eq(translationEntries.translationId, t.id),
+              eq(translationEntries.surahNumber, s),
+              eq(translationEntries.ayahNumber, a)
+            ))
+            .limit(1)
+        )
+      : [];
 
-        {/* Arabic text */}
-        {ayahRow?.textUthmani && (
+    const translation = transRow?.text ?? '';
+    const displayTrans = translation.length > 120
+      ? translation.slice(0, 120) + '\u2026'
+      : translation;
+
+    const surahName = surahRow?.englishName ?? `Surah ${s}`;
+    const reference = `${surahName}  \u00B7  ${s}:${a}`;
+
+    return new ImageResponse(
+      (
+        <div
+          style={{
+            width: '1200px',
+            height: '630px',
+            background: '#020617',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '80px',
+          }}
+        >
+          {/* Glow blob */}
           <div style={{
-            fontSize: arabicFont ? '48px' : '44px',
-            color: '#e2e8f0',
-            textAlign: 'center',
-            lineHeight: 1.9,
-            marginBottom: '36px',
-            fontFamily: arabicFont ? 'Arabic' : 'serif',
-            direction: 'rtl',
-            maxWidth: '900px',
-          }}>
-            {ayahRow.textUthmani}
-          </div>
-        )}
+            position: 'absolute',
+            top: '115px',
+            left: '150px',
+            width: '900px',
+            height: '400px',
+            background: 'rgba(212,165,116,0.10)',
+            borderRadius: '50%',
+            filter: 'blur(80px)',
+          }} />
 
-        {/* Translation */}
-        {displayTrans && (
+          {/* Top line */}
           <div style={{
-            fontSize: '22px',
-            color: 'rgba(255,255,255,0.5)',
-            textAlign: 'center',
-            lineHeight: 1.65,
-            fontStyle: 'italic',
-            maxWidth: '880px',
-            marginBottom: '44px',
+            width: '64px',
+            height: '1px',
+            background: 'rgba(212,165,116,0.5)',
+            marginBottom: '40px',
+          }} />
+
+          {/* Arabic */}
+          {ayahRow?.textUthmani && (
+            <div style={{
+              fontSize: '46px',
+              color: '#e2e8f0',
+              textAlign: 'center',
+              lineHeight: 1.9,
+              marginBottom: '32px',
+              direction: 'rtl',
+              maxWidth: '900px',
+            }}>
+              {ayahRow.textUthmani}
+            </div>
+          )}
+
+          {/* Translation */}
+          {displayTrans ? (
+            <div style={{
+              fontSize: '21px',
+              color: 'rgba(255,255,255,0.5)',
+              textAlign: 'center',
+              lineHeight: 1.6,
+              maxWidth: '880px',
+              marginBottom: '40px',
+            }}>
+              {'\u201C'}{displayTrans}{'\u201D'}
+            </div>
+          ) : null}
+
+          {/* Reference */}
+          <div style={{
+            fontSize: '13px',
+            color: '#D4A574',
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            marginBottom: '40px',
           }}>
-            &ldquo;{displayTrans}&rdquo;
+            {reference}
           </div>
-        )}
 
-        {/* Reference */}
-        <div style={{
-          fontSize: '13px',
-          color: '#D4A574',
-          letterSpacing: '0.12em',
-          textTransform: 'uppercase',
-          marginBottom: '44px',
-        }}>
-          {surahRow?.englishName ?? `Surah ${s}`} &nbsp;·&nbsp; {s}:{a}
-        </div>
-
-        {/* Bottom line + branding */}
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: '16px',
-        }}>
+          {/* Divider + branding */}
           <div style={{
             width: '40px',
             height: '1px',
             background: 'rgba(255,255,255,0.08)',
+            marginBottom: '14px',
           }} />
           <div style={{
             fontSize: '15px',
-            color: 'rgba(255,255,255,0.2)',
+            color: 'rgba(255,255,255,0.25)',
             letterSpacing: '0.06em',
           }}>
-            Qu<span style={{ color: '#D4A574' }}>Roots</span>
+            QuRoots
           </div>
         </div>
-      </div>
-    ),
-    {
-      width: 1200,
-      height: 630,
-      fonts: arabicFont
-        ? [{ name: 'Arabic', data: arabicFont, weight: 400, style: 'normal' }]
-        : [],
-    }
-  );
+      ),
+      { width: 1200, height: 630 }
+    );
+  } catch (err) {
+    console.error('[og/ayah]', err);
+    return new Response('Image generation failed', { status: 500 });
+  }
 }
