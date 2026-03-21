@@ -166,16 +166,17 @@ export function HomepageClient() {
 
       {/* ===== HERO — Pure CSS animations, no JS on the animation path ===== */}
       <section className="relative flex flex-col items-center justify-center min-h-screen px-6 text-center pt-14">
-        {/* Ambient background glow — reduced blur for mobile GPU perf */}
+        {/* Ambient background glow */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-gold/[0.04] rounded-full blur-[80px]" />
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-gold/[0.02] rounded-full blur-[60px]" />
+          <div className="hero-dot-grid absolute inset-0 opacity-100" />
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[700px] bg-gold/[0.12] rounded-full blur-[120px]" />
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-gold/[0.06] rounded-full blur-[80px]" />
         </div>
 
         {/* Decorative line */}
         <div className="hero-line w-16 h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent mb-8" />
 
-        <p className="hero-bismillah font-arabic text-2xl sm:text-3xl text-gold/50 mb-8 leading-relaxed">
+        <p className="hero-bismillah font-arabic text-2xl sm:text-3xl text-gold/75 mb-8 leading-relaxed">
           بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ
         </p>
 
@@ -183,19 +184,19 @@ export function HomepageClient() {
           Qu<span className="text-gold">Roots</span>
         </h1>
 
-        <p className="hero-subtitle text-base sm:text-lg text-white/50 max-w-lg mb-4 leading-relaxed">
+        <p className="hero-subtitle text-base sm:text-lg text-white/65 max-w-lg mb-4 leading-relaxed">
           A comprehensive platform to explore the linguistic roots of the Quran.
           Read, study, and understand every word.
         </p>
 
-        <p className="hero-tagline text-xs text-white/25 tracking-widest uppercase mb-10">
+        <p className="hero-tagline text-xs text-white/40 tracking-widest uppercase mb-10">
           Read &middot; Explore &middot; Understand
         </p>
 
         <div className="hero-cta flex flex-col sm:flex-row items-center gap-3">
           <Link
             href="/quran"
-            className="inline-flex items-center gap-2 bg-gold text-black px-8 py-3.5 rounded-xl text-sm font-semibold hover:bg-gold-light transition-all hover:shadow-[0_0_30px_rgba(212,165,116,0.2)]"
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-gold to-gold-light text-black px-8 py-3.5 rounded-xl text-sm font-semibold hover:brightness-110 transition-all hover:shadow-[0_0_50px_rgba(212,165,116,0.4)]"
           >
             Start Reading
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
@@ -204,7 +205,7 @@ export function HomepageClient() {
           </Link>
           <Link
             href="/roots"
-            className="inline-flex items-center gap-2 text-white/60 hover:text-white px-6 py-3.5 rounded-xl text-sm transition-colors"
+            className="inline-flex items-center gap-2 text-white/60 hover:text-white border border-white/[0.08] hover:border-white/[0.18] px-6 py-3.5 rounded-xl text-sm transition-all"
           >
             Explore Roots
           </Link>
@@ -234,7 +235,7 @@ export function HomepageClient() {
               <p className="text-2xl sm:text-5xl font-extralight tracking-tight text-white tabular-nums">
                 {stat.value}{stat.suffix}
               </p>
-              <p className="text-xs sm:text-sm text-white/35 mt-2 tracking-wide">{stat.label}</p>
+              <p className="text-xs sm:text-sm text-white/50 mt-2 tracking-wide">{stat.label}</p>
             </div>
           ))}
         </div>
@@ -289,15 +290,15 @@ export function HomepageClient() {
             >
               <Link
                 href={feature.href}
-                className="group relative flex flex-col h-full bg-white/[0.02] border border-white/[0.04] rounded-2xl p-7 sm:p-8 transition-all duration-300 hover:border-white/[0.08] hover:bg-white/[0.03]"
+                className="group relative flex flex-col h-full bg-white/[0.04] border border-white/[0.08] rounded-2xl p-7 sm:p-8 transition-all duration-300 hover:border-white/[0.14] hover:bg-white/[0.06]"
               >
                 <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${feature.accent} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
                 <div className="relative">
-                  <div className="w-10 h-10 rounded-xl bg-white/[0.04] flex items-center justify-center mb-5">
+                  <div className="w-10 h-10 rounded-xl bg-white/[0.08] flex items-center justify-center mb-5">
                     <feature.icon className="w-5 h-5 text-gold" />
                   </div>
                   <h3 className="text-base font-medium text-white mb-2">{feature.title}</h3>
-                  <p className="text-sm text-white/40 leading-relaxed">{feature.description}</p>
+                  <p className="text-sm text-white/55 leading-relaxed">{feature.description}</p>
                   <div className="flex items-center gap-1 mt-5 text-xs text-gold/60 group-hover:text-gold transition-colors">
                     <span>Explore</span>
                     <svg className="w-3 h-3 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
@@ -371,13 +372,13 @@ export function HomepageClient() {
                 <Link
                   href={`/roots/${encodeURIComponent(root.root)}`}
                   prefetch={false}
-                  className="group flex flex-col items-center text-center bg-white/[0.02] border border-white/[0.04] rounded-2xl p-5 transition-all duration-300 hover:border-gold/20 hover:bg-gold/[0.03]"
+                  className="group flex flex-col items-center text-center bg-white/[0.04] border border-white/[0.08] rounded-2xl p-5 transition-all duration-300 hover:border-gold/30 hover:bg-gold/[0.06]"
                 >
                   <span className="font-arabic text-2xl text-gold mb-2 group-hover:scale-105 transition-transform">
                     {root.root}
                   </span>
                   <span className="text-xs text-white/50 mb-1">{root.meaning}</span>
-                  <span className="text-[10px] text-white/20">{root.freq}x in Quran</span>
+                  <span className="text-[10px] text-white/40">{root.freq}x in Quran</span>
                 </Link>
               </div>
             ))}
@@ -421,11 +422,11 @@ export function HomepageClient() {
                 className="reveal relative text-center sm:text-left"
                 style={{ '--reveal-delay': `${i * 0.1}s` } as React.CSSProperties}
               >
-                <span className="text-4xl sm:text-5xl font-extralight text-gold/10 mb-3 block">
+                <span className="text-4xl sm:text-5xl font-extralight text-gold/25 mb-3 block">
                   {item.step}
                 </span>
                 <h3 className="text-base font-medium text-white mb-2">{item.title}</h3>
-                <p className="text-sm text-white/35 leading-relaxed">{item.description}</p>
+                <p className="text-sm text-white/55 leading-relaxed">{item.description}</p>
               </div>
             ))}
           </div>
@@ -448,7 +449,7 @@ export function HomepageClient() {
           <div className="reveal" style={{ '--reveal-delay': '0.24s' } as React.CSSProperties}>
             <Link
               href="/quran"
-              className="inline-flex items-center gap-2 bg-gold text-black px-10 py-4 rounded-xl text-sm font-semibold hover:bg-gold-light transition-all hover:shadow-[0_0_40px_rgba(212,165,116,0.15)]"
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-gold to-gold-light text-black px-10 py-4 rounded-xl text-sm font-semibold hover:brightness-110 transition-all hover:shadow-[0_0_60px_rgba(212,165,116,0.35)]"
             >
               Start Exploring
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
