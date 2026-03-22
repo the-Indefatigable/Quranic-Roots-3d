@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAppStore } from '@/store/useAppStore';
 import { WordPopover, type WordData } from './WordPopover';
 import { TafsirPanel } from './TafsirPanel';
-import { AudioPlayer } from './AudioPlayer';
+import { AudioPlayer, type PlayMode, type LoopMode } from './AudioPlayer';
 
 interface AyahData {
   number: number;
@@ -67,6 +67,8 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, hasWords, has
   const [audioStartAyah, setAudioStartAyah] = useState(1);
   const [audioCurrentAyah, setAudioCurrentAyah] = useState<number | null>(null);
   const [audioCurrentWordPos, setAudioCurrentWordPos] = useState<number | null>(null);
+  const [audioPlayMode, setAudioPlayMode] = useState<PlayMode>('ayah');
+  const [audioLoopMode, setAudioLoopMode] = useState<LoopMode>('none');
 
   // Shared audio element — must exist before AudioPlayer mounts so we can
   // unlock it synchronously inside the click handler (iOS Safari autoplay gate)
@@ -193,6 +195,7 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, hasWords, has
       <div className="space-y-6">
         {ayahs.map((ayah) => {
           const isActiveAyah = audioMode && audioCurrentAyah === ayah.number;
+          const showWordHighlight = isActiveAyah && audioPlayMode === 'ayah';
           return (
             <div
               key={ayah.number}
@@ -211,13 +214,13 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, hasWords, has
                 </span>
 
                 <div className="flex-1">
-                  {/* Word-by-word mode (also forced on when audio is playing this ayah) */}
-                  {(wordByWord || isActiveAyah) && ayah.words.length > 0 ? (
+                  {/* Word-by-word mode (forced on when audio plays this ayah in ayah mode) */}
+                  {(wordByWord || showWordHighlight) && ayah.words.length > 0 ? (
                     <div className="flex flex-wrap gap-x-3 gap-y-4 justify-end" dir="rtl">
                       {ayah.words
                         .filter((w) => w.charType === 'word')
                         .map((word) => {
-                          const isActiveWord = isActiveAyah && audioCurrentWordPos === word.position;
+                          const isActiveWord = showWordHighlight && audioCurrentWordPos === word.position;
                           return (
                             <button
                               key={word.position}
@@ -347,9 +350,13 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, hasWords, has
           surahName={surahName}
           totalAyahs={ayahs.length}
           startAyah={audioStartAyah}
+          playMode={audioPlayMode}
+          loopMode={audioLoopMode}
           onAyahChange={setAudioCurrentAyah}
           onWordChange={setAudioCurrentWordPos}
           onClose={closeAudioMode}
+          onPlayModeChange={setAudioPlayMode}
+          onLoopModeChange={setAudioLoopMode}
         />
       )}
     </div>

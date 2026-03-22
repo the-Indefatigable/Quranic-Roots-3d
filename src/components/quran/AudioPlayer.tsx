@@ -8,15 +8,22 @@ interface AyahAudio {
   segments: [number, number, number][]; // [wordPos, startMs, endMs]
 }
 
+export type PlayMode = 'ayah' | 'surah';
+export type LoopMode = 'none' | 'ayah' | 'surah';
+
 interface Props {
   audioElement: HTMLAudioElement;
   surahNumber: number;
   surahName: string;
   totalAyahs: number;
   startAyah: number;
+  playMode: PlayMode;
+  loopMode: LoopMode;
   onAyahChange: (ayahNumber: number) => void;
   onWordChange: (wordPos: number | null) => void;
   onClose: () => void;
+  onPlayModeChange: (mode: PlayMode) => void;
+  onLoopModeChange: (mode: LoopMode) => void;
 }
 
 export function AudioPlayer({
@@ -25,15 +32,24 @@ export function AudioPlayer({
   surahName,
   totalAyahs,
   startAyah,
+  playMode,
+  loopMode,
   onAyahChange,
   onWordChange,
   onClose,
+  onPlayModeChange,
+  onLoopModeChange,
 }: Props) {
   const ayahDataRef = useRef<Map<number, AyahAudio>>(new Map());
   const onAyahChangeRef = useRef(onAyahChange);
   const onWordChangeRef = useRef(onWordChange);
   onAyahChangeRef.current = onAyahChange;
   onWordChangeRef.current = onWordChange;
+
+  const playModeRef = useRef(playMode);
+  const loopModeRef = useRef(loopMode);
+  playModeRef.current = playMode;
+  loopModeRef.current = loopMode;
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentAyah, setCurrentAyah] = useState(startAyah);
@@ -75,8 +91,7 @@ export function AudioPlayer({
     onWordChangeRef.current(null);
   }, [audioElement, surahNumber]);
 
-  // On mount: the audio element was already unlocked by the click handler in
-  // SurahReaderClient, so we can safely load a src and play now.
+  // On mount: play the starting ayah
   useEffect(() => {
     playAyah(startAyah);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -90,19 +105,37 @@ export function AudioPlayer({
       const pct = audio.duration ? audio.currentTime / audio.duration : 0;
       setProgress(pct);
 
-      const ms = audio.currentTime * 1000;
-      const segments = ayahDataRef.current.get(currentAyah)?.segments ?? [];
-      const active = segments.find(([, start, end]) => ms >= start && ms < end);
-      onWordChangeRef.current(active ? active[0] : null);
+      // Word highlighting only in ayah mode
+      if (playModeRef.current === 'ayah') {
+        const ms = audio.currentTime * 1000;
+        const segments = ayahDataRef.current.get(currentAyah)?.segments ?? [];
+        const active = segments.find(([, start, end]) => ms >= start && ms < end);
+        onWordChangeRef.current(active ? active[0] : null);
+      } else {
+        onWordChangeRef.current(null);
+      }
     }
 
     function handleEnded() {
       setIsPlaying(false);
       onWordChangeRef.current(null);
+
+      const loop = loopModeRef.current;
+
+      // Loop current ayah
+      if (loop === 'ayah') {
+        setTimeout(() => playAyah(currentAyah), 300);
+        return;
+      }
+
+      // Continue to next ayah
       if (currentAyah < totalAyahs) {
         const next = currentAyah + 1;
         setCurrentAyah(next);
         setTimeout(() => playAyah(next), 300);
+      } else if (loop === 'surah') {
+        // Loop whole surah — restart from ayah 1
+        setTimeout(() => playAyah(1), 300);
       }
     }
 
@@ -142,6 +175,14 @@ export function AudioPlayer({
     playAyah(1);
   }
 
+  function cycleLoop() {
+    const order: LoopMode[] = ['none', 'ayah', 'surah'];
+    const idx = order.indexOf(loopMode);
+    onLoopModeChange(order[(idx + 1) % order.length]);
+  }
+
+  const loopLabel = loopMode === 'ayah' ? '1' : loopMode === 'surah' ? '∞' : '';
+
   return (
     <>
       {/* Floating player bar */}
@@ -154,9 +195,9 @@ export function AudioPlayer({
           />
         </div>
 
-        <div className="bg-card/95 backdrop-blur-xl border-t border-white/[0.06] px-4 py-3 flex items-center gap-4">
-          {/* Controls */}
-          <div className="flex items-center gap-2">
+        <div className="bg-card/95 backdrop-blur-xl border-t border-white/[0.06] px-4 py-3 flex items-center gap-3">
+          {/* Transport controls */}
+          <div className="flex items-center gap-1.5">
             <button
               onClick={prevAyah}
               disabled={currentAyah <= 1}
@@ -201,6 +242,43 @@ export function AudioPlayer({
               {timingsError && ' · word sync unavailable'}
             </p>
           </div>
+
+          {/* Play mode toggle: Ayah / Surah */}
+          <button
+            onClick={() => onPlayModeChange(playMode === 'ayah' ? 'surah' : 'ayah')}
+            className={`text-[10px] font-medium px-2 py-1 rounded-md transition-colors whitespace-nowrap ${
+              playMode === 'surah'
+                ? 'bg-gold/15 text-gold'
+                : 'bg-white/[0.05] text-muted-more hover:text-white'
+            }`}
+            title={playMode === 'ayah' ? 'Playing per-ayah with word highlighting' : 'Playing full surah continuously'}
+          >
+            {playMode === 'ayah' ? 'Ayah' : 'Surah'}
+          </button>
+
+          {/* Loop toggle */}
+          <button
+            onClick={cycleLoop}
+            className={`relative w-7 h-7 flex items-center justify-center rounded-md transition-colors ${
+              loopMode !== 'none'
+                ? 'bg-gold/15 text-gold'
+                : 'text-muted-more hover:text-white'
+            }`}
+            title={
+              loopMode === 'none' ? 'Loop off' :
+              loopMode === 'ayah' ? 'Looping current ayah' :
+              'Looping full surah'
+            }
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 0 0-3.7-3.7 48.678 48.678 0 0 0-7.324 0 4.006 4.006 0 0 0-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 0 0 3.7 3.7 48.656 48.656 0 0 0 7.324 0 4.006 4.006 0 0 0 3.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3-3 3" />
+            </svg>
+            {loopLabel && (
+              <span className="absolute -top-0.5 -right-0.5 text-[8px] font-bold leading-none text-gold">
+                {loopLabel}
+              </span>
+            )}
+          </button>
 
           {/* Start from top */}
           {currentAyah > 1 && (
