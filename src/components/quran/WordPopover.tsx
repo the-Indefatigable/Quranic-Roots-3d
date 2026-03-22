@@ -2,6 +2,19 @@
 
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import {
+  useFloating,
+  autoUpdate,
+  offset,
+  flip,
+  shift,
+  useDismiss,
+  useRole,
+  useInteractions,
+  FloatingPortal,
+  FloatingFocusManager,
+  useTransitionStyles,
+} from '@floating-ui/react';
 
 export interface WordData {
   position: number;
@@ -14,32 +27,54 @@ export interface WordData {
 
 interface Props {
   word: WordData | null;
+  anchorElement: HTMLElement | null;
   onClose: () => void;
 }
 
-export function WordPopover({ word, onClose }: Props) {
-  return (
-    <AnimatePresence>
-      {word && (
-        <>
-          {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-40"
-            onClick={onClose}
-          />
+export function WordPopover({ word, anchorElement, onClose }: Props) {
+  const { refs, floatingStyles, context } = useFloating({
+    open: !!word,
+    onOpenChange: (open) => !open && onClose(),
+    elements: {
+      reference: anchorElement,
+    },
+    placement: 'top',
+    middleware: [offset(10), flip(), shift({ padding: 16 })],
+    whileElementsMounted: autoUpdate,
+  });
 
-          {/* Popover */}
-          <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 10, scale: 0.95 }}
-            transition={{ duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="fixed bottom-16 left-0 right-0 z-50 sm:bottom-auto sm:left-auto sm:right-auto sm:fixed sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2"
-          >
-            <div className="bg-card border border-border rounded-t-2xl sm:rounded-2xl p-5 sm:p-4 shadow-2xl max-w-sm mx-auto sm:mx-0 w-full sm:w-72">
+  const dismiss = useDismiss(context);
+  const role = useRole(context);
+  const { getFloatingProps } = useInteractions([dismiss, role]);
+
+  const { isMounted, styles: transitionStyles } = useTransitionStyles(context, {
+    duration: 200,
+    initial: { opacity: 0, transform: 'translateY(10px) scale(0.95)' },
+    open: { opacity: 1, transform: 'translateY(0) scale(1)' },
+    close: { opacity: 0, transform: 'translateY(10px) scale(0.95)' },
+  });
+
+  if (!isMounted || !word) return null;
+
+  return (
+    <FloatingPortal>
+      {/* Backdrop (invisible but handles outside clicks via useDismiss) */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-[100] bg-black/20 backdrop-blur-[2px]"
+        aria-hidden="true"
+      />
+
+      <FloatingFocusManager context={context} modal>
+        <div
+          ref={refs.setFloating}
+          style={{ ...floatingStyles, ...transitionStyles, zIndex: 101 }}
+          {...getFloatingProps()}
+          className="focus:outline-none"
+        >
+          <div className="bg-card glass-strong border border-white/[0.1] rounded-2xl p-5 shadow-2xl w-64 sm:w-72">
               {/* Word */}
               <div className="text-center sm:text-right mb-4">
                 <p className="font-arabic text-4xl text-gold leading-relaxed" dir="rtl">
@@ -97,9 +132,8 @@ export function WordPopover({ word, onClose }: Props) {
                 Close
               </button>
             </div>
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
+        </div>
+      </FloatingFocusManager>
+    </FloatingPortal>
   );
 }

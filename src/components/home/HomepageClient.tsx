@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
+import { useAppStore } from '@/store/useAppStore';
 
 // --- Scroll-reveal via IntersectionObserver (no JS on scroll path) ---
 function useScrollReveal() {
@@ -97,6 +98,10 @@ const SAMPLE_ROOTS = [
 ];
 
 export function HomepageClient() {
+  const { lastRead, streak } = useAppStore();
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => setIsMounted(true), []);
+
   useScrollReveal();
 
   const roots = useCounter(1716);
@@ -193,15 +198,27 @@ export function HomepageClient() {
         </p>
 
         <div className="hero-cta flex flex-col sm:flex-row items-center gap-3">
-          <Link
-            href="/quran"
-            className="btn-primary px-8 py-3.5"
-          >
-            Start Reading
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-            </svg>
-          </Link>
+          {isMounted && lastRead ? (
+            <Link
+              href={`/quran/${lastRead.surah}#ayah-${lastRead.ayah}`}
+              className="btn-primary px-8 py-3.5"
+            >
+              Continue Reading
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+              </svg>
+            </Link>
+          ) : (
+            <Link
+              href="/quran"
+              className="btn-primary px-8 py-3.5"
+            >
+              Start Reading
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+              </svg>
+            </Link>
+          )}
           <Link
             href="/roots"
             className="btn-secondary px-8 py-3.5"
@@ -224,13 +241,14 @@ export function HomepageClient() {
         className="relative border-y border-white/[0.04] py-16 sm:py-20"
       >
         <div className="absolute inset-0 bg-gradient-to-b from-white/[0.01] to-transparent pointer-events-none" />
-        <div className="max-w-5xl mx-auto grid grid-cols-3 gap-2 sm:gap-4 px-6">
+        <div className="max-w-5xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-4 px-6">
           {[
             { value: roots.count.toLocaleString(), label: 'Quranic Roots', suffix: '' },
             { value: ayahs.count.toLocaleString(), label: 'Ayahs', suffix: '' },
             { value: words.count.toLocaleString(), label: 'Words Analyzed', suffix: '+' },
-          ].map((stat) => (
-            <div key={stat.label} className="text-center">
+            { value: isMounted ? streak.count.toLocaleString() : '0', label: 'Day Streak', suffix: ' 🔥' },
+          ].map((stat, i) => (
+            <div key={i} className="text-center">
               <p className="text-2xl sm:text-5xl font-extralight tracking-tight text-white tabular-nums">
                 {stat.value}{stat.suffix}
               </p>
@@ -440,10 +458,10 @@ export function HomepageClient() {
           </p>
           <div className="reveal" style={{ '--reveal-delay': '0.24s' } as React.CSSProperties}>
             <Link
-              href="/quran"
+              href={isMounted && lastRead ? `/quran/${lastRead.surah}#ayah-${lastRead.ayah}` : "/quran"}
               className="btn-primary px-10 py-4 text-base"
             >
-              Start Exploring
+              {isMounted && lastRead ? "Continue Exploring" : "Start Exploring"}
               <svg className="w-5 h-5 ml-1" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
               </svg>

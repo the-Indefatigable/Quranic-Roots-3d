@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useAppStore } from '@/store/useAppStore';
 import { WordPopover, type WordData } from './WordPopover';
 import { TafsirPanel } from './TafsirPanel';
@@ -55,12 +55,89 @@ function getVisibleAyahNumber(ayahs: AyahData[]): number {
 }
 
 export function SurahReaderClient({ ayahs, surahNumber, surahName, hasWords, hasTafsir }: Props) {
-  const { quranSettings, updateQuranSettings } = useAppStore();
+  const { quranSettings, updateQuranSettings, setLastRead, updateStreak } = useAppStore();
   const [showSettings, setShowSettings] = useState(false);
   const [selectedWord, setSelectedWord] = useState<WordData | null>(null);
+  const [wordAnchor, setWordAnchor] = useState<HTMLElement | null>(null);
   const [wordByWord, setWordByWord] = useState(hasWords);
   const [tafsirAyah, setTafsirAyah] = useState<number | null>(null);
   const [copiedAyah, setCopiedAyah] = useState<number | null>(null);
+
+  // Flat list of words for keyboard navigation
+  const allWords = useMemo(() => {
+    return ayahs.flatMap(a => a.words.filter(w => w.charType === 'word'));
+  }, [ayahs]);
+
+  // Keyboard navigation for words
+  useEffect(() => {
+    if (!selectedWord) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+        e.preventDefault();
+        const currentIndex = allWords.findIndex(w => w.position === selectedWord.position);
+        if (currentIndex === -1) return;
+        
+        // Arabic is RTL, so ArrowLeft visually moves to the "next" word in reading order
+        const nextIndex = e.key === 'ArrowLeft' 
+          ? Math.min(allWords.length - 1, currentIndex + 1)
+          : Math.max(0, currentIndex - 1);
+          
+        if (nextIndex !== currentIndex) {
+          const nextWord = allWords[nextIndex];
+          setSelectedWord(nextWord);
+          
+          // Must wait for render to potentially mount the button if user navigated across ayahs
+          // although in Word By Word mode they are all mounted.
+          setTimeout(() => {
+            const btn = document.getElementById(`word-btn-${nextWord.position}`);
+            if (btn) {
+              setWordAnchor(btn);
+              // Calculate custom scroll boundary to leave room for the top nav and popover
+              const rect = btn.getBoundingClientRect();
+              const absoluteY = rect.top + window.scrollY;
+              // If the word is near the top or bottom of the viewport, smooth scroll to it
+              if (rect.top < 150 || rect.bottom > window.innerHeight - 150) {
+                window.scrollTo({
+                  top: absoluteY - window.innerHeight / 2,
+                  behavior: 'smooth'
+                });
+              }
+            }
+          }, 10);
+        }
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedWord, allWords]);
+
+  // Track daily streak on load
+  useEffect(() => {
+    updateStreak();
+  }, [updateStreak]);
+
+  // Track reading progress passively
+  useEffect(() => {
+    let timeoutId: ReturnType<typeof setTimeout>;
+    
+    const handleScroll = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        const visibleAyah = getVisibleAyahNumber(ayahs);
+        setLastRead(surahNumber, visibleAyah);
+      }, 1000); // Debounce to avoid spamming local storage
+    };
+    
+    // Save initial load position and attach listener
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      clearTimeout(timeoutId);
+    };
+  }, [ayahs, surahNumber, setLastRead]);
 
   // Audio mode
   const [audioMode, setAudioMode] = useState(false);
@@ -223,8 +300,13 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, hasWords, has
                           const isActiveWord = showWordHighlight && audioCurrentWordPos === word.position;
                           return (
                             <button
+                              id={`word-btn-${word.position}`}
                               key={word.position}
-                              onClick={(e) => { e.stopPropagation(); setSelectedWord(word); }}
+                              onClick={(e) => { 
+                                e.stopPropagation(); 
+                                setSelectedWord(word); 
+                                setWordAnchor(e.currentTarget); 
+                              }}
                               className={`flex flex-col items-center gap-1 px-2 py-1.5 rounded-xl cursor-pointer group/word border transition-all duration-200 ${
                                 isActiveWord
                                   ? 'bg-gold-dim border-gold/30 -translate-y-1.5 scale-105'
@@ -330,9 +412,12 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, hasWords, has
         </div>
       )}
 
-      {/* Word popover */}
-      <WordPopover word={selectedWord} onClose={() => setSelectedWord(null)} />
-
+      {/* Modals & Popovers */}
+      <WordPopover
+        word={selectedWord}
+        anchorElement={wordAnchor}
+        onClose={() => { setSelectedWord(null); setWordAnchor(null); }}
+      />
       {/* Tafsir panel */}
       <TafsirPanel
         surahNumber={surahNumber}
