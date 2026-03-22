@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 
 interface AyahAudio {
   ayahNumber: number;
@@ -365,10 +366,15 @@ export function AudioPlayer({
 
   const loopLabel = loopMode === 'ayah' ? '1' : loopMode === 'surah' ? '∞' : '';
 
-  return (
+  // Avoid SSR hydration issues with Portals
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return null;
+
+  return createPortal(
     <>
       {/* Floating player bar */}
-      <div className="fixed bottom-16 left-0 right-0 lg:bottom-0 lg:left-60 z-30">
+      <div className="fixed bottom-16 left-0 right-0 lg:bottom-0 lg:left-60 z-30" style={{ pointerEvents: 'auto' }}>
         {/* Progress bar */}
         <div className="h-[2px] bg-white/[0.06] w-full">
           <div
@@ -486,6 +492,7 @@ export function AudioPlayer({
           </button>
         </div>
       </div>
-    </>
+    </>,
+    document.body
   );
 }
