@@ -9,9 +9,9 @@ const inter = Inter({
   display: 'swap',
 });
 
-const scheherazade = localFont({
-  src: '../public/fonts/ScheherazadeNew-Regular.ttf',
-  variable: '--font-scheherazade',
+const uthmani = localFont({
+  src: '../public/fonts/UthmanicHafs1Ver18.woff2',
+  variable: '--font-uthmani',
   display: 'swap',
 });
 
@@ -97,7 +97,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   };
 
   return (
-    <html lang="en" className={`${inter.variable} ${scheherazade.variable}`}>
+    <html lang="en" className={`${inter.variable} ${uthmani.variable}`}>
       <head>
         <script
           type="application/ld+json"
