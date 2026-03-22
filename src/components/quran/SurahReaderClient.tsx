@@ -195,7 +195,7 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, hasWords, has
       <div className="space-y-6">
         {ayahs.map((ayah) => {
           const isActiveAyah = audioMode && audioCurrentAyah === ayah.number;
-          const showWordHighlight = isActiveAyah && audioPlayMode === 'ayah';
+          const showWordHighlight = isActiveAyah;
           return (
             <div
               key={ayah.number}

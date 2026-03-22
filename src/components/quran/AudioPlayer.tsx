@@ -8,6 +8,14 @@ interface AyahAudio {
   segments: [number, number, number][]; // [wordPos, startMs, endMs]
 }
 
+/** For surah mode: flattened segment with absolute timing in the chapter audio */
+interface ChapterSegment {
+  ayahNumber: number;
+  wordPos: number;
+  startMs: number;
+  endMs: number;
+}
+
 export type PlayMode = 'ayah' | 'surah';
 export type LoopMode = 'none' | 'ayah' | 'surah';
 
@@ -41,6 +49,8 @@ export function AudioPlayer({
   onLoopModeChange,
 }: Props) {
   const ayahDataRef = useRef<Map<number, AyahAudio>>(new Map());
+  const chapterAudioUrlRef = useRef<string | null>(null);
+  const chapterSegmentsRef = useRef<ChapterSegment[]>([]);
   const onAyahChangeRef = useRef(onAyahChange);
   const onWordChangeRef = useRef(onWordChange);
   onAyahChangeRef.current = onAyahChange;
@@ -56,16 +66,49 @@ export function AudioPlayer({
   const [progress, setProgress] = useState(0);
   const [timingsLoaded, setTimingsLoaded] = useState(false);
   const [timingsError, setTimingsError] = useState(false);
+  // Track if we're currently using the chapter audio src
+  const usingSurahAudioRef = useRef(false);
 
   // Fetch timing data for whole surah once
   useEffect(() => {
     fetch(`/api/audio/timings/${surahNumber}`)
       .then((r) => r.json())
-      .then((data: AyahAudio[]) => {
-        if (!Array.isArray(data)) throw new Error('bad response');
+      .then((data) => {
+        // Support both old format (array) and new format ({ ayahs, chapterAudioUrl })
+        const ayahList: AyahAudio[] = Array.isArray(data) ? data : data.ayahs ?? [];
         const map = new Map<number, AyahAudio>();
-        for (const d of data) map.set(d.ayahNumber, d);
+        for (const d of ayahList) map.set(d.ayahNumber, d);
         ayahDataRef.current = map;
+
+        // Store chapter audio URL
+        if (!Array.isArray(data) && data.chapterAudioUrl) {
+          chapterAudioUrlRef.current = data.chapterAudioUrl;
+        }
+
+        // Build cumulative chapter segments for surah-mode word highlighting
+        // Each ayah's segments are relative to that ayah's audio file.
+        // We estimate cumulative offset from the end of each ayah's last segment.
+        const sortedAyahs = [...ayahList].sort((a, b) => a.ayahNumber - b.ayahNumber);
+        let cumulativeOffset = 0;
+        const allSegments: ChapterSegment[] = [];
+        for (const ayah of sortedAyahs) {
+          for (const [wordPos, startMs, endMs] of ayah.segments) {
+            allSegments.push({
+              ayahNumber: ayah.ayahNumber,
+              wordPos,
+              startMs: startMs + cumulativeOffset,
+              endMs: endMs + cumulativeOffset,
+            });
+          }
+          // Advance offset by the duration of this ayah's audio
+          const lastSeg = ayah.segments[ayah.segments.length - 1];
+          if (lastSeg) {
+            // Add a small buffer (200ms) for silence between ayahs in the chapter recording
+            cumulativeOffset += lastSeg[2] + 200;
+          }
+        }
+        chapterSegmentsRef.current = allSegments;
+
         setTimingsLoaded(true);
       })
       .catch(() => {
@@ -74,13 +117,14 @@ export function AudioPlayer({
       });
   }, [surahNumber]);
 
-  // Load and play a specific ayah
+  // Load and play a specific ayah (per-ayah mode)
   const playAyah = useCallback((ayahNumber: number) => {
     const audio = audioElement;
     const ayahData = ayahDataRef.current.get(ayahNumber);
     const src = ayahData?.url
       ?? `https://everyayah.com/data/Alafasy_128kbps/${String(surahNumber).padStart(3, '0')}${String(ayahNumber).padStart(3, '0')}.mp3`;
 
+    usingSurahAudioRef.current = false;
     audio.src = src;
     audio.load();
     audio.play().catch(() => setIsPlaying(false));
@@ -91,11 +135,72 @@ export function AudioPlayer({
     onWordChangeRef.current(null);
   }, [audioElement, surahNumber]);
 
-  // On mount: play the starting ayah
+  // Load and play full chapter audio (surah mode)
+  const playSurahAudio = useCallback((seekToAyah?: number) => {
+    const audio = audioElement;
+    const url = chapterAudioUrlRef.current;
+    if (!url) {
+      // Fallback: play per-ayah if chapter audio unavailable
+      playAyah(seekToAyah ?? startAyah);
+      return;
+    }
+
+    usingSurahAudioRef.current = true;
+    audio.src = url;
+    audio.load();
+
+    // If seeking to a specific ayah, calculate the offset
+    if (seekToAyah && seekToAyah > 1) {
+      const firstSegOfAyah = chapterSegmentsRef.current.find(
+        (s) => s.ayahNumber === seekToAyah
+      );
+      if (firstSegOfAyah) {
+        audio.currentTime = firstSegOfAyah.startMs / 1000;
+      }
+    }
+
+    audio.play().catch(() => setIsPlaying(false));
+    setCurrentAyah(seekToAyah ?? startAyah);
+    setIsPlaying(true);
+    setProgress(0);
+    onAyahChangeRef.current(seekToAyah ?? startAyah);
+    onWordChangeRef.current(null);
+  }, [audioElement, playAyah, startAyah]);
+
+  // On mount: start playback based on mode
   useEffect(() => {
-    playAyah(startAyah);
+    if (playModeRef.current === 'surah') {
+      // Wait for timings to load so we have the chapter URL
+      const checkAndPlay = () => {
+        if (chapterAudioUrlRef.current) {
+          playSurahAudio(startAyah);
+        } else {
+          playAyah(startAyah);
+        }
+      };
+      // If timings already loaded, play now; otherwise wait a bit
+      if (timingsLoaded) {
+        checkAndPlay();
+      } else {
+        // Start with per-ayah immediately, switch to chapter when loaded
+        playAyah(startAyah);
+      }
+    } else {
+      playAyah(startAyah);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // When play mode changes, switch audio source
+  useEffect(() => {
+    if (!timingsLoaded) return;
+    if (playMode === 'surah' && !usingSurahAudioRef.current) {
+      playSurahAudio(currentAyah);
+    } else if (playMode === 'ayah' && usingSurahAudioRef.current) {
+      playAyah(currentAyah);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [playMode, timingsLoaded]);
 
   // Audio event handlers
   useEffect(() => {
@@ -105,14 +210,36 @@ export function AudioPlayer({
       const pct = audio.duration ? audio.currentTime / audio.duration : 0;
       setProgress(pct);
 
-      // Word highlighting only in ayah mode
-      if (playModeRef.current === 'ayah') {
+      if (usingSurahAudioRef.current) {
+        // Surah mode: find current segment from chapter-level timing
+        const ms = audio.currentTime * 1000;
+        const segments = chapterSegmentsRef.current;
+
+        // Find which ayah we're in
+        let foundAyah: number | null = null;
+        let foundWord: number | null = null;
+
+        for (let i = segments.length - 1; i >= 0; i--) {
+          if (ms >= segments[i].startMs) {
+            foundAyah = segments[i].ayahNumber;
+            if (ms < segments[i].endMs) {
+              foundWord = segments[i].wordPos;
+            }
+            break;
+          }
+        }
+
+        if (foundAyah && foundAyah !== currentAyah) {
+          setCurrentAyah(foundAyah);
+          onAyahChangeRef.current(foundAyah);
+        }
+        onWordChangeRef.current(foundWord);
+      } else {
+        // Ayah mode: word highlighting from per-ayah segments
         const ms = audio.currentTime * 1000;
         const segments = ayahDataRef.current.get(currentAyah)?.segments ?? [];
         const active = segments.find(([, start, end]) => ms >= start && ms < end);
         onWordChangeRef.current(active ? active[0] : null);
-      } else {
-        onWordChangeRef.current(null);
       }
     }
 
@@ -122,19 +249,26 @@ export function AudioPlayer({
 
       const loop = loopModeRef.current;
 
-      // Loop current ayah
+      if (usingSurahAudioRef.current) {
+        // Surah audio ended — the whole surah finished
+        if (loop === 'surah') {
+          setTimeout(() => playSurahAudio(1), 300);
+        }
+        // loop === 'ayah' doesn't apply to surah audio track
+        return;
+      }
+
+      // Per-ayah mode
       if (loop === 'ayah') {
         setTimeout(() => playAyah(currentAyah), 300);
         return;
       }
 
-      // Continue to next ayah
       if (currentAyah < totalAyahs) {
         const next = currentAyah + 1;
         setCurrentAyah(next);
         setTimeout(() => playAyah(next), 300);
       } else if (loop === 'surah') {
-        // Loop whole surah — restart from ayah 1
         setTimeout(() => playAyah(1), 300);
       }
     }
@@ -152,27 +286,61 @@ export function AudioPlayer({
       audio.removeEventListener('play', handlePlay);
       audio.removeEventListener('pause', handlePause);
     };
-  }, [audioElement, currentAyah, totalAyahs, playAyah]);
+  }, [audioElement, currentAyah, totalAyahs, playAyah, playSurahAudio]);
 
   function togglePlay() {
     const audio = audioElement;
     if (audio.src) {
       isPlaying ? audio.pause() : audio.play().catch(() => {});
+    } else if (playMode === 'surah') {
+      playSurahAudio(currentAyah);
     } else {
       playAyah(currentAyah);
     }
   }
 
   function prevAyah() {
-    if (currentAyah > 1) playAyah(currentAyah - 1);
+    if (currentAyah <= 1) return;
+    const prev = currentAyah - 1;
+    if (usingSurahAudioRef.current) {
+      // Seek in chapter audio
+      const seg = chapterSegmentsRef.current.find((s) => s.ayahNumber === prev);
+      if (seg) {
+        audioElement.currentTime = seg.startMs / 1000;
+        setCurrentAyah(prev);
+        onAyahChangeRef.current(prev);
+        if (!isPlaying) audioElement.play().catch(() => {});
+      }
+    } else {
+      playAyah(prev);
+    }
   }
 
   function nextAyah() {
-    if (currentAyah < totalAyahs) playAyah(currentAyah + 1);
+    if (currentAyah >= totalAyahs) return;
+    const next = currentAyah + 1;
+    if (usingSurahAudioRef.current) {
+      const seg = chapterSegmentsRef.current.find((s) => s.ayahNumber === next);
+      if (seg) {
+        audioElement.currentTime = seg.startMs / 1000;
+        setCurrentAyah(next);
+        onAyahChangeRef.current(next);
+        if (!isPlaying) audioElement.play().catch(() => {});
+      }
+    } else {
+      playAyah(next);
+    }
   }
 
   function startFromBeginning() {
-    playAyah(1);
+    if (usingSurahAudioRef.current) {
+      audioElement.currentTime = 0;
+      setCurrentAyah(1);
+      onAyahChangeRef.current(1);
+      if (!isPlaying) audioElement.play().catch(() => {});
+    } else {
+      playAyah(1);
+    }
   }
 
   function cycleLoop() {
@@ -251,7 +419,7 @@ export function AudioPlayer({
                 ? 'bg-gold/15 text-gold'
                 : 'bg-white/[0.05] text-muted-more hover:text-white'
             }`}
-            title={playMode === 'ayah' ? 'Playing per-ayah with word highlighting' : 'Playing full surah continuously'}
+            title={playMode === 'ayah' ? 'Per-ayah with word highlighting' : 'Full surah continuous playback'}
           >
             {playMode === 'ayah' ? 'Ayah' : 'Surah'}
           </button>

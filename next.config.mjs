@@ -8,6 +8,17 @@ const nextConfig = {
     }
     return config;
   },
+  // Redirect old static JSON paths (pre-DB-migration) so stale browser caches
+  // get a clean reload instead of a confusing 404.
+  async redirects() {
+    return [
+      {
+        source: '/data/:path*',
+        destination: '/',
+        permanent: false,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

@@ -10,14 +10,21 @@ export async function GET(
   }
 
   try {
-    const res = await fetch(
-      `https://api.quran.com/api/v4/recitations/7/by_chapter/${surahNumber}?per_page=300&fields=segments`,
-      { headers: { Accept: 'application/json' }, next: { revalidate: false } }
-    );
+    // Fetch per-ayah segments and full chapter audio URL in parallel
+    const [segRes, chapterRes] = await Promise.all([
+      fetch(
+        `https://api.quran.com/api/v4/recitations/7/by_chapter/${surahNumber}?per_page=300&fields=segments`,
+        { headers: { Accept: 'application/json' }, next: { revalidate: false } }
+      ),
+      fetch(
+        `https://api.quran.com/api/v4/chapter_recitations/7/${surahNumber}`,
+        { headers: { Accept: 'application/json' }, next: { revalidate: false } }
+      ),
+    ]);
 
-    if (!res.ok) throw new Error('quran.com API error');
+    if (!segRes.ok) throw new Error('quran.com API error');
 
-    const data = await res.json();
+    const data = await segRes.json();
 
     // Normalize audio_files into { ayahNumber, url, segments }
     // Quran.com segments format: [wordIndex, wordPosition, startMs, endMs]
@@ -42,7 +49,14 @@ export async function GET(
       return { ayahNumber: parseInt(ayahStr), url, segments };
     });
 
-    return Response.json(ayahs, {
+    // Extract full chapter audio URL
+    let chapterAudioUrl: string | null = null;
+    if (chapterRes.ok) {
+      const chapterData = await chapterRes.json();
+      chapterAudioUrl = chapterData?.audio_file?.audio_url ?? null;
+    }
+
+    return Response.json({ ayahs, chapterAudioUrl }, {
       headers: { 'Cache-Control': 'public, s-maxage=31536000, immutable' },
     });
   } catch {
