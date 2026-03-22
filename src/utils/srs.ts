@@ -2,7 +2,11 @@
  * Spaced-Repetition System (SRS) — standalone module.
  * Manages mastery levels, review scheduling, and queue ordering.
  */
-import type { VerbRoot } from '../data/verbs';
+
+/** Minimal item shape needed by the SRS queue. Any quiz item (root, noun, etc.) must have an `id`. */
+export interface SRSItem {
+  id: string;
+}
 
 const SRS_KEY = 'quranic_srs_v1';
 
@@ -62,14 +66,14 @@ export function updateSRS(data: SRSData, rootId: string, correct: number, total:
   };
 }
 
-/** Sort roots by SRS priority: overdue → new → upcoming */
-export function buildSRSQueue(srsData: SRSData, roots: VerbRoot[]): VerbRoot[] {
+/** Sort items by SRS priority: overdue → new → upcoming */
+export function buildSRSQueue<T extends SRSItem>(srsData: SRSData, items: T[]): T[] {
   const now = Date.now();
-  const overdue: VerbRoot[] = [];
-  const unseen:  VerbRoot[] = [];
-  const upcoming: VerbRoot[] = [];
+  const overdue: T[] = [];
+  const unseen:  T[] = [];
+  const upcoming: T[] = [];
 
-  for (const root of roots) {
+  for (const root of items) {
     const rec = srsData[root.id];
     if (!rec) {
       unseen.push(root);

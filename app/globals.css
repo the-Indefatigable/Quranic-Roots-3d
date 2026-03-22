@@ -176,7 +176,7 @@ button {
 
 /* Tafsir content styling */
 .tafsir-content h3,
-.tafsir-content ### {
+.tafsir-content h4 {
   color: var(--color-gold);
   font-size: 0.9375rem;
   font-weight: 600;
