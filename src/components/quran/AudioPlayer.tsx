@@ -85,29 +85,43 @@ export function AudioPlayer({
           chapterAudioUrlRef.current = data.chapterAudioUrl;
         }
 
-        // Build cumulative chapter segments for surah-mode word highlighting
-        // Each ayah's segments are relative to that ayah's audio file.
-        // We estimate cumulative offset from the end of each ayah's last segment.
-        const sortedAyahs = [...ayahList].sort((a, b) => a.ayahNumber - b.ayahNumber);
-        let cumulativeOffset = 0;
-        const allSegments: ChapterSegment[] = [];
-        for (const ayah of sortedAyahs) {
-          for (const [wordPos, startMs, endMs] of ayah.segments) {
-            allSegments.push({
-              ayahNumber: ayah.ayahNumber,
-              wordPos,
-              startMs: startMs + cumulativeOffset,
-              endMs: endMs + cumulativeOffset,
-            });
+        // Use chapter-level verse timings from the API (absolute timestamps)
+        // These are perfectly aligned with the chapter audio file
+        const chapterTimings = data.chapterVerseTimings ?? [];
+        if (chapterTimings.length > 0) {
+          const allSegments: ChapterSegment[] = [];
+          for (const vt of chapterTimings) {
+            for (const [wordPos, startMs, endMs] of vt.segments) {
+              allSegments.push({
+                ayahNumber: vt.ayahNumber,
+                wordPos,
+                startMs,
+                endMs,
+              });
+            }
           }
-          // Advance offset by the duration of this ayah's audio
-          const lastSeg = ayah.segments[ayah.segments.length - 1];
-          if (lastSeg) {
-            // Add a small buffer (200ms) for silence between ayahs in the chapter recording
-            cumulativeOffset += lastSeg[2] + 200;
+          chapterSegmentsRef.current = allSegments;
+        } else {
+          // Fallback: estimate from per-ayah data (less accurate)
+          const sortedAyahs = [...ayahList].sort((a, b) => a.ayahNumber - b.ayahNumber);
+          let cumulativeOffset = 0;
+          const allSegments: ChapterSegment[] = [];
+          for (const ayah of sortedAyahs) {
+            for (const [wordPos, startMs, endMs] of ayah.segments) {
+              allSegments.push({
+                ayahNumber: ayah.ayahNumber,
+                wordPos,
+                startMs: startMs + cumulativeOffset,
+                endMs: endMs + cumulativeOffset,
+              });
+            }
+            const lastSeg = ayah.segments[ayah.segments.length - 1];
+            if (lastSeg) {
+              cumulativeOffset += lastSeg[2] + 200;
+            }
           }
+          chapterSegmentsRef.current = allSegments;
         }
-        chapterSegmentsRef.current = allSegments;
 
         setTimingsLoaded(true);
       })

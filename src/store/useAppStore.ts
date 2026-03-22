@@ -24,8 +24,6 @@ interface AppState {
   selectedRoot: string | null;
   setSelectedRoot: (id: string | null) => void;
 
-  selectedNoun: string | null;
-  setSelectedNoun: (id: string | null) => void;
 
   bookmarks: Bookmark[];
   addBookmark: (bookmark: Omit<Bookmark, 'createdAt'>) => void;
@@ -45,8 +43,6 @@ export const useAppStore = create<AppState>()(
       selectedRoot: null,
       setSelectedRoot: (id) => set({ selectedRoot: id }),
 
-      selectedNoun: null,
-      setSelectedNoun: (id) => set({ selectedNoun: id }),
 
       bookmarks: [],
       addBookmark: (bookmark) =>
