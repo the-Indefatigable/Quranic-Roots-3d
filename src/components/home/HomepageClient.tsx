@@ -135,7 +135,7 @@ export function HomepageClient() {
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
       {/* ===== TOP NAV ===== */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-background/60 backdrop-blur-xl border-b border-white/[0.04]">
+      <nav className="fixed top-0 left-0 right-0 z-50 glass-strong border-b-0">
         <div className="max-w-6xl mx-auto flex items-center justify-between h-14 px-6">
           <Link href="/" className="text-lg font-light tracking-tight text-white">
             Qu<span className="text-gold">Roots</span>
@@ -195,7 +195,7 @@ export function HomepageClient() {
         <div className="hero-cta flex flex-col sm:flex-row items-center gap-3">
           <Link
             href="/quran"
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-gold to-gold-light text-black px-8 py-3.5 rounded-xl text-sm font-semibold hover:brightness-110 transition-all hover:shadow-[0_0_50px_rgba(212,165,116,0.4)]"
+            className="btn-primary px-8 py-3.5"
           >
             Start Reading
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
@@ -204,7 +204,7 @@ export function HomepageClient() {
           </Link>
           <Link
             href="/roots"
-            className="inline-flex items-center gap-2 text-white/60 hover:text-white border border-white/[0.08] hover:border-white/[0.18] px-6 py-3.5 rounded-xl text-sm transition-all"
+            className="btn-secondary px-8 py-3.5"
           >
             Explore Roots
           </Link>
@@ -282,7 +282,7 @@ export function HomepageClient() {
             >
               <Link
                 href={feature.href}
-                className="group relative flex flex-col h-full bg-white/[0.04] border border-white/[0.08] rounded-2xl p-7 sm:p-8 transition-all duration-300 hover:border-white/[0.14] hover:bg-white/[0.06]"
+                className="group relative flex flex-col h-full bg-card border border-border rounded-2xl p-7 sm:p-8 card-glow"
               >
                 <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${feature.accent} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
                 <div className="relative">
@@ -364,7 +364,7 @@ export function HomepageClient() {
                 <Link
                   href={`/roots/${encodeURIComponent(root.root)}`}
                   prefetch={false}
-                  className="group flex flex-col items-center text-center bg-white/[0.04] border border-white/[0.08] rounded-2xl p-5 transition-all duration-300 hover:border-gold/30 hover:bg-gold/[0.06]"
+                  className="group flex flex-col items-center text-center bg-card border border-border rounded-2xl p-5 card-glow hover:border-gold/30"
                 >
                   <span className="font-arabic text-2xl text-gold mb-2 group-hover:scale-105 transition-transform">
                     {root.root}
@@ -441,10 +441,10 @@ export function HomepageClient() {
           <div className="reveal" style={{ '--reveal-delay': '0.24s' } as React.CSSProperties}>
             <Link
               href="/quran"
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-gold to-gold-light text-black px-10 py-4 rounded-xl text-sm font-semibold hover:brightness-110 transition-all hover:shadow-[0_0_60px_rgba(212,165,116,0.35)]"
+              className="btn-primary px-10 py-4 text-base"
             >
               Start Exploring
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+              <svg className="w-5 h-5 ml-1" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
               </svg>
             </Link>
