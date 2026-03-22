@@ -16,7 +16,7 @@ export function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-card/80 backdrop-blur-xl border-t border-border z-40 pb-[env(safe-area-inset-bottom)]">
+    <nav className="lg:hidden fixed bottom-0 left-0 right-0 glass-strong z-40 pb-[env(safe-area-inset-bottom)]">
       <div className="flex items-center justify-around h-16">
         {navItems.map((item) => {
           const isActive = pathname.startsWith(item.href);
@@ -25,15 +25,15 @@ export function BottomNav() {
               key={item.href}
               href={item.href}
               className={cn(
-                'relative flex flex-col items-center gap-1 px-3 py-1.5 transition-colors',
-                isActive ? 'text-gold' : 'text-muted-more hover:text-white'
+                'relative flex flex-col items-center gap-1 px-3 py-1.5 transition-all duration-200',
+                isActive ? 'text-gold' : 'text-muted-more active:scale-95'
               )}
             >
               {isActive && (
-                <div className="absolute -top-[1px] left-1/2 -translate-x-1/2 w-8 h-[2px] bg-gold shadow-[0_1px_8px_rgba(212,165,116,0.6)] rounded-b-full" />
+                <div className="absolute -top-[1px] left-1/2 -translate-x-1/2 w-8 h-[2px] bg-gold shadow-[0_1px_12px_rgba(212,165,116,0.7)] rounded-b-full" />
               )}
-              <item.icon className="w-5 h-5" />
-              <span className="text-[10px] font-medium">{item.label}</span>
+              <item.icon className={cn('w-5 h-5 transition-transform', isActive && 'scale-110')} />
+              <span className={cn('text-[10px]', isActive ? 'font-semibold' : 'font-medium')}>{item.label}</span>
             </Link>
           );
         })}
@@ -54,14 +54,6 @@ function RootIcon({ className }: { className?: string }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" />
-    </svg>
-  );
-}
-
-function NounIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" />
     </svg>
   );
 }

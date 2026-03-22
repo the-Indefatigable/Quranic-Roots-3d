@@ -10,7 +10,7 @@
   --color-emerald: #00A86B;
   --color-muted: rgba(255,255,255,0.55);
   --color-muted-more: rgba(255,255,255,0.30);
-  --color-border: rgba(255,255,255,0.06);
+  --color-border: rgba(255,255,255,0.08);
   --font-sans: var(--font-inter), system-ui, sans-serif;
   --font-arabic: var(--font-uthmani), serif;
 }
@@ -32,7 +32,7 @@ html, body {
   width: 100%;
   min-height: 100vh;
   background: var(--color-background);
-  color: #e2e8f0; /* Soft off-white */
+  color: #e2e8f0;
 }
 
 /* Custom scrollbar */
@@ -146,7 +146,7 @@ html, body {
 a { text-decoration: none; color: inherit; }
 
 button {
-  border-radius: 8px;
+  border-radius: 10px;
   border: 1px solid transparent;
   font-family: inherit;
   cursor: pointer;
@@ -186,4 +186,136 @@ button {
 
 .tafsir-content h3:first-child {
   margin-top: 0;
+}
+
+/* ===== MODERN DESIGN SYSTEM ===== */
+
+/* Glassmorphism surfaces */
+.glass {
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-strong {
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(24px) saturate(200%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Vibrant CTA buttons */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.75rem;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #000;
+  background: linear-gradient(135deg, var(--color-gold) 0%, var(--color-gold-light) 100%);
+  box-shadow:
+    0 2px 8px rgba(212, 165, 116, 0.25),
+    0 0 0 1px rgba(212, 165, 116, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: none;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.1);
+  box-shadow:
+    0 4px 20px rgba(212, 165, 116, 0.35),
+    0 0 0 1px rgba(212, 165, 116, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+  filter: brightness(1);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.75rem;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+/* Card glow on hover */
+.card-glow {
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.card-glow:hover {
+  border-color: rgba(212, 165, 116, 0.15);
+  box-shadow: 0 4px 30px rgba(212, 165, 116, 0.06);
+  transform: translateY(-2px);
+}
+
+/* Smooth page content transitions */
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-enter {
+  animation: page-enter 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* Subtle pulse for active indicators */
+@keyframes soft-pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.soft-pulse {
+  animation: soft-pulse 2s ease-in-out infinite;
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .hero-line,
+  .hero-bismillah,
+  .hero-title,
+  .hero-subtitle,
+  .hero-tagline,
+  .hero-cta,
+  .hero-scroll,
+  .card-glow,
+  .page-enter {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }
