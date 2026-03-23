@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, integer, jsonb, timestamp, uniqueIndex, index } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, text, integer, jsonb, timestamp, boolean, date, uniqueIndex, index } from 'drizzle-orm/pg-core';
 
 // ── Roots ──────────────────────────────────────────
 export const roots = pgTable('roots', {
@@ -168,6 +168,88 @@ export const tafsirEntries = pgTable('tafsir_entries', {
 }, (table) => [
   uniqueIndex('tafsir_entry_unique').on(table.tafsirId, table.surahNumber, table.ayahNumber),
   index('tafsir_entries_surah_idx').on(table.surahNumber),
+]);
+
+// ── Users ─────────────────────────────────────────
+export const users = pgTable('users', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  email: text('email').unique().notNull(),
+  passwordHash: text('password_hash'),
+  name: text('name'),
+  avatarUrl: text('avatar_url'),
+  role: text('role').default('student').notNull(), // 'student' | 'admin' | 'teacher'
+  preferredLang: text('preferred_lang').default('en'),
+  streakDays: integer('streak_days').default(0),
+  lastActive: date('last_active'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+});
+
+// ── Sessions ──────────────────────────────────────
+export const sessions = pgTable('sessions', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  token: text('token').unique().notNull(),
+  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+});
+
+// ── Auth Accounts (OAuth providers) ───────────────
+export const authAccounts = pgTable('auth_accounts', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  provider: text('provider').notNull(),
+  providerAccountId: text('provider_account_id').notNull(),
+  accessToken: text('access_token'),
+  refreshToken: text('refresh_token'),
+  expiresAt: timestamp('expires_at', { withTimezone: true }),
+});
+
+// ── Magic Link Tokens ─────────────────────────────
+export const magicLinkTokens = pgTable('magic_link_tokens', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  email: text('email').notNull(),
+  token: text('token').unique().notNull(),
+  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+  usedAt: timestamp('used_at', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+});
+
+// ── Server-side Bookmarks ─────────────────────────
+export const bookmarks = pgTable('bookmarks', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  rootId: uuid('root_id').references(() => roots.id, { onDelete: 'cascade' }),
+  nounId: uuid('noun_id').references(() => nouns.id, { onDelete: 'cascade' }),
+  surahId: integer('surah_id'),
+  ayahNumber: integer('ayah_number'),
+  note: text('note'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+});
+
+// ── User Activity ─────────────────────────────────
+export const userActivity = pgTable('user_activity', {
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  activityDate: date('activity_date').notNull(),
+  quizzesTaken: integer('quizzes_taken').default(0),
+  rootsStudied: integer('roots_studied').default(0),
+  lessonsDone: integer('lessons_done').default(0),
+  timeSpentS: integer('time_spent_s').default(0),
+}, (table) => [
+  uniqueIndex('user_activity_pkey_idx').on(table.userId, table.activityDate),
+]);
+
+// ── User Root Mastery ─────────────────────────────
+export const userRootMastery = pgTable('user_root_mastery', {
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  rootId: uuid('root_id').notNull().references(() => roots.id, { onDelete: 'cascade' }),
+  mastery: integer('mastery').default(0), // 0–5
+  nextReview: timestamp('next_review', { withTimezone: true }),
+  totalAttempts: integer('total_attempts').default(0),
+  correctAttempts: integer('correct_attempts').default(0),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+}, (table) => [
+  uniqueIndex('user_root_mastery_pkey_idx').on(table.userId, table.rootId),
 ]);
 
 // ── Edit History ───────────────────────────────────

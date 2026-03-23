@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/cn';
+import { useAuthStore } from '@/store/useAuthStore';
 
 const navItems = [
   { href: '/quran',     label: 'Quran',    icon: BookIcon },
@@ -14,6 +15,7 @@ const navItems = [
 
 export function BottomNav() {
   const pathname = usePathname();
+  const { user, isLoading, setShowLoginModal } = useAuthStore();
 
   return (
     <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 glass-strong border-t border-white/[0.06] pb-[env(safe-area-inset-bottom)]">
@@ -29,7 +31,6 @@ export function BottomNav() {
                 isActive ? 'text-gold' : 'text-white/28'
               )}
             >
-              {/* Top indicator bar */}
               {isActive && (
                 <span className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-[2px] rounded-b-full bg-gold shadow-[0_0_8px_rgba(232,184,109,0.8)]" />
               )}
@@ -50,8 +51,38 @@ export function BottomNav() {
             </Link>
           );
         })}
+
+        {/* Profile / Sign in — 6th item */}
+        {!isLoading && (
+          user ? (
+            <div className="flex flex-col items-center justify-center gap-[3px] px-3 py-1">
+              <div className="w-[19px] h-[19px] rounded-full bg-gold/20 flex items-center justify-center">
+                <span className="text-[8px] font-bold text-gold uppercase leading-none">
+                  {user.name?.[0] || user.email[0]}
+                </span>
+              </div>
+              <span className="text-[9.5px] font-medium text-white/28 tracking-wide">You</span>
+            </div>
+          ) : (
+            <button
+              onClick={() => setShowLoginModal(true)}
+              className="flex flex-col items-center justify-center gap-[3px] px-3 py-1 text-white/28 active:scale-95 transition-all"
+            >
+              <UserIcon className="w-[19px] h-[19px]" />
+              <span className="text-[9.5px] font-medium tracking-wide">Sign in</span>
+            </button>
+          )
+        )}
       </div>
     </nav>
+  );
+}
+
+function UserIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+    </svg>
   );
 }
 
