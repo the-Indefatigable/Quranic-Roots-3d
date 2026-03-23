@@ -5,19 +5,19 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/cn';
 
 const navItems = [
-  { href: '/quran', label: 'Quran', icon: BookIcon },
-  { href: '/roots', label: 'Roots', icon: RootIcon },
-  { href: '/search', label: 'Search', icon: SearchIcon },
-  { href: '/review', label: 'Review', icon: ReviewIcon },
-  { href: '/bookmarks', label: 'Saved', icon: BookmarkIcon },
+  { href: '/quran',     label: 'Quran',    icon: BookIcon },
+  { href: '/roots',     label: 'Roots',    icon: RootIcon },
+  { href: '/search',    label: 'Search',   icon: SearchIcon },
+  { href: '/review',    label: 'Review',   icon: ReviewIcon },
+  { href: '/bookmarks', label: 'Saved',    icon: BookmarkIcon },
 ];
 
 export function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="lg:hidden fixed bottom-0 left-0 right-0 glass-strong z-40 pb-[env(safe-area-inset-bottom)]">
-      <div className="flex items-center justify-around h-16">
+    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 glass-strong border-t border-white/[0.06] pb-[env(safe-area-inset-bottom)]">
+      <div className="flex items-center justify-around h-[58px]">
         {navItems.map((item) => {
           const isActive = pathname.startsWith(item.href);
           return (
@@ -25,15 +25,28 @@ export function BottomNav() {
               key={item.href}
               href={item.href}
               className={cn(
-                'relative flex flex-col items-center gap-1 px-3 py-1.5 transition-all duration-200',
-                isActive ? 'text-gold' : 'text-muted-more active:scale-95'
+                'relative flex flex-col items-center justify-center gap-[3px] px-3 py-1 transition-all duration-200 active:scale-95',
+                isActive ? 'text-gold' : 'text-white/28'
               )}
             >
+              {/* Top indicator bar */}
               {isActive && (
-                <div className="absolute -top-[1px] left-1/2 -translate-x-1/2 w-8 h-[2px] bg-gold shadow-[0_1px_12px_rgba(212,165,116,0.7)] rounded-b-full" />
+                <span className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-[2px] rounded-b-full bg-gold shadow-[0_0_8px_rgba(232,184,109,0.8)]" />
               )}
-              <item.icon className={cn('w-5 h-5 transition-transform', isActive && 'scale-110')} />
-              <span className={cn('text-[10px]', isActive ? 'font-semibold' : 'font-medium')}>{item.label}</span>
+              <item.icon
+                className={cn(
+                  'w-[19px] h-[19px] transition-all duration-200',
+                  isActive ? 'text-gold scale-110' : 'text-white/30'
+                )}
+              />
+              <span
+                className={cn(
+                  'text-[9.5px] tracking-wide transition-all duration-200',
+                  isActive ? 'font-bold text-gold' : 'font-medium text-white/28'
+                )}
+              >
+                {item.label}
+              </span>
             </Link>
           );
         })}

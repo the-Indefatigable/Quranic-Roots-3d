@@ -5,10 +5,10 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/cn';
 
 const navItems = [
-  { href: '/quran', label: 'Quran', icon: BookIcon },
-  { href: '/roots', label: 'Roots', icon: RootIcon },
-  { href: '/search', label: 'Search', icon: SearchIcon },
-  { href: '/review', label: 'Review', icon: ReviewIcon },
+  { href: '/quran',     label: 'Quran',     icon: BookIcon },
+  { href: '/roots',     label: 'Roots',     icon: RootIcon },
+  { href: '/search',    label: 'Search',    icon: SearchIcon },
+  { href: '/review',    label: 'Review',    icon: ReviewIcon },
   { href: '/bookmarks', label: 'Bookmarks', icon: BookmarkIcon },
 ];
 
@@ -16,14 +16,17 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden lg:flex flex-col fixed left-0 top-0 bottom-0 w-60 glass-strong z-40">
-      <Link href="/" className="flex items-center gap-3 px-6 py-6 group">
-        <span className="text-2xl font-light tracking-tight text-white transition-colors">
-          Qu<span className="text-gold group-hover:text-gold-light transition-colors">Roots</span>
+    <aside className="hidden lg:flex flex-col fixed left-0 top-0 bottom-0 w-60 glass-strong z-40 border-r border-white/[0.05]">
+
+      {/* Logo */}
+      <Link href="/" className="flex items-center px-6 h-16 border-b border-white/[0.05]">
+        <span className="text-lg font-bold tracking-tight text-white">
+          Qu<span className="text-gold">Roots</span>
         </span>
       </Link>
 
-      <nav className="flex-1 px-3 py-4 space-y-1">
+      {/* Nav */}
+      <nav className="flex-1 px-3 py-5 space-y-0.5">
         {navItems.map((item) => {
           const isActive = pathname.startsWith(item.href);
           return (
@@ -31,24 +34,29 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               className={cn(
-                'relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 overflow-hidden',
+                'relative flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200',
                 isActive
-                  ? 'bg-gold/[0.1] text-gold shadow-[inset_0_0_0_1px_rgba(212,165,116,0.15)] before:absolute before:inset-y-1.5 before:left-0 before:w-[3px] before:bg-gold before:rounded-full before:shadow-[0_0_8px_rgba(212,165,116,0.5)]'
-                  : 'text-muted hover:text-white hover:bg-white/[0.05]'
+                  ? 'bg-gold/[0.1] text-gold'
+                  : 'text-white/38 hover:text-white/80 hover:bg-white/[0.04]'
               )}
             >
-              <item.icon className="w-5 h-5" />
-              <span className="font-medium">{item.label}</span>
+              {/* Active left bar */}
               {isActive && (
-                <div className="absolute right-3 w-1.5 h-1.5 rounded-full bg-gold soft-pulse" />
+                <span className="absolute left-0 inset-y-2 w-[3px] bg-gold rounded-r-full shadow-[0_0_8px_rgba(232,184,109,0.6)]" />
+              )}
+              <item.icon className={cn('w-[18px] h-[18px] flex-shrink-0', isActive ? 'text-gold' : 'text-white/35')} />
+              <span>{item.label}</span>
+              {isActive && (
+                <span className="ml-auto w-1.5 h-1.5 rounded-full bg-gold soft-pulse" />
               )}
             </Link>
           );
         })}
       </nav>
 
-      <div className="px-6 py-4 border-t border-white/[0.06]">
-        <p className="text-xs text-muted-more">QuRoots v2.0</p>
+      {/* Footer */}
+      <div className="px-6 py-4 border-t border-white/[0.05]">
+        <p className="text-[11px] font-medium text-white/18 tracking-wide">QuRoots v2.0</p>
       </div>
     </aside>
   );
