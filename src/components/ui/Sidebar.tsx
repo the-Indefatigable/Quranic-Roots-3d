@@ -10,10 +10,12 @@ const navItems = [
   { href: '/roots',     label: 'Roots',     icon: RootIcon },
   { href: '/learn',     label: 'Learn',     icon: LearnIcon },
   { href: '/search',    label: 'Search',    icon: SearchIcon },
-  { href: '/review',    label: 'Review',    icon: ReviewIcon },
+  { type: 'divider' as const },
   { href: '/quiz',      label: 'Quiz',      icon: QuizIcon, requiresAuth: true },
+  { href: '/review',    label: 'Review',    icon: ReviewIcon, requiresAuth: true },
+  { href: '/bookmarks', label: 'Bookmarks', icon: BookmarkIcon, requiresAuth: true },
   { href: '/rewards',   label: 'Rewards',   icon: TrophyIcon, requiresAuth: true },
-  { href: '/bookmarks', label: 'Bookmarks', icon: BookmarkIcon },
+  { type: 'divider' as const },
   { href: '/admin',     label: 'Admin',     icon: AdminIcon, requiresAdmin: true },
 ];
 
@@ -33,16 +35,20 @@ export function Sidebar() {
 
       {/* Nav */}
       <nav className="flex-1 px-3 py-5 space-y-0.5">
-        {navItems.map((item) => {
-          // Hide auth-required items if user not logged in
-          if ((item as any).requiresAuth && !user) return null;
-          if ((item as any).requiresAdmin && user?.role !== 'admin') return null;
+        {navItems.map((item, idx) => {
+          if ('type' in item && item.type === 'divider') {
+            return <div key={`div-${idx}`} className="h-px bg-white/[0.05] my-3 mx-2" />;
+          }
 
-          const isActive = pathname.startsWith(item.href);
+          const navItem = item as { href: string; label: string; icon: any; requiresAuth?: boolean; requiresAdmin?: boolean };
+          if (navItem.requiresAuth && !user) return null;
+          if (navItem.requiresAdmin && user?.role !== 'admin') return null;
+
+          const isActive = pathname.startsWith(navItem.href);
           return (
             <Link
-              key={item.href}
-              href={item.href}
+              key={navItem.href}
+              href={navItem.href}
               className={cn(
                 'relative flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200',
                 isActive
@@ -53,8 +59,8 @@ export function Sidebar() {
               {isActive && (
                 <span className="absolute left-0 inset-y-2 w-[3px] bg-gold rounded-r-full shadow-[0_0_8px_rgba(232,184,109,0.6)]" />
               )}
-              <item.icon className={cn('w-[18px] h-[18px] flex-shrink-0', isActive ? 'text-gold' : 'text-white/35')} />
-              <span>{item.label}</span>
+              <navItem.icon className={cn('w-[18px] h-[18px] flex-shrink-0', isActive ? 'text-gold' : 'text-white/35')} />
+              <span>{navItem.label}</span>
               {isActive && (
                 <span className="ml-auto w-1.5 h-1.5 rounded-full bg-gold soft-pulse" />
               )}
