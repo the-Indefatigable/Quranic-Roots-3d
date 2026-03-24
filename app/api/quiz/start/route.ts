@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { db, dbQuery } from '@/db';
 import { roots, forms, tenses, nouns, particles, quizSessions } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { getDueItemsForUser } from '@/utils/srsEngine';
 import { generateConjugationQuestion, generateNounQuestion, generateParticleQuestion } from '@/utils/quizGenerator';
 
@@ -21,16 +21,8 @@ export async function GET(req: NextRequest) {
     const quizType = (searchParams.get('type') || 'mixed') as string;
     const limit = parseInt(searchParams.get('limit') || '10', 10);
 
-    // Get due items for user
-    const dueItems = await getDueItemsForUser(session.user.id, limit * 2); // Fetch extra to account for missing data
-
-    if (dueItems.length === 0) {
-      return NextResponse.json({
-        sessionId: null,
-        items: [],
-        message: 'No items due for review. Great job!',
-      });
-    }
+    // Get due items for user (SRS-based)
+    let dueItems = await getDueItemsForUser(session.user.id, limit * 2);
 
     // Filter by quiz type
     let filteredItems = dueItems;
@@ -45,11 +37,57 @@ export async function GET(req: NextRequest) {
     // Slice to limit
     filteredItems = filteredItems.slice(0, limit);
 
+    // Fallback: if no SRS items are due, pick random items from the database
+    if (filteredItems.length < limit) {
+      const needed = limit - filteredItems.length;
+      const existingIds = new Set(filteredItems.map((i) => i.id));
+
+      if (quizType === 'mixed' || quizType === 'verb_conjugation') {
+        const randomRoots = await dbQuery(() =>
+          db.select({ id: roots.id }).from(roots).orderBy(sql`RANDOM()`).limit(needed)
+        );
+        for (const r of randomRoots) {
+          if (!existingIds.has(r.id) && filteredItems.length < limit) {
+            filteredItems.push({ id: r.id, type: 'root', mastery: 0, nextReview: null });
+            existingIds.add(r.id);
+          }
+        }
+      }
+
+      if (quizType === 'mixed' || quizType === 'noun_translation') {
+        const randomNouns = await dbQuery(() =>
+          db.select({ id: nouns.id }).from(nouns).orderBy(sql`RANDOM()`).limit(needed)
+        );
+        for (const n of randomNouns) {
+          if (!existingIds.has(n.id) && filteredItems.length < limit) {
+            filteredItems.push({ id: n.id, type: 'noun', mastery: 0, nextReview: null });
+            existingIds.add(n.id);
+          }
+        }
+      }
+
+      if (quizType === 'mixed' || quizType === 'particle_translation') {
+        const randomParticles = await dbQuery(() =>
+          db.select({ id: particles.id }).from(particles).orderBy(sql`RANDOM()`).limit(needed)
+        );
+        for (const p of randomParticles) {
+          if (!existingIds.has(p.id) && filteredItems.length < limit) {
+            filteredItems.push({ id: p.id, type: 'particle', mastery: 0, nextReview: null });
+            existingIds.add(p.id);
+          }
+        }
+      }
+
+      // Shuffle the combined items
+      filteredItems.sort(() => Math.random() - 0.5);
+      filteredItems = filteredItems.slice(0, limit);
+    }
+
     if (filteredItems.length === 0) {
       return NextResponse.json({
         sessionId: null,
         items: [],
-        message: `No ${quizType.replace('_', ' ')} items due right now.`,
+        message: 'No quiz items available. Please check back later.',
       });
     }
 
