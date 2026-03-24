@@ -48,3 +48,4 @@ venv/
 scripts/*.report.txt
 scripts/*_report.txt
 scripts/*_errors.json
+.vercel
