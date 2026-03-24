@@ -99,11 +99,13 @@ export default function AdminPage() {
     }
   }, [tab, query, page]);
 
+  const isAdmin = !authLoading && user?.role === 'admin';
+
   useEffect(() => {
-    if (!authLoading && user?.role === 'admin') {
+    if (isAdmin) {
       fetchData();
     }
-  }, [fetchData, authLoading, user]);
+  }, [fetchData, isAdmin]);
 
   useEffect(() => {
     setPage(1);

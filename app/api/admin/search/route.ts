@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { db, dbQuery } from '@/db';
 import { roots, forms, tenses, nouns, particles } from '@/db/schema';
-import { eq, ilike, or, sql } from 'drizzle-orm';
+import { eq, ilike, or, sql, inArray } from 'drizzle-orm';
 
 export async function GET(req: NextRequest) {
   try {
@@ -54,7 +54,7 @@ export async function GET(req: NextRequest) {
               db
                 .select()
                 .from(forms)
-                .where(sql`${forms.rootId} IN ${rootIds}`)
+                .where(inArray(forms.rootId, rootIds))
                 .orderBy(forms.sortOrder)
             )
           : [];
@@ -66,7 +66,7 @@ export async function GET(req: NextRequest) {
               db
                 .select()
                 .from(tenses)
-                .where(sql`${tenses.formId} IN ${formIds}`)
+                .where(inArray(tenses.formId, formIds))
             )
           : [];
 
