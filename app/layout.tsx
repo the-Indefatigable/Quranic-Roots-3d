@@ -81,6 +81,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             'url': 'https://quroots.com/icon-512.png',
           },
         },
+        'potentialAction': {
+          '@type': 'SearchAction',
+          'target': 'https://quroots.com/search?q={search_term_string}',
+          'query-input': 'required name=search_term_string',
+        },
       },
       {
         '@type': 'SoftwareApplication',
@@ -101,6 +106,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${jakarta.variable} ${uthmani.variable}`}>
       <head>
+        <link rel="manifest" href="/manifest.json" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

@@ -6,8 +6,21 @@ import { RootsBrowserClient } from '@/components/roots/RootsBrowserClient';
 export const revalidate = false; // Root data never changes — cache forever, invalidate on redeploy
 
 export const metadata = {
-  title: 'Quranic Roots — QuRoots',
-  description: 'Browse all 1,716 Quranic Arabic verb roots with meanings, frequencies, and verb forms.',
+  title: 'All 1,716 Quranic Arabic Roots — Browse, Search & Learn',
+  description:
+    'Browse all 1,716 Quranic Arabic verb roots with meanings, frequencies, verb forms, and derived nouns. The most comprehensive Quranic root dictionary online.',
+  openGraph: {
+    title: 'All 1,716 Quranic Arabic Roots | QuRoots',
+    description: 'Browse Quranic Arabic verb roots with meanings, frequencies, and verb forms.',
+    url: 'https://quroots.com/roots',
+    images: [{ url: '/og-image.png', width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'All 1,716 Quranic Arabic Roots | QuRoots',
+    description: 'The most comprehensive Quranic root dictionary online.',
+    images: ['/og-image.png'],
+  },
 };
 
 export default async function RootsPage() {

@@ -30,9 +30,22 @@ export async function generateMetadata({ params }: Props) {
 
   if (!rootRow[0]) return { title: 'Root Not Found' };
   const r = rootRow[0];
+  const title = `${r.root} — ${r.meaning} | Quranic Root`;
+  const description = `Explore the Quranic Arabic root ${r.root} meaning "${r.meaning}". ${r.totalFreq} occurrences in the Quran. View verb forms, derived nouns, and Quranic verses.`;
   return {
-    title: `${r.root} — ${r.meaning}`,
-    description: `Explore the Quranic root ${r.root} meaning "${r.meaning}". ${r.totalFreq} occurrences in the Quran.`,
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: `https://quroots.com/roots/${encodeURIComponent(r.root)}`,
+      images: [{ url: '/og-image.png', width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: 'summary',
+      title,
+      description,
+    },
   };
 }
 

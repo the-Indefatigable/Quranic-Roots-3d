@@ -24,9 +24,23 @@ export async function generateMetadata({ params }: Props) {
 
   if (!surah[0]) return {};
   const s = surah[0];
+  const title = `Surah ${s.englishName} (${s.arabicName}) — ${s.versesCount} Ayahs`;
+  const description = `Read Surah ${s.englishName} (${s.arabicName}), Surah ${s.number} of the Quran — ${s.versesCount} ayahs with word-by-word analysis and English translation.`;
   return {
-    title: `${s.englishName} — Surah ${s.number}`,
-    description: `Read Surah ${s.englishName} (${s.arabicName}) — ${s.versesCount} ayahs with translation`,
+    title,
+    description,
+    openGraph: {
+      title: `${title} | QuRoots`,
+      description,
+      url: `https://quroots.com/quran/${s.number}`,
+      images: [{ url: '/og-image.png', width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${title} | QuRoots`,
+      description,
+      images: ['/og-image.png'],
+    },
   };
 }
 
