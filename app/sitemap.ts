@@ -11,8 +11,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: baseUrl, changeFrequency: 'weekly', priority: 1.0 },
     { url: `${baseUrl}/quran`, changeFrequency: 'monthly', priority: 0.9 },
     { url: `${baseUrl}/roots`, changeFrequency: 'monthly', priority: 0.9 },
+    { url: `${baseUrl}/learn`, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${baseUrl}/search`, changeFrequency: 'monthly', priority: 0.6 },
   ];
+
+  // Learn / grammar pages
+  const learnPages: MetadataRoute.Sitemap = [
+    'irab',
+    'mufrad-muthanna-jam',
+    'murakkab',
+    'adad',
+    'verb-forms',
+  ].map((slug) => ({
+    url: `${baseUrl}/learn/${slug}`,
+    changeFrequency: 'monthly' as const,
+    priority: 0.85,
+  }));
 
   // All 114 surahs
   const allSurahs = await dbQuery(() =>
@@ -36,5 +50,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  return [...staticPages, ...surahPages, ...rootPages];
+  return [...staticPages, ...learnPages, ...surahPages, ...rootPages];
 }
