@@ -3,9 +3,10 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { db, dbQuery } from '@/db';
-import { quizSessions, userRootMastery, userNounMastery, userParticleMastery } from '@/db/schema';
+import { quizSessions, userRootMastery, userNounMastery, userParticleMastery, achievements, userAchievements } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { getUserStats } from '@/utils/srsEngine';
+import { getUserLevelInfo } from '@/utils/levelEngine';
 
 export async function GET(req: NextRequest) {
   try {
@@ -14,41 +15,36 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get quiz sessions
-    const sessions = await dbQuery(() =>
-      db.select().from(quizSessions).where(eq(quizSessions.userId, session.user.id))
-    );
+    const userId = session.user.id;
+
+    // Get quiz sessions, masteries, level info, and achievements in parallel
+    const [sessions, roots, nouns, particles, levelInfo, allAchievements, unlockedAchievements] = await Promise.all([
+      dbQuery(() =>
+        db.select().from(quizSessions).where(eq(quizSessions.userId, userId))
+      ),
+      dbQuery(() =>
+        db.select().from(userRootMastery).where(eq(userRootMastery.userId, userId))
+      ),
+      dbQuery(() =>
+        db.select().from(userNounMastery).where(eq(userNounMastery.userId, userId))
+      ),
+      dbQuery(() =>
+        db.select().from(userParticleMastery).where(eq(userParticleMastery.userId, userId))
+      ),
+      getUserLevelInfo(userId),
+      dbQuery(() => db.select().from(achievements)),
+      dbQuery(() =>
+        db.select({ achievementId: userAchievements.achievementId, unlockedAt: userAchievements.unlockedAt })
+          .from(userAchievements)
+          .where(eq(userAchievements.userId, userId))
+      ),
+    ]);
 
     const totalSessions = sessions.length;
     const totalCorrect = sessions.reduce((sum, s) => sum + s.correctCount, 0);
     const totalAttempts = sessions.reduce((sum, s) => sum + s.itemCount, 0);
     const avgAccuracy = totalAttempts > 0 ? Math.round((totalCorrect / totalAttempts) * 100) : 0;
-    const totalXP = totalCorrect * 10;
-
-    // Get mastery stats
-    const stats = await getUserStats(session.user.id);
-
-    // Get masteries
-    const [roots, nouns, particles] = await Promise.all([
-      dbQuery(() =>
-        db
-          .select()
-          .from(userRootMastery)
-          .where(eq(userRootMastery.userId, session.user.id))
-      ),
-      dbQuery(() =>
-        db
-          .select()
-          .from(userNounMastery)
-          .where(eq(userNounMastery.userId, session.user.id))
-      ),
-      dbQuery(() =>
-        db
-          .select()
-          .from(userParticleMastery)
-          .where(eq(userParticleMastery.userId, session.user.id))
-      ),
-    ]);
+    const totalXP = levelInfo?.totalXP ?? totalCorrect * 10;
 
     const masteryBreakdown = {
       roots: {
@@ -69,15 +65,37 @@ export async function GET(req: NextRequest) {
       },
     };
 
+    // Merge all achievements with user's unlocked status
+    const unlockedMap = new Map(unlockedAchievements.map((u) => [u.achievementId, u.unlockedAt]));
+    const mergedAchievements = allAchievements.map((a) => ({
+      id: a.id,
+      title: a.title,
+      description: a.description,
+      category: a.category,
+      xpBonus: a.xpBonus,
+      unlockedAt: unlockedMap.get(a.id)?.toISOString() ?? null,
+    }));
+
+    // Get mastery stats
+    const srsStats = await getUserStats(userId);
+
     return NextResponse.json({
       totalSessions,
       totalCorrect,
       totalAttempts,
       avgAccuracy,
       totalXP,
+      levelInfo: levelInfo ?? {
+        level: 1,
+        totalXP: 0,
+        levelProgress: 0,
+        xpToNextLevel: 100,
+        nextLevelThreshold: 100,
+      },
+      achievements: mergedAchievements,
       masteryBreakdown,
-      totalLearned: stats.totalLearned,
-      overallAvgMastery: stats.avgMastery,
+      totalLearned: srsStats.totalLearned,
+      overallAvgMastery: srsStats.avgMastery,
     });
   } catch (error) {
     console.error('[quiz/stats] Error:', error);
