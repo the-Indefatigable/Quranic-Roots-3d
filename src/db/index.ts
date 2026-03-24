@@ -6,8 +6,8 @@ const connectionString = process.env.DATABASE_URL!;
 
 // Keep a warm connection — Railway kills idle connections after ~60s
 let client = postgres(connectionString, {
-  max: 20,
-  idle_timeout: 30,
+  max: 5,
+  idle_timeout: 20,
   connect_timeout: 15,
   max_lifetime: 60 * 10,
   prepare: false,

@@ -3,7 +3,7 @@ import { db, dbQuery } from '@/db';
 import { surahs } from '@/db/schema';
 import { asc } from 'drizzle-orm';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 86400;
 
 export async function GET() {
   const allSurahs = await dbQuery(() =>

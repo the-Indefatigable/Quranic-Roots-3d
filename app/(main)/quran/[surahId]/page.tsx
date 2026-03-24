@@ -10,7 +10,11 @@ interface Props {
   params: { surahId: string };
 }
 
-export const dynamic = 'force-dynamic';
+export const revalidate = false;
+
+export function generateStaticParams() {
+  return Array.from({ length: 114 }, (_, i) => ({ surahId: String(i + 1) }));
+}
 
 export async function generateMetadata({ params }: Props) {
   const surahNumber = parseInt(params.surahId);

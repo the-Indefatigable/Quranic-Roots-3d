@@ -15,7 +15,7 @@ interface Props {
   params: { rootId: string };
 }
 
-export const dynamic = 'force-dynamic';
+export const revalidate = false;
 
 export async function generateMetadata({ params }: Props) {
   const rootName = decodeURIComponent(params.rootId).replace(/\s/g, '');
