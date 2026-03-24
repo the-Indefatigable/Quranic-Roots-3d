@@ -1,5 +1,3 @@
-export const dynamic = 'force-dynamic';
-
 import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
 import { db, dbQuery } from '@/db';

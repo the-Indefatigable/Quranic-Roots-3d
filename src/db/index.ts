@@ -22,7 +22,7 @@ client`SELECT 1`.catch(() => {});
 const baseDb = drizzle(client, { schema });
 
 // Proxy that auto-retries on transient Railway errors
-const TRANSIENT_CODES = ['ECONNRESET', 'ECONNREFUSED', 'ETIMEDOUT', 'CONNECT_TIMEOUT', 'CONNECTION_CLOSED'];
+const TRANSIENT_CODES = ['ECONNRESET', 'ECONNREFUSED', 'ETIMEDOUT', 'CONNECT_TIMEOUT', 'CONNECTION_CLOSED', 'ENETUNREACH'];
 
 function isTransient(err: unknown): boolean {
   if (!(err instanceof Error)) return false;
