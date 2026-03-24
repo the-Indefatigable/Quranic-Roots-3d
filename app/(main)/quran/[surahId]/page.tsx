@@ -10,11 +10,9 @@ interface Props {
   params: { surahId: string };
 }
 
-export const revalidate = false; // Quran data never changes — cache forever, invalidate on redeploy
-
-export function generateStaticParams() {
-  return Array.from({ length: 114 }, (_, i) => ({ surahId: String(i + 1) }));
-}
+// Render on-demand and cache indefinitely — avoids 114 concurrent DB connections at build time
+export const dynamic = 'force-dynamic';
+export const revalidate = false;
 
 export async function generateMetadata({ params }: Props) {
   const surahNumber = parseInt(params.surahId);
