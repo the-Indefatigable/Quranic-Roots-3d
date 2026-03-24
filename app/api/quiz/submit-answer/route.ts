@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
+
+export const dynamic = 'force-dynamic';
 import { db, dbQuery } from '@/db';
 import { quizAttempts } from '@/db/schema';
 import { updateMasteryInDB } from '@/utils/srsEngine';
