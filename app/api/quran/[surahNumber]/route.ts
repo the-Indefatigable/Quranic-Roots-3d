@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { db, dbQuery } from '@/db';
 import { surahs, ayahs, translationEntries, translations, quranWords } from '@/db/schema';

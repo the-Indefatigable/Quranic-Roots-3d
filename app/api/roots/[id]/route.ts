@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { NextResponse } from 'next/server';
 import { db, dbQuery } from '../../../../src/db';
 import { roots, forms, tenses, editHistory } from '../../../../src/db/schema';
