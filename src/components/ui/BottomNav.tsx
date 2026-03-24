@@ -10,6 +10,7 @@ const navItems = [
   { href: '/roots',     label: 'Roots',    icon: RootIcon },
   { href: '/search',    label: 'Search',   icon: SearchIcon },
   { href: '/review',    label: 'Review',   icon: ReviewIcon },
+  { href: '/quiz',      label: 'Quiz',     icon: QuizIcon, requiresAuth: true },
   { href: '/bookmarks', label: 'Saved',    icon: BookmarkIcon },
 ];
 
@@ -21,6 +22,9 @@ export function BottomNav() {
     <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 glass-strong border-t border-white/[0.06] pb-[env(safe-area-inset-bottom)]">
       <div className="flex items-center justify-around h-[58px]">
         {navItems.map((item) => {
+          // Hide auth-required items if user not logged in
+          if ((item as any).requiresAuth && !user) return null;
+
           const isActive = pathname.startsWith(item.href);
           return (
             <Link
@@ -122,6 +126,14 @@ function ReviewIcon({ className }: { className?: string }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z" />
+    </svg>
+  );
+}
+
+function QuizIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
     </svg>
   );
 }
