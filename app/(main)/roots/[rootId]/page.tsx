@@ -15,10 +15,7 @@ interface Props {
   params: { rootId: string };
 }
 
-export const revalidate = false; // Root data never changes — cache forever, invalidate on redeploy
-
-// No generateStaticParams — 1,716 pages overwhelm Railway during build.
-// Pages render on-demand via SSR, then cached 24h by ISR. Same performance, zero build failures.
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: Props) {
   const rootName = decodeURIComponent(params.rootId).replace(/\s/g, '');

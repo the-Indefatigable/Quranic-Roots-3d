@@ -3,7 +3,7 @@ import { db, dbQuery } from '@/db';
 import { surahs, ayahs, translationEntries, translations, quranWords } from '@/db/schema';
 import { eq, and, asc } from 'drizzle-orm';
 
-export const revalidate = 86400;
+export const dynamic = 'force-dynamic';
 
 export async function GET(
   _request: NextRequest,

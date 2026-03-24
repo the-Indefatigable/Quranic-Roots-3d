@@ -4,7 +4,7 @@ import { roots, forms, tenses } from '../../../src/db/schema';
 import { asc } from 'drizzle-orm';
 import { cacheGet, cacheSet } from '../../../src/db/cache';
 
-export const revalidate = 86400; // ISR: 24h — root data rarely changes
+export const dynamic = 'force-dynamic';
 
 const BAB_COLORS: Record<string, string> = {
   I: '#4a9eff', II: '#f97316', III: '#a855f7', IV: '#22c55e', V: '#ec4899',

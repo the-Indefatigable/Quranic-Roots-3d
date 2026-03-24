@@ -21,7 +21,7 @@ export const metadata = {
   },
 };
 
-export const revalidate = false;
+export const dynamic = 'force-dynamic';
 
 export default async function QuranPage() {
   const allSurahs = await dbQuery(() =>
