@@ -1,7 +1,7 @@
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-
-export const dynamic = 'force-dynamic';
 import { db, dbQuery } from '@/db';
 import { roots, forms, tenses, nouns, particles, quizSessions } from '@/db/schema';
 import { eq } from 'drizzle-orm';
