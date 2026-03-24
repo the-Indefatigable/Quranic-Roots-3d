@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, integer, jsonb, timestamp, boolean, date, uniqueIndex, index } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, text, integer, jsonb, timestamp, boolean, date, uniqueIndex, index, primaryKey } from 'drizzle-orm/pg-core';
 
 // ── Roots ──────────────────────────────────────────
 export const roots = pgTable('roots', {
@@ -174,9 +174,11 @@ export const tafsirEntries = pgTable('tafsir_entries', {
 export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
   email: text('email').unique().notNull(),
+  emailVerified: timestamp('email_verified', { withTimezone: true }),
   passwordHash: text('password_hash'),
   name: text('name'),
-  avatarUrl: text('avatar_url'),
+  image: text('image'),
+  avatarUrl: text('avatar_url'), // deprecated, use image
   role: text('role').default('student').notNull(), // 'student' | 'admin' | 'teacher'
   preferredLang: text('preferred_lang').default('en'),
   streakDays: integer('streak_days').default(0),
@@ -185,35 +187,38 @@ export const users = pgTable('users', {
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
 });
 
-// ── Sessions ──────────────────────────────────────
-export const sessions = pgTable('sessions', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  token: text('token').unique().notNull(),
-  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
-  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+// ── Sessions (NextAuth compatible) ────────────────
+export const sessions = pgTable('session', {
+  sessionToken: text('sessionToken').primaryKey(),
+  userId: uuid('userId').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  expires: timestamp('expires', { withTimezone: true }).notNull(),
 });
 
-// ── Auth Accounts (OAuth providers) ───────────────
-export const authAccounts = pgTable('auth_accounts', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+// ── Accounts (NextAuth OAuth providers) ─────────────
+export const accounts = pgTable('account', {
+  userId: uuid('userId').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  type: text('type').notNull(),
   provider: text('provider').notNull(),
-  providerAccountId: text('provider_account_id').notNull(),
-  accessToken: text('access_token'),
-  refreshToken: text('refresh_token'),
-  expiresAt: timestamp('expires_at', { withTimezone: true }),
-});
+  providerAccountId: text('providerAccountId').notNull(),
+  refresh_token: text('refresh_token'),
+  access_token: text('access_token'),
+  expires_at: integer('expires_at'),
+  token_type: text('token_type'),
+  scope: text('scope'),
+  id_token: text('id_token'),
+  session_state: text('session_state'),
+}, (table) => [
+  primaryKey({ columns: [table.provider, table.providerAccountId] }),
+]);
 
-// ── Magic Link Tokens ─────────────────────────────
-export const magicLinkTokens = pgTable('magic_link_tokens', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  email: text('email').notNull(),
-  token: text('token').unique().notNull(),
-  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
-  usedAt: timestamp('used_at', { withTimezone: true }),
-  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
-});
+// ── Verification Tokens (NextAuth) ────────────────
+export const verificationTokens = pgTable('verification_token', {
+  identifier: text('identifier').notNull(),
+  token: text('token').notNull().unique(),
+  expires: timestamp('expires', { withTimezone: true }).notNull(),
+}, (table) => [
+  uniqueIndex('verification_token_composite_idx').on(table.identifier, table.token),
+]);
 
 // ── Server-side Bookmarks ─────────────────────────
 export const bookmarks = pgTable('bookmarks', {

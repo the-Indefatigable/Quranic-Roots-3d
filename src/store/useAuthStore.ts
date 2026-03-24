@@ -1,65 +1,49 @@
 'use client';
 
+import { useSession, signIn, signOut } from 'next-auth/react';
 import { create } from 'zustand';
+
+// Keep only UI state in Zustand (modal visibility)
+const useAuthUIStore = create<{ showLoginModal: boolean; setShowLoginModal: (v: boolean) => void }>((set) => ({
+  showLoginModal: false,
+  setShowLoginModal: (show) => set({ showLoginModal: show }),
+}));
 
 export interface AuthUser {
   id: string;
   email: string;
   name: string | null;
-  avatarUrl: string | null;
+  image: string | null;
   role: string;
   streakDays: number | null;
   lastActive: string | null;
+  // Backward compat alias
+  avatarUrl?: string | null;
 }
 
-interface AuthState {
-  user: AuthUser | null;
-  isLoading: boolean;
-  showLoginModal: boolean;
+export function useAuthStore() {
+  const { data: session, status } = useSession();
+  const { showLoginModal, setShowLoginModal } = useAuthUIStore();
 
-  fetchUser: () => Promise<void>;
-  login: (email: string) => Promise<{ ok: boolean; error?: string }>;
-  logout: () => Promise<void>;
-  setShowLoginModal: (show: boolean) => void;
+  const user = session?.user
+    ? ({
+        id: session.user.id,
+        email: session.user.email!,
+        name: session.user.name ?? null,
+        image: session.user.image ?? null,
+        avatarUrl: session.user.image ?? null, // backward compat
+        role: session.user.role ?? 'student',
+        streakDays: session.user.streakDays ?? 0,
+        lastActive: session.user.lastActive ?? null,
+      } as AuthUser)
+    : null;
+
+  return {
+    user,
+    isLoading: status === 'loading',
+    showLoginModal,
+    setShowLoginModal,
+    login: () => signIn('google'),
+    logout: () => signOut({ callbackUrl: '/' }),
+  };
 }
-
-export const useAuthStore = create<AuthState>((set) => ({
-  user: null,
-  isLoading: true,
-  showLoginModal: false,
-
-  fetchUser: async () => {
-    try {
-      const res = await fetch('/api/auth/me');
-      const data = await res.json();
-      set({ user: data.user, isLoading: false });
-    } catch {
-      set({ user: null, isLoading: false });
-    }
-  },
-
-  login: async (email: string) => {
-    try {
-      const res = await fetch('/api/auth/magic-link', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
-      const data = await res.json();
-      if (!res.ok) return { ok: false, error: data.error };
-      return { ok: true };
-    } catch {
-      return { ok: false, error: 'Network error' };
-    }
-  },
-
-  logout: async () => {
-    try {
-      await fetch('/api/auth/logout', { method: 'POST' });
-    } catch { /* ignore */ }
-    set({ user: null });
-    window.location.reload();
-  },
-
-  setShowLoginModal: (show) => set({ showLoginModal: show }),
-}));
