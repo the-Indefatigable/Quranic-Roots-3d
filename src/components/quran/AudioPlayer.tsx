@@ -69,6 +69,8 @@ export function AudioPlayer({
   const [timingsError, setTimingsError] = useState(false);
   // Track if we're currently using the chapter audio src
   const usingSurahAudioRef = useRef(false);
+  // Preload next ayah audio to eliminate gap in per-ayah mode
+  const preloadedAudioRef = useRef<HTMLAudioElement | null>(null);
 
   // Fetch timing data for whole surah once
   useEffect(() => {
@@ -132,6 +134,19 @@ export function AudioPlayer({
       });
   }, [surahNumber]);
 
+  // Preload the next ayah's audio file so it's ready instantly
+  const preloadNextAyah = useCallback((currentAyahNumber: number) => {
+    const nextAyah = currentAyahNumber + 1;
+    if (nextAyah > totalAyahs) return;
+    const nextData = ayahDataRef.current.get(nextAyah);
+    const nextSrc = nextData?.url
+      ?? `https://everyayah.com/data/Alafasy_128kbps/${String(surahNumber).padStart(3, '0')}${String(nextAyah).padStart(3, '0')}.mp3`;
+    const preload = new Audio();
+    preload.preload = 'auto';
+    preload.src = nextSrc;
+    preloadedAudioRef.current = preload;
+  }, [surahNumber, totalAyahs]);
+
   // Load and play a specific ayah (per-ayah mode)
   const playAyah = useCallback((ayahNumber: number) => {
     const audio = audioElement;
@@ -148,7 +163,10 @@ export function AudioPlayer({
     setProgress(0);
     onAyahChangeRef.current(ayahNumber);
     onWordChangeRef.current(null);
-  }, [audioElement, surahNumber]);
+
+    // Preload next ayah for gapless transition
+    preloadNextAyah(ayahNumber);
+  }, [audioElement, surahNumber, preloadNextAyah]);
 
   // Load and play full chapter audio (surah mode)
   const playSurahAudio = useCallback((seekToAyah?: number) => {
@@ -185,21 +203,16 @@ export function AudioPlayer({
   // On mount: start playback based on mode
   useEffect(() => {
     if (playModeRef.current === 'surah') {
-      // Wait for timings to load so we have the chapter URL
-      const checkAndPlay = () => {
+      // In surah mode, wait for timings to load so we get the chapter audio URL
+      // The timingsLoaded effect below will trigger playSurahAudio once ready
+      if (timingsLoaded) {
         if (chapterAudioUrlRef.current) {
           playSurahAudio(startAyah);
         } else {
           playAyah(startAyah);
         }
-      };
-      // If timings already loaded, play now; otherwise wait a bit
-      if (timingsLoaded) {
-        checkAndPlay();
-      } else {
-        // Start with per-ayah immediately, switch to chapter when loaded
-        playAyah(startAyah);
       }
+      // If not loaded yet, do nothing — the effect on [playMode, timingsLoaded] will start playback
     } else {
       playAyah(startAyah);
     }
@@ -267,7 +280,7 @@ export function AudioPlayer({
       if (usingSurahAudioRef.current) {
         // Surah audio ended — the whole surah finished
         if (loop === 'surah') {
-          setTimeout(() => playSurahAudio(1), 300);
+          playSurahAudio(1);
         }
         // loop === 'ayah' doesn't apply to surah audio track
         return;
@@ -275,16 +288,16 @@ export function AudioPlayer({
 
       // Per-ayah mode
       if (loop === 'ayah') {
-        setTimeout(() => playAyah(currentAyah), 300);
+        playAyah(currentAyah);
         return;
       }
 
       if (currentAyah < totalAyahs) {
         const next = currentAyah + 1;
         setCurrentAyah(next);
-        setTimeout(() => playAyah(next), 300);
+        playAyah(next);
       } else if (loop === 'surah') {
-        setTimeout(() => playAyah(1), 300);
+        playAyah(1);
       }
     }
 
