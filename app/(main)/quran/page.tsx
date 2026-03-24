@@ -1,6 +1,3 @@
-import { db, dbQuery } from '@/db';
-import { surahs } from '@/db/schema';
-import { asc } from 'drizzle-orm';
 import { QuranSurahList } from './QuranSurahList';
 
 export const metadata = {
@@ -21,12 +18,6 @@ export const metadata = {
   },
 };
 
-export const dynamic = 'force-dynamic';
-
-export default async function QuranPage() {
-  const allSurahs = await dbQuery(() =>
-    db.select().from(surahs).orderBy(asc(surahs.number))
-  );
-
-  return <QuranSurahList surahs={allSurahs} />;
+export default function QuranPage() {
+  return <QuranSurahList />;
 }

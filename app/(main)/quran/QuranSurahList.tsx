@@ -1,12 +1,11 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/Badge';
 import { PageHeader } from '@/components/ui/PageHeader';
 
 interface Surah {
-  id: string;
   number: number;
   arabicName: string;
   englishName: string;
@@ -14,8 +13,18 @@ interface Surah {
   versesCount: number;
 }
 
-export function QuranSurahList({ surahs }: { surahs: Surah[] }) {
+export function QuranSurahList() {
+  const [surahs, setSurahs] = useState<Surah[]>([]);
+  const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState('');
+
+  useEffect(() => {
+    fetch('/api/quran/surahs')
+      .then((res) => res.json())
+      .then((data) => setSurahs(data))
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
 
   const filtered = useMemo(() => {
     if (!query.trim()) return surahs;
@@ -66,7 +75,13 @@ export function QuranSurahList({ surahs }: { surahs: Surah[] }) {
         )}
       </div>
 
-      {filtered.length === 0 ? (
+      {loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {Array.from({ length: 12 }).map((_, i) => (
+            <div key={i} className="bg-card border border-border rounded-2xl px-5 py-4 h-[76px] animate-pulse" />
+          ))}
+        </div>
+      ) : filtered.length === 0 ? (
         <div className="text-center py-16 text-white/30 text-sm">
           No surahs matching &ldquo;{query}&rdquo;
         </div>
