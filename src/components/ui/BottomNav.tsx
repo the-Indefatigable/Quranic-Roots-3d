@@ -11,6 +11,7 @@ const navItems = [
   { href: '/search',    label: 'Search',   icon: SearchIcon },
   { href: '/review',    label: 'Review',   icon: ReviewIcon },
   { href: '/quiz',      label: 'Quiz',     icon: QuizIcon, requiresAuth: true },
+  { href: '/rewards',   label: 'Rewards',  icon: TrophyIcon, requiresAuth: true },
   { href: '/bookmarks', label: 'Saved',    icon: BookmarkIcon },
 ];
 
@@ -134,6 +135,14 @@ function QuizIcon({ className }: { className?: string }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  );
+}
+
+function TrophyIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 9v-2.25m6.364-6.364l1.591 1.591M9 12a3 3 0 11-6 0 3 3 0 016 0z" />
     </svg>
   );
 }
