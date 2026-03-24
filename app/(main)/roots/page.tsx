@@ -3,7 +3,7 @@ import { roots, nouns, particles } from '@/db/schema';
 import { asc, sql } from 'drizzle-orm';
 import { RootsBrowserClient } from '@/components/roots/RootsBrowserClient';
 
-export const revalidate = false;
+export const dynamic = 'force-dynamic';
 
 export const metadata = {
   title: 'All 1,716 Quranic Arabic Roots — Browse, Search & Learn',

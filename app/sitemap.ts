@@ -3,7 +3,7 @@ import { db, dbQuery } from '@/db';
 import { roots, surahs } from '@/db/schema';
 import { asc } from 'drizzle-orm';
 
-export const revalidate = 86400;
+export const dynamic = 'force-dynamic';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://quroots.com';
