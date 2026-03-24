@@ -257,6 +257,68 @@ export const userRootMastery = pgTable('user_root_mastery', {
   uniqueIndex('user_root_mastery_pkey_idx').on(table.userId, table.rootId),
 ]);
 
+// ── User Noun Mastery ──────────────────────────────
+export const userNounMastery = pgTable('user_noun_mastery', {
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  nounId: uuid('noun_id').notNull().references(() => nouns.id, { onDelete: 'cascade' }),
+  mastery: integer('mastery').default(0), // 0–5
+  nextReview: timestamp('next_review', { withTimezone: true }),
+  totalAttempts: integer('total_attempts').default(0),
+  correctAttempts: integer('correct_attempts').default(0),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+}, (table) => [
+  uniqueIndex('user_noun_mastery_pkey_idx').on(table.userId, table.nounId),
+]);
+
+// ── User Particle Mastery ──────────────────────────
+export const userParticleMastery = pgTable('user_particle_mastery', {
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  particleId: uuid('particle_id').notNull().references(() => particles.id, { onDelete: 'cascade' }),
+  mastery: integer('mastery').default(0), // 0–5
+  nextReview: timestamp('next_review', { withTimezone: true }),
+  totalAttempts: integer('total_attempts').default(0),
+  correctAttempts: integer('correct_attempts').default(0),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+}, (table) => [
+  uniqueIndex('user_particle_mastery_pkey_idx').on(table.userId, table.particleId),
+]);
+
+// ── Quiz Sessions ───────────────────────────────────
+export const quizSessions = pgTable('quiz_sessions', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  quizType: text('quiz_type').notNull(), // 'verb_conjugation' | 'noun_translation' | 'particle_translation' | 'mixed'
+  itemCount: integer('item_count').notNull(),
+  correctCount: integer('correct_count').notNull(),
+  score: integer('score').notNull(), // percentage 0-100
+  duration_s: integer('duration_s'), // session duration in seconds
+  sessionStartedAt: timestamp('session_started_at', { withTimezone: true }).defaultNow(),
+  sessionEndedAt: timestamp('session_ended_at', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+}, (table) => [
+  index('quiz_sessions_user_id_idx').on(table.userId),
+  index('quiz_sessions_started_idx').on(table.userId, table.sessionStartedAt),
+]);
+
+// ── Quiz Attempts ───────────────────────────────────
+export const quizAttempts = pgTable('quiz_attempts', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  sessionId: uuid('session_id').notNull().references(() => quizSessions.id, { onDelete: 'cascade' }),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  itemType: text('item_type').notNull(), // 'root' | 'noun' | 'particle'
+  itemId: uuid('item_id').notNull(),
+  questionType: text('question_type').notNull(), // 'translate_conjugation', 'translate_noun', 'identify_conjugation', 'identify_root', 'mcq_*'
+  questPrompt: text('quest_prompt'), // JSON string with question data
+  userAnswer: text('user_answer').notNull(),
+  correctAnswer: text('correct_answer').notNull(),
+  isCorrect: boolean('is_correct').notNull(),
+  responseTime_ms: integer('response_time_ms'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+}, (table) => [
+  index('quiz_attempts_session_id_idx').on(table.sessionId),
+  index('quiz_attempts_user_item_idx').on(table.userId, table.itemId, table.itemType),
+]);
+
 // ── Edit History ───────────────────────────────────
 export const editHistory = pgTable('edit_history', {
   id: uuid('id').primaryKey().defaultRandom(),
