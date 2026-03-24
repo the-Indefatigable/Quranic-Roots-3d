@@ -14,6 +14,7 @@ const navItems = [
   { href: '/quiz',      label: 'Quiz',     icon: QuizIcon, requiresAuth: true },
   { href: '/rewards',   label: 'Rewards',  icon: TrophyIcon, requiresAuth: true },
   { href: '/bookmarks', label: 'Saved',    icon: BookmarkIcon },
+  { href: '/admin',     label: 'Admin',    icon: AdminIcon, requiresAdmin: true },
 ];
 
 export function BottomNav() {
@@ -26,6 +27,7 @@ export function BottomNav() {
         {navItems.map((item) => {
           // Hide auth-required items if user not logged in
           if ((item as any).requiresAuth && !user) return null;
+          if ((item as any).requiresAdmin && user?.role !== 'admin') return null;
 
           const isActive = pathname.startsWith(item.href);
           return (
@@ -152,6 +154,14 @@ function TrophyIcon({ className }: { className?: string }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 9v-2.25m6.364-6.364l1.591 1.591M9 12a3 3 0 11-6 0 3 3 0 016 0z" />
+    </svg>
+  );
+}
+
+function AdminIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
     </svg>
   );
 }
