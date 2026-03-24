@@ -183,6 +183,9 @@ export const users = pgTable('users', {
   preferredLang: text('preferred_lang').default('en'),
   streakDays: integer('streak_days').default(0),
   lastActive: date('last_active'),
+  totalXP: integer('total_xp').default(0),
+  userLevel: integer('user_level').default(1),
+  levelProgress: integer('level_progress').default(0),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
 });
@@ -330,3 +333,43 @@ export const editHistory = pgTable('edit_history', {
   newValue: text('new_value'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
+
+// ── Achievements ────────────────────────────────────
+export const achievements = pgTable('achievements', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  title: text('title').unique().notNull(),
+  description: text('description'),
+  category: text('category').notNull(), // 'milestone' | 'mastery' | 'streak' | 'speed'
+  iconSvg: text('icon_svg'),
+  xpBonus: integer('xp_bonus').default(0),
+  unlockcriteria: jsonb('unlock_criteria'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+}, (table) => [
+  index('achievements_category_idx').on(table.category),
+]);
+
+// ── User Achievements ───────────────────────────────
+export const userAchievements = pgTable('user_achievements', {
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  achievementId: uuid('achievement_id').notNull().references(() => achievements.id, { onDelete: 'cascade' }),
+  unlockedAt: timestamp('unlocked_at', { withTimezone: true }).defaultNow(),
+}, (table) => [
+  primaryKey({ columns: [table.userId, table.achievementId] }),
+  index('user_achievements_user_id_idx').on(table.userId),
+  index('user_achievements_unlocked_idx').on(table.userId, table.unlockedAt),
+]);
+
+// ── Leaderboard Snapshots ────────────────────────────
+export const leaderboardSnapshots = pgTable('leaderboard_snapshots', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  rank: integer('rank').notNull(),
+  totalXP: integer('total_xp').notNull(),
+  period: text('period').notNull(), // 'all_time' | 'weekly' | 'monthly'
+  periodDate: date('period_date').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+}, (table) => [
+  index('leaderboard_snapshots_user_idx').on(table.userId),
+  index('leaderboard_snapshots_period_idx').on(table.period, table.periodDate, table.rank),
+  index('leaderboard_snapshots_rank_idx').on(table.period, table.periodDate, table.totalXP),
+]);
