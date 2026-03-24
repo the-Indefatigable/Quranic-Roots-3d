@@ -91,16 +91,31 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, hasWords, has
           setTimeout(() => {
             const btn = document.getElementById(`word-btn-${nextWord.position}`);
             if (btn) {
-              setWordAnchor(btn);
               // Calculate custom scroll boundary to leave room for the top nav and popover
               const rect = btn.getBoundingClientRect();
               const absoluteY = rect.top + window.scrollY;
               // If the word is near the top or bottom of the viewport, smooth scroll to it
               if (rect.top < 150 || rect.bottom > window.innerHeight - 150) {
+                // Scroll first, then update anchor after scroll completes
                 window.scrollTo({
                   top: absoluteY - window.innerHeight / 2,
                   behavior: 'smooth'
                 });
+                // Wait for scroll to complete before updating anchor to avoid race condition
+                // with floating-ui's position recalculation
+                const handleScrollEnd = () => {
+                  setWordAnchor(btn);
+                  window.removeEventListener('scrollend', handleScrollEnd);
+                };
+                if ('onscrollend' in window) {
+                  window.addEventListener('scrollend', handleScrollEnd);
+                } else {
+                  // Fallback for browsers without scrollend event: smooth scroll takes ~300-400ms
+                  setTimeout(() => setWordAnchor(btn), 500);
+                }
+              } else {
+                // Word is already in viewport, just set anchor immediately
+                setWordAnchor(btn);
               }
             }
           }, 10);

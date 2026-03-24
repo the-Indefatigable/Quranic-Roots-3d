@@ -39,7 +39,11 @@ export function WordPopover({ word, anchorElement, onClose }: Props) {
       reference: anchorElement,
     },
     placement: 'top',
-    middleware: [offset(10), flip(), shift({ padding: 16 })],
+    middleware: [
+      offset(10),
+      flip({ padding: 12 }),
+      shift({ padding: 12 }),
+    ],
     whileElementsMounted: autoUpdate,
   });
 
@@ -74,7 +78,13 @@ export function WordPopover({ word, anchorElement, onClose }: Props) {
           {...getFloatingProps()}
           className="focus:outline-none"
         >
-          <div className="bg-card glass-strong border border-white/[0.1] rounded-2xl p-5 shadow-2xl w-64 sm:w-72">
+          <div
+            className="bg-card glass-strong border border-white/[0.1] rounded-2xl p-5 shadow-2xl w-56 sm:w-64 md:w-72"
+            style={{
+              maxHeight: 'calc(100vh - 32px)',
+              overflowY: 'auto'
+            }}
+          >
               {/* Word */}
               <div className="text-center sm:text-right mb-4">
                 <p className="font-arabic text-4xl text-gold leading-relaxed" dir="rtl">
