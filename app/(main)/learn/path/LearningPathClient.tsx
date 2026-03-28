@@ -10,7 +10,10 @@ export function LearningPathClient() {
 
   useEffect(() => {
     fetch('/api/learn/path')
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
       .then((data) => {
         if (data.error) {
           setError(data.error);
@@ -18,7 +21,10 @@ export function LearningPathClient() {
           setUnits(data.path || []);
         }
       })
-      .catch(() => setError('Failed to load learning path'))
+      .catch((err) => {
+        console.error('[LearningPath] fetch error:', err);
+        setError(`Failed to load learning path: ${err.message}`);
+      })
       .finally(() => setLoading(false));
   }, []);
 

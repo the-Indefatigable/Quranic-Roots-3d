@@ -77,7 +77,7 @@ export function Dashboard() {
 
       {/* ── Continue Learning CTA ──────────────────── */}
       {data.nextLesson ? (
-        <Link href={`/learn/lesson/${data.nextLesson.lessonId}`}>
+        <Link href={`/lesson/${data.nextLesson.lessonId}`}>
           <motion.div
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}

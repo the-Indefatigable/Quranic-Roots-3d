@@ -113,7 +113,7 @@ export function PathNode({ lesson, unit, isCheckpoint }: PathNodeProps) {
   }
 
   return (
-    <Link href={`/learn/lesson/${lesson.id}`} className="block hover:scale-105 transition-transform">
+    <Link href={`/lesson/${lesson.id}`} className="block hover:scale-105 transition-transform">
       {content}
     </Link>
   );

@@ -103,10 +103,9 @@ export function LearningPath({ units }: LearningPathProps) {
             <motion.div
               key={node.lesson!.id}
               ref={isActive ? activeRef : undefined}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0, scale: 0.8, x: offset }}
+              animate={{ opacity: 1, scale: 1, x: offset }}
               transition={{ delay: i * 0.03, type: 'spring', stiffness: 300, damping: 25 }}
-              style={{ transform: `translateX(${offset}px)` }}
               className="my-2"
             >
               <PathNode
