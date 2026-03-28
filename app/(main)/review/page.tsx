@@ -39,9 +39,9 @@ function FlipCard({
         {/* Front */}
         <div
           style={{ backfaceVisibility: 'hidden' }}
-          className="absolute inset-0 flex flex-col items-center justify-center bg-white/[0.04] border border-white/[0.08] rounded-3xl p-8"
+          className="absolute inset-0 flex flex-col items-center justify-center bg-surface border border-border rounded-3xl p-8"
         >
-          <p className="text-xs text-gold/50 tracking-widest uppercase mb-8">
+          <p className="text-xs text-primary/50 tracking-widest uppercase mb-8">
             {item.type === 'ayah' ? 'Ayah' : item.type === 'root' ? 'Root' : 'Noun'}
           </p>
           <p className="font-arabic text-5xl sm:text-6xl text-white text-center leading-[1.6]" dir="rtl">
@@ -53,12 +53,12 @@ function FlipCard({
         {/* Back */}
         <div
           style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
-          className="absolute inset-0 flex flex-col items-center justify-center bg-white/[0.04] border border-gold/20 rounded-3xl p-8"
+          className="absolute inset-0 flex flex-col items-center justify-center bg-surface border border-primary/20 rounded-3xl p-8"
         >
-          <p className="font-arabic text-2xl text-gold/60 text-center mb-6 leading-[1.8]" dir="rtl">
+          <p className="font-arabic text-2xl text-primary/60 text-center mb-6 leading-[1.8]" dir="rtl">
             {item.arabicLabel}
           </p>
-          <div className="w-8 h-px bg-gold/20 mb-6" />
+          <div className="w-8 h-px bg-primary/20 mb-6" />
           <p className="text-xl sm:text-2xl font-light text-white text-center leading-snug">
             {item.label}
           </p>
@@ -66,7 +66,7 @@ function FlipCard({
             <Link
               href={`/roots/${encodeURIComponent(item.id)}`}
               onClick={(e) => e.stopPropagation()}
-              className="mt-8 text-xs text-gold/40 hover:text-gold transition-colors"
+              className="mt-8 text-xs text-primary/40 hover:text-primary transition-colors"
             >
               View conjugations →
             </Link>
@@ -88,7 +88,7 @@ function EmptyState() {
       </p>
       <Link
         href="/roots"
-        className="inline-flex items-center gap-2 bg-white/[0.05] border border-white/[0.08] text-white/70 hover:text-white px-6 py-3 rounded-xl text-sm transition-all"
+        className="inline-flex items-center gap-2 bg-surface border border-border text-white/70 hover:text-white px-6 py-3 rounded-xl text-sm transition-all"
       >
         Browse Roots
       </Link>
@@ -101,7 +101,7 @@ function Summary({ total, correct, onRestart }: { total: number; correct: number
   const pct = Math.round((correct / total) * 100);
   return (
     <div className="text-center py-12">
-      <div className="w-24 h-24 rounded-full bg-white/[0.04] border border-white/[0.08] flex items-center justify-center mx-auto mb-8">
+      <div className="w-24 h-24 rounded-full bg-surface border border-border flex items-center justify-center mx-auto mb-8">
         <span className="text-3xl font-light text-white">{pct}%</span>
       </div>
       <h2 className="text-xl font-light text-white mb-2">Session complete</h2>
@@ -111,13 +111,13 @@ function Summary({ total, correct, onRestart }: { total: number; correct: number
       <div className="flex items-center justify-center gap-3">
         <button
           onClick={onRestart}
-          className="inline-flex items-center gap-2 bg-gradient-to-r from-gold to-gold-light text-black px-6 py-3 rounded-xl text-sm font-semibold hover:brightness-110 transition-all"
+          className="inline-flex items-center gap-2 bg-gradient-to-r from-primary to-primary-light text-black px-6 py-3 rounded-xl text-sm font-semibold hover:brightness-110 transition-all"
         >
           Review again
         </button>
         <Link
           href="/bookmarks"
-          className="inline-flex items-center gap-2 text-white/40 hover:text-white border border-white/[0.08] hover:border-white/[0.15] px-6 py-3 rounded-xl text-sm transition-all"
+          className="inline-flex items-center gap-2 text-white/40 hover:text-white border border-border hover:border-border px-6 py-3 rounded-xl text-sm transition-all"
         >
           Manage bookmarks
         </Link>
@@ -180,9 +180,9 @@ export default function ReviewPage() {
       </div>
 
       {/* Progress bar */}
-      <div className="w-full h-px bg-white/[0.06] rounded-full mb-8 overflow-hidden">
+      <div className="w-full h-px bg-border-light rounded-full mb-8 overflow-hidden">
         <div
-          className="h-full bg-gradient-to-r from-gold/60 to-gold rounded-full transition-all duration-500"
+          className="h-full bg-gradient-to-r from-primary/60 to-primary rounded-full transition-all duration-500"
           style={{ width: `${progress * 100}%` }}
         />
       </div>
@@ -197,7 +197,7 @@ export default function ReviewPage() {
       >
         <button
           onClick={() => advance(false)}
-          className="flex-1 flex items-center justify-center gap-2 bg-white/[0.04] border border-white/[0.08] hover:border-white/[0.15] text-white/60 hover:text-white py-3.5 rounded-2xl text-sm transition-all"
+          className="flex-1 flex items-center justify-center gap-2 bg-surface border border-border hover:border-border text-white/60 hover:text-white py-3.5 rounded-2xl text-sm transition-all"
         >
           <svg className="w-4 h-4 text-red-400/70" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
@@ -206,7 +206,7 @@ export default function ReviewPage() {
         </button>
         <button
           onClick={() => advance(true)}
-          className="flex-1 flex items-center justify-center gap-2 bg-emerald/10 border border-emerald/20 hover:border-emerald/40 text-emerald hover:brightness-110 py-3.5 rounded-2xl text-sm transition-all"
+          className="flex-1 flex items-center justify-center gap-2 bg-correct/10 border border-correct/20 hover:border-correct/40 text-correct hover:brightness-110 py-3.5 rounded-2xl text-sm transition-all"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />

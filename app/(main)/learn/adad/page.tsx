@@ -37,7 +37,7 @@ export default function AdadPage() {
           <span className="text-white/50">Adad</span>
         </nav>
 
-        <p className="text-4xl font-arabic text-gold/70 mb-3">العدد</p>
+        <p className="text-4xl font-arabic text-primary/70 mb-3">العدد</p>
         <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight mb-4">
           Adad — Numbers in Arabic
         </h1>
@@ -51,7 +51,7 @@ export default function AdadPage() {
           <p className="text-white/45 leading-relaxed mb-4">
             One and two <strong className="text-white/60">agree in gender</strong> with the counted noun. They typically come <em>after</em> the noun as adjectives.
           </p>
-          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
+          <div className="rounded-2xl border border-border-light bg-surface p-6">
             <p className="text-sm text-white/30 uppercase tracking-wider font-semibold mb-3">Surah Al-Baqarah (2:163)</p>
             <p className="text-2xl font-arabic text-white/80 text-right leading-loose mb-3" dir="rtl">
               وَإِلَـٰهُكُمْ إِلَـٰهٌ وَاحِدٌ
@@ -73,7 +73,7 @@ export default function AdadPage() {
               <strong>The rule:</strong> If the singular noun is masculine, the number gets a ta&apos; marbuta (looks feminine). If the noun is feminine, the number drops it (looks masculine). Yes, it&apos;s backwards!
             </p>
           </div>
-          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
+          <div className="rounded-2xl border border-border-light bg-surface p-6">
             <div className="space-y-4">
               {[
                 {
@@ -111,7 +111,7 @@ export default function AdadPage() {
           <p className="text-white/45 leading-relaxed mb-4">
             For 11 and 12, both parts agree with the noun in gender. For 13–19, the first part follows the reverse-gender rule (like 3–10), while the second part (عشر) agrees with the noun. The counted noun is <strong className="text-white/60">singular and in nasb</strong> (accusative).
           </p>
-          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
+          <div className="rounded-2xl border border-border-light bg-surface p-6">
             <p className="text-sm text-white/30 uppercase tracking-wider font-semibold mb-3">Surah Yusuf (12:4)</p>
             <p className="text-2xl font-arabic text-white/80 text-right leading-loose mb-3" dir="rtl">
               إِنِّي رَأَيْتُ أَحَدَ عَشَرَ كَوْكَبًا
@@ -128,7 +128,7 @@ export default function AdadPage() {
           <p className="text-white/45 leading-relaxed mb-4">
             The tens (20, 30, 40, ... 90) are treated as sound masculine plurals and do not change for gender. The counted noun is <strong className="text-white/60">singular and in nasb</strong>.
           </p>
-          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
+          <div className="rounded-2xl border border-border-light bg-surface p-6">
             <p className="text-sm text-white/30 uppercase tracking-wider font-semibold mb-3">Surah Al-Ankabut (29:14)</p>
             <p className="text-2xl font-arabic text-white/80 text-right leading-loose mb-3" dir="rtl">
               أَلْفَ سَنَةٍ إِلَّا خَمْسِينَ عَامًا
@@ -143,18 +143,18 @@ export default function AdadPage() {
         <section className="mb-12">
           <h2 className="text-xl font-semibold text-white mb-4">Key Takeaways</h2>
           <ul className="space-y-2 text-sm text-white/45 leading-relaxed">
-            <li className="flex gap-2"><span className="text-gold/60 shrink-0">1.</span> Numbers 1–2 agree in gender with the noun (simple).</li>
-            <li className="flex gap-2"><span className="text-gold/60 shrink-0">2.</span> Numbers 3–10 take the <em>opposite</em> gender (the famous reverse rule). Noun is plural jarr.</li>
-            <li className="flex gap-2"><span className="text-gold/60 shrink-0">3.</span> Numbers 11–99 take the counted noun as <em>singular accusative</em> (nasb).</li>
-            <li className="flex gap-2"><span className="text-gold/60 shrink-0">4.</span> In the Quran, pay attention to the ta&apos; marbuta on the number — it reveals the gender of the counted noun.</li>
+            <li className="flex gap-2"><span className="text-primary/60 shrink-0">1.</span> Numbers 1–2 agree in gender with the noun (simple).</li>
+            <li className="flex gap-2"><span className="text-primary/60 shrink-0">2.</span> Numbers 3–10 take the <em>opposite</em> gender (the famous reverse rule). Noun is plural jarr.</li>
+            <li className="flex gap-2"><span className="text-primary/60 shrink-0">3.</span> Numbers 11–99 take the counted noun as <em>singular accusative</em> (nasb).</li>
+            <li className="flex gap-2"><span className="text-primary/60 shrink-0">4.</span> In the Quran, pay attention to the ta&apos; marbuta on the number — it reveals the gender of the counted noun.</li>
           </ul>
         </section>
 
-        <div className="flex items-center justify-between pt-8 border-t border-white/[0.06]">
+        <div className="flex items-center justify-between pt-8 border-t border-border-light">
           <Link href="/learn/murakkab" className="text-sm text-white/30 hover:text-white/60 transition-colors">
             &larr; Compound Phrases
           </Link>
-          <Link href="/learn/verb-forms" className="text-sm text-gold/70 hover:text-gold transition-colors">
+          <Link href="/learn/verb-forms" className="text-sm text-primary/70 hover:text-primary transition-colors">
             Next: The 10 Verb Forms &rarr;
           </Link>
         </div>

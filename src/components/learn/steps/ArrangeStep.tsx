@@ -78,7 +78,7 @@ export function ArrangeStep({ content, onAnswer }: ArrangeStepProps) {
       )}
 
       {/* Drop zone — placed tiles */}
-      <div className="w-full min-h-[60px] px-4 py-3 rounded-2xl border-2 border-dashed border-white/20 bg-white/5 flex flex-wrap gap-2 justify-center items-center">
+      <div className="w-full min-h-[60px] px-4 py-3 rounded-2xl border-2 border-dashed border-border bg-surface flex flex-wrap gap-2 justify-center items-center">
         {placed.length === 0 ? (
           <span className="text-white/20 text-sm">Tap tiles to arrange</span>
         ) : (
@@ -114,7 +114,7 @@ export function ArrangeStep({ content, onAnswer }: ArrangeStepProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.05 }}
             onClick={() => handleTap(tile, false)}
-            className="px-4 py-3 rounded-xl font-arabic text-lg font-medium border-2 border-white/10 bg-white/5 text-white shadow-[0_3px_0_rgba(255,255,255,0.1)] hover:bg-white/10 active:shadow-none active:translate-y-[3px] transition-all"
+            className="px-4 py-3 rounded-xl font-arabic text-lg font-medium border-2 border-border bg-surface text-white shadow-[0_3px_0_rgba(255,255,255,0.1)] hover:bg-surface active:shadow-none active:translate-y-[3px] transition-all"
           >
             {tile}
           </motion.button>

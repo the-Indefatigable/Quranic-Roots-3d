@@ -13,8 +13,8 @@ interface AchievementBadgeProps {
 }
 
 const categoryColors = {
-  milestone: { from: '#E8B86D', to: '#D4A158' }, // Gold
-  mastery: { from: '#E8B86D', to: '#D4A158' }, // Gold
+  milestone: { from: '#2DD4BF', to: '#0D9488' }, // Gold
+  mastery: { from: '#2DD4BF', to: '#0D9488' }, // Gold
   streak: { from: '#F97316', to: '#EA580C' }, // Orange
   speed: { from: '#06B6D4', to: '#0891B2' }, // Cyan
 };

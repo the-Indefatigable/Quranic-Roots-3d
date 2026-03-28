@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from 'next';
 import { Plus_Jakarta_Sans, DM_Serif_Display } from 'next/font/google';
 import localFont from 'next/font/local';
 import Script from 'next/script';
+import { Suspense } from 'react';
+import { NavigationProgress } from '@/components/ui/NavigationProgress';
 import './globals.css';
 
 const jakarta = Plus_Jakarta_Sans({
@@ -120,6 +122,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="bg-canvas font-sans text-text antialiased">
+        <Suspense fallback={null}>
+          <NavigationProgress />
+        </Suspense>
         {children}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-XFLPNVR8VQ"

@@ -67,7 +67,7 @@ export function LeaderboardRow({ entry, isCurrentUser = false, isMedal = false }
           <div className="flex items-center gap-2 mb-1">
             <p className="text-sm font-bold text-white truncate">{entry.userName}</p>
             {isCurrentUser && (
-              <span className="text-xs px-2 py-0.5 bg-gold/20 border border-gold/30 text-gold rounded-full">
+              <span className="text-xs px-2 py-0.5 bg-primary/20 border border-primary/30 text-primary rounded-full">
                 You
               </span>
             )}
@@ -77,7 +77,7 @@ export function LeaderboardRow({ entry, isCurrentUser = false, isMedal = false }
 
         {/* XP */}
         <div className="flex-shrink-0 text-right">
-          <p className="text-lg font-bold text-gold">{entry.totalXP.toLocaleString()}</p>
+          <p className="text-lg font-bold text-primary">{entry.totalXP.toLocaleString()}</p>
           <p className="text-xs text-slate-400">XP</p>
         </div>
       </div>
@@ -85,11 +85,11 @@ export function LeaderboardRow({ entry, isCurrentUser = false, isMedal = false }
       {/* Current User Highlight */}
       {isCurrentUser && (
         <motion.div
-          className="absolute inset-0 rounded-xl border border-gold/40 pointer-events-none"
+          className="absolute inset-0 rounded-xl border border-primary/40 pointer-events-none"
           animate={{
             boxShadow: [
-              '0 0 0 0 rgba(232, 184, 109, 0.3)',
-              '0 0 0 8px rgba(232, 184, 109, 0)',
+              '0 0 0 0 rgba(45, 212, 191, 0.3)',
+              '0 0 0 8px rgba(45, 212, 191, 0)',
             ],
           }}
           transition={{

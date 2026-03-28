@@ -168,7 +168,7 @@ export function LessonPlayer({
         </button>
 
         {/* Progress bar */}
-        <div className="flex-1 h-3 bg-white/10 rounded-full overflow-hidden">
+        <div className="flex-1 h-3 bg-surface rounded-full overflow-hidden">
           <motion.div
             className="h-full rounded-full"
             style={{ backgroundColor: unitColor || '#58CC02' }}

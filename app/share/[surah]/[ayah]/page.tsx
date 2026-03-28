@@ -85,21 +85,21 @@ export default async function SharePage({ params }: Props) {
     <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6 py-16">
       {/* Ambient glow */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-gold/[0.08] rounded-full blur-[100px]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-primary/[0.08] rounded-full blur-[100px]" />
       </div>
 
       <div className="relative max-w-2xl w-full">
         {/* Logo */}
         <div className="text-center mb-12">
           <Link href="/" className="text-lg font-light tracking-tight text-white">
-            Qu<span className="text-gold">Roots</span>
+            Qu<span className="text-primary">Roots</span>
           </Link>
         </div>
 
         {/* Verse card */}
-        <div className="bg-white/[0.03] border border-white/[0.08] rounded-3xl p-8 sm:p-12 text-center">
+        <div className="bg-surface border border-border rounded-3xl p-8 sm:p-12 text-center">
           {/* Reference */}
-          <p className="text-xs text-gold/60 tracking-widest uppercase mb-8">
+          <p className="text-xs text-primary/60 tracking-widest uppercase mb-8">
             {surahRow?.englishName} · {s}:{a}
           </p>
 
@@ -109,7 +109,7 @@ export default async function SharePage({ params }: Props) {
           </p>
 
           {/* Divider */}
-          <div className="w-12 h-px bg-gold/20 mx-auto mb-8" />
+          <div className="w-12 h-px bg-primary/20 mx-auto mb-8" />
 
           {/* Translation */}
           {translation && (
@@ -121,7 +121,7 @@ export default async function SharePage({ params }: Props) {
           {/* CTA */}
           <Link
             href={`/quran/${s}`}
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-gold to-gold-light text-black px-8 py-3.5 rounded-xl text-sm font-semibold hover:brightness-110 transition-all hover:shadow-[0_0_40px_rgba(212,165,116,0.3)]"
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-primary to-primary-light text-black px-8 py-3.5 rounded-xl text-sm font-semibold hover:brightness-110 transition-all hover:shadow-[0_0_40px_rgba(212,165,116,0.3)]"
           >
             Read full Surah {surahRow?.englishName}
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">

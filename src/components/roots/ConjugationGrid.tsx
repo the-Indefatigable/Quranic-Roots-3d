@@ -21,7 +21,7 @@ const TENSE_ACCENTS: Record<string, string> = {
   mudari: 'text-cyan-400',
   amr: 'text-rose-400',
   passive_madi: 'text-purple-400',
-  passive_mudari: 'text-emerald-400',
+  passive_mudari: 'text-correct',
 };
 
 const TENSE_BG: Record<string, string> = {
@@ -29,7 +29,7 @@ const TENSE_BG: Record<string, string> = {
   mudari: 'bg-cyan-400/10',
   amr: 'bg-rose-400/10',
   passive_madi: 'bg-purple-400/10',
-  passive_mudari: 'bg-emerald-400/10',
+  passive_mudari: 'bg-correct/10',
 };
 
 const MATRIX_ROWS = [
@@ -50,10 +50,10 @@ export function ConjugationGrid({ tense }: { tense: TenseData }) {
     <div className="mt-4 -mx-4 px-4 overflow-x-auto">
       <div className="min-w-[340px]">
         {/* Column headers */}
-        <div className="flex border-b border-white/[0.06] pb-3 mb-2">
+        <div className="flex border-b border-border-light pb-3 mb-2">
           <div className="w-16 sm:w-20 shrink-0" />
           {['Singular', 'Dual', 'Plural'].map((h) => (
-            <div key={h} className="flex-1 text-center text-[10px] text-muted-more uppercase tracking-widest">
+            <div key={h} className="flex-1 text-center text-[10px] text-text-tertiary uppercase tracking-widest">
               {h}
             </div>
           ))}
@@ -61,8 +61,8 @@ export function ConjugationGrid({ tense }: { tense: TenseData }) {
 
         {/* Rows */}
         {rows.map((row) => (
-          <div key={row.id} className="flex items-center border-b border-white/[0.02] py-2.5 sm:py-3">
-            <div className="w-16 sm:w-20 shrink-0 text-[10px] text-muted-more uppercase tracking-wider leading-tight">
+          <div key={row.id} className="flex items-center border-b border-border-light py-2.5 sm:py-3">
+            <div className="w-16 sm:w-20 shrink-0 text-[10px] text-text-tertiary uppercase tracking-wider leading-tight">
               {row.label}
             </div>
             {row.keys.map((key, i) => {
@@ -104,17 +104,17 @@ export function TenseAccordion({ tenses }: { tenses: TenseData[] }) {
       {tenses.map((tense) => {
         const isOpen = openTense === tense.type;
         const accent = TENSE_ACCENTS[tense.type] || 'text-white';
-        const bg = TENSE_BG[tense.type] || 'bg-white/5';
+        const bg = TENSE_BG[tense.type] || 'bg-surface';
 
         return (
-          <div key={tense.type} className="bg-white/[0.02] border border-white/[0.04] rounded-xl overflow-hidden">
+          <div key={tense.type} className="bg-surface border border-border-light rounded-xl overflow-hidden">
             <button
               onClick={() => setOpenTense(isOpen ? null : tense.type)}
-              className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-white/[0.02] transition-colors"
+              className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-canvas transition-colors"
             >
               <div className="flex items-center gap-3">
                 <span className={`font-arabic text-lg ${accent}`}>{tense.arabicName}</span>
-                <span className="text-xs text-muted">{tense.englishName}</span>
+                <span className="text-xs text-text-secondary">{tense.englishName}</span>
               </div>
               <div className="flex items-center gap-2">
                 {tense.occurrences > 0 && (
@@ -123,7 +123,7 @@ export function TenseAccordion({ tenses }: { tenses: TenseData[] }) {
                   </span>
                 )}
                 <svg
-                  className={`w-4 h-4 text-muted-more transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                  className={`w-4 h-4 text-text-tertiary transition-transform ${isOpen ? 'rotate-180' : ''}`}
                   fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />

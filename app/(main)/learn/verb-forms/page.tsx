@@ -234,7 +234,7 @@ export default function VerbFormsPage() {
           </ul>
         </section>
 
-        <div className="flex items-center justify-between pt-8 border-t border-white/[0.06]">
+        <div className="flex items-center justify-between pt-8 border-t border-border-light">
           <Link href="/learn/adad" className="text-sm text-text-tertiary hover:text-text-secondary transition-colors">
             &larr; Numbers in Arabic
           </Link>

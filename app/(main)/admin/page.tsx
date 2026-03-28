@@ -182,7 +182,7 @@ export default function AdminPage() {
       {toast && (
         <div
           className={`fixed top-4 right-4 z-50 px-4 py-2 rounded-lg text-sm font-medium shadow-lg ${
-            toast.startsWith('Error') ? 'bg-red-500/90 text-white' : 'bg-emerald-500/90 text-white'
+            toast.startsWith('Error') ? 'bg-red-500/90 text-white' : 'bg-correct/90 text-white'
           }`}
         >
           {toast}
@@ -290,7 +290,7 @@ export default function AdminPage() {
 
             {/* Expanded editor */}
             {expandedId === item.id && (
-              <div className="border-t border-white/[0.06] px-4 py-4">
+              <div className="border-t border-border-light px-4 py-4">
                 {tab === 'roots' && (
                   <RootEditor root={item} onSave={saveField} saving={saving} />
                 )}
@@ -550,7 +550,7 @@ function TenseEditor({
                   value={conj.transliteration || ''}
                   onChange={(e) => updateConjugation(i, 'transliteration', e.target.value)}
                   placeholder="translit."
-                  className="w-32 bg-surface border border-border rounded px-2 py-1.5 text-sm text-text-secondary focus:outline-none focus:border-gold/40"
+                  className="w-32 bg-surface border border-border rounded px-2 py-1.5 text-sm text-text-secondary focus:outline-none focus:border-primary/40"
                 />
               </div>
             ))}

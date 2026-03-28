@@ -37,7 +37,7 @@ export default function MurakkabPage() {
           <span className="text-white/50">Murakkab</span>
         </nav>
 
-        <p className="text-4xl font-arabic text-gold/70 mb-3">المركّب</p>
+        <p className="text-4xl font-arabic text-primary/70 mb-3">المركّب</p>
         <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight mb-4">
           Murakkab — Compound Phrases
         </h1>
@@ -51,13 +51,13 @@ export default function MurakkabPage() {
           <p className="text-white/45 leading-relaxed mb-4">
             The most common type in the Quran. Two nouns are placed together where the second noun &quot;possesses&quot; or specifies the first. The first noun (<em>mudaf</em>) loses its tanwin, and the second noun (<em>mudaf ilayhi</em>) is always in the <em>jarr</em> case.
           </p>
-          <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 mb-4">
+          <div className="rounded-xl border border-border-light bg-surface p-5 mb-4">
             <p className="text-xs text-white/30 uppercase tracking-wider font-semibold mb-3">Rule</p>
             <p className="text-sm text-white/50">
               <strong className="text-white/70">Mudaf</strong> (مُضاف) — no &quot;al&quot;, no tanwin &nbsp;+&nbsp; <strong className="text-white/70">Mudaf Ilayhi</strong> (مُضاف إليه) — always majrur (jarr case)
             </p>
           </div>
-          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
+          <div className="rounded-2xl border border-border-light bg-surface p-6">
             <p className="text-sm text-white/30 uppercase tracking-wider font-semibold mb-3">Quranic Examples</p>
             <div className="space-y-4">
               {[
@@ -81,7 +81,7 @@ export default function MurakkabPage() {
           <p className="text-white/45 leading-relaxed mb-4">
             A noun followed by an adjective (or participle) that describes it. In Arabic, the adjective <strong className="text-white/60">must match</strong> the noun in four things: gender, number, definiteness, and case (i&apos;rab).
           </p>
-          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
+          <div className="rounded-2xl border border-border-light bg-surface p-6">
             <p className="text-sm text-white/30 uppercase tracking-wider font-semibold mb-3">Quranic Examples</p>
             <div className="space-y-4">
               {[
@@ -110,7 +110,7 @@ export default function MurakkabPage() {
           <p className="text-white/45 leading-relaxed mb-4">
             Two words fused into a single proper noun. This is rare in Quranic Arabic but appears in some proper names. The two parts lose their individual i&apos;rab and are treated as one indeclinable (mabni) word.
           </p>
-          <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5">
+          <div className="rounded-xl border border-border-light bg-surface p-5">
             <p className="text-sm text-white/45">
               Examples from classical Arabic: <strong className="font-arabic text-white/60">بَعْلَبَكّ</strong> (Baalbek), <strong className="font-arabic text-white/60">حَضْرَمَوْت</strong> (Hadramawt). These compound names function as single nouns.
             </p>
@@ -121,17 +121,17 @@ export default function MurakkabPage() {
         <section className="mb-12">
           <h2 className="text-xl font-semibold text-white mb-4">Key Takeaways</h2>
           <ul className="space-y-2 text-sm text-white/45 leading-relaxed">
-            <li className="flex gap-2"><span className="text-gold/60 shrink-0">1.</span> Idaafi (possessive) is the most important compound type — the second noun is always in jarr.</li>
-            <li className="flex gap-2"><span className="text-gold/60 shrink-0">2.</span> Wasfi (descriptive) requires the adjective to match the noun in gender, number, definiteness, and case.</li>
-            <li className="flex gap-2"><span className="text-gold/60 shrink-0">3.</span> The key test: if the first word has no &quot;al&quot; and no tanwin, it&apos;s probably idaafi.</li>
+            <li className="flex gap-2"><span className="text-primary/60 shrink-0">1.</span> Idaafi (possessive) is the most important compound type — the second noun is always in jarr.</li>
+            <li className="flex gap-2"><span className="text-primary/60 shrink-0">2.</span> Wasfi (descriptive) requires the adjective to match the noun in gender, number, definiteness, and case.</li>
+            <li className="flex gap-2"><span className="text-primary/60 shrink-0">3.</span> The key test: if the first word has no &quot;al&quot; and no tanwin, it&apos;s probably idaafi.</li>
           </ul>
         </section>
 
-        <div className="flex items-center justify-between pt-8 border-t border-white/[0.06]">
+        <div className="flex items-center justify-between pt-8 border-t border-border-light">
           <Link href="/learn/mufrad-muthanna-jam" className="text-sm text-white/30 hover:text-white/60 transition-colors">
             &larr; Singular, Dual & Plural
           </Link>
-          <Link href="/learn/adad" className="text-sm text-gold/70 hover:text-gold transition-colors">
+          <Link href="/learn/adad" className="text-sm text-primary/70 hover:text-primary transition-colors">
             Next: Numbers in Arabic &rarr;
           </Link>
         </div>

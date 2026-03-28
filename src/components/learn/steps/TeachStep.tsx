@@ -67,7 +67,7 @@ export function TeachStep({ content, onContinue }: TeachStepProps) {
           {data.examples.map((ex, i) => (
             <div
               key={i}
-              className="flex items-center justify-between px-5 py-3 rounded-xl bg-white/5 border border-white/10"
+              className="flex items-center justify-between px-5 py-3 rounded-xl bg-surface border border-border"
             >
               <div className="text-left">
                 <span className="text-sm text-white/50">{ex.en}</span>

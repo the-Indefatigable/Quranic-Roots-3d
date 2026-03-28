@@ -141,18 +141,18 @@ export function TafsirPanel({ surahNumber, ayahNumber, ayahs, onClose }: Props) 
               <div>
                 <h3 className="text-sm font-medium text-white">Tafsir</h3>
                 {meta && (
-                  <p className="text-[10px] text-muted-more mt-0.5">
+                  <p className="text-[10px] text-text-tertiary mt-0.5">
                     {meta.tafsirName} — {meta.authorName}
                   </p>
                 )}
               </div>
               <div className="flex items-center gap-3">
-                <span className="text-xs text-gold bg-gold-dim px-2 py-1 rounded-lg">
+                <span className="text-xs text-primary bg-primary-light px-2 py-1 rounded-lg">
                   Ayah {ayahRangeText}
                 </span>
                 <button
                   onClick={onClose}
-                  className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/[0.04] text-muted-more hover:text-white transition-colors"
+                  className="w-8 h-8 flex items-center justify-center rounded-lg bg-surface text-text-tertiary hover:text-text transition-colors"
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
@@ -167,9 +167,9 @@ export function TafsirPanel({ surahNumber, ayahNumber, ayahs, onClose }: Props) 
                 <div className="space-y-3">
                   {[1, 2, 3, 4].map((i) => (
                     <div key={i} className="animate-pulse">
-                      <div className="h-4 bg-white/[0.04] rounded w-full mb-2" />
-                      <div className="h-4 bg-white/[0.04] rounded w-5/6 mb-2" />
-                      <div className="h-4 bg-white/[0.04] rounded w-4/6" />
+                      <div className="h-4 bg-surface rounded w-full mb-2" />
+                      <div className="h-4 bg-surface rounded w-5/6 mb-2" />
+                      <div className="h-4 bg-surface rounded w-4/6" />
                     </div>
                   ))}
                 </div>
@@ -177,10 +177,10 @@ export function TafsirPanel({ surahNumber, ayahNumber, ayahs, onClose }: Props) 
 
               {error && (
                 <div className="text-center py-12">
-                  <p className="text-sm text-muted">Failed to load tafsir</p>
+                  <p className="text-sm text-text-secondary">Failed to load tafsir</p>
                   <button
                     onClick={() => ayahNumber !== null && fetchTafsir(ayahNumber)}
-                    className="text-xs text-gold mt-2 hover:text-gold-light transition-colors"
+                    className="text-xs text-primary mt-2 hover:text-primary transition-colors"
                   >
                     Try again
                   </button>
@@ -189,7 +189,7 @@ export function TafsirPanel({ surahNumber, ayahNumber, ayahs, onClose }: Props) 
 
               {!loading && !error && !entry && (
                 <div className="text-center py-12">
-                  <p className="text-sm text-muted">No commentary available for this ayah</p>
+                  <p className="text-sm text-text-secondary">No commentary available for this ayah</p>
                 </div>
               )}
 
@@ -197,11 +197,11 @@ export function TafsirPanel({ surahNumber, ayahNumber, ayahs, onClose }: Props) 
                 <div>
                   {/* Arabic text for the covered ayahs */}
                   {coveredAyahs.length > 0 && (
-                    <div className="bg-white/[0.02] border border-white/[0.04] rounded-xl p-5 mb-6 space-y-4">
+                    <div className="bg-surface border border-border-light rounded-xl p-5 mb-6 space-y-4">
                       {coveredAyahs.map((a) => (
                         <p key={a.number} className="font-arabic text-2xl text-white leading-loose text-right" dir="rtl">
                           {a.textUthmani}
-                          <span className="inline-block shrink-0 w-8 h-8 ml-2 text-center rounded-full bg-gold-dim text-gold text-[10px] font-sans font-medium">
+                          <span className="inline-block shrink-0 w-8 h-8 ml-2 text-center rounded-full bg-primary-light text-primary text-[10px] font-sans font-medium">
                             <span className="flex items-center justify-center h-full pt-[2px]">{a.number}</span>
                           </span>
                         </p>
@@ -216,7 +216,7 @@ export function TafsirPanel({ surahNumber, ayahNumber, ayahs, onClose }: Props) 
                         // Bold
                         .replace(/\*\*(.*?)\*\*/g, '<strong class="text-white font-medium">$1</strong>')
                         // H3 Headers (###)
-                        .replace(/^###\s+(.*)$/gm, '<h3 class="text-base text-gold mt-6 mb-2 font-medium">$1</h3>')
+                        .replace(/^###\s+(.*)$/gm, '<h3 class="text-base text-primary mt-6 mb-2 font-medium">$1</h3>')
                     }}
                   />
                 </div>

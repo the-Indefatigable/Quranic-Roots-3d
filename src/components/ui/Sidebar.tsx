@@ -6,14 +6,12 @@ import { cn } from '@/lib/cn';
 import { useAuthStore } from '@/store/useAuthStore';
 
 const navItems = [
-  { href: '/learn',     label: 'Learn',     icon: LearnIcon },
-  { href: '/quran',     label: 'Quran',     icon: BookIcon },
-  { href: '/roots',     label: 'Roots',     icon: RootIcon },
-  { href: '/search',    label: 'Search',    icon: SearchIcon },
+  { href: '/learn/path', label: 'Learn',     icon: LearnIcon },
+  { href: '/quran',      label: 'Quran',     icon: BookIcon },
+  { href: '/roots',      label: 'Roots',     icon: RootIcon },
+  { href: '/search',     label: 'Search',    icon: SearchIcon },
   { type: 'divider' as const },
-  { href: '/rewards',   label: 'Rewards',   icon: TrophyIcon, requiresAuth: true },
-  { type: 'divider' as const },
-  { href: '/admin',     label: 'Admin',     icon: AdminIcon, requiresAdmin: true },
+  { href: '/admin',      label: 'Admin',     icon: AdminIcon, requiresAdmin: true },
 ];
 
 export function Sidebar() {
@@ -64,11 +62,19 @@ export function Sidebar() {
       </nav>
 
       {/* Auth section */}
-      <div className="px-4 py-4 border-t border-border">
+      <div className="px-3 py-4 border-t border-border">
         {isLoading ? (
           <div className="h-9 rounded-xl bg-border-light animate-pulse" />
         ) : user ? (
-          <div className="flex items-center gap-3">
+          <Link
+            href="/profile"
+            className={cn(
+              'flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-150',
+              pathname.startsWith('/profile') || pathname.startsWith('/rewards')
+                ? 'bg-primary-light text-primary'
+                : 'hover:bg-canvas'
+            )}
+          >
             <div className="w-8 h-8 rounded-full bg-primary-light flex items-center justify-center flex-shrink-0">
               <span className="text-xs font-bold text-primary uppercase">
                 {user.name?.[0] || user.email[0]}
@@ -78,14 +84,9 @@ export function Sidebar() {
               <p className="text-xs font-semibold text-text truncate">
                 {user.name || user.email.split('@')[0]}
               </p>
-              <button
-                onClick={() => logout()}
-                className="text-[10px] font-medium text-text-tertiary hover:text-text-secondary transition-colors"
-              >
-                Sign out
-              </button>
+              <p className="text-[10px] text-text-tertiary">Profile & Rewards</p>
             </div>
-          </div>
+          </Link>
         ) : (
           <button
             onClick={() => setShowLoginModal(true)}

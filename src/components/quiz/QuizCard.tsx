@@ -40,24 +40,24 @@ export function QuizCard({
           <span className="text-sm text-white/60">
             Question {currentIndex + 1} of {totalQuestions}
           </span>
-          <span className="text-xs text-gold">{Math.round(((currentIndex + 1) / totalQuestions) * 100)}%</span>
+          <span className="text-xs text-primary">{Math.round(((currentIndex + 1) / totalQuestions) * 100)}%</span>
         </div>
-        <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
+        <div className="w-full h-1 bg-surface rounded-full overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-gold to-gold/60 transition-all duration-300"
+            className="h-full bg-gradient-to-r from-primary to-primary/60 transition-all duration-300"
             style={{ width: `${((currentIndex + 1) / totalQuestions) * 100}%` }}
           />
         </div>
       </div>
 
       {/* Question Card */}
-      <div className="bg-card border border-white/[0.08] rounded-2xl p-8 mb-6">
+      <div className="bg-surface border border-border rounded-2xl p-8 mb-6">
         {/* Question Text */}
         <div className="mb-6">
           <p className="text-white/60 text-sm mb-3 uppercase tracking-wide">Question</p>
           <p className="text-white text-xl font-semibold">{question.prompt.text}</p>
           {question.prompt.arabicText && (
-            <p className="text-2xl font-arabic text-gold mt-4">{question.prompt.arabicText}</p>
+            <p className="text-2xl font-arabic text-primary mt-4">{question.prompt.arabicText}</p>
           )}
           {question.prompt.context && (
             <p className="text-sm text-white/40 mt-3 italic">{question.prompt.context}</p>
@@ -78,7 +78,7 @@ export function QuizCard({
               }}
               disabled={isAnswered}
               placeholder="Type your answer..."
-              className="w-full bg-white/[0.04] border border-white/[0.1] rounded-xl px-4 py-3 text-white placeholder:text-white/20 focus:outline-none focus:border-gold/40 focus:ring-1 focus:ring-gold/20 transition-all disabled:opacity-50"
+              className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-white placeholder:text-white/20 focus:outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/20 transition-all disabled:opacity-50"
               autoFocus
             />
           ) : isMCQ ? (
@@ -90,8 +90,8 @@ export function QuizCard({
                   disabled={isAnswered}
                   className={`w-full text-left px-4 py-3 rounded-lg border transition-all ${
                     userAnswer === option.id
-                      ? 'bg-gold/20 border-gold/40'
-                      : 'bg-white/[0.04] border-white/[0.1] hover:border-white/[0.2]'
+                      ? 'bg-primary/20 border-primary/40'
+                      : 'bg-surface border-border hover:border-border'
                   } ${isAnswered ? 'cursor-default' : 'cursor-pointer'}`}
                 >
                   <p className="text-white font-medium">{option.label}</p>
@@ -105,10 +105,10 @@ export function QuizCard({
 
         {/* Feedback */}
         {isAnswered && feedback && (
-          <div className="mb-6 p-4 bg-white/[0.05] border border-white/[0.1] rounded-lg">
+          <div className="mb-6 p-4 bg-surface border border-border rounded-lg">
             <p className="text-sm text-white/70">{feedback}</p>
             {question.correctAnswer && typeof question.correctAnswer === 'string' && (
-              <p className="text-gold text-sm mt-2">
+              <p className="text-primary text-sm mt-2">
                 Correct answer: <span className="font-semibold">{question.correctAnswer}</span>
               </p>
             )}

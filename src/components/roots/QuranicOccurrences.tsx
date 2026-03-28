@@ -49,16 +49,16 @@ export function QuranicOccurrences({ occurrences: initial, totalAyahs, rootArabi
           <Link
             key={`${occ.surahNumber}:${occ.ayahNumber}`}
             href={`/quran/${occ.surahNumber}#ayah-${occ.ayahNumber}`}
-            className="block bg-white/[0.02] border border-white/[0.04] rounded-2xl p-4 sm:p-5 hover:bg-white/[0.04] hover:border-white/[0.06] transition-colors group"
+            className="block bg-surface border border-border-light rounded-2xl p-4 sm:p-5 hover:bg-canvas hover:border-border transition-colors group"
           >
             {/* Location badge */}
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <Badge variant="amber">{occ.surahNumber}:{occ.ayahNumber}</Badge>
-                <span className="text-xs text-muted">{occ.surahName}</span>
+                <span className="text-xs text-text-secondary">{occ.surahName}</span>
               </div>
               <svg
-                className="w-3.5 h-3.5 text-muted-more group-hover:text-gold transition-colors"
+                className="w-3.5 h-3.5 text-text-tertiary group-hover:text-primary transition-colors"
                 fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
@@ -70,7 +70,7 @@ export function QuranicOccurrences({ occurrences: initial, totalAyahs, rootArabi
               {occ.words.map((w, i) => (
                 <span key={i}>
                   {i > 0 && ' '}
-                  <span className={w.isRoot ? 'text-gold font-semibold' : 'text-white/80'}>
+                  <span className={w.isRoot ? 'text-primary font-semibold' : 'text-white/80'}>
                     {w.text}
                   </span>
                 </span>
@@ -79,7 +79,7 @@ export function QuranicOccurrences({ occurrences: initial, totalAyahs, rootArabi
 
             {/* Translation */}
             {occ.translation && (
-              <p className="text-sm text-muted leading-relaxed line-clamp-2">
+              <p className="text-sm text-text-secondary leading-relaxed line-clamp-2">
                 {occ.translation}
               </p>
             )}
@@ -89,14 +89,14 @@ export function QuranicOccurrences({ occurrences: initial, totalAyahs, rootArabi
 
       {/* Footer */}
       <div className="mt-4 flex items-center justify-between">
-        <span className="text-xs text-muted-more">
+        <span className="text-xs text-text-tertiary">
           Showing {items.length} of {totalAyahs} ayahs
         </span>
         {hasMore && (
           <button
             onClick={loadMore}
             disabled={loading}
-            className="text-xs text-gold hover:text-gold-light transition-colors font-medium disabled:opacity-50"
+            className="text-xs text-primary hover:text-primary transition-colors font-medium disabled:opacity-50"
           >
             {loading ? 'Loading...' : `Show more`}
           </button>

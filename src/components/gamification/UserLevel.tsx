@@ -41,20 +41,20 @@ export function UserLevel({
         <div
           className="absolute inset-0 rounded-full opacity-100"
           style={{
-            background: `conic-gradient(from 0deg, #E8B86D, #D4A158, #E8B86D)`,
-            boxShadow: `0 0 20px #E8B86D40`,
+            background: `conic-gradient(from 0deg, #2DD4BF, #0D9488, #2DD4BF)`,
+            boxShadow: `0 0 20px #2DD4BF40`,
           }}
         />
 
         {/* Badge Content */}
-        <div className="relative z-10 flex flex-col items-center justify-center bg-slate-900 rounded-full w-full h-full border-2 border-gold/30">
-          <span className={`${sizes.number} font-bold text-gold`}>{level}</span>
-          <span className="text-[8px] text-gold/70 uppercase tracking-wider">lvl</span>
+        <div className="relative z-10 flex flex-col items-center justify-center bg-slate-900 rounded-full w-full h-full border-2 border-primary/30">
+          <span className={`${sizes.number} font-bold text-primary`}>{level}</span>
+          <span className="text-[8px] text-primary/70 uppercase tracking-wider">lvl</span>
         </div>
 
         {/* Animated Ring */}
         <motion.div
-          className="absolute inset-0 rounded-full border border-gold/40"
+          className="absolute inset-0 rounded-full border border-primary/40"
           animate={{ rotate: 360 }}
           transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
         />
@@ -71,12 +71,12 @@ export function UserLevel({
           {/* Progress Bar */}
           <div className="w-full h-2 bg-slate-700 rounded-full overflow-hidden border border-slate-600">
             <motion.div
-              className="h-full bg-gradient-to-r from-gold to-gold/60"
+              className="h-full bg-gradient-to-r from-primary to-primary/60"
               initial={{ width: 0 }}
               animate={{ width: `${progressPercent}%` }}
               transition={{ duration: 0.8, ease: 'easeOut' }}
               style={{
-                boxShadow: '0 0 10px rgba(232, 184, 109, 0.4)',
+                boxShadow: '0 0 10px rgba(45, 212, 191, 0.4)',
               }}
             />
           </div>
@@ -84,7 +84,7 @@ export function UserLevel({
           {/* XP Text */}
           <div className="flex items-center justify-between">
             <span className="text-xs text-slate-400">
-              <span className="text-gold font-semibold">{levelProgress}</span>
+              <span className="text-primary font-semibold">{levelProgress}</span>
               <span className="text-slate-600"> / </span>
               <span>{nextLevelXP}</span> XP
             </span>

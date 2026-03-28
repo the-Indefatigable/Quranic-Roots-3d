@@ -61,8 +61,8 @@ export function QuizSelector({ counts = {}, onSelect, isLoading }: QuizSelectorP
             onClick={() => setSelectedType(type.id)}
             className={`w-full text-left p-4 rounded-xl border transition-all ${
               selectedType === type.id
-                ? 'bg-gold/10 border-gold/40'
-                : 'bg-card border-white/[0.08] hover:border-white/[0.15]'
+                ? 'bg-primary/10 border-primary/40'
+                : 'bg-surface border-border hover:border-border'
             }`}
           >
             <div className="flex items-start gap-4">
@@ -77,7 +77,7 @@ export function QuizSelector({ counts = {}, onSelect, isLoading }: QuizSelectorP
       </div>
 
       {/* Question Count Selector */}
-      <div className="bg-card border border-white/[0.08] rounded-xl p-6 mb-8">
+      <div className="bg-surface border border-border rounded-xl p-6 mb-8">
         <label className="block text-sm font-semibold text-white/60 uppercase tracking-wide mb-3">
           Questions per session
         </label>
@@ -89,7 +89,7 @@ export function QuizSelector({ counts = {}, onSelect, isLoading }: QuizSelectorP
             step="5"
             value={questionCount}
             onChange={(e) => setQuestionCount(parseInt(e.target.value, 10))}
-            className="flex-1 h-2 bg-white/10 rounded-lg appearance-none cursor-pointer"
+            className="flex-1 h-2 bg-surface rounded-lg appearance-none cursor-pointer"
           />
           <span className="text-white font-semibold min-w-12 text-right">{questionCount}</span>
         </div>
@@ -112,7 +112,7 @@ export function QuizSelector({ counts = {}, onSelect, isLoading }: QuizSelectorP
       </button>
 
       {/* Footer Info */}
-      <div className="mt-8 p-4 bg-white/[0.02] border border-white/[0.08] rounded-lg">
+      <div className="mt-8 p-4 bg-surface border border-border rounded-lg">
         <p className="text-xs text-white/40 text-center">
           💡 Quiz items are based on your learning history. Only items you've started learning will appear.
         </p>

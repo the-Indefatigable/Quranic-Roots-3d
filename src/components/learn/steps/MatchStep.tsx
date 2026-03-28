@@ -93,7 +93,7 @@ export function MatchStep({ content, onAnswer }: MatchStepProps) {
                     ? 'border-[#1CB0F6] bg-[#1CB0F6]/10 text-[#1CB0F6]'
                     : isWrong
                     ? 'border-[#FF4B4B] bg-[#FF4B4B]/10 text-[#FF4B4B]'
-                    : 'border-white/10 bg-white/5 text-white hover:border-white/20'
+                    : 'border-border bg-surface text-white hover:border-border'
                 }`}
               >
                 {pair.left}
@@ -124,7 +124,7 @@ export function MatchStep({ content, onAnswer }: MatchStepProps) {
                     ? 'border-[#1CB0F6] bg-[#1CB0F6]/10 text-[#1CB0F6]'
                     : isWrong
                     ? 'border-[#FF4B4B] bg-[#FF4B4B]/10 text-[#FF4B4B]'
-                    : 'border-white/10 bg-white/5 text-white hover:border-white/20'
+                    : 'border-border bg-surface text-white hover:border-border'
                 }`}
               >
                 {pair.right}

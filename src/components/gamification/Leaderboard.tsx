@@ -71,7 +71,7 @@ export function Leaderboard({ period, currentUserId }: LeaderboardProps) {
         <div className="text-center py-12">
           <div className="inline-block">
             <div className="animate-spin">
-              <svg className="w-8 h-8 text-gold" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <svg className="w-8 h-8 text-primary" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>

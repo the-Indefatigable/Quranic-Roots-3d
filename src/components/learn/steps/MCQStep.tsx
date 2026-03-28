@@ -37,8 +37,8 @@ export function MCQStep({ content, onAnswer }: MCQStepProps) {
 
       <div className="space-y-3">
         {data.options.map((option, i) => {
-          let borderColor = 'border-white/10';
-          let bgColor = 'bg-white/5';
+          let borderColor = 'border-border';
+          let bgColor = 'bg-surface';
 
           if (answered && selected === i) {
             borderColor = option.correct ? 'border-[#58CC02]' : 'border-[#FF4B4B]';
@@ -57,7 +57,7 @@ export function MCQStep({ content, onAnswer }: MCQStepProps) {
               onClick={() => handleSelect(i)}
               disabled={answered}
               className={`w-full text-left px-5 py-4 rounded-2xl border-2 ${borderColor} ${bgColor} transition-all ${
-                !answered ? 'hover:bg-white/10 hover:border-white/20 active:scale-[0.98]' : ''
+                !answered ? 'hover:bg-surface hover:border-border active:scale-[0.98]' : ''
               }`}
             >
               <span className="text-base text-white">{option.text}</span>

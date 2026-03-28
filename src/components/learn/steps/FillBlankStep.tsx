@@ -39,7 +39,7 @@ export function FillBlankStep({ content, onAnswer }: FillBlankStepProps) {
     <div className="flex flex-col gap-6 items-center">
       <h2 className="text-lg font-bold text-white text-center">Fill in the blank</h2>
 
-      <div className="px-5 py-4 rounded-2xl bg-white/5 border border-white/10 w-full text-center">
+      <div className="px-5 py-4 rounded-2xl bg-surface border border-border w-full text-center">
         <p className="text-xl text-white leading-relaxed">
           {displaySentence.split(selected || '______').map((part, i, arr) => (
             <span key={i}>
@@ -48,7 +48,7 @@ export function FillBlankStep({ content, onAnswer }: FillBlankStepProps) {
                 <span
                   className={`inline-block px-3 py-1 mx-1 rounded-lg font-bold border-b-2 ${
                     !selected
-                      ? 'bg-white/10 border-white/20 text-white/30 min-w-[80px]'
+                      ? 'bg-surface border-border text-white/30 min-w-[80px]'
                       : selected === data.correct_answer
                       ? 'bg-[#58CC02]/20 border-[#58CC02] text-[#58CC02]'
                       : 'bg-[#FF4B4B]/20 border-[#FF4B4B] text-[#FF4B4B]'
@@ -64,7 +64,7 @@ export function FillBlankStep({ content, onAnswer }: FillBlankStepProps) {
 
       <div className="flex flex-wrap gap-3 justify-center">
         {data.options.map((option, i) => {
-          let style = 'border-white/10 bg-white/5 text-white hover:bg-white/10';
+          let style = 'border-border bg-surface text-white hover:bg-surface';
           if (answered && option === selected) {
             style = option === data.correct_answer
               ? 'border-[#58CC02] bg-[#58CC02]/10 text-[#58CC02]'

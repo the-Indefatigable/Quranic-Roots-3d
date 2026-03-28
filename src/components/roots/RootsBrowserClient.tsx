@@ -135,33 +135,33 @@ export function RootsBrowserClient({
       </PageHeader>
 
       {/* Tab selector */}
-      <div className="flex items-center gap-1.5 mb-5 border-b border-white/[0.05] pb-4">
+      <div className="flex items-center gap-1.5 mb-5 border-b border-border-light pb-4">
         {tabs.map((t) => (
           <button
             key={t.key}
             onClick={() => handleTabChange(t.key)}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
               tab === t.key
-                ? 'bg-gold-dim text-gold'
-                : 'text-muted-more hover:text-white hover:bg-white/[0.04]'
+                ? 'bg-primary-light text-primary'
+                : 'text-text-tertiary hover:text-text hover:bg-canvas'
             }`}
           >
             {t.label}
             <span className={`text-[10px] px-1.5 py-0.5 rounded-md ${
-              tab === t.key ? 'bg-gold/20 text-gold' : 'bg-white/[0.06] text-muted-more'
+              tab === t.key ? 'bg-primary/20 text-primary' : 'bg-surface text-text-tertiary'
             }`}>
               {t.count.toLocaleString()}
             </span>
           </button>
         ))}
         {search && (
-          <span className="text-xs text-muted ml-auto">{currentCount} results</span>
+          <span className="text-xs text-text-secondary ml-auto">{currentCount} results</span>
         )}
       </div>
 
       {/* Sort controls */}
       <div className="flex items-center gap-2 mb-6">
-        <span className="text-[10px] text-muted-more uppercase tracking-wider">Sort</span>
+        <span className="text-[10px] text-text-tertiary uppercase tracking-wider">Sort</span>
 
         {tab === 'verbs' && (
           <>
@@ -170,7 +170,7 @@ export function RootsBrowserClient({
                 key={key}
                 onClick={() => setSortVerbs(key)}
                 className={`text-xs px-3 py-1.5 rounded-lg transition-colors ${
-                  sortVerbs === key ? 'bg-gold-dim text-gold' : 'bg-white/[0.03] text-muted-more hover:text-white'
+                  sortVerbs === key ? 'bg-primary-light text-primary' : 'bg-surface text-text-tertiary hover:text-text'
                 }`}
               >
                 {key === 'freq' ? 'Frequency' : key === 'alpha' ? 'Alphabetical' : 'Forms'}
@@ -186,7 +186,7 @@ export function RootsBrowserClient({
                 key={key}
                 onClick={() => setSortNouns(key)}
                 className={`text-xs px-3 py-1.5 rounded-lg transition-colors ${
-                  sortNouns === key ? 'bg-gold-dim text-gold' : 'bg-white/[0.03] text-muted-more hover:text-white'
+                  sortNouns === key ? 'bg-primary-light text-primary' : 'bg-surface text-text-tertiary hover:text-text'
                 }`}
               >
                 {key === 'freq' ? 'Frequency' : key === 'alpha' ? 'Alphabetical' : 'Type'}
@@ -202,7 +202,7 @@ export function RootsBrowserClient({
                 key={key}
                 onClick={() => setSortParticles(key)}
                 className={`text-xs px-3 py-1.5 rounded-lg transition-colors ${
-                  sortParticles === key ? 'bg-gold-dim text-gold' : 'bg-white/[0.03] text-muted-more hover:text-white'
+                  sortParticles === key ? 'bg-primary-light text-primary' : 'bg-surface text-text-tertiary hover:text-text'
                 }`}
               >
                 {key === 'freq' ? 'Frequency' : key === 'alpha' ? 'Alphabetical' : 'Type'}
@@ -219,17 +219,17 @@ export function RootsBrowserClient({
             <Link key={root.id} href={`/roots/${encodeURIComponent(root.root)}`} prefetch={false}>
               <Card className="h-full">
                 <div className="flex items-start justify-between mb-2">
-                  <ArabicText size="2xl" className="text-gold">{root.root}</ArabicText>
+                  <ArabicText size="2xl" className="text-primary">{root.root}</ArabicText>
                   <div className="flex items-center gap-1.5">
                     {root.formCount > 0 && (
-                      <span className="text-[10px] text-muted-more bg-white/[0.04] px-1.5 py-0.5 rounded">
+                      <span className="text-[10px] text-text-tertiary bg-surface px-1.5 py-0.5 rounded">
                         {root.formCount} form{root.formCount !== 1 ? 's' : ''}
                       </span>
                     )}
                     <Badge variant="amber">{root.totalFreq}x</Badge>
                   </div>
                 </div>
-                <p className="text-sm text-muted line-clamp-2">{root.meaning}</p>
+                <p className="text-sm text-text-secondary line-clamp-2">{root.meaning}</p>
               </Card>
             </Link>
           ))}
@@ -247,14 +247,14 @@ export function RootsBrowserClient({
                   <ArabicText size="xl" className="text-white">{noun.lemma}</ArabicText>
                   {noun.totalFreq > 0 && <Badge>{noun.totalFreq}x</Badge>}
                 </div>
-                <p className="text-sm text-muted line-clamp-1 mb-2">{noun.meaning}</p>
+                <p className="text-sm text-text-secondary line-clamp-1 mb-2">{noun.meaning}</p>
                 <div className="flex items-center gap-2">
                   <Badge variant="amber">{nounTypeLabels[noun.type] || noun.type}</Badge>
                   {noun.root && (
                     <Link
                       href={`/roots/${encodeURIComponent(noun.root)}`}
                       prefetch={false}
-                      className="text-xs text-muted-more font-arabic hover:text-gold transition-colors"
+                      className="text-xs text-text-tertiary font-arabic hover:text-primary transition-colors"
                       onClick={(e) => e.stopPropagation()}
                     >
                       {noun.root}
@@ -269,7 +269,7 @@ export function RootsBrowserClient({
             <div className="text-center mt-6">
               <button
                 onClick={() => setShowCount((c) => c + 200)}
-                className="text-xs text-gold hover:text-gold-light transition-colors font-medium"
+                className="text-xs text-primary hover:text-primary transition-colors font-medium"
               >
                 Show more ({filteredNouns.length - visibleNouns.length} remaining)
               </button>
@@ -283,7 +283,7 @@ export function RootsBrowserClient({
         <>
           {particles.length === 0 ? (
             <div className="text-center py-20">
-              <p className="text-muted text-sm">No particle data in database yet.</p>
+              <p className="text-text-secondary text-sm">No particle data in database yet.</p>
             </div>
           ) : (
             <>
@@ -294,7 +294,7 @@ export function RootsBrowserClient({
                       <ArabicText size="xl" className="text-white">{p.form}</ArabicText>
                       {p.frequency > 0 && <Badge>{p.frequency}x</Badge>}
                     </div>
-                    <p className="text-sm text-muted line-clamp-1 mb-2">{p.meaning}</p>
+                    <p className="text-sm text-text-secondary line-clamp-1 mb-2">{p.meaning}</p>
                     <Badge variant="emerald">{p.type}</Badge>
                   </Card>
                 ))}
@@ -304,7 +304,7 @@ export function RootsBrowserClient({
                 <div className="text-center mt-6">
                   <button
                     onClick={() => setShowCount((c) => c + 200)}
-                    className="text-xs text-gold hover:text-gold-light transition-colors font-medium"
+                    className="text-xs text-primary hover:text-primary transition-colors font-medium"
                   >
                     Show more ({filteredParticles.length - visibleParticles.length} remaining)
                   </button>
@@ -321,7 +321,7 @@ export function RootsBrowserClient({
 function EmptyState({ query }: { query: string }) {
   return (
     <div className="col-span-full text-center py-20">
-      <p className="text-muted text-sm">No results for &ldquo;{query}&rdquo;</p>
+      <p className="text-text-secondary text-sm">No results for &ldquo;{query}&rdquo;</p>
     </div>
   );
 }

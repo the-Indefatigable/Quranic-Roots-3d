@@ -6,11 +6,11 @@ import { cn } from '@/lib/cn';
 import { useAuthStore } from '@/store/useAuthStore';
 
 const navItems = [
-  { href: '/learn',  label: 'Learn',  icon: LearnIcon },
-  { href: '/quran',  label: 'Quran',  icon: BookIcon },
-  { href: '/roots',  label: 'Roots',  icon: RootIcon },
-  { href: '/search', label: 'Search', icon: SearchIcon },
-  { href: '/admin',  label: 'Admin',  icon: AdminIcon, requiresAdmin: true },
+  { href: '/learn/path', label: 'Learn',  icon: LearnIcon },
+  { href: '/quran',      label: 'Quran',  icon: BookIcon },
+  { href: '/roots',      label: 'Roots',  icon: RootIcon },
+  { href: '/search',     label: 'Search', icon: SearchIcon },
+  { href: '/admin',      label: 'Admin',  icon: AdminIcon, requiresAdmin: true },
 ];
 
 export function BottomNav() {

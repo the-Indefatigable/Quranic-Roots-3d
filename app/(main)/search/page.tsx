@@ -18,7 +18,7 @@ function highlight(text: string, query: string) {
   const parts = text.split(new RegExp(`(${escaped})`, 'gi'));
   return parts.map((part, i) =>
     part.toLowerCase() === query.toLowerCase()
-      ? <mark key={i} className="bg-gold/20 text-gold-light rounded px-0.5">{part}</mark>
+      ? <mark key={i} className="bg-primary/20 text-primary rounded px-0.5">{part}</mark>
       : part
   );
 }
@@ -66,7 +66,7 @@ export default function SearchPage() {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-light tracking-tight text-white mb-1">Search</h1>
-        <p className="text-sm text-muted">Search by Arabic text or English translation</p>
+        <p className="text-sm text-text-secondary">Search by Arabic text or English translation</p>
       </div>
 
       {/* Search input */}
@@ -82,7 +82,7 @@ export default function SearchPage() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="e.g. mercy, صبر, knowledge…"
-          className={`w-full bg-white/[0.04] border border-white/[0.08] rounded-2xl pl-12 pr-12 py-4 text-white placeholder:text-white/25 focus:outline-none focus:border-gold/40 focus:bg-white/[0.06] transition-all text-base ${isArabic ? 'text-right font-arabic text-xl' : ''}`}
+          className={`w-full bg-surface border border-border rounded-2xl pl-12 pr-12 py-4 text-white placeholder:text-white/25 focus:outline-none focus:border-primary/40 focus:bg-surface transition-all text-base ${isArabic ? 'text-right font-arabic text-xl' : ''}`}
           dir={isArabic ? 'rtl' : 'ltr'}
         />
         {query && (
@@ -100,7 +100,7 @@ export default function SearchPage() {
       {/* Loading */}
       {loading && (
         <div className="flex items-center gap-2 text-sm text-white/30 mb-6">
-          <div className="w-3 h-3 rounded-full border border-gold/40 border-t-gold animate-spin" />
+          <div className="w-3 h-3 rounded-full border border-primary/40 border-t-primary animate-spin" />
           Searching…
         </div>
       )}
@@ -117,11 +117,11 @@ export default function SearchPage() {
             <Link
               key={`${r.surahNumber}:${r.ayahNumber}`}
               href={`/quran/${r.surahNumber}`}
-              className="group block bg-white/[0.03] border border-white/[0.06] hover:border-white/[0.12] hover:bg-white/[0.05] rounded-2xl p-5 transition-all"
+              className="group block bg-surface border border-border-light hover:border-border hover:bg-surface rounded-2xl p-5 transition-all"
             >
               {/* Reference */}
               <div className="flex items-center justify-between mb-3">
-                <span className="text-xs text-gold/60 group-hover:text-gold transition-colors">
+                <span className="text-xs text-primary/60 group-hover:text-primary transition-colors">
                   {r.surahEnglishName} · {r.surahNumber}:{r.ayahNumber}
                 </span>
                 <span className="font-arabic text-xs text-white/25">{r.surahArabicName}</span>
@@ -161,7 +161,7 @@ export default function SearchPage() {
                 <button
                   key={s}
                   onClick={() => setQuery(s)}
-                  className={`px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.06] hover:border-gold/30 hover:text-gold/60 transition-all text-xs ${/[\u0600-\u06FF]/.test(s) ? 'font-arabic text-base' : ''}`}
+                  className={`px-3 py-1.5 rounded-lg bg-surface border border-border-light hover:border-primary/30 hover:text-primary/60 transition-all text-xs ${/[\u0600-\u06FF]/.test(s) ? 'font-arabic text-base' : ''}`}
                 >
                   {s}
                 </button>

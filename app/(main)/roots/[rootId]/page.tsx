@@ -281,7 +281,7 @@ export default async function RootDetailPage({ params }: Props) {
   return (
     <div>
       {/* Back link */}
-      <Link href="/roots" className="inline-flex items-center gap-1 text-xs text-muted-more hover:text-white transition-colors mb-6">
+      <Link href="/roots" className="inline-flex items-center gap-1 text-xs text-text-tertiary hover:text-white transition-colors mb-6">
         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
         </svg>
@@ -290,10 +290,10 @@ export default async function RootDetailPage({ params }: Props) {
 
       {/* Hero Header */}
       <div className="text-center mb-12">
-        <ArabicText size="3xl" className="text-gold block mb-3">
+        <ArabicText size="3xl" className="text-primary block mb-3">
           {root.root}
         </ArabicText>
-        <p className="text-lg text-muted mb-3">{root.meaning}</p>
+        <p className="text-lg text-text-secondary mb-3">{root.meaning}</p>
         <div className="flex items-center justify-center gap-3 flex-wrap">
           <Badge variant="amber">{root.totalFreq} occurrences</Badge>
           <Badge>{formsData.length} form{formsData.length !== 1 ? 's' : ''}</Badge>
@@ -305,7 +305,7 @@ export default async function RootDetailPage({ params }: Props) {
       {/* Forms with conjugation grids */}
       {formsData.length > 0 && (
         <section className="mb-12">
-          <h2 className="text-sm text-muted-more uppercase tracking-widest mb-4">Verb Forms</h2>
+          <h2 className="text-sm text-text-tertiary uppercase tracking-widest mb-4">Verb Forms</h2>
           <RootDetailClient forms={formsData} />
         </section>
       )}
@@ -313,7 +313,7 @@ export default async function RootDetailPage({ params }: Props) {
       {/* Quranic Occurrences — streamed with Suspense */}
       {totalAyahs > 0 && (
         <section className="mb-12">
-          <h2 className="text-sm text-muted-more uppercase tracking-widest mb-4">
+          <h2 className="text-sm text-text-tertiary uppercase tracking-widest mb-4">
             Quranic Occurrences
           </h2>
           <Suspense fallback={<div className="space-y-3">{[1,2,3].map(i => <Skeleton key={i} className="h-32 rounded-2xl" />)}</div>}>
@@ -329,7 +329,7 @@ export default async function RootDetailPage({ params }: Props) {
       {/* Derived Nouns */}
       {nounRows.length > 0 && (
         <section className="mb-12">
-          <h2 className="text-sm text-muted-more uppercase tracking-widest mb-4">
+          <h2 className="text-sm text-text-tertiary uppercase tracking-widest mb-4">
             Derived Nouns ({nounRows.length})
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -338,12 +338,12 @@ export default async function RootDetailPage({ params }: Props) {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <ArabicText size="xl" className="text-white">{noun.lemma}</ArabicText>
-                    <span className="text-xs text-muted">{noun.meaning}</span>
+                    <span className="text-xs text-text-secondary">{noun.meaning}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Badge variant="amber">{nounTypeLabels[noun.type] || noun.type}</Badge>
                     {noun.totalFreq && noun.totalFreq > 0 && (
-                      <span className="text-[10px] text-muted-more">{noun.totalFreq}x</span>
+                      <span className="text-[10px] text-text-tertiary">{noun.totalFreq}x</span>
                     )}
                   </div>
                 </div>

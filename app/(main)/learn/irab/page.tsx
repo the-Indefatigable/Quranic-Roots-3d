@@ -45,7 +45,7 @@ export default function IrabPage() {
           <span className="text-white/50">I&apos;rab</span>
         </nav>
 
-        <p className="text-4xl font-arabic text-gold/70 mb-3">الإعراب</p>
+        <p className="text-4xl font-arabic text-primary/70 mb-3">الإعراب</p>
         <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight mb-4">
           I&apos;rab — Grammatical Case Endings
         </h1>
@@ -62,15 +62,15 @@ export default function IrabPage() {
           <p className="text-white/45 leading-relaxed mb-4">
             This means Arabic word order is flexible. The verb can come first, the object can come first, or the subject can come first — and the meaning stays clear because the endings tell you which word plays which role.
           </p>
-          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 mb-4">
+          <div className="rounded-2xl border border-border-light bg-surface p-6 mb-4">
             <p className="text-sm text-white/30 uppercase tracking-wider font-semibold mb-3">Example from Surah Al-Fatiha (1:2)</p>
             <p className="text-2xl font-arabic text-white/80 text-right leading-loose mb-3" dir="rtl">
               الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ
             </p>
             <p className="text-sm text-white/50 leading-relaxed">
-              <strong className="text-white/70">الْحَمْدُ</strong> (al-hamdu) — ends with <em>damma</em> (ُ) because it is the <em>mubtada&apos;</em> (subject), in the <strong className="text-gold/70">raf&apos;</strong> case.
+              <strong className="text-white/70">الْحَمْدُ</strong> (al-hamdu) — ends with <em>damma</em> (ُ) because it is the <em>mubtada&apos;</em> (subject), in the <strong className="text-primary/70">raf&apos;</strong> case.
               <br />
-              <strong className="text-white/70">لِلَّهِ</strong> (lillahi) — ends with <em>kasra</em> (ِ) because it follows the preposition <em>li</em>, putting it in the <strong className="text-gold/70">jarr</strong> case.
+              <strong className="text-white/70">لِلَّهِ</strong> (lillahi) — ends with <em>kasra</em> (ِ) because it follows the preposition <em>li</em>, putting it in the <strong className="text-primary/70">jarr</strong> case.
               <br />
               <strong className="text-white/70">رَبِّ</strong> (rabbi) — also in <em>jarr</em> because it is a <em>badal</em> (appositive) following a <em>majrur</em> word.
             </p>
@@ -116,9 +116,9 @@ export default function IrabPage() {
                 color: 'purple',
               },
             ].map((c) => (
-              <div key={c.name} className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5">
+              <div key={c.name} className="rounded-xl border border-border-light bg-surface p-5">
                 <h3 className={`text-sm font-bold mb-1 ${
-                  c.color === 'emerald' ? 'text-emerald-400' :
+                  c.color === 'emerald' ? 'text-correct' :
                   c.color === 'blue' ? 'text-blue-400' :
                   c.color === 'amber' ? 'text-amber-400' : 'text-purple-400'
                 }`}>{c.name}</h3>
@@ -138,14 +138,14 @@ export default function IrabPage() {
             Not every Arabic word changes its ending. Words are divided into two categories:
           </p>
           <div className="grid gap-4 sm:grid-cols-2 mb-4">
-            <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5">
-              <h3 className="text-sm font-bold text-gold/70 mb-2">Mu&apos;rab (مُعْرَب)</h3>
+            <div className="rounded-xl border border-border-light bg-surface p-5">
+              <h3 className="text-sm font-bold text-primary/70 mb-2">Mu&apos;rab (مُعْرَب)</h3>
               <p className="text-sm text-white/45 leading-relaxed">
                 Words whose endings <strong className="text-white/70">do change</strong> based on their grammatical position. Most nouns and present-tense verbs are mu&apos;rab.
               </p>
             </div>
-            <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5">
-              <h3 className="text-sm font-bold text-gold/70 mb-2">Mabni (مَبْنِي)</h3>
+            <div className="rounded-xl border border-border-light bg-surface p-5">
+              <h3 className="text-sm font-bold text-primary/70 mb-2">Mabni (مَبْنِي)</h3>
               <p className="text-sm text-white/45 leading-relaxed">
                 Words whose endings <strong className="text-white/70">never change</strong> regardless of position. This includes pronouns, demonstratives (هذا, ذلك), past-tense verbs, and most particles.
               </p>
@@ -156,7 +156,7 @@ export default function IrabPage() {
         {/* Quranic Practice */}
         <section className="mb-12">
           <h2 className="text-xl font-semibold text-white mb-4">Practice: I&apos;rab in Surah Al-Ikhlas</h2>
-          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
+          <div className="rounded-2xl border border-border-light bg-surface p-6">
             <p className="text-2xl font-arabic text-white/80 text-right leading-[2.2] mb-4" dir="rtl">
               قُلْ هُوَ اللَّهُ أَحَدٌ · اللَّهُ الصَّمَدُ · لَمْ يَلِدْ وَلَمْ يُولَدْ · وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ
             </p>
@@ -184,19 +184,19 @@ export default function IrabPage() {
         <section className="mb-12">
           <h2 className="text-xl font-semibold text-white mb-4">Key Takeaways</h2>
           <ul className="space-y-2 text-sm text-white/45 leading-relaxed">
-            <li className="flex gap-2"><span className="text-gold/60 shrink-0">1.</span> I&apos;rab marks the <em>role</em> a word plays — subject, object, or governed by a preposition.</li>
-            <li className="flex gap-2"><span className="text-gold/60 shrink-0">2.</span> The four cases are: raf&apos; (ُ), nasb (َ), jarr (ِ), and jazm (ْ, verbs only).</li>
-            <li className="flex gap-2"><span className="text-gold/60 shrink-0">3.</span> Mu&apos;rab words change endings; mabni words do not.</li>
-            <li className="flex gap-2"><span className="text-gold/60 shrink-0">4.</span> Learning i&apos;rab is the single biggest unlock for understanding the Quran without translation.</li>
+            <li className="flex gap-2"><span className="text-primary/60 shrink-0">1.</span> I&apos;rab marks the <em>role</em> a word plays — subject, object, or governed by a preposition.</li>
+            <li className="flex gap-2"><span className="text-primary/60 shrink-0">2.</span> The four cases are: raf&apos; (ُ), nasb (َ), jarr (ِ), and jazm (ْ, verbs only).</li>
+            <li className="flex gap-2"><span className="text-primary/60 shrink-0">3.</span> Mu&apos;rab words change endings; mabni words do not.</li>
+            <li className="flex gap-2"><span className="text-primary/60 shrink-0">4.</span> Learning i&apos;rab is the single biggest unlock for understanding the Quran without translation.</li>
           </ul>
         </section>
 
         {/* Next topic */}
-        <div className="flex items-center justify-between pt-8 border-t border-white/[0.06]">
+        <div className="flex items-center justify-between pt-8 border-t border-border-light">
           <Link href="/learn" className="text-sm text-white/30 hover:text-white/60 transition-colors">
             &larr; All Lessons
           </Link>
-          <Link href="/learn/mufrad-muthanna-jam" className="text-sm text-gold/70 hover:text-gold transition-colors">
+          <Link href="/learn/mufrad-muthanna-jam" className="text-sm text-primary/70 hover:text-primary transition-colors">
             Next: Singular, Dual & Plural &rarr;
           </Link>
         </div>

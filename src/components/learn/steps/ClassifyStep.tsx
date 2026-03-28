@@ -73,7 +73,7 @@ export function ClassifyStep({ content, onAnswer }: ClassifyStepProps) {
                   : 'bg-[#FF4B4B]'
                 : i === currentItem
                 ? 'bg-[#1CB0F6]'
-                : 'bg-white/20'
+                : 'bg-surface'
             }`}
           />
         ))}
@@ -84,7 +84,7 @@ export function ClassifyStep({ content, onAnswer }: ClassifyStepProps) {
         key={currentItem}
         initial={{ opacity: 0, scale: 0.8, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="px-6 py-4 rounded-2xl bg-white/10 border border-white/20 text-center"
+        className="px-6 py-4 rounded-2xl bg-surface border border-border text-center"
       >
         <span className="text-xl font-arabic text-white">{item.text}</span>
       </motion.div>
@@ -97,7 +97,7 @@ export function ClassifyStep({ content, onAnswer }: ClassifyStepProps) {
             whileTap={{ scale: 0.95 }}
             onClick={() => handleClassify(cat)}
             disabled={answered}
-            className="px-4 py-5 rounded-2xl border-2 border-white/10 bg-white/5 text-white font-medium text-sm hover:bg-white/10 hover:border-white/20 shadow-[0_3px_0_rgba(255,255,255,0.06)] active:shadow-none active:translate-y-[3px] transition-all"
+            className="px-4 py-5 rounded-2xl border-2 border-border bg-surface text-white font-medium text-sm hover:bg-surface hover:border-border shadow-[0_3px_0_rgba(255,255,255,0.06)] active:shadow-none active:translate-y-[3px] transition-all"
           >
             {cat}
           </motion.button>
@@ -116,7 +116,7 @@ export function ClassifyStep({ content, onAnswer }: ClassifyStepProps) {
               <div key={cat} className="flex items-center gap-2 text-xs text-white/40">
                 <span className="font-medium">{cat}:</span>
                 {items.map((t) => (
-                  <span key={t} className="px-2 py-0.5 rounded bg-white/5">{t}</span>
+                  <span key={t} className="px-2 py-0.5 rounded bg-surface">{t}</span>
                 ))}
               </div>
             );

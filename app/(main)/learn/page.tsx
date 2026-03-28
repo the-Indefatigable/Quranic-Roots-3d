@@ -107,18 +107,18 @@ export default function LearnPage() {
                 </div>
                 <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full shrink-0 ${
                   topic.level === 'Essential'
-                    ? 'bg-emerald-500/10 text-emerald-400'
+                    ? 'bg-correct/10 text-correct'
                     : topic.level === 'Intermediate'
-                    ? 'bg-amber-500/10 text-amber-400'
-                    : 'bg-purple-500/10 text-purple-400'
+                    ? 'bg-accent/10 text-accent'
+                    : 'bg-info/10 text-info'
                 }`}>
                   {topic.level}
                 </span>
               </div>
-              <h2 className="text-lg font-semibold text-white group-hover:text-gold transition-colors mb-1.5">
+              <h2 className="text-lg font-semibold text-text group-hover:text-primary transition-colors mb-1.5">
                 {topic.title}
               </h2>
-              <p className="text-sm text-white/40 leading-relaxed">
+              <p className="text-sm text-text-tertiary leading-relaxed">
                 {topic.description}
               </p>
             </Link>
