@@ -6,14 +6,11 @@ import { cn } from '@/lib/cn';
 import { useAuthStore } from '@/store/useAuthStore';
 
 const navItems = [
+  { href: '/learn',     label: 'Learn',     icon: LearnIcon },
   { href: '/quran',     label: 'Quran',     icon: BookIcon },
   { href: '/roots',     label: 'Roots',     icon: RootIcon },
-  { href: '/learn',     label: 'Learn',     icon: LearnIcon },
   { href: '/search',    label: 'Search',    icon: SearchIcon },
   { type: 'divider' as const },
-  { href: '/quiz',      label: 'Quiz',      icon: QuizIcon, requiresAuth: true },
-  { href: '/review',    label: 'Review',    icon: ReviewIcon, requiresAuth: true },
-  { href: '/bookmarks', label: 'Bookmarks', icon: BookmarkIcon, requiresAuth: true },
   { href: '/rewards',   label: 'Rewards',   icon: TrophyIcon, requiresAuth: true },
   { type: 'divider' as const },
   { href: '/admin',     label: 'Admin',     icon: AdminIcon, requiresAdmin: true },
@@ -24,12 +21,12 @@ export function Sidebar() {
   const { user, isLoading, setShowLoginModal, logout } = useAuthStore();
 
   return (
-    <aside className="hidden lg:flex flex-col fixed left-0 top-0 bottom-0 w-60 glass-strong z-40 border-r border-white/[0.05]">
+    <aside className="hidden lg:flex flex-col fixed left-0 top-0 bottom-0 w-60 bg-surface border-r border-border z-40">
 
       {/* Logo */}
-      <Link href="/" className="flex items-center px-6 h-16 border-b border-white/[0.05]">
-        <span className="text-lg font-bold tracking-tight text-white">
-          Qu<span className="text-gold">Roots</span>
+      <Link href="/" className="flex items-center px-6 h-16 border-b border-border">
+        <span className="text-lg font-heading tracking-tight text-text">
+          Qu<span className="text-primary">Roots</span>
         </span>
       </Link>
 
@@ -37,7 +34,7 @@ export function Sidebar() {
       <nav className="flex-1 px-3 py-5 space-y-0.5">
         {navItems.map((item, idx) => {
           if ('type' in item && item.type === 'divider') {
-            return <div key={`div-${idx}`} className="h-px bg-white/[0.05] my-3 mx-2" />;
+            return <div key={`div-${idx}`} className="h-px bg-border my-3 mx-2" />;
           }
 
           const navItem = item as { href: string; label: string; icon: any; requiresAuth?: boolean; requiresAdmin?: boolean };
@@ -50,43 +47,40 @@ export function Sidebar() {
               key={navItem.href}
               href={navItem.href}
               className={cn(
-                'relative flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200',
+                'relative flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-150',
                 isActive
-                  ? 'bg-gold/[0.1] text-gold'
-                  : 'text-white/38 hover:text-white/80 hover:bg-white/[0.04]'
+                  ? 'bg-primary-light text-primary font-semibold'
+                  : 'text-text-secondary hover:text-text hover:bg-canvas'
               )}
             >
               {isActive && (
-                <span className="absolute left-0 inset-y-2 w-[3px] bg-gold rounded-r-full shadow-[0_0_8px_rgba(232,184,109,0.6)]" />
+                <span className="absolute left-0 inset-y-2 w-[3px] bg-primary rounded-r-full" />
               )}
-              <navItem.icon className={cn('w-[18px] h-[18px] flex-shrink-0', isActive ? 'text-gold' : 'text-white/35')} />
+              <navItem.icon className={cn('w-[18px] h-[18px] flex-shrink-0', isActive ? 'text-primary' : 'text-text-tertiary')} />
               <span>{navItem.label}</span>
-              {isActive && (
-                <span className="ml-auto w-1.5 h-1.5 rounded-full bg-gold soft-pulse" />
-              )}
             </Link>
           );
         })}
       </nav>
 
       {/* Auth section */}
-      <div className="px-4 py-4 border-t border-white/[0.05]">
+      <div className="px-4 py-4 border-t border-border">
         {isLoading ? (
-          <div className="h-9 rounded-xl bg-white/[0.03] animate-pulse" />
+          <div className="h-9 rounded-xl bg-border-light animate-pulse" />
         ) : user ? (
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-gold/15 flex items-center justify-center flex-shrink-0">
-              <span className="text-xs font-bold text-gold uppercase">
+            <div className="w-8 h-8 rounded-full bg-primary-light flex items-center justify-center flex-shrink-0">
+              <span className="text-xs font-bold text-primary uppercase">
                 {user.name?.[0] || user.email[0]}
               </span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold text-white/70 truncate">
+              <p className="text-xs font-semibold text-text truncate">
                 {user.name || user.email.split('@')[0]}
               </p>
               <button
                 onClick={() => logout()}
-                className="text-[10px] font-medium text-white/25 hover:text-white/50 transition-colors"
+                className="text-[10px] font-medium text-text-tertiary hover:text-text-secondary transition-colors"
               >
                 Sign out
               </button>
@@ -95,7 +89,7 @@ export function Sidebar() {
         ) : (
           <button
             onClick={() => setShowLoginModal(true)}
-            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gold/10 hover:bg-gold/15 text-gold text-xs font-semibold transition-all duration-150"
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-primary-light hover:bg-primary/15 text-primary text-xs font-semibold transition-all duration-150"
           >
             <UserIcon className="w-3.5 h-3.5" />
             Sign in

@@ -92,7 +92,7 @@ export default function RewardsPage() {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="animate-spin">
-          <svg className="w-8 h-8 text-gold" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+          <svg className="w-8 h-8 text-primary" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
@@ -104,13 +104,13 @@ export default function RewardsPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
         <div className="text-4xl mb-4">📊</div>
-        <h2 className="text-xl font-bold text-white mb-2">No progress yet</h2>
-        <p className="text-white/40 text-sm mb-6 max-w-md">
+        <h2 className="text-xl font-bold text-text mb-2">No progress yet</h2>
+        <p className="text-text-tertiary text-sm mb-6 max-w-md">
           Take your first quiz to start tracking your progress, earning XP, and unlocking achievements.
         </p>
         <Link
           href="/quiz"
-          className="px-6 py-3 bg-gold text-black font-semibold rounded-xl hover:brightness-110 transition-all"
+          className="px-6 py-3 bg-primary text-white font-semibold rounded-xl hover:brightness-110 transition-all"
         >
           Start a Quiz
         </Link>
@@ -129,13 +129,13 @@ export default function RewardsPage() {
     <div className="space-y-8">
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="text-4xl font-bold text-white mb-2">Your Rewards</h1>
-        <p className="text-slate-400">Track your progress and achievements</p>
+        <h1 className="text-4xl font-bold text-text mb-2">Your Rewards</h1>
+        <p className="text-text-secondary">Track your progress and achievements</p>
       </motion.div>
 
       {/* User Level Card */}
       <motion.div
-        className="p-8 rounded-3xl bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-gold/20 backdrop-blur"
+        className="p-8 rounded-3xl bg-surface border border-border backdrop-blur"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
@@ -162,13 +162,13 @@ export default function RewardsPage() {
             ].map((stat, idx) => (
               <motion.div
                 key={stat.label}
-                className="p-4 rounded-xl bg-slate-700/30 border border-slate-600/30"
+                className="p-4 rounded-xl bg-surface border border-border"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 + idx * 0.1 }}
               >
-                <p className="text-xs text-slate-400 uppercase tracking-wider mb-2">{stat.label}</p>
-                <p className="text-2xl font-bold text-gold">{stat.value}</p>
+                <p className="text-xs text-text-secondary uppercase tracking-wider mb-2">{stat.label}</p>
+                <p className="text-2xl font-bold text-primary">{stat.value}</p>
               </motion.div>
             ))}
           </div>
@@ -191,20 +191,20 @@ export default function RewardsPage() {
             <Link
               key={item.label}
               href={item.href}
-              className="p-5 rounded-2xl bg-card border border-border hover:border-gold/30 transition-colors group"
+              className="p-5 rounded-2xl bg-surface border border-border hover:border-primary/30 transition-colors group"
             >
               <div className="flex items-center justify-between mb-3">
-                <p className="text-sm font-medium text-white">{item.label}</p>
-                <span className="text-xs text-white/30 group-hover:text-gold/60 transition-colors">Practice</span>
+                <p className="text-sm font-medium text-text">{item.label}</p>
+                <span className="text-xs text-text-tertiary group-hover:text-primary/60 transition-colors">Practice</span>
               </div>
-              <p className="text-3xl font-bold text-gold">{item.data.learned}</p>
-              <p className="text-xs text-white/30 mt-1">
+              <p className="text-3xl font-bold text-primary">{item.data.learned}</p>
+              <p className="text-xs text-text-tertiary mt-1">
                 {item.data.learned === 0 ? 'None learned yet' : `of ${item.data.total} studied`}
               </p>
               {item.data.total > 0 && (
-                <div className="mt-3 h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
+                <div className="mt-3 h-1.5 bg-border-light rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-gold/60 rounded-full transition-all"
+                    className="h-full bg-primary/60 rounded-full transition-all"
                     style={{ width: `${Math.min((item.data.learned / Math.max(item.data.total, 1)) * 100, 100)}%` }}
                   />
                 </div>
@@ -217,17 +217,17 @@ export default function RewardsPage() {
       {/* New user CTA */}
       {isNewUser && (
         <motion.div
-          className="p-6 rounded-2xl bg-gold/[0.08] border border-gold/20 text-center"
+          className="p-6 rounded-2xl bg-primary-light border border-primary/20 text-center"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25 }}
         >
-          <p className="text-white/70 text-sm mb-4">
+          <p className="text-text-secondary text-sm mb-4">
             Start quizzing to learn roots, nouns, and particles. The spaced repetition system will track your mastery and bring back words you need to review.
           </p>
           <Link
             href="/quiz"
-            className="inline-block px-6 py-3 bg-gold text-black font-semibold rounded-xl hover:brightness-110 transition-all"
+            className="inline-block px-6 py-3 bg-primary text-white font-semibold rounded-xl hover:brightness-110 transition-all"
           >
             Take Your First Quiz
           </Link>
@@ -242,8 +242,8 @@ export default function RewardsPage() {
             onClick={() => setSelectedTab(tab as any)}
             className={`px-4 py-2 rounded-lg font-medium transition-all ${
               selectedTab === tab
-                ? 'bg-gold/20 border border-gold/40 text-gold'
-                : 'bg-slate-800/50 border border-slate-700/50 text-slate-400 hover:text-white'
+                ? 'bg-primary/10 border border-primary/30 text-primary'
+                : 'bg-surface border border-border text-text-secondary hover:text-text'
             }`}
           >
             {tab === 'overview' && 'Overview'}
@@ -271,13 +271,13 @@ export default function RewardsPage() {
             ].map((stat, idx) => (
               <motion.div
                 key={stat.label}
-                className="p-4 rounded-xl bg-slate-800/50 border border-slate-700/50"
+                className="p-4 rounded-xl bg-surface border border-border"
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.4 + idx * 0.05 }}
               >
-                <p className="text-xs text-slate-400 uppercase tracking-wider">{stat.label}</p>
-                <p className="text-2xl font-bold text-gold mt-2">{stat.value}</p>
+                <p className="text-xs text-text-secondary uppercase tracking-wider">{stat.label}</p>
+                <p className="text-2xl font-bold text-primary mt-2">{stat.value}</p>
               </motion.div>
             ))}
           </motion.div>
@@ -285,7 +285,7 @@ export default function RewardsPage() {
           {/* Recent Achievements */}
           {unlockedAchievements.length > 0 && (
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
-              <h3 className="text-xl font-bold text-white mb-4">Recent Achievements</h3>
+              <h3 className="text-xl font-bold text-text mb-4">Recent Achievements</h3>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                 {unlockedAchievements.slice(0, 8).map((achievement, idx) => (
                   <motion.div
@@ -312,7 +312,7 @@ export default function RewardsPage() {
       {selectedTab === 'achievements' && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
           {achievementsList.length === 0 && (
-            <div className="text-center py-12 text-white/30 text-sm">
+            <div className="text-center py-12 text-text-tertiary text-sm">
               No achievements available yet. Complete quizzes to start unlocking them.
             </div>
           )}
@@ -320,7 +320,7 @@ export default function RewardsPage() {
           {/* Unlocked */}
           {unlockedAchievements.length > 0 && (
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-              <h3 className="text-lg font-bold text-white mb-4">
+              <h3 className="text-lg font-bold text-text mb-4">
                 Unlocked ({unlockedAchievements.length})
               </h3>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
@@ -347,7 +347,7 @@ export default function RewardsPage() {
           {/* Locked */}
           {lockedAchievements.length > 0 && (
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-              <h3 className="text-lg font-bold text-slate-400 mb-4">
+              <h3 className="text-lg font-bold text-text-secondary mb-4">
                 Locked ({lockedAchievements.length})
               </h3>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">

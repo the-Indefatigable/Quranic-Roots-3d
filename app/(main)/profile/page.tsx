@@ -13,7 +13,7 @@ export default function ProfilePage() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-gold/30 border-t-gold rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
       </div>
     );
   }
@@ -22,15 +22,15 @@ export default function ProfilePage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 rounded-full bg-white/[0.04] border border-white/[0.08] flex items-center justify-center mx-auto mb-4">
-            <svg className="w-7 h-7 text-white/30" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+          <div className="w-16 h-16 rounded-full bg-surface border border-border flex items-center justify-center mx-auto mb-4">
+            <svg className="w-7 h-7 text-text-tertiary" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
             </svg>
           </div>
-          <p className="text-white/50 mb-4">Sign in to track your progress</p>
+          <p className="text-text-secondary mb-4">Sign in to track your progress</p>
           <button
             onClick={() => setShowLoginModal(true)}
-            className="px-6 py-2.5 bg-gold/15 text-gold rounded-xl text-sm font-semibold hover:bg-gold/20 transition-colors"
+            className="px-6 py-2.5 bg-primary/10 text-primary rounded-xl text-sm font-semibold hover:bg-primary/15 transition-colors"
           >
             Sign in
           </button>
@@ -86,20 +86,20 @@ export default function ProfilePage() {
     <div className="py-6 px-1">
       {/* User header */}
       <div className="flex items-center gap-4 mb-8">
-        <div className="w-14 h-14 rounded-full bg-gold/15 flex items-center justify-center shrink-0">
+        <div className="w-14 h-14 rounded-full bg-primary-light flex items-center justify-center shrink-0">
           {user.image ? (
             <img src={user.image} alt="" className="w-14 h-14 rounded-full object-cover" />
           ) : (
-            <span className="text-xl font-bold text-gold uppercase">
+            <span className="text-xl font-bold text-primary uppercase">
               {user.name?.[0] || user.email[0]}
             </span>
           )}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-lg font-semibold text-white truncate">
+          <p className="text-lg font-semibold text-text truncate">
             {user.name || user.email.split('@')[0]}
           </p>
-          <p className="text-xs text-white/30 truncate">{user.email}</p>
+          <p className="text-xs text-text-tertiary truncate">{user.email}</p>
         </div>
       </div>
 
@@ -109,14 +109,14 @@ export default function ProfilePage() {
           <Link
             key={link.href}
             href={link.href}
-            className="flex items-center gap-4 px-4 py-4 bg-card border border-white/[0.08] rounded-2xl hover:border-white/[0.12] hover:bg-elevated transition-colors"
+            className="flex items-center gap-4 px-4 py-4 bg-surface border border-border rounded-2xl hover:shadow-card transition-colors"
           >
-            <div className="text-white/40">{link.icon}</div>
+            <div className="text-text-tertiary">{link.icon}</div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white">{link.label}</p>
-              <p className="text-xs text-white/35">{link.desc}</p>
+              <p className="text-sm font-medium text-text">{link.label}</p>
+              <p className="text-xs text-text-tertiary">{link.desc}</p>
             </div>
-            <svg className="w-4 h-4 text-white/20" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+            <svg className="w-4 h-4 text-text-tertiary" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
             </svg>
           </Link>
@@ -126,7 +126,7 @@ export default function ProfilePage() {
       {/* Sign out */}
       <button
         onClick={() => { logout(); router.push('/'); }}
-        className="w-full mt-8 py-3 text-sm text-white/30 hover:text-white/50 transition-colors"
+        className="w-full mt-8 py-3 text-sm text-text-tertiary hover:text-text-secondary transition-colors"
       >
         Sign out
       </button>

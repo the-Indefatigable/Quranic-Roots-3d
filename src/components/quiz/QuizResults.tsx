@@ -79,7 +79,7 @@ export function QuizResults({
           <button
             onClick={onBack}
             disabled={isLoading}
-            className="flex-1 px-6 py-3 rounded-xl border border-white/[0.2] text-white font-semibold hover:bg-white/[0.05] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 px-6 py-3 rounded-xl border border-border text-text font-semibold hover:bg-border-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Back to Menu
           </button>

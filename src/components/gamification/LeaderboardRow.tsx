@@ -20,16 +20,16 @@ const medalEmojis = ['🥇', '🥈', '🥉'];
 
 export function LeaderboardRow({ entry, isCurrentUser = false, isMedal = false }: LeaderboardRowProps) {
   const getMedalColor = (rank: number) => {
-    if (rank === 1) return 'from-yellow-500/20 to-yellow-600/20 border-yellow-500/30';
-    if (rank === 2) return 'from-gray-400/20 to-gray-500/20 border-gray-400/30';
-    if (rank === 3) return 'from-orange-600/20 to-orange-700/20 border-orange-600/30';
-    return 'from-slate-700/20 to-slate-800/20 border-slate-600/20';
+    if (rank === 1) return 'from-yellow-500/10 to-yellow-600/10 border-yellow-500/20';
+    if (rank === 2) return 'from-gray-400/10 to-gray-500/10 border-gray-400/20';
+    if (rank === 3) return 'from-orange-600/10 to-orange-700/10 border-orange-600/20';
+    return 'from-surface to-surface border-border';
   };
 
   const getMedalGlow = (rank: number) => {
-    if (rank === 1) return 'shadow-[0_0_20px_rgba(234,179,8,0.3)]';
-    if (rank === 2) return 'shadow-[0_0_20px_rgba(168,162,158,0.3)]';
-    if (rank === 3) return 'shadow-[0_0_20px_rgba(249,115,22,0.3)]';
+    if (rank === 1) return 'shadow-[0_0_20px_rgba(234,179,8,0.15)]';
+    if (rank === 2) return 'shadow-[0_0_20px_rgba(168,162,158,0.15)]';
+    if (rank === 3) return 'shadow-[0_0_20px_rgba(249,115,22,0.15)]';
     return '';
   };
 
@@ -37,8 +37,8 @@ export function LeaderboardRow({ entry, isCurrentUser = false, isMedal = false }
     <motion.div
       className={`relative group p-4 rounded-xl border transition-all ${
         isCurrentUser
-          ? `bg-gradient-to-r ${getMedalColor(entry.rank)} ${getMedalGlow(entry.rank)} border-gold/40`
-          : `bg-gradient-to-r ${getMedalColor(entry.rank)} hover:border-slate-500/40`
+          ? `bg-gradient-to-r ${getMedalColor(entry.rank)} ${getMedalGlow(entry.rank)} border-primary/40`
+          : `bg-gradient-to-r ${getMedalColor(entry.rank)} hover:border-border`
       }`}
       whileHover={{ scale: isCurrentUser ? 1.02 : 1.01 }}
       transition={{ type: 'spring', stiffness: 300 }}

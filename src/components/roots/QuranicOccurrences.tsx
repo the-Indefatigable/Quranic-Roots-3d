@@ -54,7 +54,7 @@ export function QuranicOccurrences({ occurrences: initial, totalAyahs, rootArabi
             {/* Location badge */}
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <Badge variant="gold">{occ.surahNumber}:{occ.ayahNumber}</Badge>
+                <Badge variant="amber">{occ.surahNumber}:{occ.ayahNumber}</Badge>
                 <span className="text-xs text-muted">{occ.surahName}</span>
               </div>
               <svg

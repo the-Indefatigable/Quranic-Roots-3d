@@ -152,7 +152,7 @@ export default function AdminPage() {
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-gold/30 border-t-gold rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
       </div>
     );
   }
@@ -161,8 +161,8 @@ export default function AdminPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <p className="text-white/60 mb-4">Admin access required</p>
-          <button onClick={() => router.push('/')} className="text-gold hover:underline">
+          <p className="text-text-secondary mb-4">Admin access required</p>
+          <button onClick={() => router.push('/')} className="text-primary hover:underline">
             Back to Home
           </button>
         </div>
@@ -174,8 +174,8 @@ export default function AdminPage() {
     <div className="min-h-screen py-6 px-4 max-w-6xl mx-auto">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-white">Admin Editor</h1>
-        <p className="text-sm text-white/40">Edit roots, nouns, particles, forms & conjugations</p>
+        <h1 className="text-2xl font-bold text-text">Admin Editor</h1>
+        <p className="text-sm text-text-tertiary">Edit roots, nouns, particles, forms & conjugations</p>
       </div>
 
       {/* Toast */}
@@ -190,15 +190,15 @@ export default function AdminPage() {
       )}
 
       {/* Tabs */}
-      <div className="flex gap-1 mb-4 bg-white/[0.04] rounded-xl p-1">
+      <div className="flex gap-1 mb-4 bg-surface rounded-xl p-1">
         {(['roots', 'nouns', 'particles'] as Tab[]).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
             className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all capitalize ${
               tab === t
-                ? 'bg-gold/20 text-gold'
-                : 'text-white/50 hover:text-white/70'
+                ? 'bg-primary/10 text-primary'
+                : 'text-text-secondary hover:text-text'
             }`}
           >
             {t}
@@ -212,24 +212,24 @@ export default function AdminPage() {
           type="text"
           placeholder={`Search ${tab}...`}
           onChange={(e) => debouncedSearch(e.target.value)}
-          className="w-full bg-card border border-white/[0.08] rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-gold/40"
+          className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-text placeholder-text-tertiary focus:outline-none focus:border-primary/40"
         />
         {loading && (
           <div className="absolute right-3 top-1/2 -translate-y-1/2">
-            <div className="w-4 h-4 border-2 border-gold/30 border-t-gold rounded-full animate-spin" />
+            <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
           </div>
         )}
       </div>
 
       {/* Results count + Pagination */}
-      <div className="flex items-center justify-between mb-3 text-xs text-white/40">
+      <div className="flex items-center justify-between mb-3 text-xs text-text-tertiary">
         <span>{total} results</span>
         {totalPages > 1 && (
           <div className="flex items-center gap-2">
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="px-2 py-1 rounded bg-white/[0.06] disabled:opacity-30 hover:bg-white/[0.1]"
+              className="px-2 py-1 rounded bg-border-light disabled:opacity-30 hover:bg-border-light"
             >
               Prev
             </button>
@@ -239,7 +239,7 @@ export default function AdminPage() {
             <button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
-              className="px-2 py-1 rounded bg-white/[0.06] disabled:opacity-30 hover:bg-white/[0.1]"
+              className="px-2 py-1 rounded bg-border-light disabled:opacity-30 hover:bg-border-light"
             >
               Next
             </button>
@@ -250,11 +250,11 @@ export default function AdminPage() {
       {/* Items List */}
       <div className="space-y-2">
         {items.map((item: any) => (
-          <div key={item.id} className="bg-card border border-white/[0.08] rounded-xl overflow-hidden">
+          <div key={item.id} className="bg-surface border border-border rounded-xl overflow-hidden">
             {/* Row header - clickable to expand */}
             <button
               onClick={() => setExpandedId(expandedId === item.id ? null : item.id)}
-              className="w-full text-left px-4 py-3 flex items-center gap-4 hover:bg-white/[0.02] transition-colors"
+              className="w-full text-left px-4 py-3 flex items-center gap-4 hover:bg-canvas transition-colors"
             >
               <span
                 className={`text-[10px] transition-transform ${
@@ -266,24 +266,24 @@ export default function AdminPage() {
 
               {tab === 'roots' && (
                 <>
-                  <span className="text-lg font-arabic text-gold min-w-[80px]">{item.root}</span>
-                  <span className="text-white/70 text-sm flex-1 truncate">{item.meaning}</span>
-                  <span className="text-white/30 text-xs">{item.forms?.length || 0} forms</span>
-                  <span className="text-white/20 text-xs">freq: {item.totalFreq}</span>
+                  <span className="text-lg font-arabic text-primary min-w-[80px]">{item.root}</span>
+                  <span className="text-text-secondary text-sm flex-1 truncate">{item.meaning}</span>
+                  <span className="text-text-tertiary text-xs">{item.forms?.length || 0} forms</span>
+                  <span className="text-text-tertiary text-xs">freq: {item.totalFreq}</span>
                 </>
               )}
               {tab === 'nouns' && (
                 <>
-                  <span className="text-lg font-arabic text-gold min-w-[80px]">{item.lemma}</span>
-                  <span className="text-white/70 text-sm flex-1 truncate">{item.meaning || '—'}</span>
-                  <span className="text-white/30 text-xs">{item.type}</span>
+                  <span className="text-lg font-arabic text-primary min-w-[80px]">{item.lemma}</span>
+                  <span className="text-text-secondary text-sm flex-1 truncate">{item.meaning || '—'}</span>
+                  <span className="text-text-tertiary text-xs">{item.type}</span>
                 </>
               )}
               {tab === 'particles' && (
                 <>
-                  <span className="text-lg font-arabic text-gold min-w-[80px]">{item.form}</span>
-                  <span className="text-white/70 text-sm flex-1 truncate">{item.meaning || '—'}</span>
-                  <span className="text-white/30 text-xs">{item.type}</span>
+                  <span className="text-lg font-arabic text-primary min-w-[80px]">{item.form}</span>
+                  <span className="text-text-secondary text-sm flex-1 truncate">{item.meaning || '—'}</span>
+                  <span className="text-text-tertiary text-xs">{item.type}</span>
                 </>
               )}
             </button>
@@ -306,7 +306,7 @@ export default function AdminPage() {
         ))}
 
         {!loading && items.length === 0 && (
-          <div className="text-center py-12 text-white/30">No results found</div>
+          <div className="text-center py-12 text-text-tertiary">No results found</div>
         )}
       </div>
     </div>
@@ -329,12 +329,12 @@ function InlineField({
   multiline?: boolean;
 }) {
   const base =
-    'w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-gold/40';
+    'w-full bg-surface border border-border rounded-lg px-3 py-2 text-sm text-text focus:outline-none focus:border-primary/40';
   const fontClass = arabic ? 'font-arabic text-right text-lg' : '';
 
   return (
     <div>
-      <label className="block text-[11px] uppercase tracking-wider text-white/30 mb-1">{label}</label>
+      <label className="block text-[11px] uppercase tracking-wider text-text-tertiary mb-1">{label}</label>
       {multiline ? (
         <textarea
           value={value}
@@ -367,7 +367,7 @@ function SaveButton({
     <button
       onClick={onClick}
       disabled={saving === id}
-      className="px-4 py-2 bg-gold/20 text-gold rounded-lg text-sm font-medium hover:bg-gold/30 transition-colors disabled:opacity-50"
+      className="px-4 py-2 bg-primary/10 text-primary rounded-lg text-sm font-medium hover:bg-primary/15 transition-colors disabled:opacity-50"
     >
       {saving === id ? 'Saving...' : 'Save Changes'}
     </button>
@@ -430,15 +430,15 @@ function FormEditor({
   const [showTenses, setShowTenses] = useState(false);
 
   return (
-    <div className="border border-white/[0.06] rounded-xl p-4 bg-white/[0.02]">
+    <div className="border border-border rounded-xl p-4 bg-canvas">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-semibold text-white/70">
+        <h3 className="text-sm font-semibold text-text-secondary">
           Form {form.formNumber}{' '}
-          <span className="font-arabic text-gold ml-2">{form.arabicPattern}</span>
+          <span className="font-arabic text-primary ml-2">{form.arabicPattern}</span>
         </h3>
         <button
           onClick={() => setShowTenses(!showTenses)}
-          className="text-xs text-white/40 hover:text-white/60"
+          className="text-xs text-text-tertiary hover:text-text-secondary"
         >
           {showTenses ? 'Hide' : 'Show'} Tenses ({form.tenses?.length || 0})
         </button>
@@ -517,9 +517,9 @@ function TenseEditor({
   };
 
   return (
-    <div className="mt-4 border border-white/[0.04] rounded-lg p-3 bg-white/[0.01]">
-      <h4 className="text-xs font-semibold text-white/50 mb-3">
-        {tense.type.toUpperCase()} — <span className="font-arabic text-gold">{tense.arabicName}</span>
+    <div className="mt-4 border border-border rounded-lg p-3 bg-canvas">
+      <h4 className="text-xs font-semibold text-text-secondary mb-3">
+        {tense.type.toUpperCase()} — <span className="font-arabic text-primary">{tense.arabicName}</span>
       </h4>
 
       <div className="grid grid-cols-2 gap-2 mb-3">
@@ -530,27 +530,27 @@ function TenseEditor({
       {/* Conjugations grid */}
       {conjugations.length > 0 && (
         <div className="space-y-1.5 mb-3">
-          <label className="block text-[11px] uppercase tracking-wider text-white/30">
+          <label className="block text-[11px] uppercase tracking-wider text-text-tertiary">
             Conjugations
           </label>
           <div className="grid gap-1.5">
             {conjugations.map((conj, i) => (
               <div key={i} className="flex items-center gap-2">
-                <span className="text-[11px] text-white/30 w-20 shrink-0">
+                <span className="text-[11px] text-text-tertiary w-20 shrink-0">
                   {PERSON_LABELS[conj.person] || conj.person}
                 </span>
                 <input
                   type="text"
                   value={conj.arabic}
                   onChange={(e) => updateConjugation(i, 'arabic', e.target.value)}
-                  className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded px-2 py-1.5 text-sm font-arabic text-right text-white focus:outline-none focus:border-gold/40"
+                  className="flex-1 bg-surface border border-border rounded px-2 py-1.5 text-sm font-arabic text-right text-text focus:outline-none focus:border-primary/40"
                 />
                 <input
                   type="text"
                   value={conj.transliteration || ''}
                   onChange={(e) => updateConjugation(i, 'transliteration', e.target.value)}
                   placeholder="translit."
-                  className="w-32 bg-white/[0.04] border border-white/[0.08] rounded px-2 py-1.5 text-sm text-white/60 focus:outline-none focus:border-gold/40"
+                  className="w-32 bg-surface border border-border rounded px-2 py-1.5 text-sm text-text-secondary focus:outline-none focus:border-gold/40"
                 />
               </div>
             ))}

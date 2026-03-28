@@ -5,12 +5,11 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/cn';
 import { useAuthStore } from '@/store/useAuthStore';
 
-// Mobile: 5 core tabs only
 const navItems = [
+  { href: '/learn',  label: 'Learn',  icon: LearnIcon },
   { href: '/quran',  label: 'Quran',  icon: BookIcon },
   { href: '/roots',  label: 'Roots',  icon: RootIcon },
-  { href: '/learn',  label: 'Learn',  icon: LearnIcon },
-  { href: '/quiz',   label: 'Quiz',   icon: QuizIcon, requiresAuth: true },
+  { href: '/search', label: 'Search', icon: SearchIcon },
   { href: '/admin',  label: 'Admin',  icon: AdminIcon, requiresAdmin: true },
 ];
 
@@ -19,7 +18,7 @@ export function BottomNav() {
   const { user, isLoading, setShowLoginModal } = useAuthStore();
 
   return (
-    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 glass-strong border-t border-white/[0.06] pb-[env(safe-area-inset-bottom)]">
+    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-surface border-t border-border pb-[env(safe-area-inset-bottom)]">
       <div className="flex items-center justify-around h-[58px]">
         {navItems.map((item) => {
           if ((item as any).requiresAuth && !user) return null;
@@ -32,23 +31,23 @@ export function BottomNav() {
               key={item.href}
               href={item.href}
               className={cn(
-                'relative flex flex-col items-center justify-center gap-[3px] px-3 py-1 transition-all duration-200 active:scale-95',
-                isActive ? 'text-gold' : 'text-white/28'
+                'relative flex flex-col items-center justify-center gap-[3px] px-3 py-1 transition-all duration-150 active:scale-95 interactive',
+                isActive ? 'text-primary' : 'text-text-tertiary'
               )}
             >
               {isActive && (
-                <span className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-[2px] rounded-b-full bg-gold shadow-[0_0_8px_rgba(232,184,109,0.8)]" />
+                <span className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-[2px] rounded-b-full bg-primary" />
               )}
               <item.icon
                 className={cn(
-                  'w-[19px] h-[19px] transition-all duration-200',
-                  isActive ? 'text-gold scale-110' : 'text-white/30'
+                  'w-[19px] h-[19px] transition-all duration-150',
+                  isActive ? 'text-primary scale-110' : 'text-text-tertiary'
                 )}
               />
               <span
                 className={cn(
-                  'text-[9.5px] tracking-wide transition-all duration-200',
-                  isActive ? 'font-bold text-gold' : 'font-medium text-white/28'
+                  'text-[9.5px] tracking-wide transition-all duration-150',
+                  isActive ? 'font-bold text-primary' : 'font-medium text-text-tertiary'
                 )}
               >
                 {item.label}
@@ -63,28 +62,28 @@ export function BottomNav() {
             <Link
               href="/profile"
               className={cn(
-                'relative flex flex-col items-center justify-center gap-[3px] px-3 py-1 transition-all duration-200 active:scale-95',
+                'relative flex flex-col items-center justify-center gap-[3px] px-3 py-1 transition-all duration-150 active:scale-95 interactive',
                 pathname.startsWith('/profile') || pathname.startsWith('/bookmarks') || pathname.startsWith('/review') || pathname.startsWith('/rewards')
-                  ? 'text-gold'
-                  : 'text-white/28'
+                  ? 'text-primary'
+                  : 'text-text-tertiary'
               )}
             >
               {(pathname.startsWith('/profile') || pathname.startsWith('/bookmarks') || pathname.startsWith('/review') || pathname.startsWith('/rewards')) && (
-                <span className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-[2px] rounded-b-full bg-gold shadow-[0_0_8px_rgba(232,184,109,0.8)]" />
+                <span className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-[2px] rounded-b-full bg-primary" />
               )}
               <div className={cn(
                 'w-[19px] h-[19px] rounded-full flex items-center justify-center',
                 pathname.startsWith('/profile') || pathname.startsWith('/bookmarks') || pathname.startsWith('/review') || pathname.startsWith('/rewards')
-                  ? 'bg-gold/30' : 'bg-gold/15'
+                  ? 'bg-primary/20' : 'bg-primary-light'
               )}>
-                <span className="text-[7px] font-bold text-gold uppercase leading-none">
+                <span className="text-[7px] font-bold text-primary uppercase leading-none">
                   {user.name?.[0] || user.email[0]}
                 </span>
               </div>
               <span className={cn(
                 'text-[9.5px] tracking-wide',
                 pathname.startsWith('/profile') || pathname.startsWith('/bookmarks') || pathname.startsWith('/review') || pathname.startsWith('/rewards')
-                  ? 'font-bold text-gold' : 'font-medium text-white/28'
+                  ? 'font-bold text-primary' : 'font-medium text-text-tertiary'
               )}>
                 You
               </span>
@@ -92,7 +91,7 @@ export function BottomNav() {
           ) : (
             <button
               onClick={() => setShowLoginModal(true)}
-              className="flex flex-col items-center justify-center gap-[3px] px-3 py-1 text-white/28 active:scale-95 transition-all"
+              className="flex flex-col items-center justify-center gap-[3px] px-3 py-1 text-text-tertiary active:scale-95 transition-all interactive"
             >
               <UserIcon className="w-[19px] h-[19px]" />
               <span className="text-[9.5px] font-medium tracking-wide">Sign in</span>
@@ -140,6 +139,14 @@ function QuizIcon({ className }: { className?: string }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  );
+}
+
+function SearchIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
     </svg>
   );
 }

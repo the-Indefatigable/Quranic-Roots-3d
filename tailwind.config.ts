@@ -5,30 +5,52 @@ const config: Config = {
     './app/**/*.{ts,tsx}',
     './src/**/*.{ts,tsx}',
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        background: '#020617', // slate-950
-        card: '#0F172A',       // slate-900
-        elevated: '#1E293B',   // slate-800
-        gold: {
-          DEFAULT: '#D4A574',
-          light: '#E8C9A0',
-          dim: 'rgba(212,165,116,0.15)',
+        canvas: 'var(--color-canvas)',
+        surface: 'var(--color-surface)',
+        primary: {
+          DEFAULT: 'var(--color-primary)',
+          hover: 'var(--color-primary-hover)',
+          light: 'var(--color-primary-light)',
         },
-        emerald: {
-          DEFAULT: '#00A86B',
+        accent: {
+          DEFAULT: 'var(--color-accent)',
+          light: 'var(--color-accent-light)',
         },
-        muted: 'rgba(255,255,255,0.55)',
-        'muted-more': 'rgba(255,255,255,0.30)',
-        border: 'rgba(255,255,255,0.06)',
+        correct: {
+          DEFAULT: 'var(--color-correct)',
+          light: 'var(--color-correct-light)',
+        },
+        wrong: {
+          DEFAULT: 'var(--color-wrong)',
+          light: 'var(--color-wrong-light)',
+        },
+        info: {
+          DEFAULT: 'var(--color-info)',
+          light: 'var(--color-info-light)',
+        },
+        text: {
+          DEFAULT: 'var(--color-text)',
+          secondary: 'var(--color-text-secondary)',
+          tertiary: 'var(--color-text-tertiary)',
+        },
+        border: {
+          DEFAULT: 'var(--color-border)',
+          light: 'var(--color-border-light)',
+        },
       },
       fontFamily: {
         sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
+        heading: ['var(--font-heading)', 'Georgia', 'serif'],
         arabic: ['var(--font-arabic)', 'serif'],
       },
-      fontSize: {
-        hero: ['3.5rem', { lineHeight: '1.1', letterSpacing: '-0.04em', fontWeight: '200' }],
+      boxShadow: {
+        card: 'var(--shadow-card)',
+        raised: 'var(--shadow-raised)',
+        modal: 'var(--shadow-modal)',
       },
       borderRadius: {
         '2xl': '1rem',

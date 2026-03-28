@@ -44,7 +44,7 @@ export function QuranSurahList() {
       {/* Search */}
       <div className="relative mb-5">
         <svg
-          className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/25 pointer-events-none"
+          className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary pointer-events-none"
           fill="none"
           viewBox="0 0 24 24"
           strokeWidth={1.5}
@@ -61,12 +61,12 @@ export function QuranSurahList() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search by name or number..."
-          className="w-full bg-card border border-white/[0.08] rounded-xl pl-10 pr-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-gold/40 transition-colors"
+          className="w-full bg-surface border border-border rounded-xl pl-10 pr-4 py-3 text-sm text-text placeholder-text-tertiary focus:outline-none focus:border-primary/40 transition-colors"
         />
         {query && (
           <button
             onClick={() => setQuery('')}
-            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60"
+            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-text-tertiary hover:text-text-secondary"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
@@ -82,7 +82,7 @@ export function QuranSurahList() {
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="text-center py-16 text-white/30 text-sm">
+        <div className="text-center py-16 text-text-tertiary text-sm">
           No surahs matching &ldquo;{query}&rdquo;
         </div>
       ) : (
@@ -91,24 +91,24 @@ export function QuranSurahList() {
             <Link
               key={surah.number}
               href={`/quran/${surah.number}`}
-              className="group flex items-center gap-4 bg-card border border-border rounded-2xl px-5 py-4 transition-colors hover:border-white/[0.12] hover:bg-elevated"
+              className="group flex items-center gap-4 bg-surface border border-border rounded-2xl px-5 py-4 transition-colors hover:border-border hover:bg-surface shadow-card"
             >
-              <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gold-dim text-gold text-sm font-medium">
+              <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary-light text-primary text-sm font-medium">
                 {surah.number}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium text-white truncate">
+                  <p className="text-sm font-medium text-text truncate">
                     {surah.englishName}
                   </p>
-                  <span className="font-arabic text-lg text-gold ml-2 shrink-0">
+                  <span className="font-arabic text-lg text-primary ml-2 shrink-0">
                     {surah.arabicName}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 mt-0.5">
                   <Badge>{surah.versesCount} ayahs</Badge>
                   {surah.revelationType && (
-                    <Badge variant={surah.revelationType === 'makkah' ? 'gold' : 'emerald'}>
+                    <Badge variant={surah.revelationType === 'makkah' ? 'amber' : 'emerald'}>
                       {surah.revelationType === 'makkah' ? 'Meccan' : 'Medinan'}
                     </Badge>
                   )}

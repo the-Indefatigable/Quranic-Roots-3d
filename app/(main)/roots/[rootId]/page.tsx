@@ -295,7 +295,7 @@ export default async function RootDetailPage({ params }: Props) {
         </ArabicText>
         <p className="text-lg text-muted mb-3">{root.meaning}</p>
         <div className="flex items-center justify-center gap-3 flex-wrap">
-          <Badge variant="gold">{root.totalFreq} occurrences</Badge>
+          <Badge variant="amber">{root.totalFreq} occurrences</Badge>
           <Badge>{formsData.length} form{formsData.length !== 1 ? 's' : ''}</Badge>
           {totalAyahs > 0 && <Badge variant="emerald">{totalAyahs} ayahs</Badge>}
           {nounRows.length > 0 && <Badge>{nounRows.length} noun{nounRows.length !== 1 ? 's' : ''}</Badge>}
@@ -341,7 +341,7 @@ export default async function RootDetailPage({ params }: Props) {
                     <span className="text-xs text-muted">{noun.meaning}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge variant="gold">{nounTypeLabels[noun.type] || noun.type}</Badge>
+                    <Badge variant="amber">{nounTypeLabels[noun.type] || noun.type}</Badge>
                     {noun.totalFreq && noun.totalFreq > 0 && (
                       <span className="text-[10px] text-muted-more">{noun.totalFreq}x</span>
                     )}

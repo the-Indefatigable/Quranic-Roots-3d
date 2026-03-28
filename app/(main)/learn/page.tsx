@@ -83,13 +83,13 @@ export default function LearnPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <div className="max-w-3xl mx-auto px-4 py-12">
-        <p className="text-xs font-semibold uppercase tracking-widest text-gold mb-4">
+        <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-4">
           Free Lessons
         </p>
-        <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight mb-3">
+        <h1 className="text-3xl sm:text-4xl font-bold text-text tracking-tight mb-3">
           Learn Quranic Arabic Grammar
         </h1>
-        <p className="text-white/50 text-base sm:text-lg leading-relaxed mb-12 max-w-2xl">
+        <p className="text-text-secondary text-base sm:text-lg leading-relaxed mb-12 max-w-2xl">
           Structured lessons covering the essential grammar you need to understand the Quran in its original Arabic.
           Each topic includes Quranic examples and clear explanations.
         </p>
@@ -99,11 +99,11 @@ export default function LearnPage() {
             <Link
               key={topic.href}
               href={topic.href}
-              className="block group rounded-2xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/[0.12] transition-all duration-200 p-6"
+              className="block group rounded-2xl border border-border bg-surface hover:bg-surface hover:shadow-card transition-all duration-200 p-6"
             >
               <div className="flex items-start justify-between gap-4 mb-2">
                 <div>
-                  <span className="text-2xl font-arabic text-gold/70 leading-none">{topic.arabic}</span>
+                  <span className="text-2xl font-arabic text-primary leading-none">{topic.arabic}</span>
                 </div>
                 <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full shrink-0 ${
                   topic.level === 'Essential'

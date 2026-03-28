@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 
 const HomepageClient = dynamic(
   () => import('@/components/home/HomepageClient').then((m) => ({ default: m.HomepageClient })),
-  { loading: () => <div className="min-h-screen bg-background" /> }
+  { loading: () => <div className="min-h-screen bg-canvas" /> }
 );
 
 export default function HomePage() {

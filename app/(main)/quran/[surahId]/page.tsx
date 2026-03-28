@@ -158,7 +158,7 @@ export default async function SurahPage({ params }: Props) {
           {prevSurah ? (
             <Link
               href={`/quran/${prevSurah.number}`}
-              className="flex items-center gap-1.5 text-muted-more hover:text-white transition-colors text-sm p-2 -m-2"
+              className="flex items-center gap-1.5 text-text-tertiary hover:text-text transition-colors text-sm p-2 -m-2"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
@@ -168,12 +168,12 @@ export default async function SurahPage({ params }: Props) {
           ) : <div className="w-16" />}
 
           <div>
-            <p className="font-arabic text-2xl sm:text-3xl text-gold mb-1">{surah.arabicName}</p>
-            <h1 className="text-lg sm:text-xl font-light text-white">{surah.englishName}</h1>
-            <p className="text-sm text-muted mt-1">
+            <p className="font-arabic text-2xl sm:text-3xl text-primary mb-1">{surah.arabicName}</p>
+            <h1 className="text-lg sm:text-xl font-light text-text">{surah.englishName}</h1>
+            <p className="text-sm text-text-secondary mt-1">
               {surah.versesCount} Ayahs
               {surah.revelationType && (
-                <span className="text-muted-more"> &middot; {surah.revelationType === 'makkah' ? 'Meccan' : 'Medinan'}</span>
+                <span className="text-text-tertiary"> &middot; {surah.revelationType === 'makkah' ? 'Meccan' : 'Medinan'}</span>
               )}
             </p>
           </div>
@@ -181,7 +181,7 @@ export default async function SurahPage({ params }: Props) {
           {nextSurah ? (
             <Link
               href={`/quran/${nextSurah.number}`}
-              className="flex items-center gap-1.5 text-muted-more hover:text-white transition-colors text-sm p-2 -m-2"
+              className="flex items-center gap-1.5 text-text-tertiary hover:text-text transition-colors text-sm p-2 -m-2"
             >
               <span className="hidden sm:inline">{nextSurah.englishName}</span>
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -192,7 +192,7 @@ export default async function SurahPage({ params }: Props) {
         </div>
 
         {surahNumber !== 9 && surahNumber !== 1 && (
-          <p className="font-arabic text-xl text-muted/60 mb-6">بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ</p>
+          <p className="font-arabic text-xl text-text-tertiary mb-6">بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ</p>
         )}
       </div>
 
@@ -202,7 +202,7 @@ export default async function SurahPage({ params }: Props) {
       {/* Bottom navigation */}
       <div className="flex items-center justify-between mt-12 pt-8 border-t border-border">
         {prevSurah ? (
-          <Link href={`/quran/${prevSurah.number}`} className="flex items-center gap-2 text-sm text-muted hover:text-white transition-colors">
+          <Link href={`/quran/${prevSurah.number}`} className="flex items-center gap-2 text-sm text-text-secondary hover:text-text transition-colors">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
             </svg>
@@ -210,7 +210,7 @@ export default async function SurahPage({ params }: Props) {
           </Link>
         ) : <div />}
         {nextSurah ? (
-          <Link href={`/quran/${nextSurah.number}`} className="flex items-center gap-2 text-sm text-muted hover:text-white transition-colors">
+          <Link href={`/quran/${nextSurah.number}`} className="flex items-center gap-2 text-sm text-text-secondary hover:text-text transition-colors">
             {nextSurah.englishName}
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />

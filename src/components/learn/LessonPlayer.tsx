@@ -200,7 +200,7 @@ export function LessonPlayer({
             exit={{ opacity: 0 }}
             className="text-center py-1"
           >
-            <span className="text-sm font-bold" style={{ color: '#FFC800' }}>
+            <span className="text-sm font-bold" style={{ color: '#D97706' }}>
               🔥 {combo}x Combo!
             </span>
           </motion.div>

@@ -43,7 +43,7 @@ export function LessonPageClient({ lessonId }: { lessonId: string }) {
     return (
       <div className="fixed inset-0 bg-[#131F24] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-[#58CC02] border-t-transparent rounded-full animate-spin" />
+          <div className="w-12 h-12 border-4 border-[#0D9488] border-t-transparent rounded-full animate-spin" />
           <p className="text-white/50 text-sm">Loading lesson...</p>
         </div>
       </div>
@@ -57,7 +57,7 @@ export function LessonPageClient({ lessonId }: { lessonId: string }) {
           <p className="text-red-400 mb-4">{error || 'Lesson not found'}</p>
           <button
             onClick={() => router.push('/learn/path')}
-            className="px-6 py-3 rounded-2xl bg-[#1CB0F6] text-white font-bold"
+            className="px-6 py-3 rounded-2xl bg-[#0D9488] text-white font-bold"
           >
             Back to Path
           </button>

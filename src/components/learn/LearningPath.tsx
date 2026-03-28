@@ -46,8 +46,8 @@ interface LearningPathProps {
   units: PathUnit[];
 }
 
-// Zigzag offsets for nodes — alternating left/center/right
-const ZIGZAG_OFFSETS = [0, 60, 0, -60, 0, 60, 0, -60];
+// Zigzag offsets for nodes — gentler alternating left/center/right
+const ZIGZAG_OFFSETS = [0, 50, 0, -50, 0, 50, 0, -50];
 
 export function LearningPath({ units }: LearningPathProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -77,10 +77,7 @@ export function LearningPath({ units }: LearningPathProps) {
 
   return (
     <div ref={scrollRef} className="relative w-full max-w-md mx-auto py-8 px-4">
-      {/* Dotted path line */}
-      <div className="absolute left-1/2 top-0 bottom-0 w-0.5 border-l-2 border-dashed border-white/10 -translate-x-1/2 z-0" />
-
-      <div className="relative z-10 flex flex-col items-center gap-1">
+      <div className="relative z-10 flex flex-col items-center gap-3">
         {nodes.map((node, i) => {
           const offset = ZIGZAG_OFFSETS[i % ZIGZAG_OFFSETS.length];
           const isActive = node.lesson?.progress.status === 'available' || node.lesson?.progress.status === 'in_progress';
@@ -106,7 +103,7 @@ export function LearningPath({ units }: LearningPathProps) {
               initial={{ opacity: 0, scale: 0.8, x: offset }}
               animate={{ opacity: 1, scale: 1, x: offset }}
               transition={{ delay: i * 0.03, type: 'spring', stiffness: 300, damping: 25 }}
-              className="my-2"
+              className="my-3"
             >
               <PathNode
                 lesson={node.lesson!}

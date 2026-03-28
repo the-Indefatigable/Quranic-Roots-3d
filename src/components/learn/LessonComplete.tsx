@@ -76,7 +76,7 @@ export function LessonComplete({ data, onContinue }: LessonCompleteProps) {
               }}
               className="absolute w-3 h-3 rounded-sm"
               style={{
-                backgroundColor: ['#58CC02', '#1CB0F6', '#FFC800', '#FF4B4B', '#CE82FF'][i % 5],
+                backgroundColor: ['#0D9488', '#1CB0F6', '#D97706', '#059669', '#CE82FF'][i % 5],
               }}
             />
           ))}
@@ -110,8 +110,8 @@ export function LessonComplete({ data, onContinue }: LessonCompleteProps) {
           transition={{ delay: 0.5 }}
           className="flex items-center justify-center gap-3 my-6"
         >
-          <div className="px-6 py-3 rounded-2xl bg-[#FFC800]/10 border border-[#FFC800]/30">
-            <span className="text-3xl font-bold text-[#FFC800]">+{xpEarned} XP</span>
+          <div className="px-6 py-3 rounded-2xl bg-[#D97706]/10 border border-[#D97706]/30">
+            <span className="text-3xl font-bold text-[#D97706]">+{xpEarned} XP</span>
           </div>
         </motion.div>
 
@@ -128,7 +128,7 @@ export function LessonComplete({ data, onContinue }: LessonCompleteProps) {
           </div>
           {streak?.currentStreak && streak.currentStreak > 0 && (
             <div className="text-center">
-              <p className="text-2xl font-bold text-[#FF9600]">🔥 {streak.currentStreak}</p>
+              <p className="text-2xl font-bold text-[#D97706]">🔥 {streak.currentStreak}</p>
               <p className="text-xs text-white/40">Day Streak</p>
             </div>
           )}
@@ -157,9 +157,9 @@ export function LessonComplete({ data, onContinue }: LessonCompleteProps) {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 1.0 }}
-            className="mb-4 px-4 py-2 rounded-full bg-[#FF9600]/10 border border-[#FF9600]/30 inline-block"
+            className="mb-4 px-4 py-2 rounded-full bg-[#D97706]/10 border border-[#D97706]/30 inline-block"
           >
-            <span className="text-sm text-[#FF9600] font-bold">🔥 {streak.milestoneReached}-Day Streak!</span>
+            <span className="text-sm text-[#D97706] font-bold">🔥 {streak.milestoneReached}-Day Streak!</span>
           </motion.div>
         )}
 
@@ -169,7 +169,7 @@ export function LessonComplete({ data, onContinue }: LessonCompleteProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.0 }}
           onClick={onContinue}
-          className="w-full max-w-xs py-4 rounded-2xl bg-[#58CC02] text-white font-bold text-lg shadow-[0_4px_0_#46a302] hover:shadow-[0_2px_0_#46a302] hover:translate-y-[2px] active:shadow-none active:translate-y-[4px] transition-all mt-4"
+          className="w-full max-w-xs py-4 rounded-2xl bg-[#0D9488] text-white font-bold text-lg shadow-[0_4px_0_#0a756b] hover:shadow-[0_2px_0_#0a756b] hover:translate-y-[2px] active:shadow-none active:translate-y-[4px] transition-all mt-4"
         >
           Continue
         </motion.button>

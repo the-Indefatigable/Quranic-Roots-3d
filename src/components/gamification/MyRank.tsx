@@ -20,7 +20,7 @@ export function MyRank({ entry }: MyRankProps) {
 
   return (
     <motion.div
-      className="mb-8 p-6 rounded-2xl bg-gradient-to-r from-gold/15 to-gold/5 border border-gold/30 backdrop-blur"
+      className="mb-8 p-6 rounded-2xl bg-gradient-to-r from-primary-light to-primary-light/50 border border-primary/30"
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
     >
@@ -36,18 +36,18 @@ export function MyRank({ entry }: MyRankProps) {
               {medalEmojis[entry.rank - 1]}
             </motion.div>
           ) : (
-            <div className="w-16 h-16 rounded-full bg-gold/20 border-2 border-gold/40 flex items-center justify-center">
-              <span className="text-2xl font-bold text-gold">#{entry.rank}</span>
+            <div className="w-16 h-16 rounded-full bg-primary-light border-2 border-primary/40 flex items-center justify-center">
+              <span className="text-2xl font-bold text-primary">#{entry.rank}</span>
             </div>
           )}
 
           {/* Info */}
           <div>
-            <p className="text-xs text-slate-400 uppercase tracking-wider">Your Rank</p>
-            <p className="text-2xl font-bold text-white mt-1">
+            <p className="text-xs text-text-tertiary uppercase tracking-wider">Your Rank</p>
+            <p className="text-2xl font-bold text-text mt-1">
               {isTopThree ? `#${entry.rank} 🎉` : `#${entry.rank}`}
             </p>
-            <p className="text-sm text-slate-300 mt-1">Level {entry.userLevel}</p>
+            <p className="text-sm text-text-secondary mt-1">Level {entry.userLevel}</p>
           </div>
         </div>
 
@@ -58,20 +58,20 @@ export function MyRank({ entry }: MyRankProps) {
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <p className="text-3xl font-bold text-gold">{entry.totalXP.toLocaleString()}</p>
-          <p className="text-xs text-slate-400 mt-1">Total XP</p>
+          <p className="text-3xl font-bold text-primary">{entry.totalXP.toLocaleString()}</p>
+          <p className="text-xs text-text-tertiary mt-1">Total XP</p>
         </motion.div>
       </div>
 
       {/* Top 3 Message */}
       {isTopThree && (
         <motion.div
-          className="mt-4 p-3 rounded-lg bg-white/5 border border-gold/20"
+          className="mt-4 p-3 rounded-lg bg-primary-light border border-primary/20"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
         >
-          <p className="text-sm text-gold font-semibold">
+          <p className="text-sm text-primary font-semibold">
             {entry.rank === 1
               ? '🌟 You\'re on top! Keep the momentum going!'
               : '🚀 Amazing! You\'re in the top 3!'}

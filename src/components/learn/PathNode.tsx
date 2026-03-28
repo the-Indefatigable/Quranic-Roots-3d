@@ -30,54 +30,53 @@ export function PathNode({ lesson, unit, isCheckpoint }: PathNodeProps) {
 
   const crown = getCrown();
 
-  // Colors based on state
-  const nodeColor = isLocked
-    ? '#334155'
-    : isLegendary
-    ? '#9B59B6'
-    : isCompleted
-    ? unit.color
-    : isAvailable
-    ? unit.color
-    : '#334155';
-
-  const bgColor = isLocked
-    ? '#1E293B'
-    : isCompleted
-    ? nodeColor + '20'
-    : isAvailable
-    ? nodeColor + '30'
-    : '#1E293B';
-
   const content = (
     <div className="flex flex-col items-center gap-1.5">
       {/* Node circle */}
       <div className="relative">
+        {/* Crown badge above completed nodes */}
+        {isCompleted && crown && (
+          <div className="absolute -top-5 left-1/2 -translate-x-1/2 text-lg z-10">
+            {crown}
+          </div>
+        )}
+
         <motion.div
-          className="w-16 h-16 rounded-full flex items-center justify-center border-4 relative"
-          style={{
-            borderColor: nodeColor,
-            backgroundColor: bgColor,
-          }}
+          className={`w-16 h-16 rounded-full flex items-center justify-center border-4 relative ${
+            isLocked
+              ? 'border-stone-200 bg-stone-100'
+              : isCompleted
+              ? 'bg-primary border-primary'
+              : isAvailable
+              ? 'bg-surface border-primary'
+              : 'border-stone-200 bg-stone-100'
+          } ${isAvailable ? 'shadow-[0_0_20px_rgba(13,148,136,0.3)]' : ''}`}
+          style={
+            isCompleted
+              ? { backgroundColor: unit.color, borderColor: unit.color }
+              : undefined
+          }
           animate={
             isAvailable
-              ? { scale: [1, 1.08, 1], boxShadow: [`0 0 0px ${nodeColor}`, `0 0 20px ${nodeColor}80`, `0 0 0px ${nodeColor}`] }
+              ? { scale: [1, 1.06, 1] }
               : {}
           }
-          transition={isAvailable ? { duration: 2, repeat: Infinity, ease: 'easeInOut' } : {}}
+          transition={isAvailable ? { duration: 2.5, repeat: Infinity, ease: 'easeInOut' } : {}}
         >
           {isLocked && (
-            <svg className="w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
           )}
           {isAvailable && (
-            <svg className="w-7 h-7" fill={nodeColor} viewBox="0 0 24 24">
+            <svg className="w-7 h-7 text-primary" fill="currentColor" viewBox="0 0 24 24">
               <path d="M8 5v14l11-7z" />
             </svg>
           )}
-          {isCompleted && crown && (
-            <span className="text-2xl">{crown}</span>
+          {isCompleted && (
+            <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+            </svg>
           )}
           {isCheckpoint && !isLocked && !isCompleted && (
             <span className="text-2xl">🏰</span>
@@ -89,10 +88,7 @@ export function PathNode({ lesson, unit, isCheckpoint }: PathNodeProps) {
 
         {/* XP badge */}
         {isAvailable && (
-          <div
-            className="absolute -bottom-1 -right-1 text-[10px] font-bold px-1.5 py-0.5 rounded-full text-white"
-            style={{ backgroundColor: nodeColor }}
-          >
+          <div className="absolute -bottom-1 -right-1 text-[10px] font-bold px-1.5 py-0.5 rounded-full text-white bg-primary">
             +{lesson.xpReward}
           </div>
         )}
@@ -100,8 +96,9 @@ export function PathNode({ lesson, unit, isCheckpoint }: PathNodeProps) {
 
       {/* Label */}
       <span
-        className="text-xs font-medium text-center max-w-[100px] leading-tight"
-        style={{ color: isLocked ? '#475569' : '#E2E8F0' }}
+        className={`text-xs font-medium text-center max-w-[100px] leading-tight ${
+          isLocked ? 'text-text-secondary' : 'text-text'
+        }`}
       >
         {lesson.title}
       </span>
@@ -109,7 +106,7 @@ export function PathNode({ lesson, unit, isCheckpoint }: PathNodeProps) {
   );
 
   if (isLocked) {
-    return <div className="cursor-not-allowed opacity-60">{content}</div>;
+    return <div className="cursor-not-allowed opacity-50">{content}</div>;
   }
 
   return (

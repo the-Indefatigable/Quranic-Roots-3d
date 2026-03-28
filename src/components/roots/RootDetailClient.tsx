@@ -63,7 +63,7 @@ export function RootDetailClient({ forms }: { forms: FormData[] }) {
 
               <div className="flex items-center gap-3">
                 {totalOccurrences > 0 && (
-                  <Badge variant="gold">{totalOccurrences}x</Badge>
+                  <Badge variant="amber">{totalOccurrences}x</Badge>
                 )}
                 <svg
                   className={`w-4 h-4 text-muted-more transition-transform ${isOpen ? 'rotate-180' : ''}`}

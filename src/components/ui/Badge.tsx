@@ -2,14 +2,17 @@ import { cn } from '@/lib/cn';
 
 interface BadgeProps {
   children: React.ReactNode;
-  variant?: 'default' | 'gold' | 'emerald';
+  variant?: 'default' | 'emerald' | 'amber' | 'red' | 'sky' | 'stone';
   className?: string;
 }
 
 const variants = {
-  default: 'bg-white/[0.06] text-muted',
-  gold: 'bg-gold-dim text-gold',
-  emerald: 'bg-emerald/10 text-emerald',
+  default: 'bg-canvas text-text-secondary',
+  emerald: 'bg-correct-light text-correct',
+  amber: 'bg-accent-light text-accent',
+  red: 'bg-wrong-light text-wrong',
+  sky: 'bg-info-light text-info',
+  stone: 'bg-border-light text-text-tertiary',
 };
 
 export function Badge({ children, variant = 'default', className }: BadgeProps) {

@@ -154,51 +154,51 @@ export default function VerbFormsPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <article className="max-w-3xl mx-auto px-4 py-12">
-        <nav className="flex items-center gap-2 text-xs text-white/30 mb-8">
-          <Link href="/learn" className="hover:text-white/60 transition-colors">Learn</Link>
+        <nav className="flex items-center gap-2 text-xs text-text-tertiary mb-8">
+          <Link href="/learn" className="hover:text-text-secondary transition-colors">Learn</Link>
           <span>/</span>
-          <span className="text-white/50">Verb Forms</span>
+          <span className="text-text-secondary">Verb Forms</span>
         </nav>
 
-        <p className="text-4xl font-arabic text-gold/70 mb-3">أوزان الفعل</p>
-        <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight mb-4">
+        <p className="text-4xl font-arabic text-primary mb-3">أوزان الفعل</p>
+        <h1 className="text-3xl sm:text-4xl font-bold text-text tracking-tight mb-4">
           The 10 Arabic Verb Forms
         </h1>
-        <p className="text-white/50 text-lg leading-relaxed mb-4">
+        <p className="text-text-secondary text-lg leading-relaxed mb-4">
           Arabic verbs follow patterns called <em>awzaan</em> (أوزان, singular: <em>wazn</em>). Each three-letter root can be plugged into up to 10 different verb forms, each modifying the base meaning in a predictable way. Mastering these patterns lets you decode unfamiliar words instantly.
         </p>
-        <p className="text-white/45 text-base leading-relaxed mb-10">
-          The template uses the letters <strong className="font-arabic text-white/60">ف ع ل</strong> (fa-&apos;ain-lam) as placeholders. Form I is <strong className="font-arabic text-white/60">فَعَلَ</strong>, and each subsequent form adds prefixes, doubles letters, or inserts vowels according to its pattern.
+        <p className="text-text-secondary text-base leading-relaxed mb-10">
+          The template uses the letters <strong className="font-arabic text-text-secondary">ف ع ل</strong> (fa-&apos;ain-lam) as placeholders. Form I is <strong className="font-arabic text-text-secondary">فَعَلَ</strong>, and each subsequent form adds prefixes, doubles letters, or inserts vowels according to its pattern.
         </p>
 
         {/* Forms Grid */}
         <div className="space-y-4 mb-12">
           {forms.map((f) => (
-            <div key={f.num} className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6">
+            <div key={f.num} className="rounded-2xl border border-border bg-surface p-6">
               <div className="flex items-start justify-between gap-4 mb-3">
                 <div>
-                  <span className="text-xs font-bold text-gold/50 uppercase tracking-wider">Form {f.num}</span>
+                  <span className="text-xs font-bold text-primary/70 uppercase tracking-wider">Form {f.num}</span>
                   <div className="flex items-baseline gap-3 mt-1">
-                    <span className="font-arabic text-2xl text-white/80" dir="rtl">{f.pattern}</span>
-                    <span className="text-sm text-white/25">{f.patternLatin}</span>
+                    <span className="font-arabic text-2xl text-text" dir="rtl">{f.pattern}</span>
+                    <span className="text-sm text-text-tertiary">{f.patternLatin}</span>
                   </div>
                 </div>
-                <span className="text-xs text-white/20 font-mono shrink-0">{f.root}</span>
+                <span className="text-xs text-text-tertiary font-mono shrink-0">{f.root}</span>
               </div>
 
-              <p className="text-sm text-white/50 mb-4">{f.meaning}</p>
+              <p className="text-sm text-text-secondary mb-4">{f.meaning}</p>
 
               <div className="flex items-center gap-4 mb-4">
                 <div className="text-center">
-                  <p className="font-arabic text-lg text-white/70" dir="rtl">{f.example}</p>
-                  <p className="text-[10px] text-white/25">{f.exampleMeaning}</p>
+                  <p className="font-arabic text-lg text-text" dir="rtl">{f.example}</p>
+                  <p className="text-[10px] text-text-tertiary">{f.exampleMeaning}</p>
                 </div>
               </div>
 
-              <div className="rounded-xl bg-white/[0.02] border border-white/[0.04] p-4">
-                <p className="font-arabic text-lg text-white/70 text-right leading-loose mb-2" dir="rtl">{f.quranic}</p>
-                <p className="text-xs text-white/30">
-                  <span className="text-white/20">{f.ref}</span> — {f.refMeaning}
+              <div className="rounded-xl bg-surface border border-border p-4">
+                <p className="font-arabic text-lg text-text text-right leading-loose mb-2" dir="rtl">{f.quranic}</p>
+                <p className="text-xs text-text-tertiary">
+                  <span className="text-text-tertiary">{f.ref}</span> — {f.refMeaning}
                 </p>
               </div>
             </div>
@@ -207,38 +207,38 @@ export default function VerbFormsPage() {
 
         {/* Pattern Recognition Tips */}
         <section className="mb-12">
-          <h2 className="text-xl font-semibold text-white mb-4">How to Recognize Forms Quickly</h2>
-          <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5">
-            <ul className="space-y-2 text-sm text-white/45 leading-relaxed">
-              <li><strong className="text-white/60">Doubled middle letter?</strong> → Form II</li>
-              <li><strong className="text-white/60">Alif after first root letter?</strong> → Form III</li>
-              <li><strong className="text-white/60">Hamza prefix (أَ)?</strong> → Form IV</li>
-              <li><strong className="text-white/60">تَ prefix + doubled middle?</strong> → Form V</li>
-              <li><strong className="text-white/60">تَ prefix + alif after first root?</strong> → Form VI</li>
-              <li><strong className="text-white/60">اِنْ prefix?</strong> → Form VII</li>
-              <li><strong className="text-white/60">تَ inserted after first root letter?</strong> → Form VIII</li>
-              <li><strong className="text-white/60">Doubled final letter?</strong> → Form IX</li>
-              <li><strong className="text-white/60">اِسْتَ prefix?</strong> → Form X</li>
+          <h2 className="text-xl font-semibold text-text mb-4">How to Recognize Forms Quickly</h2>
+          <div className="rounded-xl border border-border bg-surface p-5">
+            <ul className="space-y-2 text-sm text-text-secondary leading-relaxed">
+              <li><strong className="text-text-secondary">Doubled middle letter?</strong> → Form II</li>
+              <li><strong className="text-text-secondary">Alif after first root letter?</strong> → Form III</li>
+              <li><strong className="text-text-secondary">Hamza prefix (أَ)?</strong> → Form IV</li>
+              <li><strong className="text-text-secondary">تَ prefix + doubled middle?</strong> → Form V</li>
+              <li><strong className="text-text-secondary">تَ prefix + alif after first root?</strong> → Form VI</li>
+              <li><strong className="text-text-secondary">اِنْ prefix?</strong> → Form VII</li>
+              <li><strong className="text-text-secondary">تَ inserted after first root letter?</strong> → Form VIII</li>
+              <li><strong className="text-text-secondary">Doubled final letter?</strong> → Form IX</li>
+              <li><strong className="text-text-secondary">اِسْتَ prefix?</strong> → Form X</li>
             </ul>
           </div>
         </section>
 
         {/* Key Takeaways */}
         <section className="mb-12">
-          <h2 className="text-xl font-semibold text-white mb-4">Key Takeaways</h2>
-          <ul className="space-y-2 text-sm text-white/45 leading-relaxed">
-            <li className="flex gap-2"><span className="text-gold/60 shrink-0">1.</span> Arabic has 10 verb forms, each modifying the root meaning in a predictable way.</li>
-            <li className="flex gap-2"><span className="text-gold/60 shrink-0">2.</span> Forms I–IV are the most common in the Quran. Forms V–X appear less frequently but are still important.</li>
-            <li className="flex gap-2"><span className="text-gold/60 shrink-0">3.</span> Learning the patterns lets you decode new words — if you know the root and the form, you can guess the meaning.</li>
-            <li className="flex gap-2"><span className="text-gold/60 shrink-0">4.</span> Use the <Link href="/roots" className="text-gold/70 hover:text-gold underline">Roots Browser</Link> on QuRoots to explore all verb forms for any root.</li>
+          <h2 className="text-xl font-semibold text-text mb-4">Key Takeaways</h2>
+          <ul className="space-y-2 text-sm text-text-secondary leading-relaxed">
+            <li className="flex gap-2"><span className="text-primary shrink-0">1.</span> Arabic has 10 verb forms, each modifying the root meaning in a predictable way.</li>
+            <li className="flex gap-2"><span className="text-primary shrink-0">2.</span> Forms I–IV are the most common in the Quran. Forms V–X appear less frequently but are still important.</li>
+            <li className="flex gap-2"><span className="text-primary shrink-0">3.</span> Learning the patterns lets you decode new words — if you know the root and the form, you can guess the meaning.</li>
+            <li className="flex gap-2"><span className="text-primary shrink-0">4.</span> Use the <Link href="/roots" className="text-primary hover:text-primary underline">Roots Browser</Link> on QuRoots to explore all verb forms for any root.</li>
           </ul>
         </section>
 
         <div className="flex items-center justify-between pt-8 border-t border-white/[0.06]">
-          <Link href="/learn/adad" className="text-sm text-white/30 hover:text-white/60 transition-colors">
+          <Link href="/learn/adad" className="text-sm text-text-tertiary hover:text-text-secondary transition-colors">
             &larr; Numbers in Arabic
           </Link>
-          <Link href="/learn" className="text-sm text-gold/70 hover:text-gold transition-colors">
+          <Link href="/learn" className="text-sm text-primary hover:text-primary transition-colors">
             All Lessons &rarr;
           </Link>
         </div>

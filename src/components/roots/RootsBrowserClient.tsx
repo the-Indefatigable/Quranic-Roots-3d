@@ -226,7 +226,7 @@ export function RootsBrowserClient({
                         {root.formCount} form{root.formCount !== 1 ? 's' : ''}
                       </span>
                     )}
-                    <Badge variant="gold">{root.totalFreq}x</Badge>
+                    <Badge variant="amber">{root.totalFreq}x</Badge>
                   </div>
                 </div>
                 <p className="text-sm text-muted line-clamp-2">{root.meaning}</p>
@@ -249,7 +249,7 @@ export function RootsBrowserClient({
                 </div>
                 <p className="text-sm text-muted line-clamp-1 mb-2">{noun.meaning}</p>
                 <div className="flex items-center gap-2">
-                  <Badge variant="gold">{nounTypeLabels[noun.type] || noun.type}</Badge>
+                  <Badge variant="amber">{nounTypeLabels[noun.type] || noun.type}</Badge>
                   {noun.root && (
                     <Link
                       href={`/roots/${encodeURIComponent(noun.root)}`}

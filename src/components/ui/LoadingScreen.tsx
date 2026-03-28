@@ -16,7 +16,7 @@ export function LoadingScreen({ message }: { message?: string }) {
         {[0, 1, 2].map((i) => (
           <motion.div
             key={i}
-            className="w-1.5 h-1.5 rounded-full bg-gold/60"
+            className="w-1.5 h-1.5 rounded-full bg-primary/60"
             animate={{ opacity: [0.2, 1, 0.2], scale: [0.8, 1.1, 0.8] }}
             transition={{
               duration: 1.2,
@@ -33,7 +33,7 @@ export function LoadingScreen({ message }: { message?: string }) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, delay: 0.3 }}
-        className="font-arabic text-2xl sm:text-3xl text-gold/60 mb-3 text-center leading-[2] px-4"
+        className="font-arabic text-2xl sm:text-3xl text-primary/60 mb-3 text-center leading-[2] px-4"
       >
         {VERSE.arabic}
       </motion.p>
@@ -41,7 +41,7 @@ export function LoadingScreen({ message }: { message?: string }) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, delay: 0.5 }}
-        className="text-sm text-white/30 italic text-center mb-2"
+        className="text-sm text-text-secondary italic text-center mb-2"
       >
         &ldquo;{VERSE.translation}&rdquo;
       </motion.p>
@@ -49,7 +49,7 @@ export function LoadingScreen({ message }: { message?: string }) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, delay: 0.6 }}
-        className="text-xs text-white/15 tracking-widest"
+        className="text-xs text-text-tertiary tracking-widest"
       >
         {VERSE.reference}
       </motion.p>
@@ -59,7 +59,7 @@ export function LoadingScreen({ message }: { message?: string }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.7 }}
-          className="text-xs text-white/15 mt-6"
+          className="text-xs text-text-tertiary mt-6"
         >
           {message}
         </motion.p>

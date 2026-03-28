@@ -28,7 +28,7 @@ export function SearchInput({ value, onChange, placeholder = 'Search...', classN
   return (
     <div className={cn('relative', className)}>
       <svg
-        className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-more"
+        className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary"
         fill="none"
         viewBox="0 0 24 24"
         strokeWidth={2}
@@ -41,7 +41,7 @@ export function SearchInput({ value, onChange, placeholder = 'Search...', classN
         value={localValue}
         onChange={handleChange}
         placeholder={placeholder}
-        className="w-full bg-elevated border border-border rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-muted-more focus:outline-none focus:border-gold/40 focus:ring-1 focus:ring-gold/20 transition-colors"
+        className="w-full bg-surface border border-border rounded-xl pl-10 pr-4 py-2.5 text-sm text-text placeholder:text-text-tertiary focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-colors"
       />
     </div>
   );

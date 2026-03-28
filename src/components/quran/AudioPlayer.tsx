@@ -389,20 +389,20 @@ export function AudioPlayer({
       {/* Floating player bar */}
       <div className="fixed bottom-16 left-0 right-0 lg:bottom-0 lg:left-60 z-30" style={{ pointerEvents: 'auto' }}>
         {/* Progress bar */}
-        <div className="h-[2px] bg-white/[0.06] w-full">
+        <div className="h-[2px] bg-border-light w-full">
           <div
-            className="h-full bg-gold/70 transition-all duration-100"
+            className="h-full bg-primary/70 transition-all duration-100"
             style={{ width: `${progress * 100}%` }}
           />
         </div>
 
-        <div className="bg-card/95 backdrop-blur-xl border-t border-white/[0.06] px-4 py-3 flex items-center gap-3">
+        <div className="bg-surface/95 backdrop-blur-xl border-t border-border px-4 py-3 flex items-center gap-3">
           {/* Transport controls */}
           <div className="flex items-center gap-1.5">
             <button
               onClick={prevAyah}
               disabled={currentAyah <= 1}
-              className="w-8 h-8 flex items-center justify-center text-muted-more hover:text-white disabled:opacity-30 transition-colors"
+              className="w-8 h-8 flex items-center justify-center text-text-tertiary hover:text-text disabled:opacity-30 transition-colors"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
@@ -411,7 +411,7 @@ export function AudioPlayer({
 
             <button
               onClick={togglePlay}
-              className="w-9 h-9 flex items-center justify-center rounded-full bg-gold text-black hover:brightness-110 transition-all"
+              className="w-9 h-9 flex items-center justify-center rounded-full bg-primary text-white hover:bg-primary-hover transition-all"
             >
               {isPlaying ? (
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -427,7 +427,7 @@ export function AudioPlayer({
             <button
               onClick={nextAyah}
               disabled={currentAyah >= totalAyahs}
-              className="w-8 h-8 flex items-center justify-center text-muted-more hover:text-white disabled:opacity-30 transition-colors"
+              className="w-8 h-8 flex items-center justify-center text-text-tertiary hover:text-text disabled:opacity-30 transition-colors"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
@@ -437,8 +437,8 @@ export function AudioPlayer({
 
           {/* Surah + ayah info */}
           <div className="flex-1 min-w-0">
-            <p className="text-xs text-white font-medium truncate">{surahName}</p>
-            <p className="text-[10px] text-muted-more">
+            <p className="text-xs text-text font-medium truncate">{surahName}</p>
+            <p className="text-[10px] text-text-tertiary">
               Ayah {currentAyah} of {totalAyahs}
               {timingsError && ' · word sync unavailable'}
             </p>
@@ -449,8 +449,8 @@ export function AudioPlayer({
             onClick={() => onPlayModeChange(playMode === 'ayah' ? 'surah' : 'ayah')}
             className={`text-[10px] font-medium px-2 py-1 rounded-md transition-colors whitespace-nowrap ${
               playMode === 'surah'
-                ? 'bg-gold/15 text-gold'
-                : 'bg-white/[0.05] text-muted-more hover:text-white'
+                ? 'bg-primary-light text-primary'
+                : 'bg-border-light text-text-tertiary hover:text-text'
             }`}
             title={playMode === 'ayah' ? 'Per-ayah with word highlighting' : 'Full surah continuous playback'}
           >
@@ -462,8 +462,8 @@ export function AudioPlayer({
             onClick={cycleLoop}
             className={`relative w-7 h-7 flex items-center justify-center rounded-md transition-colors ${
               loopMode !== 'none'
-                ? 'bg-gold/15 text-gold'
-                : 'text-muted-more hover:text-white'
+                ? 'bg-primary-light text-primary'
+                : 'text-text-tertiary hover:text-text'
             }`}
             title={
               loopMode === 'none' ? 'Loop off' :
@@ -475,7 +475,7 @@ export function AudioPlayer({
               <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 0 0-3.7-3.7 48.678 48.678 0 0 0-7.324 0 4.006 4.006 0 0 0-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 0 0 3.7 3.7 48.656 48.656 0 0 0 7.324 0 4.006 4.006 0 0 0 3.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3-3 3" />
             </svg>
             {loopLabel && (
-              <span className="absolute -top-0.5 -right-0.5 text-[8px] font-bold leading-none text-gold">
+              <span className="absolute -top-0.5 -right-0.5 text-[8px] font-bold leading-none text-primary">
                 {loopLabel}
               </span>
             )}
@@ -485,7 +485,7 @@ export function AudioPlayer({
           {currentAyah > 1 && (
             <button
               onClick={startFromBeginning}
-              className="text-[10px] text-muted-more hover:text-gold transition-colors whitespace-nowrap hidden sm:block"
+              className="text-[10px] text-text-tertiary hover:text-primary transition-colors whitespace-nowrap hidden sm:block"
             >
               ↑ From start
             </button>
@@ -497,7 +497,7 @@ export function AudioPlayer({
               audioElement.pause();
               onClose();
             }}
-            className="w-7 h-7 flex items-center justify-center text-muted-more hover:text-white transition-colors"
+            className="w-7 h-7 flex items-center justify-center text-text-tertiary hover:text-text transition-colors"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />

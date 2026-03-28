@@ -35,7 +35,7 @@ export default function BookmarksPage() {
                     </ArabicText>
                   )}
                   <p className="text-sm text-white">{bookmark.label}</p>
-                  <Badge variant="gold" className="mt-2">{bookmark.type}</Badge>
+                  <Badge variant="amber" className="mt-2">{bookmark.type}</Badge>
                 </div>
                 <button
                   onClick={() => removeBookmark(bookmark.id)}

@@ -68,9 +68,9 @@ export function ResultCard({
           )} opacity-20 blur-xl`}
         />
         <div className={`absolute inset-0 rounded-full bg-gradient-to-br ${getScoreColor(score)} p-1`}>
-          <div className="absolute inset-1 rounded-full bg-slate-900 flex items-center justify-center flex-col">
-            <span className="text-5xl font-bold text-white">{score}</span>
-            <span className="text-xs text-slate-400 uppercase tracking-wider">Score</span>
+          <div className="absolute inset-1 rounded-full bg-surface flex items-center justify-center flex-col">
+            <span className="text-5xl font-bold text-text">{score}</span>
+            <span className="text-xs text-text-tertiary uppercase tracking-wider">Score</span>
           </div>
         </div>
       </motion.div>
@@ -82,8 +82,8 @@ export function ResultCard({
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
       >
-        <p className="text-2xl font-bold text-white">{getScoreMessage(score)}</p>
-        <p className="text-slate-400 mt-2">{accuracy}% Accuracy</p>
+        <p className="text-2xl font-bold text-text">{getScoreMessage(score)}</p>
+        <p className="text-text-secondary mt-2">{accuracy}% Accuracy</p>
       </motion.div>
 
       {/* Stats Grid */}
@@ -93,24 +93,24 @@ export function ResultCard({
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
       >
-        <div className="p-4 rounded-xl bg-slate-800/50 border border-slate-700/50">
-          <p className="text-xs text-slate-400 uppercase tracking-wider mb-2">Correct</p>
-          <p className="text-2xl font-bold text-gold">
+        <div className="p-4 rounded-xl bg-surface border border-border">
+          <p className="text-xs text-text-tertiary uppercase tracking-wider mb-2">Correct</p>
+          <p className="text-2xl font-bold text-primary">
             {correctCount}
-            <span className="text-sm text-slate-400 ml-1">/ {totalCount}</span>
+            <span className="text-sm text-text-tertiary ml-1">/ {totalCount}</span>
           </p>
         </div>
 
-        <div className="p-4 rounded-xl bg-slate-800/50 border border-slate-700/50">
-          <p className="text-xs text-slate-400 uppercase tracking-wider mb-2">XP Earned</p>
-          <p className="text-2xl font-bold text-emerald-400">+{earnedXP}</p>
+        <div className="p-4 rounded-xl bg-surface border border-border">
+          <p className="text-xs text-text-tertiary uppercase tracking-wider mb-2">XP Earned</p>
+          <p className="text-2xl font-bold text-correct">+{earnedXP}</p>
         </div>
       </motion.div>
 
       {/* Level Up */}
       {leveledUp && newLevel && (
         <motion.div
-          className="p-6 rounded-2xl bg-gradient-to-r from-gold/20 to-gold/10 border border-gold/30"
+          className="p-6 rounded-2xl bg-gradient-to-r from-primary-light to-primary-light/50 border border-primary/30"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.5, type: 'spring' }}
@@ -120,9 +120,9 @@ export function ResultCard({
             transition={{ duration: 2, repeat: Infinity }}
             className="text-center"
           >
-            <p className="text-sm font-bold text-gold uppercase tracking-wider mb-3">🎉 Level Up! 🎉</p>
-            <p className="text-4xl font-bold text-white">Level {newLevel}</p>
-            <p className="text-slate-300 text-sm mt-2">You've unlocked new potential!</p>
+            <p className="text-sm font-bold text-primary uppercase tracking-wider mb-3">🎉 Level Up! 🎉</p>
+            <p className="text-4xl font-bold text-text">Level {newLevel}</p>
+            <p className="text-text-secondary text-sm mt-2">You've unlocked new potential!</p>
           </motion.div>
         </motion.div>
       )}
@@ -134,9 +134,9 @@ export function ResultCard({
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
         >
-          <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+          <h3 className="text-lg font-bold text-text mb-4 flex items-center gap-2">
             <span>🏆 New Achievements</span>
-            <span className="text-sm px-2 py-0.5 bg-gold/20 rounded-full text-gold">
+            <span className="text-sm px-2 py-0.5 bg-primary-light rounded-full text-primary">
               +{unlockedAchievements.length}
             </span>
           </h3>
@@ -164,11 +164,11 @@ export function ResultCard({
       )}
 
       {/* Divider */}
-      <div className="h-px bg-gradient-to-r from-transparent via-slate-700 to-transparent" />
+      <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent" />
 
       {/* Footer Message */}
       <motion.p
-        className="text-center text-sm text-slate-400"
+        className="text-center text-sm text-text-secondary"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.8 }}
