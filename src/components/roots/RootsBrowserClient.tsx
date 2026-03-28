@@ -244,7 +244,7 @@ export function RootsBrowserClient({
             {visibleNouns.map((noun) => (
               <Card key={noun.id} hover={false}>
                 <div className="flex items-start justify-between mb-1">
-                  <ArabicText size="xl" className="text-white">{noun.lemma}</ArabicText>
+                  <ArabicText size="xl" className="text-text">{noun.lemma}</ArabicText>
                   {noun.totalFreq > 0 && <Badge>{noun.totalFreq}x</Badge>}
                 </div>
                 <p className="text-sm text-text-secondary line-clamp-1 mb-2">{noun.meaning}</p>
@@ -291,7 +291,7 @@ export function RootsBrowserClient({
                 {visibleParticles.map((p) => (
                   <Card key={p.id} hover={false}>
                     <div className="flex items-start justify-between mb-1">
-                      <ArabicText size="xl" className="text-white">{p.form}</ArabicText>
+                      <ArabicText size="xl" className="text-text">{p.form}</ArabicText>
                       {p.frequency > 0 && <Badge>{p.frequency}x</Badge>}
                     </div>
                     <p className="text-sm text-text-secondary line-clamp-1 mb-2">{p.meaning}</p>

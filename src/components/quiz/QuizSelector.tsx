@@ -49,8 +49,8 @@ export function QuizSelector({ counts = {}, onSelect, isLoading }: QuizSelectorP
     <div className="w-full max-w-2xl mx-auto">
       {/* Header */}
       <div className="text-center mb-12">
-        <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Adaptive Quiz</h1>
-        <p className="text-white/60 text-lg">Choose a quiz type and test your knowledge</p>
+        <h1 className="text-3xl md:text-4xl font-bold text-text mb-3">Adaptive Quiz</h1>
+        <p className="text-text-secondary text-lg">Choose a quiz type and test your knowledge</p>
       </div>
 
       {/* Quiz Type Selection */}
@@ -68,8 +68,8 @@ export function QuizSelector({ counts = {}, onSelect, isLoading }: QuizSelectorP
             <div className="flex items-start gap-4">
               <span className="text-2xl">{type.icon}</span>
               <div className="flex-1">
-                <p className="text-white font-semibold">{type.label}</p>
-                <p className="text-sm text-white/60">{type.description}</p>
+                <p className="text-text font-semibold">{type.label}</p>
+                <p className="text-sm text-text-secondary">{type.description}</p>
               </div>
             </div>
           </button>
@@ -77,8 +77,8 @@ export function QuizSelector({ counts = {}, onSelect, isLoading }: QuizSelectorP
       </div>
 
       {/* Question Count Selector */}
-      <div className="bg-surface border border-border rounded-xl p-6 mb-8">
-        <label className="block text-sm font-semibold text-white/60 uppercase tracking-wide mb-3">
+      <div className="bg-surface rounded-xl shadow-card p-6 mb-8">
+        <label className="block text-sm font-semibold text-text-secondary uppercase tracking-wide mb-3">
           Questions per session
         </label>
         <div className="flex items-center gap-4">
@@ -91,7 +91,7 @@ export function QuizSelector({ counts = {}, onSelect, isLoading }: QuizSelectorP
             onChange={(e) => setQuestionCount(parseInt(e.target.value, 10))}
             className="flex-1 h-2 bg-surface rounded-lg appearance-none cursor-pointer"
           />
-          <span className="text-white font-semibold min-w-12 text-right">{questionCount}</span>
+          <span className="text-text font-semibold min-w-12 text-right">{questionCount}</span>
         </div>
       </div>
 
@@ -112,8 +112,8 @@ export function QuizSelector({ counts = {}, onSelect, isLoading }: QuizSelectorP
       </button>
 
       {/* Footer Info */}
-      <div className="mt-8 p-4 bg-surface border border-border rounded-lg">
-        <p className="text-xs text-white/40 text-center">
+      <div className="mt-8 p-4 bg-surface rounded-lg shadow-card">
+        <p className="text-xs text-text-tertiary text-center">
           💡 Quiz items are based on your learning history. Only items you've started learning will appear.
         </p>
       </div>

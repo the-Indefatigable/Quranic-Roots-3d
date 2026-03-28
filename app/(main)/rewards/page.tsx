@@ -129,13 +129,13 @@ export default function RewardsPage() {
     <div className="space-y-8">
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="text-4xl font-bold text-text mb-2">Your Rewards</h1>
+        <h1 className="text-3xl sm:text-4xl font-heading text-text mb-2">Your Rewards</h1>
         <p className="text-text-secondary">Track your progress and achievements</p>
       </motion.div>
 
       {/* User Level Card */}
       <motion.div
-        className="p-8 rounded-3xl bg-surface border border-border backdrop-blur"
+        className="p-8 rounded-3xl bg-surface shadow-card"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
@@ -162,7 +162,7 @@ export default function RewardsPage() {
             ].map((stat, idx) => (
               <motion.div
                 key={stat.label}
-                className="p-4 rounded-xl bg-surface border border-border"
+                className="p-4 rounded-xl bg-surface shadow-card"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 + idx * 0.1 }}
@@ -191,7 +191,7 @@ export default function RewardsPage() {
             <Link
               key={item.label}
               href={item.href}
-              className="p-5 rounded-2xl bg-surface border border-border hover:border-primary/30 transition-colors group"
+              className="p-5 rounded-2xl bg-surface shadow-card hover:shadow-raised hover:-translate-y-0.5 transition-all duration-200 group"
             >
               <div className="flex items-center justify-between mb-3">
                 <p className="text-sm font-medium text-text">{item.label}</p>
@@ -243,7 +243,7 @@ export default function RewardsPage() {
             className={`px-4 py-2 rounded-lg font-medium transition-all ${
               selectedTab === tab
                 ? 'bg-primary/10 border border-primary/30 text-primary'
-                : 'bg-surface border border-border text-text-secondary hover:text-text'
+                : 'bg-surface shadow-card text-text-secondary hover:text-text'
             }`}
           >
             {tab === 'overview' && 'Overview'}
@@ -271,7 +271,7 @@ export default function RewardsPage() {
             ].map((stat, idx) => (
               <motion.div
                 key={stat.label}
-                className="p-4 rounded-xl bg-surface border border-border"
+                className="p-4 rounded-xl bg-surface shadow-card"
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.4 + idx * 0.05 }}

@@ -107,7 +107,7 @@ export function TenseAccordion({ tenses }: { tenses: TenseData[] }) {
         const bg = TENSE_BG[tense.type] || 'bg-surface';
 
         return (
-          <div key={tense.type} className="bg-surface border border-border-light rounded-xl overflow-hidden">
+          <div key={tense.type} className="bg-surface rounded-xl shadow-card overflow-hidden">
             <button
               onClick={() => setOpenTense(isOpen ? null : tense.type)}
               className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-canvas transition-colors"

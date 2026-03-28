@@ -566,7 +566,7 @@ export function HomepageClient() {
                 <Link
                   href={`/roots/${encodeURIComponent(root.root)}`}
                   prefetch={false}
-                  className="group flex flex-col items-center text-center bg-surface border border-border rounded-2xl p-5 shadow-card hover:shadow-raised hover:-translate-y-1 transition-all duration-200"
+                  className="group flex flex-col items-center text-center bg-surface rounded-2xl p-5 shadow-card hover:shadow-raised hover:-translate-y-1 transition-all duration-200"
                 >
                   <span className="font-arabic text-2xl text-primary mb-2.5 group-hover:scale-105 transition-transform duration-200">
                     {root.root}

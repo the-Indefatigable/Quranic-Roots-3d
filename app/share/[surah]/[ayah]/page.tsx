@@ -97,7 +97,7 @@ export default async function SharePage({ params }: Props) {
         </div>
 
         {/* Verse card */}
-        <div className="bg-surface border border-border rounded-3xl p-8 sm:p-12 text-center">
+        <div className="bg-surface rounded-3xl shadow-card p-8 sm:p-12 text-center">
           {/* Reference */}
           <p className="text-xs text-primary/60 tracking-widest uppercase mb-8">
             {surahRow?.englishName} · {s}:{a}

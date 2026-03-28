@@ -245,7 +245,7 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, hasWords, has
 
       {/* Settings panel */}
       {showSettings && (
-        <div className="bg-surface border border-border rounded-2xl p-4 sm:p-5 mb-8 flex flex-wrap items-center gap-4 sm:gap-6">
+        <div className="bg-surface rounded-2xl shadow-card p-4 sm:p-5 mb-8 flex flex-wrap items-center gap-4 sm:gap-6">
           <div className="flex items-center gap-3">
             <span className="text-xs text-text-tertiary">Font size</span>
             <div className="flex items-center gap-1">

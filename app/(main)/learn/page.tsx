@@ -99,7 +99,7 @@ export default function LearnPage() {
             <Link
               key={topic.href}
               href={topic.href}
-              className="block group rounded-2xl border border-border bg-surface hover:bg-surface hover:shadow-card transition-all duration-200 p-6"
+              className="block group rounded-2xl bg-surface shadow-card hover:shadow-raised hover:-translate-y-0.5 transition-all duration-200 p-6"
             >
               <div className="flex items-start justify-between gap-4 mb-2">
                 <div>

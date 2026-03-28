@@ -78,7 +78,7 @@ export function QuranSurahList() {
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {Array.from({ length: 12 }).map((_, i) => (
-            <div key={i} className="bg-card border border-border rounded-2xl px-5 py-4 h-[76px] animate-pulse" />
+            <div key={i} className="bg-surface rounded-2xl shadow-card px-5 py-4 h-[76px] animate-pulse" />
           ))}
         </div>
       ) : filtered.length === 0 ? (
@@ -91,7 +91,7 @@ export function QuranSurahList() {
             <Link
               key={surah.number}
               href={`/quran/${surah.number}`}
-              className="group flex items-center gap-4 bg-surface border border-border rounded-2xl px-5 py-4 transition-colors hover:border-border hover:bg-surface shadow-card"
+              className="group flex items-center gap-4 bg-surface rounded-2xl px-5 py-4 shadow-card hover:shadow-raised hover:-translate-y-0.5 transition-all duration-200"
             >
               <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary-light text-primary text-sm font-medium">
                 {surah.number}

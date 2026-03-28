@@ -139,7 +139,7 @@ export function TafsirPanel({ surahNumber, ayahNumber, ayahs, onClose }: Props) 
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-border shrink-0">
               <div>
-                <h3 className="text-sm font-medium text-white">Tafsir</h3>
+                <h3 className="text-sm font-medium text-text">Tafsir</h3>
                 {meta && (
                   <p className="text-[10px] text-text-tertiary mt-0.5">
                     {meta.tafsirName} — {meta.authorName}
@@ -199,7 +199,7 @@ export function TafsirPanel({ surahNumber, ayahNumber, ayahs, onClose }: Props) 
                   {coveredAyahs.length > 0 && (
                     <div className="bg-surface border border-border-light rounded-xl p-5 mb-6 space-y-4">
                       {coveredAyahs.map((a) => (
-                        <p key={a.number} className="font-arabic text-2xl text-white leading-loose text-right" dir="rtl">
+                        <p key={a.number} className="font-arabic text-2xl text-text leading-loose text-right" dir="rtl">
                           {a.textUthmani}
                           <span className="inline-block shrink-0 w-8 h-8 ml-2 text-center rounded-full bg-primary-light text-primary text-[10px] font-sans font-medium">
                             <span className="flex items-center justify-center h-full pt-[2px]">{a.number}</span>
@@ -210,11 +210,11 @@ export function TafsirPanel({ surahNumber, ayahNumber, ayahs, onClose }: Props) 
                   )}
 
                   <div 
-                    className="text-sm text-white/80 leading-relaxed whitespace-pre-line tafsir-content"
+                    className="text-sm text-text-secondary leading-relaxed whitespace-pre-line tafsir-content"
                     dangerouslySetInnerHTML={{
                       __html: entry.text
                         // Bold
-                        .replace(/\*\*(.*?)\*\*/g, '<strong class="text-white font-medium">$1</strong>')
+                        .replace(/\*\*(.*?)\*\*/g, '<strong class="text-text font-medium">$1</strong>')
                         // H3 Headers (###)
                         .replace(/^###\s+(.*)$/gm, '<h3 class="text-base text-primary mt-6 mb-2 font-medium">$1</h3>')
                     }}

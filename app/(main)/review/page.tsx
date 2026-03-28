@@ -39,7 +39,7 @@ function FlipCard({
         {/* Front */}
         <div
           style={{ backfaceVisibility: 'hidden' }}
-          className="absolute inset-0 flex flex-col items-center justify-center bg-surface border border-border rounded-3xl p-8"
+          className="absolute inset-0 flex flex-col items-center justify-center bg-surface rounded-3xl shadow-card p-8"
         >
           <p className="text-xs text-primary/50 tracking-widest uppercase mb-8">
             {item.type === 'ayah' ? 'Ayah' : item.type === 'root' ? 'Root' : 'Noun'}

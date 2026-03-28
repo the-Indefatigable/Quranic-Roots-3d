@@ -37,7 +37,7 @@ export function RootDetailClient({ forms }: { forms: FormData[] }) {
         return (
           <div
             key={form.id}
-            className="bg-surface border border-border-light rounded-2xl overflow-hidden"
+            className="bg-surface rounded-2xl shadow-card overflow-hidden"
           >
             {/* Form header */}
             <button
@@ -50,7 +50,7 @@ export function RootDetailClient({ forms }: { forms: FormData[] }) {
                 </div>
                 <div>
                   <div className="flex items-center gap-3">
-                    <ArabicText size="xl" className="text-white">{form.arabicPattern}</ArabicText>
+                    <ArabicText size="xl" className="text-text">{form.arabicPattern}</ArabicText>
                     {form.masdar && (
                       <ArabicText size="base" className="text-primary/60">{form.masdar}</ArabicText>
                     )}
@@ -90,7 +90,7 @@ export function RootDetailClient({ forms }: { forms: FormData[] }) {
                       {form.meaning && (
                         <div>
                           <span className="text-[10px] text-text-tertiary uppercase tracking-wider block mb-0.5">Meaning</span>
-                          <span className="text-white/70">{form.meaning}</span>
+                          <span className="text-text-secondary">{form.meaning}</span>
                         </div>
                       )}
                       {form.masdar && (
@@ -102,13 +102,13 @@ export function RootDetailClient({ forms }: { forms: FormData[] }) {
                       {form.faaeil && (
                         <div>
                           <span className="text-[10px] text-text-tertiary uppercase tracking-wider block mb-0.5">Active Part.</span>
-                          <ArabicText size="base" className="text-white/70">{form.faaeil}</ArabicText>
+                          <ArabicText size="base" className="text-text-secondary">{form.faaeil}</ArabicText>
                         </div>
                       )}
                       {form.mafool && (
                         <div>
                           <span className="text-[10px] text-text-tertiary uppercase tracking-wider block mb-0.5">Passive Part.</span>
-                          <ArabicText size="base" className="text-white/70">{form.mafool}</ArabicText>
+                          <ArabicText size="base" className="text-text-secondary">{form.mafool}</ArabicText>
                         </div>
                       )}
                     </div>

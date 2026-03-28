@@ -49,7 +49,7 @@ export function QuranicOccurrences({ occurrences: initial, totalAyahs, rootArabi
           <Link
             key={`${occ.surahNumber}:${occ.ayahNumber}`}
             href={`/quran/${occ.surahNumber}#ayah-${occ.ayahNumber}`}
-            className="block bg-surface border border-border-light rounded-2xl p-4 sm:p-5 hover:bg-canvas hover:border-border transition-colors group"
+            className="block bg-surface rounded-2xl shadow-card p-4 sm:p-5 hover:shadow-raised hover:-translate-y-0.5 transition-all duration-200 group"
           >
             {/* Location badge */}
             <div className="flex items-center justify-between mb-3">

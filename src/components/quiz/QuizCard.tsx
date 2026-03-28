@@ -37,7 +37,7 @@ export function QuizCard({
       {/* Progress */}
       <div className="mb-6">
         <div className="flex justify-between items-center mb-2">
-          <span className="text-sm text-white/60">
+          <span className="text-sm text-text-secondary">
             Question {currentIndex + 1} of {totalQuestions}
           </span>
           <span className="text-xs text-primary">{Math.round(((currentIndex + 1) / totalQuestions) * 100)}%</span>
@@ -51,16 +51,16 @@ export function QuizCard({
       </div>
 
       {/* Question Card */}
-      <div className="bg-surface border border-border rounded-2xl p-8 mb-6">
+      <div className="bg-surface rounded-2xl shadow-card p-8 mb-6">
         {/* Question Text */}
         <div className="mb-6">
-          <p className="text-white/60 text-sm mb-3 uppercase tracking-wide">Question</p>
-          <p className="text-white text-xl font-semibold">{question.prompt.text}</p>
+          <p className="text-text-secondary text-sm mb-3 uppercase tracking-wide">Question</p>
+          <p className="text-text text-xl font-semibold">{question.prompt.text}</p>
           {question.prompt.arabicText && (
             <p className="text-2xl font-arabic text-primary mt-4">{question.prompt.arabicText}</p>
           )}
           {question.prompt.context && (
-            <p className="text-sm text-white/40 mt-3 italic">{question.prompt.context}</p>
+            <p className="text-sm text-text-tertiary mt-3 italic">{question.prompt.context}</p>
           )}
         </div>
 
@@ -78,7 +78,7 @@ export function QuizCard({
               }}
               disabled={isAnswered}
               placeholder="Type your answer..."
-              className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-white placeholder:text-white/20 focus:outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/20 transition-all disabled:opacity-50"
+              className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-text placeholder:text-text-tertiary focus:outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/20 transition-all disabled:opacity-50"
               autoFocus
             />
           ) : isMCQ ? (
@@ -94,19 +94,19 @@ export function QuizCard({
                       : 'bg-surface border-border hover:border-border'
                   } ${isAnswered ? 'cursor-default' : 'cursor-pointer'}`}
                 >
-                  <p className="text-white font-medium">{option.label}</p>
+                  <p className="text-text font-medium">{option.label}</p>
                 </button>
               ))}
             </div>
           ) : isSelect ? (
-            <p className="text-white/60">Select options in the form below</p>
+            <p className="text-text-secondary">Select options in the form below</p>
           ) : null}
         </div>
 
         {/* Feedback */}
         {isAnswered && feedback && (
-          <div className="mb-6 p-4 bg-surface border border-border rounded-lg">
-            <p className="text-sm text-white/70">{feedback}</p>
+          <div className="mb-6 p-4 bg-surface rounded-lg shadow-card">
+            <p className="text-sm text-text-secondary">{feedback}</p>
             {question.correctAnswer && typeof question.correctAnswer === 'string' && (
               <p className="text-primary text-sm mt-2">
                 Correct answer: <span className="font-semibold">{question.correctAnswer}</span>
