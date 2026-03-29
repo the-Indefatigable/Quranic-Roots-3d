@@ -40,6 +40,27 @@ export async function POST(request: NextRequest) {
     const body: CompletionPayload = await request.json();
     const { lessonId, score, correctCount, totalCount, mistakes, comboMax, timeSpentS } = body;
 
+    // Qirat lessons are static — skip DB operations, just return success
+    if (lessonId.startsWith('qirat-')) {
+      const { getQiratLessonById } = await import('@/data/qirat-curriculum');
+      const found = getQiratLessonById(lessonId);
+      const xpReward = found?.lesson.xpReward ?? 15;
+      let xpEarned = xpReward;
+      if (score === 100) xpEarned = Math.round(xpEarned * 2);
+      else if (score >= 90) xpEarned = Math.round(xpEarned * 1.5);
+
+      return NextResponse.json({
+        success: true,
+        xpEarned,
+        isPerfect: score === 100,
+        score,
+        streak: { currentStreak: 0, isNewStreak: false, milestoneReached: 0 },
+        dailyGoalCompleted: false,
+        gemsEarned: 0,
+        nextLessonId: null,
+      });
+    }
+
     // Fetch lesson details
     const [lesson] = await dbQuery(() =>
       db.select().from(learningLessons).where(eq(learningLessons.id, lessonId))

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { AudioVisualizer } from './AudioVisualizer';
+import { GuidedPractice } from './GuidedPractice';
 import { QARI_LIBRARY, getDefaultQari, getQariById, buildAyahAudioUrl, type QariInfo } from '@/lib/audio/qariLibrary';
 
 type ExpandedTab = 'lyrics' | 'spectrum' | 'pitch' | 'practice';
@@ -830,13 +831,29 @@ export function AudioPlayer({
               <div className="h-8" />
             </div>
           </div>
+        ) : expandedTab === 'practice' ? (
+          <div className="flex-1 overflow-hidden px-4 sm:px-6 py-2" style={{ minHeight: 0 }}>
+            <div className="w-full h-full max-w-2xl mx-auto rounded-2xl bg-surface/50 border border-border-light overflow-hidden relative">
+              <GuidedPractice
+                analyserNode={analyserNode}
+                isPlaying={isPlaying}
+                currentAyah={currentAyah}
+                totalAyahs={totalAyahs}
+                onPlayAyah={(ayahNum) => seekToAyah(ayahNum)}
+                onNextAyah={() => {
+                  if (currentAyah < totalAyahs) seekToAyah(currentAyah + 1);
+                }}
+                ayahText={ayahsList.find(a => a.number === currentAyah)?.textUthmani}
+              />
+            </div>
+          </div>
         ) : (
           <div className="flex-1 overflow-hidden px-4 sm:px-6 py-2" style={{ minHeight: 0 }}>
             <div className="w-full h-full max-w-2xl mx-auto rounded-2xl bg-surface/50 border border-border-light overflow-hidden relative">
               <AudioVisualizer
                 analyserNode={analyserNode}
                 isPlaying={isPlaying}
-                mode={expandedTab === 'spectrum' ? 'spectrum' : expandedTab === 'pitch' ? 'pitch' : 'practice'}
+                mode={expandedTab === 'spectrum' ? 'spectrum' : 'pitch'}
                 currentAyah={currentAyah}
               />
               {/* Info overlay for the visual modes */}
@@ -848,11 +865,6 @@ export function AudioPlayer({
               {expandedTab === 'pitch' && (
                 <div className="absolute top-3 right-3 text-[10px] text-text-tertiary bg-canvas/80 backdrop-blur-sm px-2 py-1 rounded-md">
                   Pitch contour shows the Qari&apos;s melody
-                </div>
-              )}
-              {expandedTab === 'practice' && (
-                <div className="absolute top-3 right-3 text-[10px] text-text-tertiary bg-canvas/80 backdrop-blur-sm px-2 py-1 rounded-md">
-                  Record yourself &amp; compare your melody to the Qari
                 </div>
               )}
             </div>

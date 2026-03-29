@@ -17,6 +17,60 @@ export async function GET(request: NextRequest) {
     const session = await auth();
     const userId = session?.user?.id;
 
+    // ─── Qirat curriculum (static data — no DB) ───
+    if (lessonId.startsWith('qirat-')) {
+      const { getQiratLessonById } = await import('@/data/qirat-curriculum');
+      const found = getQiratLessonById(lessonId);
+      if (!found) {
+        return NextResponse.json({ error: 'Qirat lesson not found' }, { status: 404 });
+      }
+
+      // Transform steps to match what LessonPlayer's existing components expect
+      const transformedSteps = found.lesson.steps.map((step: any) => {
+        if (step.type === 'teach') {
+          // TeachStep expects 'explanation', not 'body'
+          return {
+            type: 'teach',
+            content: {
+              title: step.content.title,
+              explanation: step.content.body,
+              arabic: step.content.arabicExample,
+            },
+          };
+        }
+        if (step.type === 'mcq') {
+          // MCQStep expects options as [{text, correct}], not string[] + correctIndex
+          return {
+            type: 'mcq',
+            content: {
+              question: step.content.question,
+              explanation: step.content.explanation,
+              options: step.content.options.map((opt: string, i: number) => ({
+                text: opt,
+                correct: i === step.content.correctIndex,
+              })),
+            },
+          };
+        }
+        // listen_identify, pitch_match, recite_score pass through as-is
+        return step;
+      });
+
+      return NextResponse.json({
+        lesson: {
+          id: found.lesson.id,
+          title: found.lesson.title,
+          unitTitle: found.unit.title,
+          unitColor: found.unit.color,
+          content: { steps: transformedSteps },
+          xpReward: found.lesson.xpReward,
+          lessonType: 'standard',
+        },
+        hearts: 5,
+      });
+    }
+
+    // ─── DB lessons (Arabic grammar) ───
     // Fetch lesson + unit info
     const [lesson] = await dbQuery(() =>
       db.select({
