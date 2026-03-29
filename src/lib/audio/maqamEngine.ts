@@ -68,6 +68,8 @@ export interface MaqamDetectionState {
   maqam: MaqamMatch | null;
   /** Jins modulations detected during the recitation */
   modulations: JinsModulation[];
+  /** Whether the maqam detection is locked (confident enough to stop updating) */
+  isLocked: boolean;
 }
 
 export interface JinsMatch {
@@ -104,6 +106,7 @@ export function createMaqamDetectionState(): MaqamDetectionState {
     lowerJins: null,
     maqam: null,
     modulations: [],
+    isLocked: false,
   };
 }
 
@@ -126,6 +129,33 @@ export function updateMaqamDetection(
     : 0;
 
   if (newState.pitchHistory.length < MIN_PITCH_COUNT || elapsed < MIN_ACCUMULATION_MS) {
+    return newState;
+  }
+
+  // If already locked, only check for modulations — don't update the primary maqam/jins
+  if (newState.isLocked) {
+    // Still detect modulations in the recent data
+    const tonic = findTonic(newState.pitchHistory);
+    if (newState.timestamps.length > 30) {
+      const recentCutoff = timestampMs - 5000;
+      const recentPitches = newState.pitchHistory.filter(
+        (_, i) => newState.timestamps[i] >= recentCutoff
+      );
+      if (recentPitches.length >= 8) {
+        const recentIntervals = extractIntervals(recentPitches, tonic);
+        const recentJins = matchJins(recentIntervals);
+        const currentJinsName = newState.lowerJins?.jins.name;
+        const lastMod = newState.modulations[newState.modulations.length - 1];
+        const activeJins = lastMod?.toJins ?? currentJinsName;
+        if (recentJins && activeJins && recentJins.jins.name !== activeJins && recentJins.confidence > 0.6) {
+          newState.modulations = [...newState.modulations, {
+            fromJins: activeJins,
+            toJins: recentJins.jins.name,
+            atTimestamp: timestampMs,
+          }];
+        }
+      }
+    }
     return newState;
   }
 
@@ -193,6 +223,11 @@ export function updateMaqamDetection(
         }
       }
     }
+  }
+
+  // Lock once we have a confident maqam detection
+  if (newState.maqam && newState.maqam.confidence >= 0.7) {
+    newState.isLocked = true;
   }
 
   return newState;
