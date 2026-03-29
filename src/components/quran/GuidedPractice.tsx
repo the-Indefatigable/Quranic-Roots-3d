@@ -68,21 +68,35 @@ export function GuidedPractice({
   const qariPitchesRef = useRef<(number | null)[]>([]);
   const userPitchesRef = useRef<(number | null)[]>([]);
   const silenceFramesRef = useRef(0);
+  const phaseRef = useRef<PracticePhase>('idle');
+  const listeningAyahRef = useRef<number | null>(null);
+  const listeningTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // ─── Step 1: Listen phase ───
   const startListening = useCallback(() => {
     setPhase('listening');
+    phaseRef.current = 'listening';
     setLatestScore(null);
     setWordScores([]);
     qariPitchesRef.current = [];
     userPitchesRef.current = [];
     silenceFramesRef.current = 0;
+    listeningAyahRef.current = currentAyah;
     onPlayAyah(currentAyah);
+    
+    // Timeout fallback: if nothing triggers the transition in 15s, auto-transition
+    if (listeningTimerRef.current) clearTimeout(listeningTimerRef.current);
+    listeningTimerRef.current = setTimeout(() => {
+      if (phaseRef.current === 'listening') {
+        startRecordingRef.current();
+      }
+    }, 15000);
   }, [currentAyah, onPlayAyah]);
 
   // ─── Step 2: Recording phase ───
   const startRecording = useCallback(async () => {
-    if (!analyserNode) return;
+    if (!analyserNode || phaseRef.current !== 'listening') return;
+    if (listeningTimerRef.current) { clearTimeout(listeningTimerRef.current); listeningTimerRef.current = null; }
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: { echoCancellation: true, noiseSuppression: true },
@@ -99,11 +113,15 @@ export function GuidedPractice({
       userPitchesRef.current = [];
       silenceFramesRef.current = 0;
       setPhase('recording');
+      phaseRef.current = 'recording';
     } catch {
       // Mic denied — fall back
       setPhase('idle');
+      phaseRef.current = 'idle';
     }
   }, [analyserNode]);
+  const startRecordingRef = useRef(startRecording);
+  startRecordingRef.current = startRecording;
 
   // ─── Stop recording and score ───
   const finishRecording = useCallback(() => {
@@ -157,22 +175,34 @@ export function GuidedPractice({
     }
 
     setPhase('scored');
+    phaseRef.current = 'scored';
   }, [currentAyah, wordSegments]);
+  const finishRecordingRef = useRef(finishRecording);
+  finishRecordingRef.current = finishRecording;
 
-  // Auto-transition: listening → recording when qari's playback ends
+  // ─── Auto-transition triggers ───
+  // Trigger 1: isPlaying becomes false (per-ayah mode — audio stops after one ayah)
   useEffect(() => {
-    if (phase === 'listening' && !isPlaying) {
-      // Small delay to let the last audio fade
-      const timer = setTimeout(() => startRecording(), 500);
+    if (phaseRef.current === 'listening' && !isPlaying) {
+      const timer = setTimeout(() => startRecordingRef.current(), 500);
       return () => clearTimeout(timer);
     }
-  }, [phase, isPlaying, startRecording]);
+  }, [isPlaying]);
+
+  // Trigger 2: currentAyah changes (surah mode — audio advances to next ayah)
+  useEffect(() => {
+    if (phaseRef.current === 'listening' && listeningAyahRef.current !== null && currentAyah !== listeningAyahRef.current) {
+      // The qari has moved to the next ayah — the one we were listening to is done
+      startRecordingRef.current();
+    }
+  }, [currentAyah]);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
       micStreamRef.current?.getTracks().forEach(t => t.stop());
       cancelAnimationFrame(animFrameRef.current);
+      if (listeningTimerRef.current) clearTimeout(listeningTimerRef.current);
     };
   }, []);
 
@@ -204,29 +234,25 @@ export function GuidedPractice({
       const colors = getColors();
 
       // Detect qari pitch during listening phase
-      if (phase === 'listening' && analyserNode) {
+      if (phaseRef.current === 'listening' && analyserNode) {
         const buf = new Float32Array(analyserNode.fftSize);
         analyserNode.getFloatTimeDomainData(buf);
         const result = detectPitchYIN(buf, sampleRate);
         qariPitchesRef.current.push(result?.frequency ?? null);
-        if (qariPitchesRef.current.length > MAX_PITCH_HISTORY * 3) {
-          // Keep more history for scoring but cap it
-        }
       }
 
       // Detect user pitch during recording phase
-      if (phase === 'recording' && micAnalyserRef.current) {
+      if (phaseRef.current === 'recording' && micAnalyserRef.current) {
         const micBuf = new Float32Array(micAnalyserRef.current.fftSize);
         micAnalyserRef.current.getFloatTimeDomainData(micBuf);
         const result = detectPitchYIN(micBuf, sampleRate);
         const userPitch = result?.frequency ?? null;
         userPitchesRef.current.push(userPitch);
 
-        // Auto-stop on extended silence (2 seconds)
         if (!userPitch) {
           silenceFramesRef.current++;
           if (silenceFramesRef.current > 120 && userPitchesRef.current.length > 30) {
-            finishRecording();
+            finishRecordingRef.current();
             return;
           }
         } else {
@@ -235,7 +261,7 @@ export function GuidedPractice({
       }
 
       // Draw the dual contour (qari + user)
-      if (phase === 'recording' || phase === 'listening') {
+      if (phaseRef.current === 'recording' || phaseRef.current === 'listening') {
         drawDualContour(ctx, W, H, colors);
       }
     }
@@ -291,12 +317,11 @@ export function GuidedPractice({
         }
       }
 
-      // Phase indicator
       ctx.font = 'bold 11px system-ui'; ctx.textAlign = 'left';
-      if (phase === 'listening') {
+      if (phaseRef.current === 'listening') {
         ctx.fillStyle = colors.primary;
         ctx.fillText('🎧 Listen to the Qari...', 12, 20);
-      } else if (phase === 'recording') {
+      } else if (phaseRef.current === 'recording') {
         ctx.fillStyle = colors.wrong;
         ctx.fillText('🎤 Your turn — recite now!', 12, 20);
       }
@@ -305,7 +330,7 @@ export function GuidedPractice({
       ctx.textAlign = 'left'; ctx.font = '10px system-ui';
       ctx.fillStyle = colors.primary;
       ctx.fillRect(8, H - 16, 8, 3); ctx.fillText('Qari', 20, H - 11);
-      if (phase === 'recording') {
+      if (phaseRef.current === 'recording') {
         ctx.fillStyle = colors.correct;
         ctx.fillRect(58, H - 16, 8, 3); ctx.fillText('You', 70, H - 11);
       }
@@ -313,7 +338,7 @@ export function GuidedPractice({
 
     animFrameRef.current = requestAnimationFrame(draw);
     return () => cancelAnimationFrame(animFrameRef.current);
-  }, [analyserNode, phase, finishRecording]);
+  }, [analyserNode]); // Only depend on analyserNode — phase read from ref
 
   const sessionStats = allScores.length > 0 ? computeSessionStats(allScores) : null;
 

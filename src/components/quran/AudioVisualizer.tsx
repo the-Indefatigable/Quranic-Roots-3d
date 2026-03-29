@@ -52,6 +52,12 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode, currentAyah }: 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animFrameRef = useRef<number>(0);
 
+  // Use refs for mode/isPlaying so the animation loop never restarts on tab switch
+  const modeRef = useRef(mode);
+  const isPlayingRef = useRef(isPlaying);
+  modeRef.current = mode;
+  isPlayingRef.current = isPlaying;
+
   // ─── Shared analysis state (persisted across ALL tabs — never cleared on mode switch) ───
   const pitchHistoryRef = useRef<(number | null)[]>([]);
   const pitchMinRef = useRef(Infinity);
@@ -204,7 +210,7 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode, currentAyah }: 
       const buf = new Float32Array(analyserNode.fftSize);
       analyserNode.getFloatTimeDomainData(buf);
       const rms = detectRMS(buf);
-      const pitchResult: PitchResult | null = isPlaying ? detectPitchYIN(buf, sampleRate) : null;
+      const pitchResult: PitchResult | null = isPlayingRef.current ? detectPitchYIN(buf, sampleRate) : null;
       const pitch = pitchResult?.frequency ?? null;
       const pitchMidi = pitchResult?.midi ?? null;
 
@@ -241,7 +247,7 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode, currentAyah }: 
       // Practice: detect user pitch
       let userPitch: number | null = null;
       let userPitchMidi: number | null = null;
-      if (mode === 'practice' && micAnalyserRef.current) {
+      if (modeRef.current === 'practice' && micAnalyserRef.current) {
         const micBuf = new Float32Array(micAnalyserRef.current.fftSize);
         micAnalyserRef.current.getFloatTimeDomainData(micBuf);
         const userResult = detectPitchYIN(micBuf, sampleRate);
@@ -261,9 +267,9 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode, currentAyah }: 
 
       const colors = getColors();
 
-      if (mode === 'spectrum') {
+      if (modeRef.current === 'spectrum') {
         drawSpectrum(ctx, W, H, pitch, pitchResult, rms, colors);
-      } else if (mode === 'pitch') {
+      } else if (modeRef.current === 'pitch') {
         drawMelody(ctx, W, H, pitch, colors);
       } else {
         drawPractice(ctx, W, H, pitch, userPitch, colors);
@@ -708,7 +714,7 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode, currentAyah }: 
 
     animFrameRef.current = requestAnimationFrame(draw);
     return () => cancelAnimationFrame(animFrameRef.current);
-  }, [analyserNode, mode, isPlaying]);
+  }, [analyserNode]); // Only restart when analyserNode changes — mode/isPlaying read from refs
 
   // Session stats
   const sessionStats = phraseScores.length > 0 ? computeSessionStats(phraseScores) : null;
