@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { AudioVisualizer } from './AudioVisualizer';
+import { QARI_LIBRARY, getDefaultQari, getQariById, buildAyahAudioUrl, type QariInfo } from '@/lib/audio/qariLibrary';
 
 type ExpandedTab = 'lyrics' | 'analysis' | 'pitch' | 'practice';
 
@@ -43,6 +44,10 @@ interface Props {
   onClose: () => void;
   onPlayModeChange: (mode: PlayMode) => void;
   onLoopModeChange: (mode: LoopMode) => void;
+  /** Currently selected qari (optional — defaults to Al-Afasy) */
+  selectedQariId?: string;
+  /** Callback when user selects a different qari */
+  onQariChange?: (qariId: string) => void;
 }
 
 const SPEED_OPTIONS = [0.75, 1, 1.25, 1.5] as const;
@@ -88,7 +93,12 @@ export function AudioPlayer({
   onClose,
   onPlayModeChange,
   onLoopModeChange,
+  selectedQariId,
+  onQariChange,
 }: Props) {
+  // Qari state
+  const selectedQari: QariInfo = getQariById(selectedQariId ?? '') ?? getDefaultQari();
+  const [showQariMenu, setShowQariMenu] = useState(false);
   const ayahDataRef = useRef<Map<number, AyahAudio>>(new Map());
   const chapterAudioUrlRef = useRef<string | null>(null);
   const chapterSegmentsRef = useRef<ChapterSegment[]>([]);
@@ -163,7 +173,7 @@ export function AudioPlayer({
 
   // ---------- Data fetching (unchanged logic) ----------
   useEffect(() => {
-    fetch(`/api/audio/timings/${surahNumber}`)
+    fetch(`/api/audio/timings/${surahNumber}?recitationId=${selectedQari.quranComRecitationId}`)
       .then((r) => r.json())
       .then((data) => {
         const ayahList: AyahAudio[] = Array.isArray(data) ? data : data.ayahs ?? [];
@@ -217,7 +227,7 @@ export function AudioPlayer({
     if (nextAyah > totalAyahs) return;
     const nextData = ayahDataRef.current.get(nextAyah);
     const nextSrc = nextData?.url
-      ?? `https://everyayah.com/data/Alafasy_128kbps/${String(surahNumber).padStart(3, '0')}${String(nextAyah).padStart(3, '0')}.mp3`;
+      ?? buildAyahAudioUrl(selectedQari, surahNumber, nextAyah);
     const preload = new Audio();
     preload.preload = 'auto';
     preload.src = nextSrc;
@@ -228,7 +238,7 @@ export function AudioPlayer({
     const audio = audioElement;
     const ayahData = ayahDataRef.current.get(ayahNumber);
     const src = ayahData?.url
-      ?? `https://everyayah.com/data/Alafasy_128kbps/${String(surahNumber).padStart(3, '0')}${String(ayahNumber).padStart(3, '0')}.mp3`;
+      ?? buildAyahAudioUrl(selectedQari, surahNumber, ayahNumber);
 
     usingSurahAudioRef.current = false;
     audio.src = src;
@@ -669,11 +679,58 @@ export function AudioPlayer({
           </button>
         </div>
 
-        {/* Surah header */}
+        {/* Surah header + Qari selector */}
         <div className="text-center px-8 pt-2 pb-1">
           <h3 className="text-lg font-heading text-text">{surahName}</h3>
-          <p className="text-xs text-text-secondary">
-            Sheikh Mishary Al-Afasy &middot; Ayah {currentAyah}/{totalAyahs}
+          <div className="relative inline-block">
+            <button
+              onClick={() => setShowQariMenu(!showQariMenu)}
+              className="text-xs text-text-secondary hover:text-primary transition-colors flex items-center gap-1 mx-auto"
+            >
+              {selectedQari.name}
+              <span className="text-[9px] px-1.5 py-0.5 rounded bg-primary/10 text-primary/70 font-medium">
+                {selectedQari.styleLabel}
+              </span>
+              <svg className="w-3 h-3 text-text-tertiary" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+              </svg>
+            </button>
+            {showQariMenu && (
+              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-72 bg-surface rounded-xl shadow-modal border border-border p-2 z-50">
+                {QARI_LIBRARY.map((qari) => (
+                  <button
+                    key={qari.id}
+                    onClick={() => {
+                      onQariChange?.(qari.id);
+                      setShowQariMenu(false);
+                    }}
+                    className={`w-full text-left px-3 py-2.5 rounded-lg transition-colors flex items-start gap-3 ${
+                      qari.id === selectedQari.id
+                        ? 'bg-primary/10 text-primary'
+                        : 'text-text hover:bg-border-light'
+                    }`}
+                  >
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium truncate">{qari.name}</span>
+                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-border-light text-text-tertiary font-medium shrink-0">
+                          {qari.styleLabel}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-text-tertiary mt-0.5 truncate">{qari.description}</p>
+                    </div>
+                    {qari.id === selectedQari.id && (
+                      <svg className="w-4 h-4 text-primary shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                      </svg>
+                    )}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          <p className="text-[11px] text-text-tertiary mt-1">
+            Ayah {currentAyah}/{totalAyahs}
           </p>
         </div>
 
@@ -780,6 +837,7 @@ export function AudioPlayer({
                 analyserNode={analyserNode}
                 isPlaying={isPlaying}
                 mode={expandedTab === 'analysis' ? 'analysis' : expandedTab === 'pitch' ? 'pitch' : 'practice'}
+                currentAyah={currentAyah}
               />
               {/* Info overlay for the visual modes */}
               {expandedTab === 'pitch' && (

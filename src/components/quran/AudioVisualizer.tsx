@@ -1,6 +1,25 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
+import {
+  detectPitchYIN,
+  detectRMS,
+  freqToMidi,
+  freqToNoteLabel,
+  freqToNoteName,
+  freqToQuarterToneName,
+  freqToQuarterToneCents,
+  freqToCents,
+  freqToY,
+  type PitchResult,
+} from '@/lib/audio/pitchEngine';
+import {
+  createMaqamDetectionState,
+  updateMaqamDetection,
+  formatMaqamDisplay,
+  type MaqamDetectionState,
+} from '@/lib/audio/maqamEngine';
+import { scorePhrase, type PhraseScore, computeSessionStats } from '@/lib/audio/phraseScorer';
 
 export type VisualizerMode = 'analysis' | 'pitch' | 'practice';
 
@@ -8,113 +27,8 @@ interface Props {
   analyserNode: AnalyserNode | null;
   isPlaying: boolean;
   mode: VisualizerMode;
-}
-
-// ─── Pitch detection (autocorrelation / YIN-lite) ───
-
-function detectPitch(buffer: Float32Array, sampleRate: number): number | null {
-  const SIZE = buffer.length;
-  let rms = 0;
-  for (let i = 0; i < SIZE; i++) rms += buffer[i] * buffer[i];
-  rms = Math.sqrt(rms / SIZE);
-  if (rms < 0.01) return null;
-
-  const correlation = new Float32Array(SIZE);
-  for (let lag = 0; lag < SIZE; lag++) {
-    let sum = 0;
-    for (let i = 0; i < SIZE - lag; i++) sum += buffer[i] * buffer[i + lag];
-    correlation[lag] = sum;
-  }
-
-  const threshold = 0.15;
-  let foundDip = false, bestLag = -1, bestVal = -Infinity;
-  const minLag = Math.floor(sampleRate / 800);
-  const maxLag = Math.floor(sampleRate / 60);
-  for (let lag = minLag; lag < Math.min(maxLag, SIZE); lag++) {
-    const normalized = correlation[lag] / correlation[0];
-    if (!foundDip && normalized < threshold) foundDip = true;
-    if (foundDip && normalized > threshold && correlation[lag] > bestVal) {
-      bestVal = correlation[lag]; bestLag = lag;
-    }
-  }
-  return bestLag === -1 ? null : sampleRate / bestLag;
-}
-
-function detectRMS(buffer: Float32Array): number {
-  let sum = 0;
-  for (let i = 0; i < buffer.length; i++) sum += buffer[i] * buffer[i];
-  return Math.sqrt(sum / buffer.length);
-}
-
-// ─── Music theory helpers ───
-
-const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-
-function freqToMidi(freq: number): number {
-  return 12 * Math.log2(freq / 440) + 69;
-}
-
-function freqToNote(freq: number): string {
-  const midi = Math.round(freqToMidi(freq));
-  return `${NOTE_NAMES[((midi % 12) + 12) % 12]}${Math.floor(midi / 12) - 1}`;
-}
-
-function freqToNoteName(freq: number): string {
-  const midi = Math.round(freqToMidi(freq));
-  return NOTE_NAMES[((midi % 12) + 12) % 12];
-}
-
-function freqToCents(freq: number): number {
-  // Cents deviation from nearest semitone
-  const midi = freqToMidi(freq);
-  return Math.round((midi - Math.round(midi)) * 100);
-}
-
-// Maqam detection from pitch class set
-const MAQAMAT: Record<string, number[]> = {
-  'Bayati':    [0, 1.5, 3, 5, 7, 8, 10],    // D Eb F G A Bb C (quarter-tone on 2nd)
-  'Rast':      [0, 2, 3.5, 5, 7, 9, 10.5],   // C D E↓ F G A B↓
-  'Saba':      [0, 1.5, 3, 4, 5, 8, 10],      // D Eb F Gb G Bb C
-  'Sikah':     [0, 1.5, 3.5, 5, 7, 8.5, 10.5],
-  'Hijaz':     [0, 1, 4, 5, 7, 8, 10],        // D Eb F# G A Bb C
-  'Nahawand':  [0, 2, 3, 5, 7, 8, 10],        // Natural minor
-  'Ajam':      [0, 2, 4, 5, 7, 9, 11],        // Major scale
-  'Kurd':      [0, 1, 3, 5, 7, 8, 10],        // Phrygian
-};
-
-function detectMaqam(noteHistogram: Map<number, number>): { name: string; confidence: number } | null {
-  if (noteHistogram.size < 3) return null;
-
-  // Find the most frequent note as tonic
-  let maxCount = 0, tonic = 0;
-  noteHistogram.forEach((count, note) => { if (count > maxCount) { maxCount = count; tonic = note; } });
-
-  // Build interval set relative to tonic
-  const intervals = new Set<number>();
-  noteHistogram.forEach((_, note) => {
-    intervals.add(((note - tonic) % 12 + 12) % 12);
-  });
-
-  let bestMatch = '', bestScore = 0;
-  for (const [name, scale] of Object.entries(MAQAMAT)) {
-    let matches = 0;
-    for (const interval of intervals) {
-      // Allow half-semitone tolerance for quarter tones
-      if (scale.some(s => Math.abs(s - interval) <= 0.75)) matches++;
-    }
-    const score = matches / Math.max(intervals.size, scale.length);
-    if (score > bestScore) { bestScore = score; bestMatch = name; }
-  }
-
-  return bestScore > 0.5 ? { name: bestMatch, confidence: Math.round(bestScore * 100) } : null;
-}
-
-// ─── Helpers ───
-
-function freqToY(freq: number, height: number): number {
-  const logMin = Math.log2(70), logMax = Math.log2(700);
-  const logFreq = Math.log2(Math.max(70, Math.min(700, freq)));
-  return height - ((logFreq - logMin) / (logMax - logMin)) * height * 0.85 - height * 0.05;
+  /** Current ayah number (for per-phrase scoring) */
+  currentAyah?: number;
 }
 
 const MAX_PITCH_HISTORY = 200;
@@ -122,40 +36,33 @@ const MAX_PITCH_HISTORY = 200;
 function getColors() {
   const s = getComputedStyle(document.documentElement);
   return {
-    primary: s.getPropertyValue('--color-primary').trim() || '#0D9488',
-    accent: s.getPropertyValue('--color-accent').trim() || '#B45309',
-    correct: s.getPropertyValue('--color-correct').trim() || '#059669',
-    wrong: s.getPropertyValue('--color-wrong').trim() || '#DC2626',
-    text: s.getPropertyValue('--color-text').trim() || '#1C1917',
-    textSecondary: s.getPropertyValue('--color-text-secondary').trim() || '#78716C',
-    textTertiary: s.getPropertyValue('--color-text-tertiary').trim() || '#A8A29E',
-    surface: s.getPropertyValue('--color-surface').trim() || '#FFFFFF',
+    primary: s.getPropertyValue('--color-primary').trim() || '#5AB8A8',
+    accent: s.getPropertyValue('--color-accent').trim() || '#D4A246',
+    correct: s.getPropertyValue('--color-correct').trim() || '#5CB889',
+    wrong: s.getPropertyValue('--color-wrong').trim() || '#D9635B',
+    text: s.getPropertyValue('--color-text').trim() || '#EDEDEC',
+    textSecondary: s.getPropertyValue('--color-text-secondary').trim() || '#A09F9B',
+    textTertiary: s.getPropertyValue('--color-text-tertiary').trim() || '#636260',
+    surface: s.getPropertyValue('--color-surface').trim() || '#1C1B19',
   };
 }
 
-// Pitch similarity: 0-100, based on cents distance
-function pitchSimilarity(f1: number | null, f2: number | null): number | null {
-  if (!f1 || !f2) return null;
-  const cents = Math.abs(1200 * Math.log2(f1 / f2));
-  // 0 cents = 100%, 100 cents (1 semitone) = 0%
-  return Math.max(0, Math.round(100 - cents));
-}
-
-// ─── Component ───
-
-export function AudioVisualizer({ analyserNode, isPlaying, mode }: Props) {
+export function AudioVisualizer({ analyserNode, isPlaying, mode, currentAyah }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animFrameRef = useRef<number>(0);
 
   // Shared analysis state (persisted across frames via refs)
   const pitchHistoryRef = useRef<(number | null)[]>([]);
-  const noteHistogramRef = useRef<Map<number, number>>(new Map());
   const pitchMinRef = useRef(Infinity);
   const pitchMaxRef = useRef(0);
-  const sustainCountRef = useRef(0); // frames at ~same pitch = elongation
+  const sustainCountRef = useRef(0);
   const lastPitchRef = useRef<number | null>(null);
   const rmsHistoryRef = useRef<number[]>([]);
+
+  // Maqam detection state (jins-based)
+  const maqamStateRef = useRef<MaqamDetectionState>(createMaqamDetectionState());
+  const frameCountRef = useRef(0);
 
   // Practice mode
   const [isRecording, setIsRecording] = useState(false);
@@ -163,7 +70,14 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode }: Props) {
   const micAnalyserRef = useRef<AnalyserNode | null>(null);
   const userPitchHistoryRef = useRef<(number | null)[]>([]);
   const scoreHistoryRef = useRef<number[]>([]);
-  const [avgScore, setAvgScore] = useState<number | null>(null);
+
+  // Per-phrase scoring
+  const [phraseScores, setPhraseScores] = useState<PhraseScore[]>([]);
+  const [latestScore, setLatestScore] = useState<PhraseScore | null>(null);
+  const lastScoredAyahRef = useRef<number | null>(null);
+  const qariPhrasePitchesRef = useRef<(number | null)[]>([]);
+  const userPhrasePitchesRef = useRef<(number | null)[]>([]);
+  const phraseAyahRef = useRef<number | null>(null);
 
   const startMic = useCallback(async () => {
     if (!analyserNode) return;
@@ -181,18 +95,57 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode }: Props) {
       micSource.connect(micAnalyser);
       micAnalyserRef.current = micAnalyser;
       userPitchHistoryRef.current = [];
+      userPhrasePitchesRef.current = [];
       scoreHistoryRef.current = [];
-      setAvgScore(null);
+      setLatestScore(null);
       setIsRecording(true);
     } catch { /* mic denied */ }
   }, [analyserNode]);
 
   const stopMic = useCallback(() => {
+    // Score the current phrase before stopping
+    if (phraseAyahRef.current !== null && userPhrasePitchesRef.current.length > 10) {
+      const score = scorePhrase(
+        qariPhrasePitchesRef.current,
+        userPhrasePitchesRef.current,
+        [], // word onsets - we don't have fine-grained detection yet
+        [],
+        phraseAyahRef.current,
+        60
+      );
+      setLatestScore(score);
+      setPhraseScores(prev => [...prev, score]);
+    }
+
     micStreamRef.current?.getTracks().forEach((t) => t.stop());
     micStreamRef.current = null;
     micAnalyserRef.current = null;
     setIsRecording(false);
   }, []);
+
+  // Detect ayah changes and auto-score the previous phrase
+  useEffect(() => {
+    if (currentAyah === undefined || !isRecording) return;
+    if (phraseAyahRef.current !== null && phraseAyahRef.current !== currentAyah) {
+      // Ayah changed — score the previous one
+      if (userPhrasePitchesRef.current.length > 10 && lastScoredAyahRef.current !== phraseAyahRef.current) {
+        const score = scorePhrase(
+          qariPhrasePitchesRef.current,
+          userPhrasePitchesRef.current,
+          [], [],
+          phraseAyahRef.current,
+          60
+        );
+        setLatestScore(score);
+        setPhraseScores(prev => [...prev, score]);
+        lastScoredAyahRef.current = phraseAyahRef.current;
+      }
+      // Reset for new phrase
+      qariPhrasePitchesRef.current = [];
+      userPhrasePitchesRef.current = [];
+    }
+    phraseAyahRef.current = currentAyah;
+  }, [currentAyah, isRecording]);
 
   useEffect(() => {
     return () => { micStreamRef.current?.getTracks().forEach((t) => t.stop()); };
@@ -201,11 +154,15 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode }: Props) {
   useEffect(() => {
     pitchHistoryRef.current = [];
     userPitchHistoryRef.current = [];
-    noteHistogramRef.current = new Map();
     pitchMinRef.current = Infinity;
     pitchMaxRef.current = 0;
+    maqamStateRef.current = createMaqamDetectionState();
+    frameCountRef.current = 0;
     scoreHistoryRef.current = [];
-    setAvgScore(null);
+    qariPhrasePitchesRef.current = [];
+    userPhrasePitchesRef.current = [];
+    setLatestScore(null);
+    setPhraseScores([]);
   }, [mode]);
 
   // ─── Animation loop ───
@@ -242,11 +199,15 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode }: Props) {
         return;
       }
 
-      // Common: detect pitch
+      frameCountRef.current++;
+
+      // Common: detect pitch with YIN
       const buf = new Float32Array(analyserNode.fftSize);
       analyserNode.getFloatTimeDomainData(buf);
       const rms = detectRMS(buf);
-      const pitch = isPlaying ? detectPitch(buf, sampleRate) : null;
+      const pitchResult: PitchResult | null = isPlaying ? detectPitchYIN(buf, sampleRate) : null;
+      const pitch = pitchResult?.frequency ?? null;
+      const pitchMidi = pitchResult?.midi ?? null;
 
       // Track stats
       pitchHistoryRef.current.push(pitch);
@@ -254,11 +215,16 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode }: Props) {
       rmsHistoryRef.current.push(rms);
       if (rmsHistoryRef.current.length > MAX_PITCH_HISTORY) rmsHistoryRef.current.shift();
 
-      if (pitch) {
+      if (pitch && pitchMidi !== null) {
         if (pitch < pitchMinRef.current) pitchMinRef.current = pitch;
         if (pitch > pitchMaxRef.current) pitchMaxRef.current = pitch;
-        const midi = Math.round(freqToMidi(pitch)) % 12;
-        noteHistogramRef.current.set(midi, (noteHistogramRef.current.get(midi) ?? 0) + 1);
+
+        // Maqam detection — feed fractional MIDI to jins engine
+        const now = performance.now();
+        maqamStateRef.current = updateMaqamDetection(maqamStateRef.current, pitchMidi, now);
+
+        // Track per-phrase pitches for scoring
+        qariPhrasePitchesRef.current.push(pitchMidi);
 
         // Elongation detection
         if (lastPitchRef.current && Math.abs(1200 * Math.log2(pitch / lastPitchRef.current)) < 50) {
@@ -270,32 +236,36 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode }: Props) {
       } else {
         sustainCountRef.current = 0;
         lastPitchRef.current = null;
+        qariPhrasePitchesRef.current.push(null);
       }
 
       // Practice: detect user pitch
       let userPitch: number | null = null;
+      let userPitchMidi: number | null = null;
       if (mode === 'practice' && micAnalyserRef.current) {
         const micBuf = new Float32Array(micAnalyserRef.current.fftSize);
         micAnalyserRef.current.getFloatTimeDomainData(micBuf);
-        userPitch = detectPitch(micBuf, sampleRate);
+        const userResult = detectPitchYIN(micBuf, sampleRate);
+        userPitch = userResult?.frequency ?? null;
+        userPitchMidi = userResult?.midi ?? null;
         userPitchHistoryRef.current.push(userPitch);
         if (userPitchHistoryRef.current.length > MAX_PITCH_HISTORY) userPitchHistoryRef.current.shift();
 
-        const sim = pitchSimilarity(pitch, userPitch);
-        if (sim !== null) {
+        // Track per-phrase user pitches
+        userPhrasePitchesRef.current.push(userPitchMidi);
+
+        // Continuous similarity for real-time feedback
+        if (pitch && userPitch) {
+          const cents = Math.abs(1200 * Math.log2(pitch / userPitch));
+          const sim = Math.max(0, Math.round(100 - cents));
           scoreHistoryRef.current.push(sim);
-          // Update avg score every 30 frames (~0.5s)
-          if (scoreHistoryRef.current.length % 30 === 0) {
-            const avg = scoreHistoryRef.current.reduce((a, b) => a + b, 0) / scoreHistoryRef.current.length;
-            setAvgScore(Math.round(avg));
-          }
         }
       }
 
       const colors = getColors();
 
       if (mode === 'analysis') {
-        drawAnalysis(ctx, W, H, pitch, rms, colors);
+        drawAnalysis(ctx, W, H, pitch, pitchResult, rms, colors);
       } else if (mode === 'pitch') {
         drawMelody(ctx, W, H, pitch, colors);
       } else {
@@ -304,14 +274,17 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode }: Props) {
     }
 
     // ─── ANALYSIS MODE: Live dashboard ───
-    function drawAnalysis(ctx: CanvasRenderingContext2D, W: number, H: number, pitch: number | null, rms: number, colors: ReturnType<typeof getColors>) {
+    function drawAnalysis(ctx: CanvasRenderingContext2D, W: number, H: number, pitch: number | null, pitchResult: PitchResult | null, rms: number, colors: ReturnType<typeof getColors>) {
       const midX = W / 2;
 
       // ── Current note (big display) ──
-      if (pitch) {
+      if (pitch && pitchResult) {
         const note = freqToNoteName(pitch);
-        const octave = freqToNote(pitch).replace(note, '');
+        const quarterNote = freqToQuarterToneName(pitch);
+        const label = freqToNoteLabel(pitch);
+        const octave = label.replace(note, '');
         const cents = freqToCents(pitch);
+        const quarterCents = freqToQuarterToneCents(pitch);
 
         // Note name
         ctx.font = `bold ${Math.min(72, W * 0.15)}px system-ui`;
@@ -324,34 +297,35 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode }: Props) {
         ctx.fillStyle = colors.textSecondary;
         ctx.fillText(octave, midX + Math.min(45, W * 0.09), H * 0.22);
 
-        // Hz
+        // Hz + confidence
         ctx.font = '13px system-ui';
         ctx.fillStyle = colors.textTertiary;
-        ctx.fillText(`${Math.round(pitch)} Hz`, midX, H * 0.34);
+        const confLabel = pitchResult.confidence > 0.9 ? '●' : pitchResult.confidence > 0.7 ? '◐' : '○';
+        ctx.fillText(`${Math.round(pitch)} Hz  ${confLabel}`, midX, H * 0.34);
+
+        // Quarter-tone indicator (shows if the pitch is near a quarter tone)
+        if (quarterNote !== note && Math.abs(quarterCents) < 15) {
+          ctx.font = 'bold 11px system-ui';
+          ctx.fillStyle = colors.accent;
+          ctx.fillText(`≈ ${quarterNote} (¼ tone)`, midX, H * 0.40);
+        }
 
         // Cents meter (tuner-style bar)
         const meterW = Math.min(180, W * 0.45);
         const meterH = 6;
         const meterX = midX - meterW / 2;
-        const meterY = H * 0.38;
+        const meterY = H * 0.43;
 
-        // Background
         ctx.fillStyle = `${colors.textTertiary}20`;
-        ctx.beginPath();
-        ctx.roundRect(meterX, meterY, meterW, meterH, 3);
-        ctx.fill();
+        ctx.beginPath(); ctx.roundRect(meterX, meterY, meterW, meterH, 3); ctx.fill();
 
-        // Center mark
         ctx.fillStyle = `${colors.textTertiary}40`;
         ctx.fillRect(midX - 1, meterY - 2, 2, meterH + 4);
 
-        // Cents indicator
         const centsPos = midX + (cents / 50) * (meterW / 2);
         const centsColor = Math.abs(cents) < 10 ? colors.correct : Math.abs(cents) < 30 ? colors.accent : colors.wrong;
-        ctx.beginPath();
-        ctx.arc(centsPos, meterY + meterH / 2, 5, 0, Math.PI * 2);
-        ctx.fillStyle = centsColor;
-        ctx.fill();
+        ctx.beginPath(); ctx.arc(centsPos, meterY + meterH / 2, 5, 0, Math.PI * 2);
+        ctx.fillStyle = centsColor; ctx.fill();
 
         ctx.font = '10px system-ui';
         ctx.fillStyle = centsColor;
@@ -365,41 +339,57 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode }: Props) {
         ctx.fillText(isPlaying ? 'Silence' : 'Play to begin', midX, H * 0.36);
       }
 
-      // ── Stats grid below ──
-      const statsY = H * 0.5;
+      // ── Stats grid ──
+      const statsY = H * 0.55;
       const colW = W / 4;
 
-      // Volume meter
-      drawStat(ctx, colW * 0.5, statsY, 'Volume', `${Math.round(rms * 1000)}`, colors, W);
+      // Volume
+      drawStat(ctx, colW * 0.5, statsY, 'Volume', `${Math.round(rms * 1000)}`, colors);
       drawVolumeBar(ctx, colW * 0.5 - 25, statsY + 28, 50, 4, rms, colors);
 
-      // Pitch range
+      // Range
       const rangeStr = pitchMinRef.current < Infinity
         ? `${freqToNoteName(pitchMinRef.current)} – ${freqToNoteName(pitchMaxRef.current)}`
         : '—';
-      drawStat(ctx, colW * 1.5, statsY, 'Range', rangeStr, colors, W);
+      drawStat(ctx, colW * 1.5, statsY, 'Range', rangeStr, colors);
 
-      // Elongation
-      const isSustaining = sustainCountRef.current > 15; // ~0.25s at 60fps
-      const sustainLabel = isSustaining ? 'Madd ━━' : 'Normal';
-      drawStat(ctx, colW * 2.5, statsY, 'Sustain', sustainLabel, colors, W, isSustaining ? colors.accent : undefined);
+      // Sustain
+      const isSustaining = sustainCountRef.current > 15;
+      drawStat(ctx, colW * 2.5, statsY, 'Sustain', isSustaining ? 'Madd ━━' : 'Normal', colors, isSustaining ? colors.accent : undefined);
 
-      // Maqam
-      const maqam = detectMaqam(noteHistogramRef.current);
-      drawStat(ctx, colW * 3.5, statsY, 'Maqam', maqam ? maqam.name : '...', colors, W, maqam ? colors.primary : undefined);
-      if (maqam) {
+      // Maqam (jins-based)
+      const maqamDisplay = formatMaqamDisplay(maqamStateRef.current);
+      if (maqamDisplay) {
+        drawStat(ctx, colW * 3.5, statsY, 'Maqam', maqamDisplay.label.replace('Maqam ', ''), colors, colors.primary);
         ctx.font = '9px system-ui';
         ctx.fillStyle = colors.textTertiary;
-        ctx.fillText(`${maqam.confidence}%`, colW * 3.5, statsY + 30);
+        ctx.textAlign = 'center';
+        ctx.fillText(`${maqamDisplay.confidence}% · ${maqamDisplay.sublabel.split(' — ')[0]}`, colW * 3.5, statsY + 30);
+      } else {
+        const elapsed = maqamStateRef.current.timestamps.length > 0
+          ? (performance.now() - maqamStateRef.current.timestamps[0]) / 1000
+          : 0;
+        const statusText = elapsed > 0 ? `Listening... ${Math.round(elapsed)}s` : '...';
+        drawStat(ctx, colW * 3.5, statsY, 'Maqam', statusText, colors);
       }
 
-      // ── Mini pitch history at the bottom ──
-      const histY = H * 0.68;
-      const histH = H * 0.28;
+      // Modulations indicator
+      const mods = maqamStateRef.current.modulations;
+      if (mods.length > 0) {
+        ctx.font = '9px system-ui';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = colors.accent;
+        const lastMod = mods[mods.length - 1];
+        ctx.fillText(`↗ ${lastMod.fromJins} → ${lastMod.toJins}`, colW * 3.5, statsY + 42);
+      }
+
+      // ── Mini pitch contour ──
+      const histY = H * 0.72;
+      const histH = H * 0.24;
       drawMiniContour(ctx, 16, histY, W - 32, histH, pitchHistoryRef.current, colors.primary, colors);
     }
 
-    function drawStat(ctx: CanvasRenderingContext2D, x: number, y: number, label: string, value: string, colors: ReturnType<typeof getColors>, _W: number, valueColor?: string) {
+    function drawStat(ctx: CanvasRenderingContext2D, x: number, y: number, label: string, value: string, colors: ReturnType<typeof getColors>, valueColor?: string) {
       ctx.textAlign = 'center';
       ctx.font = '10px system-ui';
       ctx.fillStyle = colors.textTertiary;
@@ -418,7 +408,7 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode }: Props) {
       ctx.beginPath(); ctx.roundRect(x, y, fillW, h, 2); ctx.fill();
     }
 
-    // ─── MELODY MODE: Pitch contour with annotations ───
+    // ─── MELODY MODE ───
     function drawMelody(ctx: CanvasRenderingContext2D, W: number, H: number, pitch: number | null, colors: ReturnType<typeof getColors>) {
       // Guide lines
       ctx.strokeStyle = `${colors.primary}0F`;
@@ -430,7 +420,7 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode }: Props) {
       for (const f of [100, 150, 200, 300, 400, 500]) {
         const y = freqToY(f, H);
         ctx.beginPath(); ctx.moveTo(30, y); ctx.lineTo(W, y); ctx.stroke();
-        ctx.fillText(freqToNote(f), 2, y + 3);
+        ctx.fillText(freqToNoteLabel(f), 2, y + 3);
       }
       ctx.setLineDash([]);
 
@@ -445,7 +435,7 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode }: Props) {
       // Contour line
       drawContourLine(ctx, pitchHistoryRef.current, W, H, colors.primary, 2.5);
 
-      // Elongation markers — show where the qari holds a note
+      // Elongation markers
       let sustainStart = -1;
       let sustainPitch: number | null = null;
       const history = pitchHistoryRef.current;
@@ -457,7 +447,6 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode }: Props) {
           if (sustainStart === -1) { sustainStart = i - 1; sustainPitch = p; }
         } else {
           if (sustainStart !== -1 && i - sustainStart > 15 && sustainPitch) {
-            // Draw elongation bracket
             const x1 = (sustainStart / MAX_PITCH_HISTORY) * W;
             const x2 = (i / MAX_PITCH_HISTORY) * W;
             const y = freqToY(sustainPitch, H);
@@ -483,15 +472,20 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode }: Props) {
         ctx.beginPath(); ctx.arc(W - 16, y, 3, 0, Math.PI * 2);
         ctx.fillStyle = colors.primary; ctx.fill();
         ctx.font = 'bold 11px system-ui'; ctx.textAlign = 'right'; ctx.fillStyle = colors.primary;
-        ctx.fillText(freqToNote(pitch), W - 26, y - 6);
+        ctx.fillText(freqToNoteLabel(pitch), W - 26, y - 6);
       }
 
-      // Maqam badge
-      const maqam = detectMaqam(noteHistogramRef.current);
-      if (maqam) {
+      // Maqam badge (jins-based)
+      const maqamDisplay = formatMaqamDisplay(maqamStateRef.current);
+      if (maqamDisplay) {
         ctx.font = 'bold 11px system-ui'; ctx.textAlign = 'left';
         ctx.fillStyle = colors.primary;
-        ctx.fillText(`Maqam: ${maqam.name} (${maqam.confidence}%)`, 8, 16);
+        ctx.fillText(`${maqamDisplay.label} (${maqamDisplay.confidence}%)`, 8, 16);
+        if (maqamDisplay.sublabel) {
+          ctx.font = '9px system-ui';
+          ctx.fillStyle = colors.textTertiary;
+          ctx.fillText(maqamDisplay.sublabel.split(' — ')[0], 8, 28);
+        }
       }
 
       // Legend
@@ -502,7 +496,7 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode }: Props) {
       ctx.fillRect(58, H - 16, 8, 3); ctx.fillText('Madd', 70, H - 11);
     }
 
-    // ─── PRACTICE MODE: Comparison with scoring ───
+    // ─── PRACTICE MODE: Per-ayah scoring ───
     function drawPractice(ctx: CanvasRenderingContext2D, W: number, H: number, pitch: number | null, userPitch: number | null, colors: ReturnType<typeof getColors>) {
       // Guide lines
       ctx.strokeStyle = `${colors.primary}0F`;
@@ -514,7 +508,7 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode }: Props) {
       for (const f of [100, 150, 200, 300, 400, 500]) {
         const y = freqToY(f, H);
         ctx.beginPath(); ctx.moveTo(30, y); ctx.lineTo(W, y); ctx.stroke();
-        ctx.fillText(freqToNote(f), 2, y + 3);
+        ctx.fillText(freqToNoteLabel(f), 2, y + 3);
       }
       ctx.setLineDash([]);
 
@@ -533,14 +527,15 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode }: Props) {
           const x1 = (i - 1) * step, x2 = i * step;
           const y1 = freqToY(f1, H), y2 = freqToY(f2, H);
 
-          // Color based on similarity to qari at same time index
           const qariPitch = qariH[i] ?? null;
-          const sim = pitchSimilarity(f2, qariPitch);
           let color: string;
-          if (sim === null) color = colors.accent;
-          else if (sim >= 80) color = colors.correct;
-          else if (sim >= 50) color = colors.accent;
-          else color = colors.wrong;
+          if (!qariPitch) {
+            color = colors.accent;
+          } else {
+            const cents = Math.abs(1200 * Math.log2(f2 / qariPitch));
+            const sim = Math.max(0, 100 - cents);
+            color = sim >= 80 ? colors.correct : sim >= 50 ? colors.accent : colors.wrong;
+          }
 
           ctx.beginPath();
           ctx.lineWidth = 3;
@@ -552,9 +547,10 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode }: Props) {
         }
       }
 
-      // Real-time similarity indicator (right side)
-      const currentSim = pitchSimilarity(pitch, userPitch);
-      if (currentSim !== null) {
+      // Real-time similarity indicator
+      if (pitch && userPitch) {
+        const cents = Math.abs(1200 * Math.log2(pitch / userPitch));
+        const currentSim = Math.max(0, Math.round(100 - cents));
         const simColor = currentSim >= 80 ? colors.correct : currentSim >= 50 ? colors.accent : colors.wrong;
         ctx.font = `bold ${Math.min(36, W * 0.08)}px system-ui`;
         ctx.textAlign = 'right';
@@ -579,7 +575,6 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode }: Props) {
     function drawContourLine(ctx: CanvasRenderingContext2D, history: (number | null)[], W: number, H: number, color: string, lw: number) {
       if (history.length < 2) return;
       const step = W / MAX_PITCH_HISTORY;
-      // Glow
       ctx.save(); ctx.globalAlpha = 0.12; ctx.lineWidth = lw + 4; ctx.strokeStyle = color;
       ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.beginPath();
       let started = false;
@@ -589,7 +584,6 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode }: Props) {
         if (!started) { ctx.moveTo(x, y); started = true; } else ctx.lineTo(x, y);
       }
       ctx.stroke(); ctx.restore();
-      // Main
       ctx.beginPath(); ctx.lineWidth = lw; ctx.strokeStyle = color;
       ctx.lineJoin = 'round'; ctx.lineCap = 'round';
       started = false;
@@ -602,7 +596,6 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode }: Props) {
     }
 
     function drawMiniContour(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, history: (number | null)[], color: string, colors: ReturnType<typeof getColors>) {
-      // Background
       ctx.fillStyle = `${colors.textTertiary}08`;
       ctx.beginPath(); ctx.roundRect(x, y, w, h, 8); ctx.fill();
       ctx.strokeStyle = `${colors.textTertiary}15`;
@@ -613,7 +606,6 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode }: Props) {
       const step = w / MAX_PITCH_HISTORY;
       ctx.save();
       ctx.beginPath(); ctx.roundRect(x, y, w, h, 8); ctx.clip();
-
       ctx.beginPath(); ctx.lineWidth = 2; ctx.strokeStyle = color;
       ctx.lineJoin = 'round'; ctx.lineCap = 'round';
       let started = false;
@@ -631,6 +623,9 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode }: Props) {
     return () => cancelAnimationFrame(animFrameRef.current);
   }, [analyserNode, mode, isPlaying]);
 
+  // Session stats
+  const sessionStats = phraseScores.length > 0 ? computeSessionStats(phraseScores) : null;
+
   return (
     <div ref={containerRef} className="relative w-full h-full" style={{ minHeight: '200px' }}>
       <canvas ref={canvasRef} className="absolute inset-0" />
@@ -638,12 +633,18 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode }: Props) {
       {/* Practice mode controls */}
       {mode === 'practice' && (
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-3">
-          {avgScore !== null && (
-            <div className={`px-3 py-1 rounded-full text-sm font-bold ${
-              avgScore >= 80 ? 'bg-correct/20 text-correct' :
-              avgScore >= 50 ? 'bg-accent/20 text-accent' : 'bg-wrong/20 text-wrong'
-            }`}>
-              Avg: {avgScore}%
+          {/* Session stats */}
+          {sessionStats && (
+            <div className="flex items-center gap-2">
+              <div className={`px-3 py-1 rounded-full text-sm font-bold ${
+                sessionStats.averageScore >= 80 ? 'bg-correct/20 text-correct' :
+                sessionStats.averageScore >= 50 ? 'bg-accent/20 text-accent' : 'bg-wrong/20 text-wrong'
+              }`}>
+                Avg: {sessionStats.averageScore}%
+              </div>
+              <span className="text-[10px] text-text-tertiary">
+                {sessionStats.scores.length} phrase{sessionStats.scores.length !== 1 ? 's' : ''}
+              </span>
             </div>
           )}
           <button
@@ -670,6 +671,72 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode }: Props) {
           </button>
         </div>
       )}
+
+      {/* Per-phrase scorecard overlay */}
+      {mode === 'practice' && latestScore && !isRecording && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-canvas/80 backdrop-blur-sm animate-fade-in">
+          <div className="bg-surface rounded-2xl shadow-modal p-6 max-w-xs w-full mx-4 text-center">
+            {/* Letter grade */}
+            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-3 text-2xl font-bold ${
+              latestScore.grade === 'A' ? 'bg-correct/20 text-correct' :
+              latestScore.grade === 'B' ? 'bg-primary/20 text-primary' :
+              latestScore.grade === 'C' ? 'bg-accent/20 text-accent' :
+              'bg-wrong/20 text-wrong'
+            }`}>
+              {latestScore.grade}
+            </div>
+            <p className="text-sm text-text-secondary mb-1">Ayah {latestScore.ayahNumber}</p>
+            <p className="text-2xl font-bold text-text mb-4">{latestScore.overall}%</p>
+
+            {/* Sub-score bars */}
+            <div className="space-y-2 mb-4">
+              <ScoreBar label="Pitch" value={latestScore.pitch} />
+              <ScoreBar label="Rhythm" value={latestScore.rhythm} />
+              <ScoreBar label="Sustain" value={latestScore.sustain} />
+            </div>
+
+            {/* Feedback */}
+            {latestScore.feedback.length > 0 && (
+              <div className="text-left space-y-1 mb-4">
+                {latestScore.feedback.slice(0, 3).map((msg, i) => (
+                  <p key={i} className="text-xs text-text-secondary leading-relaxed">
+                    {i === 0 && latestScore.overall >= 70 ? '✨ ' : '→ '}{msg}
+                  </p>
+                ))}
+              </div>
+            )}
+
+            {/* Try again */}
+            <button
+              onClick={() => {
+                setLatestScore(null);
+                startMic();
+              }}
+              className="btn-primary text-sm px-6 py-2.5 w-full"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Score bar component ───
+
+function ScoreBar({ label, value }: { label: string; value: number }) {
+  const color = value >= 80 ? 'bg-correct' : value >= 60 ? 'bg-accent' : 'bg-wrong';
+  return (
+    <div className="flex items-center gap-2">
+      <span className="text-[10px] text-text-tertiary w-12 text-right">{label}</span>
+      <div className="flex-1 h-1.5 rounded-full bg-border-light">
+        <div
+          className={`h-full rounded-full transition-all duration-500 ${color}`}
+          style={{ width: `${value}%` }}
+        />
+      </div>
+      <span className="text-[10px] text-text-secondary font-medium w-8">{value}%</span>
     </div>
   );
 }

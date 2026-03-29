@@ -74,7 +74,7 @@ function getVisibleSurahAyah(blocks: SurahBlock[]): { surahNumber: number; ayahN
 const BISMILLAH = 'بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ';
 
 export function SurahReaderClient({ ayahs, surahNumber, surahName, surahArabicName, hasWords, hasTafsir }: Props) {
-  const { quranSettings, updateQuranSettings, setLastRead, updateStreak } = useAppStore();
+  const { quranSettings, updateQuranSettings, setLastRead, updateStreak, selectedQariId, setSelectedQariId } = useAppStore();
   const [showSettings, setShowSettings] = useState(false);
   const [selectedWord, setSelectedWord] = useState<WordData | null>(null);
   const [wordAnchor, setWordAnchor] = useState<HTMLElement | null>(null);
@@ -545,6 +545,8 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, surahArabicNa
           onClose={closeAudioMode}
           onPlayModeChange={setAudioPlayMode}
           onLoopModeChange={setAudioLoopMode}
+          selectedQariId={selectedQariId}
+          onQariChange={setSelectedQariId}
         />
       )}
     </div>

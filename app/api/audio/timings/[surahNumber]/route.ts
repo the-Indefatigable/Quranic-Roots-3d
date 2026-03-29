@@ -1,7 +1,7 @@
 export const revalidate = false; // Quran audio timing never changes
 
 export async function GET(
-  _req: Request,
+  req: Request,
   { params }: { params: { surahNumber: string } }
 ) {
   const surahNumber = parseInt(params.surahNumber);
@@ -9,15 +9,19 @@ export async function GET(
     return Response.json({ error: 'Invalid surah' }, { status: 400 });
   }
 
+  // Optional recitation ID (default: 7 = Al-Afasy)
+  const url = new URL(req.url);
+  const recitationId = parseInt(url.searchParams.get('recitationId') ?? '7') || 7;
+
   try {
     // Fetch per-ayah segments and full chapter audio URL in parallel
     const [segRes, chapterRes] = await Promise.all([
       fetch(
-        `https://api.quran.com/api/v4/recitations/7/by_chapter/${surahNumber}?per_page=300&fields=segments`,
+        `https://api.quran.com/api/v4/recitations/${recitationId}/by_chapter/${surahNumber}?per_page=300&fields=segments`,
         { headers: { Accept: 'application/json' }, next: { revalidate: false } }
       ),
       fetch(
-        `https://api.quran.com/api/v4/chapter_recitations/7/${surahNumber}`,
+        `https://api.quran.com/api/v4/chapter_recitations/${recitationId}/${surahNumber}`,
         { headers: { Accept: 'application/json' }, next: { revalidate: false } }
       ),
     ]);

@@ -38,6 +38,9 @@ interface AppState {
 
   streak: { count: number; lastActiveDate: string | null };
   updateStreak: () => void;
+
+  selectedQariId: string;
+  setSelectedQariId: (id: string) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -101,6 +104,9 @@ export const useAppStore = create<AppState>()(
           return state;
         });
       },
+
+      selectedQariId: 'alafasy',
+      setSelectedQariId: (id) => set({ selectedQariId: id }),
     }),
     {
       name: 'quroots-storage',
@@ -109,6 +115,7 @@ export const useAppStore = create<AppState>()(
         quranSettings: state.quranSettings,
         lastRead: state.lastRead,
         streak: state.streak,
+        selectedQariId: state.selectedQariId,
       }),
     }
   )
