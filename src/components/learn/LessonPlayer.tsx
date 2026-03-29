@@ -193,64 +193,99 @@ export function LessonPlayer({
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#131F24] flex flex-col">
-      {/* Top bar: progress + hearts + close */}
-      <div className="flex items-center gap-3 px-4 py-3 shrink-0">
-        <button onClick={onExit} className="text-white/40 hover:text-white transition-colors">
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div className="fixed inset-0 z-50 flex flex-col" style={{ background: '#0E0D0C' }}>
+
+      {/* Subtle dot-grid texture */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-0"
+        style={{
+          backgroundImage: 'radial-gradient(circle, rgba(212,162,70,0.06) 1px, transparent 1px)',
+          backgroundSize: '24px 24px',
+        }}
+      />
+
+      {/* Unit-colored ambient glow at top */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute top-0 left-0 right-0 h-48 z-0"
+        style={{ background: `radial-gradient(ellipse at 50% -20%, ${unitColor}18 0%, transparent 70%)` }}
+      />
+
+      {/* ── Top bar ─────────────────────────────────────────── */}
+      <div className="relative z-10 flex items-center gap-3 px-4 py-3 shrink-0">
+        <button
+          onClick={onExit}
+          className="w-8 h-8 flex items-center justify-center rounded-lg text-[#57534E] hover:text-[#A09F9B] transition-colors"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
 
-        {/* Progress bar */}
-        <div className="flex-1 h-3 bg-surface rounded-full overflow-hidden">
+        {/* Progress bar — with octagon-tipped capsule feel */}
+        <div className="flex-1 h-2.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
           <motion.div
             className="h-full rounded-full"
-            style={{ backgroundColor: unitColor || '#58CC02' }}
+            style={{
+              background: `linear-gradient(to right, ${unitColor}cc, ${unitColor})`,
+              boxShadow: `0 0 8px ${unitColor}60`,
+            }}
             animate={{ width: `${Math.min(progress, 100)}%` }}
-            transition={{ type: 'spring', stiffness: 100, damping: 20 }}
+            transition={{ type: 'spring', stiffness: 80, damping: 18 }}
           />
         </div>
 
-        {/* Hearts */}
+        {/* Heart dots — refined, not emoji */}
         <div className="flex items-center gap-1 shrink-0">
           {Array.from({ length: 5 }).map((_, i) => (
-            <motion.span
+            <motion.div
               key={i}
-              className="text-lg"
-              animate={i >= hearts ? { scale: [1, 0.5], opacity: [1, 0.3] } : {}}
-            >
-              {i < hearts ? '❤️' : '🖤'}
-            </motion.span>
+              className="w-2.5 h-2.5 rounded-full"
+              style={{ background: i < hearts ? '#D9635B' : 'rgba(255,255,255,0.08)' }}
+              animate={i === hearts ? { scale: [1, 0.4, 1] } : {}}
+              transition={{ duration: 0.3 }}
+            />
           ))}
         </div>
+      </div>
+
+      {/* Lesson title + unit breadcrumb */}
+      <div className="relative z-10 px-5 pb-1 shrink-0">
+        <p className="text-[10px] uppercase tracking-[0.2em] font-medium" style={{ color: `${unitColor}80` }}>
+          {unitTitle}
+        </p>
+        <p className="text-[#A09F9B] text-xs truncate">{title}</p>
       </div>
 
       {/* Combo indicator */}
       <AnimatePresence>
         {combo >= 2 && (
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            className="text-center py-1"
+            initial={{ opacity: 0, y: -8, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            className="relative z-10 text-center py-1"
           >
-            <span className="text-sm font-bold" style={{ color: '#D97706' }}>
-              🔥 {combo}x Combo!
+            <span
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold"
+              style={{ background: 'rgba(217,151,91,0.12)', color: '#D97706', border: '1px solid rgba(217,151,91,0.2)' }}
+            >
+              <span>🔥</span> {combo}× Combo
             </span>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Step content */}
-      <div className="flex-1 overflow-y-auto flex flex-col items-center justify-center px-4 pb-4">
+      {/* ── Step content ─────────────────────────────────────── */}
+      <div className="relative z-10 flex-1 overflow-y-auto flex flex-col items-center justify-center px-4 pb-4">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentStep}
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -40 }}
-            transition={{ duration: 0.2 }}
+            initial={{ opacity: 0, x: 32, filter: 'blur(4px)' }}
+            animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+            exit={{ opacity: 0, x: -32, filter: 'blur(4px)' }}
+            transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
             className="w-full max-w-lg"
           >
             {currentStepData && renderStep(currentStepData, handleAnswer, handleContinue)}
@@ -258,24 +293,42 @@ export function LessonPlayer({
         </AnimatePresence>
       </div>
 
-      {/* Feedback banner */}
+      {/* ── Feedback banner — refined, not a flat slab ───────── */}
       <AnimatePresence>
         {showFeedback && (
           <motion.div
-            initial={{ y: 100, opacity: 0 }}
+            initial={{ y: 80, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 100, opacity: 0 }}
-            className={`absolute bottom-0 left-0 right-0 p-5 ${
-              showFeedback === 'correct'
-                ? 'bg-[#58CC02]'
-                : 'bg-[#FF4B4B]'
-            }`}
+            exit={{ y: 80, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 320, damping: 28 }}
+            className="absolute bottom-0 left-0 right-0 z-20"
           >
-            <div className="max-w-lg mx-auto">
-              <p className="font-bold text-white text-lg mb-1">
-                {showFeedback === 'correct' ? '✓ Correct!' : '✗ Not quite'}
-              </p>
-              <p className="text-white/90 text-sm">{feedbackExplanation}</p>
+            <div
+              className="mx-3 mb-3 rounded-2xl p-5"
+              style={showFeedback === 'correct' ? {
+                background: 'linear-gradient(135deg, rgba(92,184,137,0.18) 0%, rgba(92,184,137,0.10) 100%)',
+                border: '1px solid rgba(92,184,137,0.30)',
+                boxShadow: '0 8px 32px rgba(92,184,137,0.12)',
+              } : {
+                background: 'linear-gradient(135deg, rgba(217,99,91,0.18) 0%, rgba(217,99,91,0.10) 100%)',
+                border: '1px solid rgba(217,99,91,0.30)',
+                boxShadow: '0 8px 32px rgba(217,99,91,0.12)',
+              }}
+            >
+              <div className="max-w-lg mx-auto flex items-start gap-3">
+                <div
+                  className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-0.5"
+                  style={{ background: showFeedback === 'correct' ? 'rgba(92,184,137,0.2)' : 'rgba(217,99,91,0.2)' }}
+                >
+                  <span className="text-base">{showFeedback === 'correct' ? '✓' : '✗'}</span>
+                </div>
+                <div>
+                  <p className="font-bold text-[#EDEDEC] text-base mb-0.5">
+                    {showFeedback === 'correct' ? 'Correct!' : 'Not quite'}
+                  </p>
+                  <p className="text-[#A09F9B] text-sm leading-relaxed">{feedbackExplanation}</p>
+                </div>
+              </div>
             </div>
           </motion.div>
         )}
