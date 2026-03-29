@@ -367,7 +367,7 @@ export const QIRAT_UNITS: QiratUnit[] = [
             type: 'teach',
             content: {
               title: 'Sing the Bayati Jins',
-              body: 'Now it\'s your turn! You\'ll see 4 target notes — the Bayati jins starting on D.\n\nSing each note and try to match it. The key is the **second note** — it\'s the quarter-tone that makes Bayati unique.\n\n**Tips:**\n- Start with a gentle hum\n- Don\'t force — let your voice relax into each note\n- The second note should feel "in between" — not sharp, not flat\n- You need **70% accuracy** to pass',
+              body: 'Now it\'s your turn! You\'ll tune your voice to 4 notes of the Bayati jins.\n\n**How it works:**\n- A reference tone plays softly while your mic is open\n- You don\'t memorize — you just tune to what you hear\n- An arrow shows if you need to go higher ↑ or lower ↓\n- Hold your voice in the golden zone — that\'s it!\n\n**The key note** is the second one — it\'s the quarter-tone that makes Bayati unique. It should feel "in between" — not sharp, not flat.',
             },
           },
           {

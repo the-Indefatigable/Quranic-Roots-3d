@@ -1,5 +1,17 @@
 'use client';
 
+/**
+ * ReciteScoreStep — "Phrase Echo" Mode
+ *
+ * Teaches through the same talaqqi principle:
+ * - Arabic text displayed prominently
+ * - Qari recites one phrase → you echo it → see pitch comparison
+ * - Qari audio plays at low volume WHILE you're recording
+ *   so you can hear yourself against the reference
+ * - Words light up as they're being recited
+ * - Scoring is compassionate — any serious attempt passes
+ */
+
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { detectPitchYIN, freqToMidi } from '@/lib/audio/pitchEngine';
 import { scorePhrase, type PhraseScore } from '@/lib/audio/phraseScorer';
@@ -12,10 +24,21 @@ interface Props {
 
 type Phase = 'ready' | 'listening' | 'countdown' | 'recording' | 'scored';
 
+// Feedback messages by grade
+const GRADE_MSG: Record<string, { title: string; body: string; emoji: string }> = {
+  A: { emoji: '🌟', title: 'Exceptional!', body: 'Your recitation was very close to the Qari. Keep this up and you will develop a beautiful tilawa.' },
+  B: { emoji: '✨', title: 'Well done!', body: 'Good attempt. Your rhythm and pitch are developing well. Repeat to build muscle memory.' },
+  C: { emoji: '📖', title: 'Good start', body: 'You tried — that\'s what matters. Listen carefully one more time, then try again.' },
+  D: { emoji: '🎤', title: 'Keep going', body: 'The more you listen and repeat, the more natural it becomes. Every Qari started exactly where you are.' },
+  F: { emoji: '🎤', title: 'Keep going', body: 'The more you listen and repeat, the more natural it becomes. Every Qari started exactly where you are.' },
+};
+
 export function ReciteScoreStep({ content, onAnswer }: Props) {
   const [phase, setPhase] = useState<Phase>('ready');
   const [score, setScore] = useState<PhraseScore | null>(null);
   const [countdown, setCountdown] = useState(3);
+  const [recordingSeconds, setRecordingSeconds] = useState(0);
+  const [hasListened, setHasListened] = useState(false);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const micStreamRef = useRef<MediaStream | null>(null);
@@ -26,11 +49,18 @@ export function ReciteScoreStep({ content, onAnswer }: Props) {
   const userPitchesRef = useRef<(number | null)[]>([]);
   const silenceFramesRef = useRef(0);
   const phaseRef = useRef<Phase>('ready');
+  const recordingTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const audioUrl = `https://everyayah.com/data/${content.reciterId}/${String(content.surah).padStart(3, '0')}${String(content.ayah).padStart(3, '0')}.mp3`;
-  const passThreshold = content.passThreshold ?? 30;
+  const passThreshold = content.passThreshold ?? 20; // very low — any real attempt passes
 
-  // Step 1: Play qari AND collect their pitch data via Web Audio routing
+  const getCtx = useCallback(() => {
+    if (!audioCtxRef.current) audioCtxRef.current = new AudioContext();
+    if (audioCtxRef.current.state === 'suspended') audioCtxRef.current.resume();
+    return audioCtxRef.current;
+  }, []);
+
+  // Step 1: Play qari + collect their pitch
   const startListening = useCallback(() => {
     setPhase('listening');
     phaseRef.current = 'listening';
@@ -38,83 +68,76 @@ export function ReciteScoreStep({ content, onAnswer }: Props) {
     userPitchesRef.current = [];
     silenceFramesRef.current = 0;
 
-    const ctx = audioCtxRef.current || new AudioContext();
-    audioCtxRef.current = ctx;
-    if (ctx.state === 'suspended') ctx.resume();
-
+    const ctx = getCtx();
     const audio = new Audio(audioUrl);
     audio.crossOrigin = 'anonymous';
     audioRef.current = audio;
 
-    // Route qari audio through analyser to capture pitch
-    const source = ctx.createMediaElementSource(audio);
-    const analyser = ctx.createAnalyser();
-    analyser.fftSize = 2048;
-    analyser.smoothingTimeConstant = 0.8;
-    source.connect(analyser);
-    analyser.connect(ctx.destination); // still plays audio
-    const qariAnalyser = analyser;
+    try {
+      const source = ctx.createMediaElementSource(audio);
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 2048;
+      analyser.smoothingTimeConstant = 0.8;
+      source.connect(analyser);
+      analyser.connect(ctx.destination);
 
-    let qariAnimFrame = 0;
-    const sampleRate = ctx.sampleRate;
+      let qariFrame = 0;
+      const sr = ctx.sampleRate;
+      function collectQari() {
+        if (phaseRef.current !== 'listening') return;
+        qariFrame = requestAnimationFrame(collectQari);
+        const buf = new Float32Array(analyser.fftSize);
+        analyser.getFloatTimeDomainData(buf);
+        const r = detectPitchYIN(buf, sr);
+        qariPitchesRef.current.push(r?.frequency ? freqToMidi(r.frequency) : null);
+      }
+      qariFrame = requestAnimationFrame(collectQari);
 
-    function collectQariPitch() {
-      if (phaseRef.current !== 'listening') return;
-      qariAnimFrame = requestAnimationFrame(collectQariPitch);
-      const buf = new Float32Array(qariAnalyser.fftSize);
-      qariAnalyser.getFloatTimeDomainData(buf);
-      const result = detectPitchYIN(buf, sampleRate);
-      qariPitchesRef.current.push(result?.frequency ? freqToMidi(result.frequency) : null);
+      audio.addEventListener('ended', () => {
+        cancelAnimationFrame(qariFrame);
+        setHasListened(true);
+        startCountdown();
+      });
+      audio.addEventListener('error', () => {
+        cancelAnimationFrame(qariFrame);
+        setPhase('ready');
+        phaseRef.current = 'ready';
+      });
+      audio.play().catch(() => {
+        setPhase('ready');
+        phaseRef.current = 'ready';
+      });
+    } catch {
+      audio.play().catch(() => {});
+      audio.addEventListener('ended', () => {
+        setHasListened(true);
+        startCountdown();
+      });
     }
+  }, [audioUrl, getCtx]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    qariAnimFrame = requestAnimationFrame(collectQariPitch);
-
-    audio.addEventListener('ended', () => {
-      cancelAnimationFrame(qariAnimFrame);
-      // Show countdown before recording
-      startCountdown();
-    });
-
-    audio.addEventListener('error', () => {
-      cancelAnimationFrame(qariAnimFrame);
-      setPhase('ready');
-    });
-
-    audio.play().catch(() => {
-      cancelAnimationFrame(qariAnimFrame);
-      setPhase('ready');
-    });
-  }, [audioUrl]);
-
-  // Countdown (3-2-1) before recording starts
   const startCountdown = useCallback(() => {
     setPhase('countdown');
     phaseRef.current = 'countdown';
     setCountdown(3);
-
-    let count = 3;
-    const interval = setInterval(() => {
-      count--;
-      setCountdown(count);
-      if (count <= 0) {
-        clearInterval(interval);
+    let c = 3;
+    const t = setInterval(() => {
+      c--;
+      setCountdown(c);
+      if (c <= 0) {
+        clearInterval(t);
         startRecording();
       }
-    }, 1000);
+    }, 900);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Step 2: Record user
   const startRecording = useCallback(async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        audio: { echoCancellation: true, noiseSuppression: true },
+        audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false },
       });
       micStreamRef.current = stream;
-
-      const ctx = audioCtxRef.current || new AudioContext();
-      audioCtxRef.current = ctx;
-      if (ctx.state === 'suspended') await ctx.resume();
-
+      const ctx = getCtx();
       const source = ctx.createMediaStreamSource(stream);
       const analyser = ctx.createAnalyser();
       analyser.fftSize = 2048;
@@ -122,187 +145,333 @@ export function ReciteScoreStep({ content, onAnswer }: Props) {
       source.connect(analyser);
       analyserRef.current = analyser;
 
+      // Play qari softly alongside (reference while recording)
+      const refAudio = new Audio(audioUrl);
+      refAudio.volume = 0.2;
+      refAudio.play().catch(() => {});
+
       setPhase('recording');
       phaseRef.current = 'recording';
       silenceFramesRef.current = 0;
-    } catch {
-      // Mic denied — pass and continue
-      setPhase('scored');
-      phaseRef.current = 'scored';
-      onAnswer(
-        true,
-        'mic_denied',
-        'mic_required',
-        'Microphone access was denied. Enable mic in your browser settings to practice recitation.'
-      );
-    }
-  }, [onAnswer]);
+      setRecordingSeconds(0);
 
-  // Detection loop for recording phase
+      // Counting seconds display
+      recordingTimerRef.current = setInterval(() => {
+        setRecordingSeconds(s => s + 1);
+      }, 1000);
+    } catch {
+      onAnswer(true, 'mic_denied', 'mic_required',
+        'Mic access denied. Enable microphone in browser settings to practice recitation.');
+    }
+  }, [audioUrl, getCtx, onAnswer]);
+
+  // Recording detection loop
   useEffect(() => {
     if (phase !== 'recording' || !analyserRef.current) return;
 
     const analyser = analyserRef.current;
-    const sampleRate = audioCtxRef.current?.sampleRate ?? 44100;
+    const sr = audioCtxRef.current?.sampleRate ?? 44100;
 
     function detect() {
       animFrameRef.current = requestAnimationFrame(detect);
-
       const buf = new Float32Array(analyser.fftSize);
       analyser.getFloatTimeDomainData(buf);
-      const result = detectPitchYIN(buf, sampleRate);
-      const userPitch = result?.frequency ?? null;
-      userPitchesRef.current.push(userPitch ? freqToMidi(userPitch) : null);
+      const r = detectPitchYIN(buf, sr);
+      const pitch = r?.frequency ?? null;
+      userPitchesRef.current.push(pitch ? freqToMidi(pitch) : null);
 
-      // Auto-stop on extended silence (after user has started reciting)
-      if (!userPitch) {
+      if (!pitch) {
         silenceFramesRef.current++;
-        if (silenceFramesRef.current > 120 && userPitchesRef.current.length > 30) {
-          finishRecording();
-          return;
+        if (silenceFramesRef.current > 150 && userPitchesRef.current.length > 40) {
+          finish();
         }
       } else {
         silenceFramesRef.current = 0;
       }
     }
 
-    function finishRecording() {
+    function finish() {
       cancelAnimationFrame(animFrameRef.current);
+      if (recordingTimerRef.current) clearInterval(recordingTimerRef.current);
       micStreamRef.current?.getTracks().forEach(t => t.stop());
       micStreamRef.current = null;
 
       const result = scorePhrase(
         qariPitchesRef.current,
         userPitchesRef.current,
-        [], [],
-        content.ayah,
-        60
+        [], [], content.ayah, 60
       );
 
       setScore(result);
       setPhase('scored');
       phaseRef.current = 'scored';
 
+      // Very low threshold — almost any attempt passes
       const passed = result.overall >= passThreshold;
-      const maqamNote = content.expectedMaqam ? ` in ${content.expectedMaqam}` : '';
+      const msg = GRADE_MSG[result.grade] ?? GRADE_MSG['F'];
       onAnswer(
         passed,
         `${result.overall}%`,
         `${passThreshold}%`,
-        passed
-          ? `Well done! You scored ${result.overall}%${maqamNote}. ${result.feedback[0] || ''}`
-          : `You scored ${result.overall}%. Need ${passThreshold}% to pass. ${result.feedback[0] || 'Keep practicing!'}`
+        `${msg.title} ${msg.body}`
       );
     }
 
     animFrameRef.current = requestAnimationFrame(detect);
     return () => cancelAnimationFrame(animFrameRef.current);
-  }, [phase, content.ayah, content.expectedMaqam, passThreshold, onAnswer]);
+  }, [phase, content.ayah, passThreshold, onAnswer]);
 
-  // Cleanup
-  useEffect(() => {
-    return () => {
-      audioRef.current?.pause();
-      micStreamRef.current?.getTracks().forEach(t => t.stop());
-      cancelAnimationFrame(animFrameRef.current);
-    };
+  useEffect(() => () => {
+    audioRef.current?.pause();
+    micStreamRef.current?.getTracks().forEach(t => t.stop());
+    cancelAnimationFrame(animFrameRef.current);
+    if (recordingTimerRef.current) clearInterval(recordingTimerRef.current);
   }, []);
 
+  const gradeInfo = score ? (GRADE_MSG[score.grade] ?? GRADE_MSG['F']) : null;
+
   return (
-    <div className="w-full max-w-lg mx-auto text-center">
-      {content.expectedMaqam && (
-        <p className="text-white/50 text-xs uppercase tracking-wider mb-2">
-          Maqam {content.expectedMaqam}
+    <div className="w-full max-w-lg mx-auto">
+
+      {/* Header */}
+      <div className="mb-5">
+        {content.expectedMaqam && (
+          <p className="text-[10px] uppercase tracking-[0.2em] font-medium mb-1" style={{ color: '#D4A246' }}>
+            Maqam {content.expectedMaqam}
+          </p>
+        )}
+        <p className="text-[#EDEDEC] text-lg font-semibold">
+          Surah {content.surah} · Ayah {content.ayah}
         </p>
-      )}
-      <p className="text-white text-lg font-bold mb-2">
-        Surah {content.surah}, Ayah {content.ayah}
-      </p>
-      <p className="text-white/50 text-sm mb-8">
-        Listen to the Qari, then recite the same ayah
-      </p>
+        <p className="text-[#636260] text-xs mt-0.5">
+          Listen to the Qari, then echo what you heard
+        </p>
+      </div>
 
-      {/* Ready state */}
+      {/* Phase indicators */}
+      <div className="flex items-center gap-2 mb-6">
+        {(['listen', 'echo'] as const).map((step, i) => {
+          const active = (step === 'listen' && (phase === 'ready' || phase === 'listening')) ||
+                         (step === 'echo' && (phase === 'countdown' || phase === 'recording' || phase === 'scored'));
+          const done = step === 'listen' && (phase === 'countdown' || phase === 'recording' || phase === 'scored');
+          return (
+            <div key={step} className="flex items-center gap-2">
+              {i > 0 && <div className="w-4 h-px bg-[#2D2C2A]" />}
+              <div className="flex items-center gap-1.5">
+                <div
+                  className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold transition-all"
+                  style={{
+                    background: done ? '#5CB889' : active ? 'rgba(212,162,70,0.2)' : 'rgba(255,255,255,0.05)',
+                    border: `1px solid ${done ? '#5CB889' : active ? 'rgba(212,162,70,0.4)' : 'rgba(255,255,255,0.08)'}`,
+                    color: done ? '#0E0D0C' : active ? '#D4A246' : '#3D3C3A',
+                  }}
+                >
+                  {done ? '✓' : i + 1}
+                </div>
+                <span className="text-xs" style={{ color: active ? '#A09F9B' : '#3D3C3A' }}>
+                  {step === 'listen' ? 'Listen' : 'Echo'}
+                </span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* READY */}
       {phase === 'ready' && (
-        <button
-          onClick={startListening}
-          className="w-full py-5 rounded-2xl bg-[#0D9488] text-white font-bold text-lg hover:bg-[#0D9488]/90 active:scale-95 transition-all flex items-center justify-center gap-3"
-        >
-          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" />
-          </svg>
-          Start — Listen First
-        </button>
+        <div className="space-y-4">
+          <div
+            className="rounded-2xl p-4"
+            style={{ background: 'rgba(212,162,70,0.06)', border: '1px solid rgba(212,162,70,0.15)' }}
+          >
+            <p className="text-[#D4A246] text-sm font-semibold mb-2">How this works</p>
+            <div className="space-y-2">
+              {[
+                { n: '1', text: 'Listen: the Qari recites — absorb the melody' },
+                { n: '2', text: 'Echo: the Qari plays softly while you recite — let it guide you' },
+                { n: '3', text: 'Any genuine attempt earns a pass — this is about exposure, not perfection' },
+              ].map(({ n, text }) => (
+                <div key={n} className="flex items-start gap-2.5">
+                  <span
+                    className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5"
+                    style={{ background: 'rgba(212,162,70,0.15)', color: '#D4A246' }}
+                  >
+                    {n}
+                  </span>
+                  <p className="text-[#A09F9B] text-sm">{text}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <button
+            onClick={startListening}
+            className="w-full py-4 rounded-2xl font-bold text-base transition-all active:scale-95"
+            style={{
+              background: 'linear-gradient(135deg, #D4A246 0%, #E8B84B 100%)',
+              color: '#0E0D0C',
+              boxShadow: '0 4px 20px rgba(212,162,70,0.3)',
+            }}
+          >
+            Listen to Qari
+          </button>
+        </div>
       )}
 
-      {/* Listening state */}
+      {/* LISTENING */}
       {phase === 'listening' && (
-        <div className="space-y-4">
-          <div className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-[#0D9488]/20">
-            <div className="w-2.5 h-2.5 rounded-full bg-[#0D9488] animate-pulse" />
-            <span className="text-[#0D9488] font-medium">Step 1: Listening to Qari...</span>
+        <div className="flex flex-col items-center gap-5 py-4">
+          <div
+            className="w-20 h-20 rounded-2xl flex items-center justify-center"
+            style={{ background: 'rgba(13,148,136,0.12)', border: '1px solid rgba(13,148,136,0.25)' }}
+          >
+            <div className="flex items-end gap-1 h-10">
+              {[4, 8, 12, 6, 10, 14, 8].map((h, i) => (
+                <div
+                  key={i}
+                  className="w-1.5 rounded-full animate-pulse"
+                  style={{
+                    height: `${h * 2}px`,
+                    background: '#0D9488',
+                    animationDelay: `${i * 0.12}s`,
+                    animationDuration: '1s',
+                  }}
+                />
+              ))}
+            </div>
           </div>
-          <div className="flex items-center justify-center gap-1">
-            {[...Array(7)].map((_, i) => (
-              <div
-                key={i}
-                className="w-1 bg-[#0D9488] rounded-full animate-pulse"
-                style={{ height: `${[10, 18, 14, 22, 12, 20, 16][i]}px`, animationDelay: `${i * 0.1}s` }}
-              />
+          <div className="text-center">
+            <p className="text-[#EDEDEC] font-semibold">Listening to Qari...</p>
+            <p className="text-[#636260] text-sm mt-1">Absorb the melody — notice how it rises and falls</p>
+          </div>
+        </div>
+      )}
+
+      {/* COUNTDOWN */}
+      {phase === 'countdown' && (
+        <div className="flex flex-col items-center gap-4 py-4">
+          <p className="text-[#A09F9B] text-sm">Get ready to echo in...</p>
+          <div
+            className="w-24 h-24 rounded-2xl flex items-center justify-center"
+            style={{ background: 'rgba(212,162,70,0.1)', border: '2px solid rgba(212,162,70,0.3)' }}
+          >
+            <span className="text-5xl font-bold" style={{ color: '#D4A246' }}>{countdown}</span>
+          </div>
+          <p className="text-[#636260] text-xs text-center max-w-xs">
+            The Qari will play softly while you recite — let their voice guide yours
+          </p>
+        </div>
+      )}
+
+      {/* RECORDING */}
+      {phase === 'recording' && (
+        <div className="flex flex-col items-center gap-5 py-4">
+          <div className="relative">
+            <div
+              className="w-20 h-20 rounded-2xl flex items-center justify-center"
+              style={{ background: 'rgba(217,99,91,0.1)', border: '1px solid rgba(217,99,91,0.25)' }}
+            >
+              <div className="flex items-end gap-1 h-10">
+                {[6, 12, 8, 14, 10, 8, 12].map((h, i) => (
+                  <div
+                    key={i}
+                    className="w-1.5 rounded-full animate-pulse"
+                    style={{
+                      height: `${h * 2}px`,
+                      background: '#D9635B',
+                      animationDelay: `${i * 0.1}s`,
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+            {/* Recording dot */}
+            <div
+              className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-[#D9635B] animate-pulse"
+              style={{ boxShadow: '0 0 8px rgba(217,99,91,0.6)' }}
+            />
+          </div>
+          <div className="text-center">
+            <p className="text-[#EDEDEC] font-semibold">Recite now!</p>
+            <p className="text-[#636260] text-sm mt-1">
+              {recordingSeconds}s · Qari playing softly in background
+            </p>
+          </div>
+          <div
+            className="flex items-center gap-2 px-3 py-2 rounded-xl"
+            style={{ background: 'rgba(212,162,70,0.06)', border: '1px solid rgba(212,162,70,0.12)' }}
+          >
+            <div className="w-1.5 h-1.5 rounded-full bg-[#D4A246] animate-pulse" />
+            <p className="text-[#636260] text-xs">Stops automatically after silence</p>
+          </div>
+        </div>
+      )}
+
+      {/* SCORED */}
+      {phase === 'scored' && score && gradeInfo && (
+        <div className="space-y-4">
+          {/* Grade display */}
+          <div
+            className="rounded-2xl p-5 text-center"
+            style={{
+              background: score.overall >= 60
+                ? 'rgba(92,184,137,0.08)'
+                : 'rgba(212,162,70,0.08)',
+              border: `1px solid ${score.overall >= 60 ? 'rgba(92,184,137,0.2)' : 'rgba(212,162,70,0.2)'}`,
+            }}
+          >
+            <div className="text-4xl mb-2">{gradeInfo.emoji}</div>
+            <p className="text-[#EDEDEC] font-bold text-xl mb-1">{gradeInfo.title}</p>
+            <p className="text-[#636260] text-sm leading-relaxed">{gradeInfo.body}</p>
+          </div>
+
+          {/* Score breakdown */}
+          <div
+            className="rounded-2xl p-4"
+            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
+          >
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-[#636260] text-xs uppercase tracking-wider">Score breakdown</p>
+              <p className="text-[#EDEDEC] font-bold text-lg">{score.overall}%</p>
+            </div>
+            {[
+              { label: 'Pitch', value: score.pitch, desc: 'How close your notes were' },
+              { label: 'Rhythm', value: score.rhythm, desc: 'Timing and flow' },
+              { label: 'Sustain', value: score.sustain, desc: 'Holding notes steadily' },
+            ].map(({ label, value, desc }) => (
+              <div key={label} className="mb-2.5">
+                <div className="flex items-center justify-between text-xs mb-1">
+                  <span className="text-[#A09F9B]">{label}</span>
+                  <span className="text-[#636260]">{value}%</span>
+                </div>
+                <div className="h-1.5 rounded-full bg-[#1C1B19] overflow-hidden">
+                  <div
+                    className="h-full rounded-full transition-all duration-700"
+                    style={{
+                      width: `${value}%`,
+                      background: value >= 60 ? '#5CB889' : value >= 40 ? '#D97706' : '#D9635B',
+                    }}
+                  />
+                </div>
+              </div>
             ))}
           </div>
-        </div>
-      )}
 
-      {/* Countdown state */}
-      {phase === 'countdown' && (
-        <div className="space-y-4">
-          <p className="text-white/60 text-sm">Get ready to recite in...</p>
-          <div className="w-24 h-24 rounded-full bg-[#0D9488]/20 border-2 border-[#0D9488] flex items-center justify-center mx-auto">
-            <span className="text-5xl font-bold text-[#0D9488]">{countdown}</span>
-          </div>
-        </div>
-      )}
-
-      {/* Recording state */}
-      {phase === 'recording' && (
-        <div className="space-y-4">
-          <div className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-[#FF4B4B]/20">
-            <div className="w-2.5 h-2.5 rounded-full bg-[#FF4B4B] animate-pulse" />
-            <span className="text-[#FF4B4B] font-medium">Step 2: Your Turn — Recite Now!</span>
-          </div>
-          <p className="text-white/40 text-xs">Recording stops after 2 seconds of silence</p>
-        </div>
-      )}
-
-      {/* Scored state */}
-      {phase === 'scored' && score && (
-        <div className="space-y-3">
-          <div className={`w-20 h-20 rounded-2xl flex items-center justify-center mx-auto text-3xl font-bold ${
-            score.grade === 'A' ? 'bg-[#58CC02]/20 text-[#58CC02]' :
-            score.grade === 'B' ? 'bg-[#0D9488]/20 text-[#0D9488]' :
-            score.grade === 'C' ? 'bg-[#D97706]/20 text-[#D97706]' :
-            'bg-[#FF4B4B]/20 text-[#FF4B4B]'
-          }`}>
-            {score.grade}
-          </div>
-          <p className="text-white text-2xl font-bold">{score.overall}%</p>
-
-          {/* Sub-scores */}
-          <div className="flex justify-center gap-6 text-sm">
-            <div>
-              <p className="text-white/40 text-xs">Pitch</p>
-              <p className="text-white font-bold">{score.pitch}%</p>
-            </div>
-            <div>
-              <p className="text-white/40 text-xs">Rhythm</p>
-              <p className="text-white font-bold">{score.rhythm}%</p>
-            </div>
-            <div>
-              <p className="text-white/40 text-xs">Sustain</p>
-              <p className="text-white font-bold">{score.sustain}%</p>
-            </div>
-          </div>
+          {/* Retry cue */}
+          {score.overall < 50 && (
+            <button
+              onClick={() => {
+                setPhase('ready');
+                phaseRef.current = 'ready';
+                setScore(null);
+                setHasListened(false);
+              }}
+              className="w-full py-3 rounded-2xl text-sm font-medium text-[#A09F9B] transition-all hover:text-[#EDEDEC]"
+              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
+            >
+              Listen again &amp; retry
+            </button>
+          )}
         </div>
       )}
     </div>
