@@ -49,12 +49,12 @@ export function ListenIdentifyStep({ content, onAnswer }: Props) {
         {isPlaying ? (
           <>
             <div className="flex items-center gap-1">
-              {[...Array(5)].map((_, i) => (
+              {[14, 22, 18, 26, 16].map((h, i) => (
                 <div
                   key={i}
                   className="w-1 bg-white rounded-full animate-pulse"
                   style={{
-                    height: `${12 + Math.random() * 16}px`,
+                    height: `${h}px`,
                     animationDelay: `${i * 0.15}s`,
                   }}
                 />

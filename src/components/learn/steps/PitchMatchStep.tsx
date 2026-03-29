@@ -91,10 +91,17 @@ export function PitchMatchStep({ content, onAnswer }: Props) {
       setCurrentNoteIdx(0);
       setNoteScores([]);
     } catch {
-      // Mic denied — skip to done
+      // Mic denied — pass with a note, don't leave user stuck
       setPhase('done');
+      setOverallScore(0);
+      onAnswer(
+        true, // pass so lesson continues
+        'mic_denied',
+        'mic_required',
+        'Microphone access was denied. Enable mic in your browser settings to practice pitch matching.'
+      );
     }
-  }, []);
+  }, [onAnswer]);
 
   // ── Detection loop for sing phase ──
   useEffect(() => {
@@ -126,9 +133,9 @@ export function PitchMatchStep({ content, onAnswer }: Props) {
         framesTotal++;
         setUserActive(true);
 
-        // Cents distance from target
+        // Cents distance from target — exponential decay: forgiving at 50 cents, rewarding at <20
         const cents = Math.abs(1200 * Math.log2(result.frequency / targetFreq));
-        const prox = Math.max(0, Math.min(100, 100 - cents));
+        const prox = Math.round(100 * Math.exp(-0.02 * cents));
         setProximity(prox);
 
         if (cents < 50) framesMatched++;
@@ -372,15 +379,24 @@ export function PitchMatchStep({ content, onAnswer }: Props) {
         </div>
       )}
 
-      {/* Sing phase — recording indicator */}
+      {/* Sing phase — recording indicator + replay button */}
       {phase === 'sing' && (
-        <div className="text-center">
+        <div className="flex items-center justify-between">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#FF4B4B]/10 border border-[#FF4B4B]/20">
             <div className="w-2 h-2 rounded-full bg-[#FF4B4B] animate-pulse" />
             <span className="text-[#FF4B4B]/80 text-xs font-medium">
-              Humming note {Math.min(currentNoteIdx + 1, noteCount)} of {noteCount}
+              Note {Math.min(currentNoteIdx + 1, noteCount)} of {noteCount}
             </span>
           </div>
+          <button
+            onClick={() => content.targetNotes?.[currentNoteIdx] && playTone(content.targetNotes[currentNoteIdx], 0.8)}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-full bg-[#0D9488]/10 border border-[#0D9488]/30 text-[#0D9488] text-xs font-medium hover:bg-[#0D9488]/20 transition-colors"
+          >
+            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" />
+            </svg>
+            Replay tone
+          </button>
         </div>
       )}
 

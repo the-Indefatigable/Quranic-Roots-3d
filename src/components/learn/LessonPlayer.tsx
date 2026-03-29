@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TeachStep } from './steps/TeachStep';
 import { MCQStep } from './steps/MCQStep';
@@ -54,73 +54,32 @@ export function LessonPlayer({
   const [showFeedback, setShowFeedback] = useState<'correct' | 'wrong' | null>(null);
   const [feedbackExplanation, setFeedbackExplanation] = useState('');
 
+  // Refs to avoid stale closures in finishLesson / handleAnswer
+  const correctCountRef = useRef(0);
+  const totalAnsweredRef = useRef(0);
+  const mistakesRef = useRef<Array<{ stepIndex: number; userAnswer: string; correctAnswer: string }>>([]);
+  const comboMaxRef = useRef(0);
+  const recycledStepsRef = useRef<LessonStep[]>([]);
+  const isCompleteRef = useRef(false);
+
   // All steps = original + recycled mistakes
   const allSteps = [...steps, ...recycledSteps];
   const totalSteps = allSteps.length;
   const progress = totalSteps > 0 ? (currentStep / totalSteps) * 100 : 0;
   const currentStepData = allSteps[currentStep];
 
-  // Handle answer from any step type
-  const handleAnswer = useCallback((isCorrect: boolean, userAnswer: string, correctAnswer: string, explanation?: string) => {
-    setTotalAnswered((p) => p + 1);
+  // Audio step types don't penalize hearts — mic/environment issues aren't user error
+  const isAudioStep = (type: LessonStep['type']) =>
+    type === 'pitch_match' || type === 'recite_score';
 
-    if (isCorrect) {
-      setCorrectCount((p) => p + 1);
-      setCombo((p) => {
-        const newCombo = p + 1;
-        setComboMax((m) => Math.max(m, newCombo));
-        return newCombo;
-      });
-      setShowFeedback('correct');
-      setFeedbackExplanation(explanation || 'Correct!');
-    } else {
-      setCombo(0);
-      setHearts((h) => Math.max(0, h - 1));
-      setMistakes((prev) => [...prev, { stepIndex: currentStep, userAnswer, correctAnswer }]);
-      // Recycle this step for later (different position)
-      if (currentStepData) {
-        setRecycledSteps((prev) => [...prev, currentStepData]);
-      }
-      setShowFeedback('wrong');
-      setFeedbackExplanation(explanation || `The correct answer is: ${correctAnswer}`);
-    }
+  const finishLesson = useCallback(async () => {
+    if (isCompleteRef.current) return;
+    isCompleteRef.current = true;
 
-    // Auto-advance after feedback delay
-    setTimeout(() => {
-      setShowFeedback(null);
-      if (currentStep + 1 >= allSteps.length + (isCorrect ? 0 : 1)) {
-        // Adding 1 for the recycled step we just pushed
-        finishLesson();
-      } else {
-        setCurrentStep((p) => p + 1);
-      }
-    }, 1500);
-  }, [currentStep, allSteps.length, currentStepData]);
-
-  // For teach steps — just advance
-  const handleContinue = useCallback(() => {
-    if (currentStep + 1 >= allSteps.length) {
-      finishLesson();
-    } else {
-      setCurrentStep((p) => p + 1);
-    }
-  }, [currentStep, allSteps.length]);
-
-  // Check hearts — if 0, force end
-  useEffect(() => {
-    if (hearts <= 0 && !isComplete) {
-      setCompletionData({
-        outOfHearts: true,
-        xpEarned: 0,
-        score: 0,
-      });
-      setIsComplete(true);
-    }
-  }, [hearts, isComplete]);
-
-  const finishLesson = async () => {
     const timeSpentS = Math.round((Date.now() - startTime) / 1000);
-    const score = totalAnswered > 0 ? Math.round((correctCount / totalAnswered) * 100) : 100;
+    const tot = totalAnsweredRef.current;
+    const cor = correctCountRef.current;
+    const score = tot > 0 ? Math.round((cor / tot) * 100) : 100;
 
     try {
       const res = await fetch('/api/learn/complete', {
@@ -129,10 +88,10 @@ export function LessonPlayer({
         body: JSON.stringify({
           lessonId,
           score,
-          correctCount,
-          totalCount: totalAnswered,
-          mistakes,
-          comboMax,
+          correctCount: cor,
+          totalCount: tot,
+          mistakes: mistakesRef.current,
+          comboMax: comboMaxRef.current,
           timeSpentS,
         }),
       });
@@ -149,7 +108,80 @@ export function LessonPlayer({
     }
 
     setIsComplete(true);
-  };
+  }, [lessonId, xpReward, startTime]);
+
+  // Handle answer from any step type
+  const handleAnswer = useCallback((isCorrect: boolean, userAnswer: string, correctAnswer: string, explanation?: string) => {
+    totalAnsweredRef.current += 1;
+    setTotalAnswered(totalAnsweredRef.current);
+
+    const stepType = currentStepData?.type;
+    const audioStep = stepType ? isAudioStep(stepType) : false;
+
+    if (isCorrect) {
+      correctCountRef.current += 1;
+      setCorrectCount(correctCountRef.current);
+      setCombo((p) => {
+        const newCombo = p + 1;
+        comboMaxRef.current = Math.max(comboMaxRef.current, newCombo);
+        setComboMax(comboMaxRef.current);
+        return newCombo;
+      });
+      setShowFeedback('correct');
+      setFeedbackExplanation(explanation || 'Correct!');
+    } else {
+      setCombo(0);
+      // Audio steps don't lose hearts — env/mic issues aren't user mistakes
+      if (!audioStep) {
+        setHearts((h) => Math.max(0, h - 1));
+      }
+      mistakesRef.current = [...mistakesRef.current, { stepIndex: currentStep, userAnswer, correctAnswer }];
+      setMistakes(mistakesRef.current);
+      // Recycle non-audio steps only
+      if (currentStepData && !audioStep) {
+        recycledStepsRef.current = [...recycledStepsRef.current, currentStepData];
+        setRecycledSteps(recycledStepsRef.current);
+      }
+      setShowFeedback('wrong');
+      setFeedbackExplanation(explanation || `The correct answer is: ${correctAnswer}`);
+    }
+
+    // Use ref for recycled count to avoid stale closure
+    const totalAfter = steps.length + recycledStepsRef.current.length;
+    const recycledWasAdded = !isCorrect && !audioStep ? 1 : 0;
+
+    setTimeout(() => {
+      setShowFeedback(null);
+      if (currentStep + 1 >= totalAfter + recycledWasAdded) {
+        finishLesson();
+      } else {
+        setCurrentStep((p) => p + 1);
+      }
+    }, 1500);
+  }, [currentStep, currentStepData, steps.length, finishLesson]);
+
+  // For teach steps — just advance
+  const handleContinue = useCallback(() => {
+    const totalAfter = steps.length + recycledStepsRef.current.length;
+    if (currentStep + 1 >= totalAfter) {
+      finishLesson();
+    } else {
+      setCurrentStep((p) => p + 1);
+    }
+  }, [currentStep, steps.length, finishLesson]);
+
+  // Check hearts — if 0, force end
+  useEffect(() => {
+    if (hearts <= 0 && !isComplete) {
+      setCompletionData({
+        outOfHearts: true,
+        xpEarned: 0,
+        score: 0,
+      });
+      setIsComplete(true);
+      isCompleteRef.current = true;
+    }
+  }, [hearts, isComplete]);
 
   if (isComplete && completionData) {
     return (

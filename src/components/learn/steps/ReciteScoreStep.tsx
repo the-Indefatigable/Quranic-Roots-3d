@@ -10,11 +10,12 @@ interface Props {
   onAnswer: (isCorrect: boolean, userAnswer: string, correctAnswer: string, explanation?: string) => void;
 }
 
-type Phase = 'ready' | 'listening' | 'recording' | 'scored';
+type Phase = 'ready' | 'listening' | 'countdown' | 'recording' | 'scored';
 
 export function ReciteScoreStep({ content, onAnswer }: Props) {
   const [phase, setPhase] = useState<Phase>('ready');
   const [score, setScore] = useState<PhraseScore | null>(null);
+  const [countdown, setCountdown] = useState(3);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const micStreamRef = useRef<MediaStream | null>(null);
@@ -29,7 +30,7 @@ export function ReciteScoreStep({ content, onAnswer }: Props) {
   const audioUrl = `https://everyayah.com/data/${content.reciterId}/${String(content.surah).padStart(3, '0')}${String(content.ayah).padStart(3, '0')}.mp3`;
   const passThreshold = content.passThreshold ?? 30;
 
-  // Step 1: Play qari
+  // Step 1: Play qari AND collect their pitch data via Web Audio routing
   const startListening = useCallback(() => {
     setPhase('listening');
     phaseRef.current = 'listening';
@@ -37,21 +38,70 @@ export function ReciteScoreStep({ content, onAnswer }: Props) {
     userPitchesRef.current = [];
     silenceFramesRef.current = 0;
 
-    const audio = new Audio(audioUrl);
-    audioRef.current = audio;
-    
-    // Set up analyser for qari audio
     const ctx = audioCtxRef.current || new AudioContext();
     audioCtxRef.current = ctx;
     if (ctx.state === 'suspended') ctx.resume();
 
+    const audio = new Audio(audioUrl);
+    audio.crossOrigin = 'anonymous';
+    audioRef.current = audio;
+
+    // Route qari audio through analyser to capture pitch
+    const source = ctx.createMediaElementSource(audio);
+    const analyser = ctx.createAnalyser();
+    analyser.fftSize = 2048;
+    analyser.smoothingTimeConstant = 0.8;
+    source.connect(analyser);
+    analyser.connect(ctx.destination); // still plays audio
+    const qariAnalyser = analyser;
+
+    let qariAnimFrame = 0;
+    const sampleRate = ctx.sampleRate;
+
+    function collectQariPitch() {
+      if (phaseRef.current !== 'listening') return;
+      qariAnimFrame = requestAnimationFrame(collectQariPitch);
+      const buf = new Float32Array(qariAnalyser.fftSize);
+      qariAnalyser.getFloatTimeDomainData(buf);
+      const result = detectPitchYIN(buf, sampleRate);
+      qariPitchesRef.current.push(result?.frequency ? freqToMidi(result.frequency) : null);
+    }
+
+    qariAnimFrame = requestAnimationFrame(collectQariPitch);
+
     audio.addEventListener('ended', () => {
-      // Auto-transition to recording
-      startRecording();
+      cancelAnimationFrame(qariAnimFrame);
+      // Show countdown before recording
+      startCountdown();
     });
 
-    audio.play().catch(() => setPhase('ready'));
+    audio.addEventListener('error', () => {
+      cancelAnimationFrame(qariAnimFrame);
+      setPhase('ready');
+    });
+
+    audio.play().catch(() => {
+      cancelAnimationFrame(qariAnimFrame);
+      setPhase('ready');
+    });
   }, [audioUrl]);
+
+  // Countdown (3-2-1) before recording starts
+  const startCountdown = useCallback(() => {
+    setPhase('countdown');
+    phaseRef.current = 'countdown';
+    setCountdown(3);
+
+    let count = 3;
+    const interval = setInterval(() => {
+      count--;
+      setCountdown(count);
+      if (count <= 0) {
+        clearInterval(interval);
+        startRecording();
+      }
+    }, 1000);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Step 2: Record user
   const startRecording = useCallback(async () => {
@@ -76,10 +126,17 @@ export function ReciteScoreStep({ content, onAnswer }: Props) {
       phaseRef.current = 'recording';
       silenceFramesRef.current = 0;
     } catch {
-      setPhase('ready');
-      phaseRef.current = 'ready';
+      // Mic denied — pass and continue
+      setPhase('scored');
+      phaseRef.current = 'scored';
+      onAnswer(
+        true,
+        'mic_denied',
+        'mic_required',
+        'Microphone access was denied. Enable mic in your browser settings to practice recitation.'
+      );
     }
-  }, []);
+  }, [onAnswer]);
 
   // Detection loop for recording phase
   useEffect(() => {
@@ -97,7 +154,7 @@ export function ReciteScoreStep({ content, onAnswer }: Props) {
       const userPitch = result?.frequency ?? null;
       userPitchesRef.current.push(userPitch ? freqToMidi(userPitch) : null);
 
-      // Auto-stop on extended silence
+      // Auto-stop on extended silence (after user has started reciting)
       if (!userPitch) {
         silenceFramesRef.current++;
         if (silenceFramesRef.current > 120 && userPitchesRef.current.length > 30) {
@@ -115,7 +172,7 @@ export function ReciteScoreStep({ content, onAnswer }: Props) {
       micStreamRef.current = null;
 
       const result = scorePhrase(
-        qariPitchesRef.current.map(p => p !== null ? freqToMidi(p) : null),
+        qariPitchesRef.current,
         userPitchesRef.current,
         [], [],
         content.ayah,
@@ -190,9 +247,19 @@ export function ReciteScoreStep({ content, onAnswer }: Props) {
               <div
                 key={i}
                 className="w-1 bg-[#0D9488] rounded-full animate-pulse"
-                style={{ height: `${8 + Math.random() * 20}px`, animationDelay: `${i * 0.1}s` }}
+                style={{ height: `${[10, 18, 14, 22, 12, 20, 16][i]}px`, animationDelay: `${i * 0.1}s` }}
               />
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Countdown state */}
+      {phase === 'countdown' && (
+        <div className="space-y-4">
+          <p className="text-white/60 text-sm">Get ready to recite in...</p>
+          <div className="w-24 h-24 rounded-full bg-[#0D9488]/20 border-2 border-[#0D9488] flex items-center justify-center mx-auto">
+            <span className="text-5xl font-bold text-[#0D9488]">{countdown}</span>
           </div>
         </div>
       )}
