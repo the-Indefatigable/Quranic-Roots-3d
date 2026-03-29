@@ -29,6 +29,7 @@ export function PitchMatchStep({ content, onAnswer }: Props) {
 
   // Play a reference tone
   const playTone = useCallback((freq: number) => {
+    if (!freq || !isFinite(freq) || freq <= 0) return;
     const ctx = audioCtxRef.current || new AudioContext();
     audioCtxRef.current = ctx;
     const osc = ctx.createOscillator();
@@ -76,10 +77,12 @@ export function PitchMatchStep({ content, onAnswer }: Props) {
   // Detection loop
   useEffect(() => {
     if (phase !== 'recording' || !analyserRef.current) return;
+    if (!content.targetNotes || !content.targetNotes[currentNoteIdx]) return;
 
     const analyser = analyserRef.current;
     const sampleRate = audioCtxRef.current?.sampleRate ?? 44100;
     const targetFreq = content.targetNotes[currentNoteIdx];
+    if (!isFinite(targetFreq) || targetFreq <= 0) return;
     let framesOnNote = 0;
     let matchedOnNote = 0;
     const requiredFrames = 60; // ~1 second at 60fps
