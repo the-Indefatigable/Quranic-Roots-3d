@@ -9,10 +9,13 @@ import { FillBlankStep } from './steps/FillBlankStep';
 import { ArrangeStep } from './steps/ArrangeStep';
 import { ClassifyStep } from './steps/ClassifyStep';
 import { TranslateStep } from './steps/TranslateStep';
+import { ListenIdentifyStep } from './steps/ListenIdentifyStep';
+import { PitchMatchStep } from './steps/PitchMatchStep';
+import { ReciteScoreStep } from './steps/ReciteScoreStep';
 import { LessonComplete } from './LessonComplete';
 
 export interface LessonStep {
-  type: 'teach' | 'mcq' | 'match' | 'fill_blank' | 'arrange' | 'classify' | 'translate';
+  type: 'teach' | 'mcq' | 'match' | 'fill_blank' | 'arrange' | 'classify' | 'translate' | 'listen_identify' | 'pitch_match' | 'recite_score';
   content: Record<string, unknown>;
 }
 
@@ -269,6 +272,12 @@ function renderStep(
       return <ClassifyStep content={step.content} onAnswer={onAnswer} />;
     case 'translate':
       return <TranslateStep content={step.content} onAnswer={onAnswer} />;
+    case 'listen_identify':
+      return <ListenIdentifyStep content={step.content as any} onAnswer={onAnswer} />;
+    case 'pitch_match':
+      return <PitchMatchStep content={step.content as any} onAnswer={onAnswer} />;
+    case 'recite_score':
+      return <ReciteScoreStep content={step.content as any} onAnswer={onAnswer} />;
     default:
       return <div className="text-white">Unknown step type</div>;
   }
