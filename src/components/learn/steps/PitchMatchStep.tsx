@@ -83,11 +83,14 @@ export function PitchMatchStep({ content, onAnswer }: Props) {
     const sampleRate = audioCtxRef.current?.sampleRate ?? 44100;
     const targetFreq = content.targetNotes[currentNoteIdx];
     if (!isFinite(targetFreq) || targetFreq <= 0) return;
+
     let framesOnNote = 0;
     let matchedOnNote = 0;
-    const requiredFrames = 60; // ~1 second at 60fps
+    let scored = false; // Prevent double-scoring before effect cleanup
+    const requiredFrames = 60;
 
     function detect() {
+      if (scored) return; // Stop loop after scoring
       animFrameRef.current = requestAnimationFrame(detect);
 
       const buf = new Float32Array(analyser.fftSize);
@@ -98,26 +101,27 @@ export function PitchMatchStep({ content, onAnswer }: Props) {
         framesOnNote++;
         totalFramesRef.current++;
 
-        // Calculate cents distance from target
         const cents = Math.abs(1200 * Math.log2(result.frequency / targetFreq));
         if (cents < toleranceCents) {
           matchedOnNote++;
           matchFramesRef.current++;
         }
 
-        // Draw on canvas
         drawPitchIndicator(result.frequency, targetFreq, cents);
       }
 
-      // After enough frames, score this note and move to next
-      if (framesOnNote >= requiredFrames) {
+      if (framesOnNote >= requiredFrames && !scored) {
+        scored = true; // Lock — only score once per note
+        cancelAnimationFrame(animFrameRef.current);
+
         const noteAccuracy = Math.round((matchedOnNote / framesOnNote) * 100);
+
+        const isLastNote = currentNoteIdx + 1 >= content.targetNotes.length;
+
         setNoteScores(prev => {
           const newScores = [...prev, noteAccuracy];
 
-          if (currentNoteIdx + 1 >= content.targetNotes.length) {
-            // All notes done
-            cancelAnimationFrame(animFrameRef.current);
+          if (isLastNote) {
             micStreamRef.current?.getTracks().forEach(t => t.stop());
             const overall = Math.round(newScores.reduce((a, b) => a + b, 0) / newScores.length);
             setOverallScore(overall);
@@ -133,25 +137,22 @@ export function PitchMatchStep({ content, onAnswer }: Props) {
                 ? `Great job! You matched the ${content.jinsName} jins with ${overall}% accuracy.`
                 : `You scored ${overall}%. You need ${threshold}% to pass. Keep practicing the ${content.jinsName} intervals!`
             );
-          } else {
-            setCurrentNoteIdx(prev => prev + 1);
           }
 
           return newScores;
         });
 
-        // Reset for next note
-        framesOnNote = 0;
-        matchedOnNote = 0;
-
-        // Play reference tone for next note
-        if (currentNoteIdx + 1 < content.targetNotes.length) {
-          setTimeout(() => playTone(content.targetNotes[currentNoteIdx + 1]), 300);
+        if (!isLastNote) {
+          // Move to next note after a short delay
+          setTimeout(() => {
+            playTone(content.targetNotes[currentNoteIdx + 1]);
+            setCurrentNoteIdx(prev => prev + 1);
+          }, 300);
         }
       }
     }
 
-    // Play the first target note
+    // Play the target note reference
     playTone(targetFreq);
     animFrameRef.current = requestAnimationFrame(detect);
     return () => cancelAnimationFrame(animFrameRef.current);
@@ -270,7 +271,7 @@ export function PitchMatchStep({ content, onAnswer }: Props) {
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#FF4B4B]/20 text-[#FF4B4B]">
             <div className="w-2 h-2 rounded-full bg-[#FF4B4B] animate-pulse" />
             <span className="text-sm font-medium">
-              Listening... Note {currentNoteIdx + 1} of {content.targetNotes.length}
+              Listening... Note {Math.min(currentNoteIdx + 1, content.targetNotes.length)} of {content.targetNotes.length}
             </span>
           </div>
         </div>
