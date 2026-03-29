@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom';
 import { AudioVisualizer } from './AudioVisualizer';
 import { QARI_LIBRARY, getDefaultQari, getQariById, buildAyahAudioUrl, type QariInfo } from '@/lib/audio/qariLibrary';
 
-type ExpandedTab = 'lyrics' | 'analysis' | 'pitch' | 'practice';
+type ExpandedTab = 'lyrics' | 'spectrum' | 'pitch' | 'practice';
 
 interface AyahAudio {
   ayahNumber: number;
@@ -742,9 +742,9 @@ export function AudioPlayer({
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" />
               </svg>
             )},
-            { id: 'analysis' as ExpandedTab, label: 'Analysis', icon: (
+            { id: 'spectrum' as ExpandedTab, label: 'Spectrum', icon: (
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9.348 14.652a3.75 3.75 0 0 1 0-5.304m5.304 0a3.75 3.75 0 0 1 0 5.304m-7.425 2.121a6.75 6.75 0 0 1 0-9.546m9.546 0a6.75 6.75 0 0 1 0 9.546M5.106 18.894c-3.808-3.807-3.808-9.98 0-13.788m13.788 0c3.808 3.807 3.808 9.98 0 13.788" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" />
               </svg>
             )},
             { id: 'pitch' as ExpandedTab, label: 'Melody', icon: (
@@ -836,10 +836,15 @@ export function AudioPlayer({
               <AudioVisualizer
                 analyserNode={analyserNode}
                 isPlaying={isPlaying}
-                mode={expandedTab === 'analysis' ? 'analysis' : expandedTab === 'pitch' ? 'pitch' : 'practice'}
+                mode={expandedTab === 'spectrum' ? 'spectrum' : expandedTab === 'pitch' ? 'pitch' : 'practice'}
                 currentAyah={currentAyah}
               />
               {/* Info overlay for the visual modes */}
+              {expandedTab === 'spectrum' && (
+                <div className="absolute top-3 right-3 text-[10px] text-text-tertiary bg-canvas/80 backdrop-blur-sm px-2 py-1 rounded-md">
+                  FFT frequency spectrum · Harmonics highlighted
+                </div>
+              )}
               {expandedTab === 'pitch' && (
                 <div className="absolute top-3 right-3 text-[10px] text-text-tertiary bg-canvas/80 backdrop-blur-sm px-2 py-1 rounded-md">
                   Pitch contour shows the Qari&apos;s melody

@@ -21,7 +21,7 @@ import {
 } from '@/lib/audio/maqamEngine';
 import { scorePhrase, type PhraseScore, computeSessionStats } from '@/lib/audio/phraseScorer';
 
-export type VisualizerMode = 'analysis' | 'pitch' | 'practice';
+export type VisualizerMode = 'spectrum' | 'pitch' | 'practice';
 
 interface Props {
   analyserNode: AnalyserNode | null;
@@ -52,7 +52,7 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode, currentAyah }: 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animFrameRef = useRef<number>(0);
 
-  // Shared analysis state (persisted across frames via refs)
+  // ─── Shared analysis state (persisted across ALL tabs — never cleared on mode switch) ───
   const pitchHistoryRef = useRef<(number | null)[]>([]);
   const pitchMinRef = useRef(Infinity);
   const pitchMaxRef = useRef(0);
@@ -60,7 +60,7 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode, currentAyah }: 
   const lastPitchRef = useRef<number | null>(null);
   const rmsHistoryRef = useRef<number[]>([]);
 
-  // Maqam detection state (jins-based)
+  // Maqam detection state (jins-based — persisted across tabs)
   const maqamStateRef = useRef<MaqamDetectionState>(createMaqamDetectionState());
   const frameCountRef = useRef(0);
 
@@ -108,8 +108,7 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode, currentAyah }: 
       const score = scorePhrase(
         qariPhrasePitchesRef.current,
         userPhrasePitchesRef.current,
-        [], // word onsets - we don't have fine-grained detection yet
-        [],
+        [], [],
         phraseAyahRef.current,
         60
       );
@@ -127,7 +126,6 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode, currentAyah }: 
   useEffect(() => {
     if (currentAyah === undefined || !isRecording) return;
     if (phraseAyahRef.current !== null && phraseAyahRef.current !== currentAyah) {
-      // Ayah changed — score the previous one
       if (userPhrasePitchesRef.current.length > 10 && lastScoredAyahRef.current !== phraseAyahRef.current) {
         const score = scorePhrase(
           qariPhrasePitchesRef.current,
@@ -140,7 +138,6 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode, currentAyah }: 
         setPhraseScores(prev => [...prev, score]);
         lastScoredAyahRef.current = phraseAyahRef.current;
       }
-      // Reset for new phrase
       qariPhrasePitchesRef.current = [];
       userPhrasePitchesRef.current = [];
     }
@@ -151,18 +148,20 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode, currentAyah }: 
     return () => { micStreamRef.current?.getTracks().forEach((t) => t.stop()); };
   }, []);
 
+  // ─── FIX: Only clear practice-specific state on mode switch ───
+  // Pitch history, maqam state, and RMS are SHARED across all tabs.
+  // Only practice-specific UI state needs resetting.
   useEffect(() => {
-    pitchHistoryRef.current = [];
-    userPitchHistoryRef.current = [];
-    pitchMinRef.current = Infinity;
-    pitchMaxRef.current = 0;
-    maqamStateRef.current = createMaqamDetectionState();
-    frameCountRef.current = 0;
-    scoreHistoryRef.current = [];
-    qariPhrasePitchesRef.current = [];
-    userPhrasePitchesRef.current = [];
-    setLatestScore(null);
-    setPhraseScores([]);
+    if (mode === 'practice') {
+      // Reset practice scoring when entering practice mode
+      userPitchHistoryRef.current = [];
+      scoreHistoryRef.current = [];
+      qariPhrasePitchesRef.current = [];
+      userPhrasePitchesRef.current = [];
+      setLatestScore(null);
+      setPhraseScores([]);
+    }
+    // Do NOT clear pitchHistoryRef, maqamStateRef, rmsHistoryRef, etc.
   }, [mode]);
 
   // ─── Animation loop ───
@@ -195,13 +194,13 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode, currentAyah }: 
         ctx.fillStyle = c.textTertiary;
         ctx.font = '13px system-ui';
         ctx.textAlign = 'center';
-        ctx.fillText('Tap a visualizer tab while audio plays', W / 2, H / 2);
+        ctx.fillText('Play audio to see visualization', W / 2, H / 2);
         return;
       }
 
       frameCountRef.current++;
 
-      // Common: detect pitch with YIN
+      // ── Common: detect pitch with YIN (runs on every tab) ──
       const buf = new Float32Array(analyserNode.fftSize);
       analyserNode.getFloatTimeDomainData(buf);
       const rms = detectRMS(buf);
@@ -209,7 +208,7 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode, currentAyah }: 
       const pitch = pitchResult?.frequency ?? null;
       const pitchMidi = pitchResult?.midi ?? null;
 
-      // Track stats
+      // Track stats (runs on EVERY tab so data persists across switches)
       pitchHistoryRef.current.push(pitch);
       if (pitchHistoryRef.current.length > MAX_PITCH_HISTORY) pitchHistoryRef.current.shift();
       rmsHistoryRef.current.push(rms);
@@ -219,7 +218,7 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode, currentAyah }: 
         if (pitch < pitchMinRef.current) pitchMinRef.current = pitch;
         if (pitch > pitchMaxRef.current) pitchMaxRef.current = pitch;
 
-        // Maqam detection — feed fractional MIDI to jins engine
+        // Maqam detection — always accumulating regardless of tab
         const now = performance.now();
         maqamStateRef.current = updateMaqamDetection(maqamStateRef.current, pitchMidi, now);
 
@@ -251,10 +250,8 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode, currentAyah }: 
         userPitchHistoryRef.current.push(userPitch);
         if (userPitchHistoryRef.current.length > MAX_PITCH_HISTORY) userPitchHistoryRef.current.shift();
 
-        // Track per-phrase user pitches
         userPhrasePitchesRef.current.push(userPitchMidi);
 
-        // Continuous similarity for real-time feedback
         if (pitch && userPitch) {
           const cents = Math.abs(1200 * Math.log2(pitch / userPitch));
           const sim = Math.max(0, Math.round(100 - cents));
@@ -264,8 +261,8 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode, currentAyah }: 
 
       const colors = getColors();
 
-      if (mode === 'analysis') {
-        drawAnalysis(ctx, W, H, pitch, pitchResult, rms, colors);
+      if (mode === 'spectrum') {
+        drawSpectrum(ctx, W, H, pitch, pitchResult, rms, colors);
       } else if (mode === 'pitch') {
         drawMelody(ctx, W, H, pitch, colors);
       } else {
@@ -273,11 +270,79 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode, currentAyah }: 
       }
     }
 
-    // ─── ANALYSIS MODE: Live dashboard ───
-    function drawAnalysis(ctx: CanvasRenderingContext2D, W: number, H: number, pitch: number | null, pitchResult: PitchResult | null, rms: number, colors: ReturnType<typeof getColors>) {
-      const midX = W / 2;
+    // ─── SPECTRUM MODE: FFT frequency bars + live stats ───
+    function drawSpectrum(ctx: CanvasRenderingContext2D, W: number, H: number, pitch: number | null, pitchResult: PitchResult | null, rms: number, colors: ReturnType<typeof getColors>) {
+      if (!analyserNode) return;
 
-      // ── Current note (big display) ──
+      // ── FFT frequency spectrum (bottom half) ──
+      const freqData = new Float32Array(analyserNode.frequencyBinCount);
+      analyserNode.getFloatFrequencyData(freqData);
+      const binCount = analyserNode.frequencyBinCount;
+      const nyquist = sampleRate / 2;
+
+      const spectrumY = H * 0.48;
+      const spectrumH = H * 0.48;
+      const barCount = Math.min(128, Math.floor(W / 4));
+
+      // Draw spectrum bars (log-scaled frequency axis for better visualization)
+      for (let i = 0; i < barCount; i++) {
+        // Log-scale mapping: more detail at low frequencies
+        const frac = i / barCount;
+        const logFreq = 60 * Math.pow(10, frac * Math.log10(8000 / 60));
+        const binIndex = Math.round((logFreq / nyquist) * binCount);
+        if (binIndex >= binCount) continue;
+
+        // Average a few nearby bins for smoother display
+        let dbSum = 0;
+        let count = 0;
+        for (let b = Math.max(0, binIndex - 1); b <= Math.min(binCount - 1, binIndex + 1); b++) {
+          dbSum += freqData[b];
+          count++;
+        }
+        const db = count > 0 ? dbSum / count : -100;
+
+        // Normalize: -100dB → 0, 0dB → 1
+        const normalized = Math.max(0, (db + 100) / 100);
+        const barH = normalized * spectrumH * 0.9;
+
+        // Color: primary for most, accent for harmonics of detected pitch
+        let barColor = colors.primary;
+        let alpha = 0.5;
+        if (pitch) {
+          // Highlight fundamental and harmonics
+          for (let harmonic = 1; harmonic <= 5; harmonic++) {
+            const harmonicFreq = pitch * harmonic;
+            if (Math.abs(logFreq - harmonicFreq) / harmonicFreq < 0.08) {
+              barColor = harmonic === 1 ? colors.correct : colors.accent;
+              alpha = harmonic === 1 ? 1.0 : 0.8;
+              break;
+            }
+          }
+        }
+
+        const barW = Math.max(1, (W / barCount) - 1.5);
+        const x = (i / barCount) * W;
+        ctx.fillStyle = barColor;
+        ctx.globalAlpha = alpha;
+        ctx.beginPath();
+        ctx.roundRect(x, spectrumY + spectrumH - barH, barW, barH, 1);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+
+      // Frequency axis labels
+      ctx.font = '9px system-ui';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = `${colors.textTertiary}80`;
+      for (const f of [100, 200, 500, 1000, 2000, 5000]) {
+        const logFrac = Math.log10(f / 60) / Math.log10(8000 / 60);
+        if (logFrac < 0 || logFrac > 1) continue;
+        const x = logFrac * W;
+        ctx.fillText(f >= 1000 ? `${f / 1000}k` : `${f}`, x, spectrumY + spectrumH + 12);
+      }
+
+      // ── Current note display (top area) ──
+      const midX = W / 2;
       if (pitch && pitchResult) {
         const note = freqToNoteName(pitch);
         const quarterNote = freqToQuarterToneName(pitch);
@@ -287,116 +352,122 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode, currentAyah }: 
         const quarterCents = freqToQuarterToneCents(pitch);
 
         // Note name
-        ctx.font = `bold ${Math.min(72, W * 0.15)}px system-ui`;
+        ctx.font = `bold ${Math.min(48, W * 0.10)}px system-ui`;
         ctx.textAlign = 'center';
         ctx.fillStyle = colors.primary;
-        ctx.fillText(note, midX, H * 0.28);
+        ctx.fillText(note, midX * 0.45, H * 0.15);
 
-        // Octave
-        ctx.font = `${Math.min(24, W * 0.05)}px system-ui`;
+        // Octave subscript
+        ctx.font = `${Math.min(18, W * 0.04)}px system-ui`;
         ctx.fillStyle = colors.textSecondary;
-        ctx.fillText(octave, midX + Math.min(45, W * 0.09), H * 0.22);
+        ctx.fillText(octave, midX * 0.45 + Math.min(30, W * 0.07), H * 0.11);
 
         // Hz + confidence
-        ctx.font = '13px system-ui';
+        ctx.font = '11px system-ui';
         ctx.fillStyle = colors.textTertiary;
-        const confLabel = pitchResult.confidence > 0.9 ? '●' : pitchResult.confidence > 0.7 ? '◐' : '○';
-        ctx.fillText(`${Math.round(pitch)} Hz  ${confLabel}`, midX, H * 0.34);
+        const confDot = pitchResult.confidence > 0.9 ? '●' : pitchResult.confidence > 0.7 ? '◐' : '○';
+        ctx.fillText(`${Math.round(pitch)} Hz ${confDot}`, midX * 0.45, H * 0.20);
 
-        // Quarter-tone indicator (shows if the pitch is near a quarter tone)
+        // Quarter-tone indicator
         if (quarterNote !== note && Math.abs(quarterCents) < 15) {
-          ctx.font = 'bold 11px system-ui';
+          ctx.font = 'bold 10px system-ui';
           ctx.fillStyle = colors.accent;
-          ctx.fillText(`≈ ${quarterNote} (¼ tone)`, midX, H * 0.40);
+          ctx.fillText(`≈ ${quarterNote} (¼ tone)`, midX * 0.45, H * 0.25);
         }
 
-        // Cents meter (tuner-style bar)
-        const meterW = Math.min(180, W * 0.45);
-        const meterH = 6;
-        const meterX = midX - meterW / 2;
-        const meterY = H * 0.43;
+        // Cents meter
+        const meterW = Math.min(120, W * 0.25);
+        const meterH = 5;
+        const meterX = midX * 0.45 - meterW / 2;
+        const meterY = H * 0.28;
 
         ctx.fillStyle = `${colors.textTertiary}20`;
         ctx.beginPath(); ctx.roundRect(meterX, meterY, meterW, meterH, 3); ctx.fill();
-
         ctx.fillStyle = `${colors.textTertiary}40`;
-        ctx.fillRect(midX - 1, meterY - 2, 2, meterH + 4);
+        ctx.fillRect(midX * 0.45 - 0.5, meterY - 1, 1, meterH + 2);
 
-        const centsPos = midX + (cents / 50) * (meterW / 2);
+        const centsPos = midX * 0.45 + (cents / 50) * (meterW / 2);
         const centsColor = Math.abs(cents) < 10 ? colors.correct : Math.abs(cents) < 30 ? colors.accent : colors.wrong;
-        ctx.beginPath(); ctx.arc(centsPos, meterY + meterH / 2, 5, 0, Math.PI * 2);
+        ctx.beginPath(); ctx.arc(centsPos, meterY + meterH / 2, 4, 0, Math.PI * 2);
         ctx.fillStyle = centsColor; ctx.fill();
 
-        ctx.font = '10px system-ui';
+        ctx.font = '9px system-ui';
         ctx.fillStyle = centsColor;
-        ctx.fillText(`${cents > 0 ? '+' : ''}${cents}¢`, midX, meterY + 20);
+        ctx.fillText(`${cents > 0 ? '+' : ''}${cents}¢`, midX * 0.45, meterY + 16);
+
+        // ── Stats panel (right side) ──
+        const statsX = midX * 1.3;
+        let statsY = H * 0.08;
+        const lineH = 38;
+
+        // Volume
+        drawStatCompact(ctx, statsX, statsY, 'Volume', `${Math.round(rms * 1000)}`, colors);
+        drawVolumeBar(ctx, statsX - 20, statsY + 16, 40, 3, rms, colors);
+        statsY += lineH;
+
+        // Range
+        const rangeStr = pitchMinRef.current < Infinity
+          ? `${freqToNoteName(pitchMinRef.current)}–${freqToNoteName(pitchMaxRef.current)}`
+          : '—';
+        drawStatCompact(ctx, statsX, statsY, 'Range', rangeStr, colors);
+        statsY += lineH;
+
+        // Sustain
+        const isSustaining = sustainCountRef.current > 15;
+        drawStatCompact(ctx, statsX, statsY, 'Sustain', isSustaining ? 'Madd ━' : '—', colors, isSustaining ? colors.accent : undefined);
+        statsY += lineH;
+
+        // Maqam (jins-based)
+        const maqamDisplay = formatMaqamDisplay(maqamStateRef.current);
+        if (maqamDisplay) {
+          drawStatCompact(ctx, statsX, statsY, 'Maqam', maqamDisplay.label.replace('Maqam ', ''), colors, colors.primary);
+          ctx.font = '8px system-ui';
+          ctx.fillStyle = colors.textTertiary;
+          ctx.fillText(`${maqamDisplay.confidence}%`, statsX, statsY + 26);
+        } else {
+          const elapsed = maqamStateRef.current.timestamps.length > 0
+            ? (performance.now() - maqamStateRef.current.timestamps[0]) / 1000
+            : 0;
+          drawStatCompact(ctx, statsX, statsY, 'Maqam', elapsed > 0 ? `${Math.round(elapsed)}s…` : '—', colors);
+        }
+        statsY += lineH;
+
+        // Modulations
+        const mods = maqamStateRef.current.modulations;
+        if (mods.length > 0) {
+          const lastMod = mods[mods.length - 1];
+          drawStatCompact(ctx, statsX, statsY, 'Shift', `${lastMod.fromJins}→${lastMod.toJins}`, colors, colors.accent);
+        }
       } else {
-        ctx.font = `${Math.min(48, W * 0.1)}px system-ui`;
+        ctx.font = `${Math.min(36, W * 0.08)}px system-ui`;
         ctx.textAlign = 'center';
         ctx.fillStyle = `${colors.textTertiary}60`;
-        ctx.fillText('—', midX, H * 0.28);
-        ctx.font = '13px system-ui';
-        ctx.fillText(isPlaying ? 'Silence' : 'Play to begin', midX, H * 0.36);
+        ctx.fillText('—', midX, H * 0.15);
+        ctx.font = '12px system-ui';
+        ctx.fillText(isPlaying ? 'Detecting...' : 'Play to begin', midX, H * 0.22);
       }
 
-      // ── Stats grid ──
-      const statsY = H * 0.55;
-      const colW = W / 4;
-
-      // Volume
-      drawStat(ctx, colW * 0.5, statsY, 'Volume', `${Math.round(rms * 1000)}`, colors);
-      drawVolumeBar(ctx, colW * 0.5 - 25, statsY + 28, 50, 4, rms, colors);
-
-      // Range
-      const rangeStr = pitchMinRef.current < Infinity
-        ? `${freqToNoteName(pitchMinRef.current)} – ${freqToNoteName(pitchMaxRef.current)}`
-        : '—';
-      drawStat(ctx, colW * 1.5, statsY, 'Range', rangeStr, colors);
-
-      // Sustain
-      const isSustaining = sustainCountRef.current > 15;
-      drawStat(ctx, colW * 2.5, statsY, 'Sustain', isSustaining ? 'Madd ━━' : 'Normal', colors, isSustaining ? colors.accent : undefined);
-
-      // Maqam (jins-based)
-      const maqamDisplay = formatMaqamDisplay(maqamStateRef.current);
-      if (maqamDisplay) {
-        drawStat(ctx, colW * 3.5, statsY, 'Maqam', maqamDisplay.label.replace('Maqam ', ''), colors, colors.primary);
+      // Harmonic label
+      if (pitch) {
         ctx.font = '9px system-ui';
-        ctx.fillStyle = colors.textTertiary;
-        ctx.textAlign = 'center';
-        ctx.fillText(`${maqamDisplay.confidence}% · ${maqamDisplay.sublabel.split(' — ')[0]}`, colW * 3.5, statsY + 30);
-      } else {
-        const elapsed = maqamStateRef.current.timestamps.length > 0
-          ? (performance.now() - maqamStateRef.current.timestamps[0]) / 1000
-          : 0;
-        const statusText = elapsed > 0 ? `Listening... ${Math.round(elapsed)}s` : '...';
-        drawStat(ctx, colW * 3.5, statsY, 'Maqam', statusText, colors);
-      }
-
-      // Modulations indicator
-      const mods = maqamStateRef.current.modulations;
-      if (mods.length > 0) {
-        ctx.font = '9px system-ui';
-        ctx.textAlign = 'center';
+        ctx.textAlign = 'left';
+        ctx.fillStyle = colors.correct;
+        ctx.fillRect(8, spectrumY - 14, 6, 2);
+        ctx.fillText(' Fundamental', 16, spectrumY - 10);
         ctx.fillStyle = colors.accent;
-        const lastMod = mods[mods.length - 1];
-        ctx.fillText(`↗ ${lastMod.fromJins} → ${lastMod.toJins}`, colW * 3.5, statsY + 42);
+        ctx.fillRect(90, spectrumY - 14, 6, 2);
+        ctx.fillText(' Harmonics', 98, spectrumY - 10);
       }
-
-      // ── Mini pitch contour ──
-      const histY = H * 0.72;
-      const histH = H * 0.24;
-      drawMiniContour(ctx, 16, histY, W - 32, histH, pitchHistoryRef.current, colors.primary, colors);
     }
 
-    function drawStat(ctx: CanvasRenderingContext2D, x: number, y: number, label: string, value: string, colors: ReturnType<typeof getColors>, valueColor?: string) {
+    function drawStatCompact(ctx: CanvasRenderingContext2D, x: number, y: number, label: string, value: string, colors: ReturnType<typeof getColors>, valueColor?: string) {
       ctx.textAlign = 'center';
-      ctx.font = '10px system-ui';
+      ctx.font = '9px system-ui';
       ctx.fillStyle = colors.textTertiary;
       ctx.fillText(label, x, y);
-      ctx.font = 'bold 14px system-ui';
+      ctx.font = 'bold 13px system-ui';
       ctx.fillStyle = valueColor ?? colors.text;
-      ctx.fillText(value, x, y + 18);
+      ctx.fillText(value, x, y + 14);
     }
 
     function drawVolumeBar(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, rms: number, colors: ReturnType<typeof getColors>) {
@@ -408,7 +479,7 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode, currentAyah }: 
       ctx.beginPath(); ctx.roundRect(x, y, fillW, h, 2); ctx.fill();
     }
 
-    // ─── MELODY MODE ───
+    // ─── MELODY MODE: Pitch contour with annotations ───
     function drawMelody(ctx: CanvasRenderingContext2D, W: number, H: number, pitch: number | null, colors: ReturnType<typeof getColors>) {
       // Guide lines
       ctx.strokeStyle = `${colors.primary}0F`;
@@ -595,30 +666,6 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode, currentAyah }: 
       ctx.stroke();
     }
 
-    function drawMiniContour(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, history: (number | null)[], color: string, colors: ReturnType<typeof getColors>) {
-      ctx.fillStyle = `${colors.textTertiary}08`;
-      ctx.beginPath(); ctx.roundRect(x, y, w, h, 8); ctx.fill();
-      ctx.strokeStyle = `${colors.textTertiary}15`;
-      ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.roundRect(x, y, w, h, 8); ctx.stroke();
-
-      if (history.length < 2) return;
-      const step = w / MAX_PITCH_HISTORY;
-      ctx.save();
-      ctx.beginPath(); ctx.roundRect(x, y, w, h, 8); ctx.clip();
-      ctx.beginPath(); ctx.lineWidth = 2; ctx.strokeStyle = color;
-      ctx.lineJoin = 'round'; ctx.lineCap = 'round';
-      let started = false;
-      for (let i = 0; i < history.length; i++) {
-        const f = history[i]; if (!f) { started = false; continue; }
-        const px = x + i * step;
-        const py = y + h - ((Math.log2(Math.max(70, Math.min(700, f))) - Math.log2(70)) / (Math.log2(700) - Math.log2(70))) * h * 0.85 - h * 0.05;
-        if (!started) { ctx.moveTo(px, py); started = true; } else ctx.lineTo(px, py);
-      }
-      ctx.stroke();
-      ctx.restore();
-    }
-
     animFrameRef.current = requestAnimationFrame(draw);
     return () => cancelAnimationFrame(animFrameRef.current);
   }, [analyserNode, mode, isPlaying]);
@@ -633,7 +680,6 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode, currentAyah }: 
       {/* Practice mode controls */}
       {mode === 'practice' && (
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-3">
-          {/* Session stats */}
           {sessionStats && (
             <div className="flex items-center gap-2">
               <div className={`px-3 py-1 rounded-full text-sm font-bold ${
@@ -676,7 +722,6 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode, currentAyah }: 
       {mode === 'practice' && latestScore && !isRecording && (
         <div className="absolute inset-0 z-20 flex items-center justify-center bg-canvas/80 backdrop-blur-sm animate-fade-in">
           <div className="bg-surface rounded-2xl shadow-modal p-6 max-w-xs w-full mx-4 text-center">
-            {/* Letter grade */}
             <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-3 text-2xl font-bold ${
               latestScore.grade === 'A' ? 'bg-correct/20 text-correct' :
               latestScore.grade === 'B' ? 'bg-primary/20 text-primary' :
@@ -688,14 +733,12 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode, currentAyah }: 
             <p className="text-sm text-text-secondary mb-1">Ayah {latestScore.ayahNumber}</p>
             <p className="text-2xl font-bold text-text mb-4">{latestScore.overall}%</p>
 
-            {/* Sub-score bars */}
             <div className="space-y-2 mb-4">
               <ScoreBar label="Pitch" value={latestScore.pitch} />
               <ScoreBar label="Rhythm" value={latestScore.rhythm} />
               <ScoreBar label="Sustain" value={latestScore.sustain} />
             </div>
 
-            {/* Feedback */}
             {latestScore.feedback.length > 0 && (
               <div className="text-left space-y-1 mb-4">
                 {latestScore.feedback.slice(0, 3).map((msg, i) => (
@@ -706,7 +749,6 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode, currentAyah }: 
               </div>
             )}
 
-            {/* Try again */}
             <button
               onClick={() => {
                 setLatestScore(null);
@@ -722,8 +764,6 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode, currentAyah }: 
     </div>
   );
 }
-
-// ─── Score bar component ───
 
 function ScoreBar({ label, value }: { label: string; value: number }) {
   const color = value >= 80 ? 'bg-correct' : value >= 60 ? 'bg-accent' : 'bg-wrong';
