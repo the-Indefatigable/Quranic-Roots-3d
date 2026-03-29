@@ -5,113 +5,94 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/cn';
 import { useAuthStore } from '@/store/useAuthStore';
 
-const navItems = [
-  { href: '/learn/path', label: 'Arabic',  icon: LearnIcon },
-  { href: '/learn/qirat', label: 'Qirat',  icon: QiratIcon },
-  { href: '/quran',      label: 'Quran',  icon: BookIcon },
-  { href: '/roots',      label: 'Roots',  icon: RootIcon },
-  { href: '/search',     label: 'Search', icon: SearchIcon },
-  { href: '/admin',      label: 'Admin',  icon: AdminIcon, requiresAdmin: true },
+const NAV = [
+  { href: '/learn/path',  label: 'Arabic', icon: LearnIcon  },
+  { href: '/learn/qirat', label: 'Qirat',  icon: QiratIcon  },
+  { href: '/quran',       label: 'Quran',  icon: BookIcon   },
+  { href: '/roots',       label: 'Roots',  icon: RootIcon   },
+  { href: '/search',      label: 'Search', icon: SearchIcon },
 ];
 
 export function BottomNav() {
   const pathname = usePathname();
   const { user, isLoading, setShowLoginModal } = useAuthStore();
 
-  return (
-    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-surface border-t border-border pb-[env(safe-area-inset-bottom)]">
-      <div className="flex items-center justify-around h-[58px]">
-        {navItems.map((item) => {
-          if ((item as any).requiresAuth && !user) return null;
-          if ((item as any).requiresAdmin && user?.role !== 'admin') return null;
+  const allItems = [
+    ...NAV,
+    user
+      ? { href: '/profile', label: 'You',    icon: ProfileIcon }
+      : null,
+  ].filter(Boolean) as typeof NAV;
 
-          const isActive =
-            pathname === item.href || pathname.startsWith(item.href + '/');
+  return (
+    <nav
+      className="lg:hidden fixed bottom-0 left-0 right-0 z-40 flex items-end justify-center pb-[calc(env(safe-area-inset-bottom)+8px)] px-4"
+      style={{ pointerEvents: 'none' }}
+    >
+      <div
+        className="flex items-center justify-around w-full max-w-sm rounded-2xl px-2 h-[60px]"
+        style={{
+          background: 'rgba(20,19,18,0.92)',
+          backdropFilter: 'blur(16px)',
+          border: '1px solid rgba(255,255,255,0.08)',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.5), 0 1px 0 rgba(255,255,255,0.05) inset',
+          pointerEvents: 'auto',
+        }}
+      >
+        {allItems.map((item) => {
+          const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={cn(
-                'relative flex flex-col items-center justify-center gap-[3px] px-3 py-1 transition-all duration-150 active:scale-95 interactive',
-                isActive ? 'text-primary' : 'text-text-tertiary'
-              )}
+              className="relative flex flex-col items-center justify-center gap-[3px] w-12 h-12 rounded-xl transition-all duration-200 active:scale-90 interactive"
+              style={{
+                background: isActive ? 'rgba(212,162,70,0.12)' : 'transparent',
+                color: isActive ? '#D4A246' : '#57534E',
+              }}
             >
               {isActive && (
-                <span className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-[2px] rounded-b-full bg-primary" />
+                <span
+                  className="absolute top-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full"
+                  style={{ background: '#D4A246', boxShadow: '0 0 6px rgba(212,162,70,0.8)' }}
+                />
               )}
               <item.icon
-                className={cn(
-                  'w-[19px] h-[19px] transition-all duration-150',
-                  isActive ? 'text-primary scale-110' : 'text-text-tertiary'
-                )}
+                className={cn('w-[18px] h-[18px] transition-all duration-200', isActive ? 'scale-110' : '')}
               />
-              <span
-                className={cn(
-                  'text-[9.5px] tracking-wide transition-all duration-150',
-                  isActive ? 'font-bold text-primary' : 'font-medium text-text-tertiary'
-                )}
-              >
+              <span className={cn('text-[9px] tracking-wide font-medium leading-none', isActive ? 'font-bold' : '')}>
                 {item.label}
               </span>
             </Link>
           );
         })}
 
-        {/* Profile / Sign in */}
-        {!isLoading && (
-          user ? (
-            <Link
-              href="/profile"
-              className={cn(
-                'relative flex flex-col items-center justify-center gap-[3px] px-3 py-1 transition-all duration-150 active:scale-95 interactive',
-                pathname.startsWith('/profile') || pathname.startsWith('/bookmarks') || pathname.startsWith('/review') || pathname.startsWith('/rewards')
-                  ? 'text-primary'
-                  : 'text-text-tertiary'
-              )}
-            >
-              {(pathname.startsWith('/profile') || pathname.startsWith('/bookmarks') || pathname.startsWith('/review') || pathname.startsWith('/rewards')) && (
-                <span className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-[2px] rounded-b-full bg-primary" />
-              )}
-              <div className={cn(
-                'w-[19px] h-[19px] rounded-full flex items-center justify-center',
-                pathname.startsWith('/profile') || pathname.startsWith('/bookmarks') || pathname.startsWith('/review') || pathname.startsWith('/rewards')
-                  ? 'bg-primary/20' : 'bg-primary-light'
-              )}>
-                <span className="text-[7px] font-bold text-primary uppercase leading-none">
-                  {user.name?.[0] || user.email[0]}
-                </span>
-              </div>
-              <span className={cn(
-                'text-[9.5px] tracking-wide',
-                pathname.startsWith('/profile') || pathname.startsWith('/bookmarks') || pathname.startsWith('/review') || pathname.startsWith('/rewards')
-                  ? 'font-bold text-primary' : 'font-medium text-text-tertiary'
-              )}>
-                You
-              </span>
-            </Link>
-          ) : (
-            <button
-              onClick={() => setShowLoginModal(true)}
-              className="flex flex-col items-center justify-center gap-[3px] px-3 py-1 text-text-tertiary active:scale-95 transition-all interactive"
-            >
-              <UserIcon className="w-[19px] h-[19px]" />
-              <span className="text-[9.5px] font-medium tracking-wide">Sign in</span>
-            </button>
-          )
+        {/* Sign-in if no user */}
+        {!isLoading && !user && (
+          <button
+            onClick={() => setShowLoginModal(true)}
+            className="flex flex-col items-center justify-center gap-[3px] w-12 h-12 rounded-xl transition-all active:scale-90 interactive"
+            style={{ color: '#57534E' }}
+          >
+            <UserIcon className="w-[18px] h-[18px]" />
+            <span className="text-[9px] font-medium leading-none">Sign in</span>
+          </button>
         )}
       </div>
     </nav>
   );
 }
 
-function UserIcon({ className }: { className?: string }) {
+function ProfileIcon({ className }: { className?: string }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
     </svg>
   );
 }
-
+function UserIcon({ className }: { className?: string }) {
+  return <ProfileIcon className={className} />;
+}
 function BookIcon({ className }: { className?: string }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -119,7 +100,6 @@ function BookIcon({ className }: { className?: string }) {
     </svg>
   );
 }
-
 function RootIcon({ className }: { className?: string }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -127,7 +107,6 @@ function RootIcon({ className }: { className?: string }) {
     </svg>
   );
 }
-
 function QiratIcon({ className }: { className?: string }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -135,7 +114,6 @@ function QiratIcon({ className }: { className?: string }) {
     </svg>
   );
 }
-
 function LearnIcon({ className }: { className?: string }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -143,27 +121,10 @@ function LearnIcon({ className }: { className?: string }) {
     </svg>
   );
 }
-
-function QuizIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-    </svg>
-  );
-}
-
 function SearchIcon({ className }: { className?: string }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-    </svg>
-  );
-}
-
-function AdminIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
     </svg>
   );
 }
