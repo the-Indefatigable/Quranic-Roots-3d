@@ -46,14 +46,21 @@ export function Sidebar() {
               key={navItem.href}
               href={navItem.href}
               className={cn(
-                'relative flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-150',
+                'relative flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200',
                 isActive
-                  ? 'bg-primary-light text-primary font-semibold'
+                  ? 'text-primary font-semibold'
                   : 'text-text-secondary hover:text-text hover:bg-canvas'
               )}
+              style={isActive ? {
+                background: 'linear-gradient(135deg, var(--color-primary-light) 0%, transparent 100%)',
+                boxShadow: '0 0 0 1px var(--color-primary-light)',
+              } : {}}
             >
               {isActive && (
-                <span className="absolute left-0 inset-y-2 w-[3px] bg-primary rounded-r-full" />
+                <span
+                  className="absolute left-0 inset-y-2 w-[3px] rounded-r-full"
+                  style={{ background: 'var(--color-primary)', boxShadow: '0 0 6px var(--color-primary)' }}
+                />
               )}
               <navItem.icon className={cn('w-[18px] h-[18px] flex-shrink-0', isActive ? 'text-primary' : 'text-text-tertiary')} />
               <span>{navItem.label}</span>
