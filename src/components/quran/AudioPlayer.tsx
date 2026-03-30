@@ -150,6 +150,9 @@ export function AudioPlayer({
     try {
       const ctx = new AudioContext();
       audioCtxRef.current = ctx;
+      // If audio is already playing, the 'play' event already fired before this
+      // AudioContext existed — resume it immediately so the analyser gets data.
+      if (!audioElement.paused) ctx.resume().catch(() => {});
       const analyser = ctx.createAnalyser();
       analyser.fftSize = 2048;
       analyser.smoothingTimeConstant = 0.8;

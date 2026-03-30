@@ -97,9 +97,21 @@ export function GuidedPractice({
     return () => { audio.pause(); audio.src = ''; };
   }, []);
 
-  // Sync selected ayah to currentAyah when idle
+  // React to ayah changes from the main player
   useEffect(() => {
-    if (phaseRef.current === 'idle') setSelectedAyah(currentAyah);
+    const phase = phaseRef.current;
+    if (phase === 'idle') {
+      setSelectedAyah(currentAyah);
+    } else if (phase === 'together' || phase === 'listening') {
+      // New ayah started — reset pitch buffers so waveform starts fresh
+      qariPitchesRef.current   = [];
+      userPitchesRef.current   = [];
+      silenceFramesRef.current = 0;
+    } else if (phase === 'scored') {
+      // Surah advanced/looped — dismiss score screen and reset for next ayah
+      setLatestScore(null);
+      setPhaseSync('idle');
+    }
   }, [currentAyah]);
 
   const ensureAudioCtx = useCallback((): AudioContext => {
