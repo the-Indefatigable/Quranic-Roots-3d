@@ -352,56 +352,115 @@ export function GuidedPractice({
       }
     }
 
-    function drawWaveform(ctx: CanvasRenderingContext2D, W: number, H: number, phase: Phase) {
-      const step   = W / MAX_HISTORY;
-      const colors = getColors();
+    // ── Piano-roll note grid data ──
+    const PIANO_NOTES = [
+      { name: 'C3', freq: 130.81 }, { name: 'E3', freq: 164.81 },
+      { name: 'G3', freq: 196.00 }, { name: 'B3', freq: 246.94 },
+      { name: 'D4', freq: 293.66 }, { name: 'F4', freq: 349.23 },
+      { name: 'A4', freq: 440.00 }, { name: 'C5', freq: 523.25 },
+    ];
+    const GRID_LEFT = 32; // space for note labels
 
-      // Guide lines
-      ctx.strokeStyle = colors.primary + '18';
-      ctx.lineWidth   = 1;
-      ctx.setLineDash([3, 10]);
-      for (const f of [130, 220, 350, 500]) {
-        const y = freqToY(f, H);
-        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    function drawWaveform(ctx: CanvasRenderingContext2D, W: number, H: number, phase: Phase) {
+      const drawW  = W - GRID_LEFT;
+      const step   = drawW / MAX_HISTORY;
+      const pad    = 14; // top/bottom padding
+
+      // ── Background gradient ──
+      const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+      bgGrad.addColorStop(0, 'rgba(8,18,22,0.95)');
+      bgGrad.addColorStop(1, 'rgba(5,12,14,0.98)');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, W, H);
+
+      // ── Piano-roll grid lines + note labels ──
+      ctx.font = '9px ui-monospace, monospace';
+      ctx.textAlign = 'right';
+      for (const note of PIANO_NOTES) {
+        const y = freqToY(note.freq, H - pad * 2) + pad;
+        // Grid line
+        ctx.strokeStyle = note.name.startsWith('C') ? 'rgba(212,162,70,0.12)' : 'rgba(255,255,255,0.04)';
+        ctx.lineWidth = note.name.startsWith('C') ? 1 : 0.5;
+        ctx.beginPath();
+        ctx.moveTo(GRID_LEFT, y);
+        ctx.lineTo(W, y);
+        ctx.stroke();
+        // Label
+        ctx.fillStyle = note.name.startsWith('C') ? 'rgba(212,162,70,0.5)' : 'rgba(255,255,255,0.15)';
+        ctx.fillText(note.name, GRID_LEFT - 4, y + 3);
       }
-      ctx.setLineDash([]);
+
+      // ── Left border line ──
+      ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(GRID_LEFT, 0);
+      ctx.lineTo(GRID_LEFT, H);
+      ctx.stroke();
 
       const qari = qariPitchesRef.current;
       const user = userPitchesRef.current;
 
-      // Qari contour (teal)
+      const toY = (f: number) => freqToY(f, H - pad * 2) + pad;
+
+      // ── Qari ribbon (teal, thick with gradient fill) ──
       if (qari.length > 1) {
         const startIdx = Math.max(0, qari.length - MAX_HISTORY);
-        const count    = qari.length - startIdx;
-        ctx.shadowColor = colors.primary;
-        ctx.shadowBlur  = 5;
+        const count = qari.length - startIdx;
+
+        // Fill area under pitch curve
         ctx.beginPath();
-        ctx.lineWidth   = 2;
-        ctx.strokeStyle = colors.primary + 'CC';
-        ctx.lineJoin    = 'round';
-        ctx.lineCap     = 'round';
+        let fillStarted = false;
+        let lastX = GRID_LEFT;
+        for (let i = 0; i < count; i++) {
+          const f = qari[startIdx + i];
+          if (!f) { fillStarted = false; continue; }
+          const x = GRID_LEFT + i * step;
+          const y = toY(f);
+          if (!fillStarted) { ctx.moveTo(x, H); ctx.lineTo(x, y); fillStarted = true; }
+          else ctx.lineTo(x, y);
+          lastX = x;
+        }
+        ctx.lineTo(lastX, H);
+        ctx.closePath();
+        const fillGrad = ctx.createLinearGradient(0, 0, 0, H);
+        fillGrad.addColorStop(0, 'rgba(13,148,136,0.12)');
+        fillGrad.addColorStop(1, 'rgba(13,148,136,0.01)');
+        ctx.fillStyle = fillGrad;
+        ctx.fill();
+
+        // Stroke line
+        ctx.beginPath();
+        ctx.lineWidth = 2.5;
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = '#0D9488';
+        ctx.shadowColor = '#0D9488';
+        ctx.shadowBlur = 8;
         let started = false;
         for (let i = 0; i < count; i++) {
           const f = qari[startIdx + i];
           if (!f) { started = false; continue; }
-          const x = i * step;
-          const y = freqToY(f, H);
+          const x = GRID_LEFT + i * step;
+          const y = toY(f);
           if (!started) { ctx.moveTo(x, y); started = true; } else ctx.lineTo(x, y);
         }
         ctx.stroke();
         ctx.shadowBlur = 0;
       }
 
-      // User contour (color-coded by pitch accuracy)
+      // ── User ribbon (color-coded: green=close, amber=near, red=far) ──
       if (user.length > 1) {
         const startIdx = Math.max(0, user.length - MAX_HISTORY);
-        const count    = user.length - startIdx;
+        const count = user.length - startIdx;
 
+        // Draw segments with per-segment color
         for (let i = 1; i < count; i++) {
           const f1 = user[startIdx + i - 1];
           const f2 = user[startIdx + i];
           if (!f1 || !f2) continue;
 
+          // Find corresponding qari pitch
           let qF: number | null = null;
           if (phase === 'together') {
             qF = qari[startIdx + i] ?? null;
@@ -410,49 +469,137 @@ export function GuidedPractice({
             qF = qari[qIdx] ?? null;
           }
 
-          let color = colors.accent;
+          let color = '#D4A246'; // amber default
           if (qF) {
             const cents = Math.abs(1200 * Math.log2(f2 / qF));
-            color = cents < 50 ? colors.correct : cents < 150 ? colors.accent : colors.wrong;
+            color = cents < 50 ? '#58CC02' : cents < 120 ? '#D4A246' : '#FF4B4B';
           }
 
+          const x1 = GRID_LEFT + (i - 1) * step;
+          const x2 = GRID_LEFT + i * step;
+          const y1 = toY(f1);
+          const y2 = toY(f2);
+
+          // Thick glowing line
           ctx.beginPath();
-          ctx.lineWidth   = 2.5;
+          ctx.lineWidth = 3;
           ctx.strokeStyle = color;
-          ctx.lineCap     = 'round';
+          ctx.lineCap = 'round';
           ctx.shadowColor = color;
-          ctx.shadowBlur  = 3;
-          ctx.moveTo((i - 1) * step, freqToY(f1, H));
-          ctx.lineTo(i * step,        freqToY(f2, H));
+          ctx.shadowBlur = 10;
+          ctx.moveTo(x1, y1);
+          ctx.lineTo(x2, y2);
           ctx.stroke();
           ctx.shadowBlur = 0;
+
+          // Subtle fill below
+          ctx.beginPath();
+          ctx.moveTo(x1, y1);
+          ctx.lineTo(x2, y2);
+          ctx.lineTo(x2, y2 + 4);
+          ctx.lineTo(x1, y1 + 4);
+          ctx.closePath();
+          ctx.fillStyle = color + '30';
+          ctx.fill();
         }
       }
 
-      // Status label
-      ctx.font      = 'bold 11px system-ui';
-      ctx.textAlign = 'left';
-      if (phase === 'listening') {
-        ctx.fillStyle = colors.primary;
-        ctx.fillText('Step 1 — Listen to Qari', 12, 20);
-      } else if (phase === 'recording') {
-        ctx.fillStyle = colors.wrong;
-        ctx.fillText('Step 2 — Recite now', 12, 20);
-      } else if (phase === 'together') {
-        ctx.fillStyle = colors.accent;
-        ctx.fillText('Singing Together', 12, 20);
+      // ── Scrolling playhead line ──
+      const activeData = phase === 'recording' || phase === 'together' ? user : qari;
+      if (activeData.length > 0) {
+        const headX = GRID_LEFT + Math.min(activeData.length, MAX_HISTORY) * step;
+        // Glow
+        const headGrad = ctx.createLinearGradient(headX - 8, 0, headX + 8, 0);
+        headGrad.addColorStop(0, 'rgba(212,162,70,0)');
+        headGrad.addColorStop(0.5, 'rgba(212,162,70,0.15)');
+        headGrad.addColorStop(1, 'rgba(212,162,70,0)');
+        ctx.fillStyle = headGrad;
+        ctx.fillRect(headX - 8, 0, 16, H);
+        // Line
+        ctx.strokeStyle = 'rgba(212,162,70,0.6)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(headX, 0);
+        ctx.lineTo(headX, H);
+        ctx.stroke();
+        // Diamond head
+        ctx.fillStyle = '#D4A246';
+        ctx.beginPath();
+        ctx.moveTo(headX, 2);
+        ctx.lineTo(headX + 4, 6);
+        ctx.lineTo(headX, 10);
+        ctx.lineTo(headX - 4, 6);
+        ctx.closePath();
+        ctx.fill();
       }
 
-      // Legend
-      ctx.font      = '10px system-ui';
+      // ── Phase badge (top-left, inside canvas) ──
+      const badges: Record<string, { text: string; color: string; bg: string }> = {
+        listening: { text: '🎧  LISTENING', color: '#0D9488', bg: 'rgba(13,148,136,0.12)' },
+        recording: { text: '🎤  YOUR TURN', color: '#FF4B4B', bg: 'rgba(255,75,75,0.12)' },
+        together:  { text: '🎵  TOGETHER', color: '#D4A246', bg: 'rgba(212,162,70,0.12)' },
+      };
+      const badge = badges[phase];
+      if (badge) {
+        ctx.font = 'bold 9px system-ui';
+        const tw = ctx.measureText(badge.text).width;
+        const bx = GRID_LEFT + 8, by = 8, bw = tw + 14, bh = 20, br = 6;
+        // Rounded rect
+        ctx.beginPath();
+        ctx.moveTo(bx + br, by);
+        ctx.lineTo(bx + bw - br, by);
+        ctx.quadraticCurveTo(bx + bw, by, bx + bw, by + br);
+        ctx.lineTo(bx + bw, by + bh - br);
+        ctx.quadraticCurveTo(bx + bw, by + bh, bx + bw - br, by + bh);
+        ctx.lineTo(bx + br, by + bh);
+        ctx.quadraticCurveTo(bx, by + bh, bx, by + bh - br);
+        ctx.lineTo(bx, by + br);
+        ctx.quadraticCurveTo(bx, by, bx + br, by);
+        ctx.closePath();
+        ctx.fillStyle = badge.bg;
+        ctx.fill();
+        ctx.strokeStyle = badge.color + '40';
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+        ctx.fillStyle = badge.color;
+        ctx.textAlign = 'left';
+        ctx.fillText(badge.text, bx + 7, by + 14);
+      }
+
+      // ── Legend bar (bottom) ──
+      const legendY = H - 24;
+      // Semi-transparent bar
+      ctx.fillStyle = 'rgba(5,12,14,0.8)';
+      ctx.fillRect(GRID_LEFT, legendY, drawW, 24);
+      ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+      ctx.lineWidth = 0.5;
+      ctx.beginPath(); ctx.moveTo(GRID_LEFT, legendY); ctx.lineTo(W, legendY); ctx.stroke();
+
+      ctx.font = '9px system-ui';
       ctx.textAlign = 'left';
-      ctx.fillStyle = colors.primary;
-      ctx.fillRect(10, H - 18, 10, 3);
-      ctx.fillText('Qari', 24, H - 12);
+      // Qari legend
+      ctx.fillStyle = '#0D9488';
+      ctx.fillRect(GRID_LEFT + 10, legendY + 10, 12, 3);
+      ctx.shadowColor = '#0D9488'; ctx.shadowBlur = 4;
+      ctx.fillRect(GRID_LEFT + 10, legendY + 10, 12, 3);
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = 'rgba(255,255,255,0.4)';
+      ctx.fillText('Qari', GRID_LEFT + 26, legendY + 14);
+
       if (phase === 'recording' || phase === 'together') {
-        ctx.fillStyle = colors.correct;
-        ctx.fillRect(65, H - 18, 10, 3);
-        ctx.fillText('You', 79, H - 12);
+        // User legend
+        ctx.fillStyle = '#58CC02';
+        ctx.fillRect(GRID_LEFT + 65, legendY + 10, 12, 3);
+        ctx.shadowColor = '#58CC02'; ctx.shadowBlur = 4;
+        ctx.fillRect(GRID_LEFT + 65, legendY + 10, 12, 3);
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = 'rgba(255,255,255,0.4)';
+        ctx.fillText('You', GRID_LEFT + 81, legendY + 14);
+
+        // Color key
+        ctx.fillStyle = '#58CC02'; ctx.fillText('● close', GRID_LEFT + 120, legendY + 14);
+        ctx.fillStyle = '#D4A246'; ctx.fillText('● near', GRID_LEFT + 168, legendY + 14);
+        ctx.fillStyle = '#FF4B4B'; ctx.fillText('● far', GRID_LEFT + 210, legendY + 14);
       }
     }
 
@@ -499,12 +646,23 @@ export function GuidedPractice({
           </div>
 
           {/* Mode description */}
-          <p className="text-xs text-center mb-4" style={{ color: '#57534E', maxWidth: '260px' }}>
+          <p className="text-xs text-center mb-2" style={{ color: '#57534E', maxWidth: '260px' }}>
             {practiceMode === 'mode1'
               ? 'Pauses playback, plays one ayah, then records your recitation — scored on pitch accuracy'
               : 'Mic opens while the Qari plays — both pitch contours shown in real-time'
             }
           </p>
+
+          {/* Headphones warning for Mode 2 */}
+          {practiceMode === 'mode2' && (
+            <div
+              className="flex items-center gap-2 px-3 py-2 rounded-lg mb-3 text-[11px]"
+              style={{ background: 'rgba(212,162,70,0.08)', border: '1px solid rgba(212,162,70,0.15)', color: '#D4A246', maxWidth: '280px' }}
+            >
+              <span className="text-base">🎧</span>
+              <span>Use <strong>headphones</strong> for accurate results — speakers bleed into mic</span>
+            </div>
+          )}
 
           {/* Ayah picker (Mode 1 only — Mode 2 follows the main player) */}
           {practiceMode === 'mode1' && (

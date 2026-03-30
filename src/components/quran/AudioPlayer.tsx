@@ -118,13 +118,23 @@ export function AudioPlayer({
   onAyahChangeRef.current = onAyahChange;
   onWordChangeRef.current = onWordChange;
 
-  const playModeRef  = useRef(playMode);
-  const loopModeRef  = useRef(loopMode);
-  playModeRef.current = playMode;
-  loopModeRef.current = loopMode;
+  const playModeRef    = useRef(playMode);
+  const loopModeRef    = useRef(loopMode);
+  const currentAyahRef = useRef(startAyah);
+  const totalAyahsRef  = useRef(totalAyahs);
+  playModeRef.current    = playMode;
+  loopModeRef.current    = loopMode;
+  totalAyahsRef.current  = totalAyahs;
 
   const [isPlaying, setIsPlaying]         = useState(false);
-  const [currentAyah, setCurrentAyah]     = useState(startAyah);
+  const [currentAyah, _setCurrentAyah]    = useState(startAyah);
+  const setCurrentAyah = useCallback((v: number | ((prev: number) => number)) => {
+    _setCurrentAyah(prev => {
+      const next = typeof v === 'function' ? v(prev) : v;
+      currentAyahRef.current = next;
+      return next;
+    });
+  }, []);
   const [progress, setProgress]           = useState(0);
   const [currentTime, setCurrentTime]     = useState(0);
   const [duration, setDuration]           = useState(0);
@@ -320,14 +330,14 @@ export function AudioPlayer({
             break;
           }
         }
-        if (foundAyah && foundAyah !== currentAyah) {
+        if (foundAyah && foundAyah !== currentAyahRef.current) {
           setCurrentAyah(foundAyah);
           onAyahChangeRef.current(foundAyah);
         }
         onWordChangeRef.current(foundWord);
       } else {
         const ms       = audio.currentTime * 1000;
-        const segments = ayahDataRef.current.get(currentAyah)?.segments ?? [];
+        const segments = ayahDataRef.current.get(currentAyahRef.current)?.segments ?? [];
         const active   = segments.find(([, start, end]) => ms >= start && ms < end);
         onWordChangeRef.current(active ? active[0] : null);
       }
@@ -360,8 +370,10 @@ export function AudioPlayer({
         setPlayRevision(r => r + 1);
         return;
       }
-      if (currentAyah < totalAyahs) {
-        const next = currentAyah + 1;
+      const ayah = currentAyahRef.current;
+      const total = totalAyahsRef.current;
+      if (ayah < total) {
+        const next = ayah + 1;
         setCurrentAyah(next);
         playAyah(next);
       } else if (loop === 'surah') {
@@ -386,7 +398,9 @@ export function AudioPlayer({
       audio.removeEventListener('pause',          handlePause);
       audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
     };
-  }, [audioElement, currentAyah, totalAyahs, playAyah, playSurahAudio, isSeeking]);
+  // currentAyah/totalAyahs accessed via refs to avoid stale closures + re-attaching listeners
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [audioElement, playAyah, playSurahAudio, isSeeking]);
 
   // ── Controls ───────────────────────────────────────────────────────────────
   function togglePlay() {
