@@ -122,19 +122,11 @@ export default function LearnPage() {
             <Link
               key={topic.href}
               href={topic.href}
-              className="group flex items-start gap-4 rounded-2xl p-5 transition-all duration-200 hover:-translate-y-0.5"
+              className="group flex items-start gap-4 rounded-2xl p-5 transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/[0.05] hover:border-white/[0.12]"
               style={{
                 background: 'rgba(255,255,255,0.03)',
                 border: '1px solid rgba(255,255,255,0.07)',
                 boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-              }}
-              onMouseEnter={e => {
-                (e.currentTarget as HTMLElement).style.borderColor = `${topic.color}30`;
-                (e.currentTarget as HTMLElement).style.background = `${topic.color}08`;
-              }}
-              onMouseLeave={e => {
-                (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.07)';
-                (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.03)';
               }}
             >
               {/* Left: Arabic */}
