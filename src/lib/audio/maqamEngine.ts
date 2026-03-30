@@ -119,9 +119,16 @@ export function updateMaqamDetection(
   midiPitch: number,
   timestampMs: number
 ): MaqamDetectionState {
+  const MAX_HISTORY = 3000; // ~50 seconds at 60fps — enough for detection
   const newState = { ...state };
-  newState.pitchHistory = [...state.pitchHistory, midiPitch];
-  newState.timestamps = [...state.timestamps, timestampMs];
+
+  // Ring buffer: push + trim instead of full array copy
+  newState.pitchHistory = state.pitchHistory.length >= MAX_HISTORY
+    ? [...state.pitchHistory.slice(state.pitchHistory.length - MAX_HISTORY + 1), midiPitch]
+    : [...state.pitchHistory, midiPitch];
+  newState.timestamps = state.timestamps.length >= MAX_HISTORY
+    ? [...state.timestamps.slice(state.timestamps.length - MAX_HISTORY + 1), timestampMs]
+    : [...state.timestamps, timestampMs];
 
   // Check if we have enough data
   const elapsed = newState.timestamps.length > 0
@@ -254,7 +261,7 @@ function findTonic(pitches: number[]): number {
   });
 
   // Find the actual MIDI note closest to this pitch class in the lowest octave observed
-  const lowestOctave = Math.min(...pitches.map(p => Math.floor(p / 12)));
+  const lowestOctave = pitches.reduce((min, p) => Math.min(min, Math.floor(p / 12)), Infinity);
   return lowestOctave * 12 + tonic;
 }
 

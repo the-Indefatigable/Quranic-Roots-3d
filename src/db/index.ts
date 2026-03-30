@@ -34,7 +34,7 @@ const baseDb = isBuildTime
   ? (null as unknown as ReturnType<typeof drizzle>)
   : drizzle(client, { schema });
 
-// Proxy that auto-retries on transient Railway errors
+// Transient error detection for retry logic
 const TRANSIENT_CODES = ['ECONNRESET', 'ECONNREFUSED', 'ETIMEDOUT', 'CONNECT_TIMEOUT', 'CONNECTION_CLOSED', 'ENETUNREACH'];
 
 function isTransient(err: unknown): boolean {
@@ -44,17 +44,7 @@ function isTransient(err: unknown): boolean {
   return TRANSIENT_CODES.some((c) => code.includes(c) || msg.includes(c));
 }
 
-export const db: typeof baseDb = new Proxy(baseDb, {
-  get(target, prop, receiver) {
-    const value = Reflect.get(target, prop, receiver);
-    if (prop !== 'select' && prop !== 'insert' && prop !== 'update' && prop !== 'delete') {
-      return value;
-    }
-    // Wrap query builders — the actual query runs when .from()...execute() is called
-    // We intercept at the top level and retry the full chain
-    return value;
-  },
-});
+export const db = baseDb;
 
 // Export a helper for server components that wraps any async DB call with retry
 export async function dbQuery<T>(fn: () => Promise<T>, retries = 2): Promise<T> {

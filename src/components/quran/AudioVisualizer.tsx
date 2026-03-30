@@ -172,6 +172,9 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode, currentAyah }: 
 
   // Canvas size tracking (avoid re-setting canvas.width/height every frame — that clears the canvas)
   const canvasSizeRef = useRef({ w: 0, h: 0 });
+  // Cache CSS colors once — no need to call getComputedStyle 60x/second
+  const colorsRef = useRef(getColors());
+  useEffect(() => { colorsRef.current = getColors(); }, [mode]);
 
   // ─── Animation loop ───
   useEffect(() => {
@@ -278,7 +281,7 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode, currentAyah }: 
         }
       }
 
-      const colors = getColors();
+      const colors = colorsRef.current;
 
       if (modeRef.current === 'spectrum') {
         drawSpectrum(ctx, W, H, pitch, pitchResult, rms, colors);
