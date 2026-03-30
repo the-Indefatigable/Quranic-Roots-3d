@@ -25,6 +25,8 @@ interface Props {
   surahNumber: number;
   selectedQari: QariInfo;
   ayahs: AyahItem[];
+  /** Increments on every loop restart — signals GuidedPractice to reset pitch buffers */
+  playRevision: number;
   onNextAyah: () => void;
   /** Pause the main AudioPlayer — called by Mode 1 before playing own single-ayah audio */
   onPause?: () => void;
@@ -52,6 +54,7 @@ export function GuidedPractice({
   surahNumber,
   selectedQari,
   ayahs,
+  playRevision,
   onPause,
 }: Props) {
   const containerRef  = useRef<HTMLDivElement>(null);
@@ -97,22 +100,22 @@ export function GuidedPractice({
     return () => { audio.pause(); audio.src = ''; };
   }, []);
 
-  // React to ayah changes from the main player
+  // React to ayah changes OR loop restarts from the main player
   useEffect(() => {
     const phase = phaseRef.current;
     if (phase === 'idle') {
       setSelectedAyah(currentAyah);
     } else if (phase === 'together' || phase === 'listening') {
-      // New ayah started — reset pitch buffers so waveform starts fresh
+      // New ayah or loop restart — reset pitch buffers so waveform starts fresh
       qariPitchesRef.current   = [];
       userPitchesRef.current   = [];
       silenceFramesRef.current = 0;
     } else if (phase === 'scored') {
-      // Surah advanced/looped — dismiss score screen and reset for next ayah
+      // Surah advanced/looped — dismiss score screen and reset for next round
       setLatestScore(null);
       setPhaseSync('idle');
     }
-  }, [currentAyah]);
+  }, [currentAyah, playRevision]);
 
   const ensureAudioCtx = useCallback((): AudioContext => {
     if (audioCtxRef.current) return audioCtxRef.current;

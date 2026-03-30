@@ -128,6 +128,7 @@ export function AudioPlayer({
   const [progress, setProgress]           = useState(0);
   const [currentTime, setCurrentTime]     = useState(0);
   const [duration, setDuration]           = useState(0);
+  const [playRevision, setPlayRevision]   = useState(0);
   const [timingsLoaded, setTimingsLoaded] = useState(false);
   const [timingsError, setTimingsError]   = useState(false);
   const [expanded, setExpanded]           = useState(false);
@@ -337,15 +338,34 @@ export function AudioPlayer({
       onWordChangeRef.current(null);
       const loop = loopModeRef.current;
       if (usingSurahAudioRef.current) {
-        if (loop === 'surah') playSurahAudio(1);
+        if (loop === 'surah') {
+          // Seek instead of reloading — preserves captureStream / MediaElementSource chain
+          audio.currentTime = 0;
+          audio.play().catch(() => setIsPlaying(false));
+          setCurrentAyah(1);
+          setIsPlaying(true);
+          setProgress(0);
+          setPlayRevision(r => r + 1);
+          onAyahChangeRef.current(1);
+          onWordChangeRef.current(null);
+        }
         return;
       }
-      if (loop === 'ayah') { playAyah(currentAyah); return; }
+      if (loop === 'ayah') {
+        // Same ayah — seek instead of reloading to keep analyser connected
+        audio.currentTime = 0;
+        audio.play().catch(() => setIsPlaying(false));
+        setIsPlaying(true);
+        setProgress(0);
+        setPlayRevision(r => r + 1);
+        return;
+      }
       if (currentAyah < totalAyahs) {
         const next = currentAyah + 1;
         setCurrentAyah(next);
         playAyah(next);
       } else if (loop === 'surah') {
+        setPlayRevision(r => r + 1);
         playAyah(1);
       }
     }
@@ -841,6 +861,7 @@ export function AudioPlayer({
                   surahNumber={surahNumber}
                   selectedQari={selectedQari}
                   ayahs={ayahsList}
+                  playRevision={playRevision}
                   onNextAyah={() => { if (currentAyah < totalAyahs) seekToAyah(currentAyah + 1); }}
                   onPause={() => audioElement.pause()}
                 />
