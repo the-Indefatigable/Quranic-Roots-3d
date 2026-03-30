@@ -58,6 +58,7 @@ export const db: typeof baseDb = new Proxy(baseDb, {
 
 // Export a helper for server components that wraps any async DB call with retry
 export async function dbQuery<T>(fn: () => Promise<T>, retries = 2): Promise<T> {
+  if (isBuildTime) throw new Error('[DB] dbQuery called at build time — mark the page as force-dynamic');
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
       return await fn();
