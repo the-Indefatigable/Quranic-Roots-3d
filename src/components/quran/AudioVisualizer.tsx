@@ -222,19 +222,37 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode, currentAyah }: 
 
       frameCountRef.current++;
 
-      // ── Common: detect pitch with YIN (runs on every tab) ──
+      // ── Common: detect pitch with YIN (runs every 3rd frame ≈ 20fps to save CPU) ──
+      // YIN is O(n²) — running at 60fps wastes ~66% of CPU. 20Hz is plenty for pitch tracking.
+      const shouldDetect = frameCountRef.current % 3 === 0;
       const buf = new Float32Array(analyserNode.fftSize);
       analyserNode.getFloatTimeDomainData(buf);
-      const rms = detectRMS(buf);
-      const pitchResult: PitchResult | null = isPlayingRef.current ? detectPitchYIN(buf, sampleRate) : null;
-      const pitch = pitchResult?.frequency ?? null;
-      const pitchMidi = pitchResult?.midi ?? null;
+      const rms = shouldDetect ? detectRMS(buf) : (rmsHistoryRef.current[rmsHistoryRef.current.length - 1] ?? 0);
+      let pitchResult: PitchResult | null = null;
+      let pitch: number | null = null;
+      let pitchMidi: number | null = null;
+      if (shouldDetect) {
+        pitchResult = isPlayingRef.current ? detectPitchYIN(buf, sampleRate) : null;
+        pitch = pitchResult?.frequency ?? null;
+        pitchMidi = pitchResult?.midi ?? null;
+        // Cache for interim frames
+        (draw as any).__cachedPitch = pitch;
+        (draw as any).__cachedMidi = pitchMidi;
+        (draw as any).__cachedResult = pitchResult;
+        (draw as any).__cachedRms = rms;
+      } else {
+        pitch = (draw as any).__cachedPitch ?? null;
+        pitchMidi = (draw as any).__cachedMidi ?? null;
+        pitchResult = (draw as any).__cachedResult ?? null;
+      }
 
-      // Track stats (runs on EVERY tab so data persists across switches)
-      pitchHistoryRef.current.push(pitch);
-      if (pitchHistoryRef.current.length > MAX_PITCH_HISTORY) pitchHistoryRef.current.shift();
-      rmsHistoryRef.current.push(rms);
-      if (rmsHistoryRef.current.length > MAX_PITCH_HISTORY) rmsHistoryRef.current.shift();
+      // Track stats only on detection frames (every 3rd) so history stays at real pitch rate
+      if (shouldDetect) {
+        pitchHistoryRef.current.push(pitch);
+        if (pitchHistoryRef.current.length > MAX_PITCH_HISTORY) pitchHistoryRef.current.shift();
+        rmsHistoryRef.current.push(rms);
+        if (rmsHistoryRef.current.length > MAX_PITCH_HISTORY) rmsHistoryRef.current.shift();
+      }
 
       if (pitch && pitchMidi !== null) {
         if (pitch < pitchMinRef.current) pitchMinRef.current = pitch;
