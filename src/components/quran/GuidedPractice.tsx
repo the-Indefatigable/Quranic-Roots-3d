@@ -17,7 +17,7 @@ interface AyahItem {
 }
 
 interface Props {
-  /** kept for API compat — not used; practice has its own audio */
+  /** Main player's analyser — used by Mode 2 (Sing Together) for qari waveform */
   analyserNode: AnalyserNode | null;
   isPlaying: boolean;
   currentAyah: number;
@@ -26,9 +26,11 @@ interface Props {
   selectedQari: QariInfo;
   ayahs: AyahItem[];
   onNextAyah: () => void;
+  /** Pause the main AudioPlayer — called by Mode 1 before playing own single-ayah audio */
+  onPause?: () => void;
 }
 
-const MAX_HISTORY = 300; // frames visible in scrolling waveform
+const MAX_HISTORY  = 300; // frames visible in scrolling waveform
 const SILENCE_FRAMES = 100; // ~1.7s at 60fps before auto-stop
 
 function getColors() {
@@ -44,23 +46,30 @@ function getColors() {
 }
 
 export function GuidedPractice({
+  analyserNode,
   currentAyah,
   totalAyahs,
   surahNumber,
   selectedQari,
   ayahs,
+  onPause,
 }: Props) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const canvasRef    = useRef<HTMLCanvasElement>(null);
-  const animFrameRef = useRef<number>(0);
+  const containerRef  = useRef<HTMLDivElement>(null);
+  const canvasRef     = useRef<HTMLCanvasElement>(null);
+  const animFrameRef  = useRef<number>(0);
   const canvasSizeRef = useRef({ w: 0, h: 0 });
 
-  // Own audio element — fully independent of the main AudioPlayer
-  const audioRef       = useRef<HTMLAudioElement | null>(null);
-  const audioCtxRef    = useRef<AudioContext | null>(null);
-  const qariAnalyserRef = useRef<AnalyserNode | null>(null);
-  const micAnalyserRef  = useRef<AnalyserNode | null>(null);
-  const micStreamRef    = useRef<MediaStream | null>(null);
+  // Own audio element — used for Mode 1 (listen then recite)
+  const audioRef        = useRef<HTMLAudioElement | null>(null);
+  const audioCtxRef     = useRef<AudioContext | null>(null);
+
+  // Two separate refs for qari analyser:
+  //   ownQariAnalyserRef — permanently wired to own <audio> element (Mode 1), created once
+  //   qariAnalyserRef    — active analyser for current session (may point to own or main player's)
+  const ownQariAnalyserRef = useRef<AnalyserNode | null>(null);
+  const qariAnalyserRef    = useRef<AnalyserNode | null>(null);
+  const micAnalyserRef     = useRef<AnalyserNode | null>(null);
+  const micStreamRef       = useRef<MediaStream | null>(null);
 
   const [practiceMode, setPracticeMode] = useState<PracticeMode>('mode1');
   const [phase, setPhase]               = useState<Phase>('idle');
@@ -70,8 +79,8 @@ export function GuidedPractice({
   const [allScores, setAllScores]       = useState<PhraseScore[]>([]);
 
   // Pitch buffers
-  const qariPitchesRef  = useRef<(number | null)[]>([]);
-  const userPitchesRef  = useRef<(number | null)[]>([]);
+  const qariPitchesRef   = useRef<(number | null)[]>([]);
+  const userPitchesRef   = useRef<(number | null)[]>([]);
   const silenceFramesRef = useRef(0);
 
   const setPhaseSync = (p: Phase) => {
@@ -79,7 +88,7 @@ export function GuidedPractice({
     setPhase(p);
   };
 
-  // ─── Audio setup ───
+  // ─── Audio setup (Mode 1 only) ───
 
   useEffect(() => {
     const audio = new Audio();
@@ -100,22 +109,22 @@ export function GuidedPractice({
     return ctx;
   }, []);
 
-  const setupQariAnalyser = useCallback(() => {
-    // Only set up once per audio element lifetime
-    if (qariAnalyserRef.current || !audioRef.current) return;
+  // Sets up qari analyser from own audio element (Mode 1).
+  // createMediaElementSource can only be called once per element — guarded by ownQariAnalyserRef.
+  const setupOwnQariAnalyser = useCallback(() => {
+    if (ownQariAnalyserRef.current || !audioRef.current) return;
     try {
       const ctx      = ensureAudioCtx();
       const analyser = ctx.createAnalyser();
       analyser.fftSize = 2048;
       analyser.smoothingTimeConstant = 0.75;
-      // createMediaElementSource is reliable and doesn't require a src to be set.
-      // Must connect analyser → destination so audio continues to play.
       const src = ctx.createMediaElementSource(audioRef.current);
       src.connect(analyser);
-      analyser.connect(ctx.destination);
-      qariAnalyserRef.current = analyser;
+      analyser.connect(ctx.destination); // must route output
+      ownQariAnalyserRef.current = analyser;
+      qariAnalyserRef.current    = analyser;
     } catch (e) {
-      console.warn('[Practice] qari analyser setup failed:', e);
+      console.warn('[Practice] own qari analyser setup failed:', e);
     }
   }, [ensureAudioCtx]);
 
@@ -124,7 +133,6 @@ export function GuidedPractice({
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: { echoCancellation: true, noiseSuppression: true },
       });
-      // Guard: stream must have at least one audio track
       if (!stream.getAudioTracks().length) {
         stream.getTracks().forEach(t => t.stop());
         return false;
@@ -151,30 +159,34 @@ export function GuidedPractice({
   }, []);
 
   const resetBuffers = () => {
-    qariPitchesRef.current  = [];
-    userPitchesRef.current  = [];
+    qariPitchesRef.current   = [];
+    userPitchesRef.current   = [];
     silenceFramesRef.current = 0;
   };
 
   // ─── Mode 1: Listen then Recite ───
+  // Pauses the main AudioPlayer, plays a single ayah via own <audio>, then records mic.
 
   const startListening = useCallback(() => {
     const audio = audioRef.current;
     if (!audio) return;
+    // Pause main player so two audios don't conflict
+    onPause?.();
     resetBuffers();
-    // Set src BEFORE setupQariAnalyser so createMediaElementSource has a valid element
     const url = buildAyahAudioUrl(selectedQari, surahNumber, selectedAyah);
     audio.src = url;
     audio.load();
-    setupQariAnalyser();
+    setupOwnQariAnalyser(); // safe to call multiple times — only wires up once
+    // If ctx was suspended (created before user gesture), resume now
+    const ctx = audioCtxRef.current;
+    if (ctx?.state === 'suspended') ctx.resume().catch(() => {});
     audio.play().catch(() => {});
     setPhaseSync('listening');
-  }, [selectedQari, surahNumber, selectedAyah, setupQariAnalyser]);
+  }, [onPause, selectedQari, surahNumber, selectedAyah, setupOwnQariAnalyser]);
 
   const startRecording = useCallback(async () => {
     if (phaseRef.current !== 'listening') return;
-    // Reset only user buffer; keep qari pitches for comparison
-    userPitchesRef.current  = [];
+    userPitchesRef.current   = [];
     silenceFramesRef.current = 0;
     const ok = await openMic();
     if (!ok) { setPhaseSync('idle'); return; }
@@ -201,25 +213,25 @@ export function GuidedPractice({
   finishRecordingRef.current = finishRecording;
 
   // ─── Mode 2: Sing Together ───
+  // Does NOT use own audio. Wires qariAnalyserRef to the main player's analyserNode,
+  // opens mic, shows both waveforms live while main player continues uninterrupted.
 
   const startTogether = useCallback(async () => {
-    const audio = audioRef.current;
-    if (!audio) return;
     resetBuffers();
-    // Set src BEFORE setupQariAnalyser so createMediaElementSource has a valid element
-    const url = buildAyahAudioUrl(selectedQari, surahNumber, selectedAyah);
-    audio.src = url;
-    audio.load();
-    setupQariAnalyser();
+    // Point active qari analyser at the main player's node (or fall back to own if set)
+    qariAnalyserRef.current = analyserNode ?? ownQariAnalyserRef.current ?? null;
     const ok = await openMic();
-    if (!ok) return;
-    audio.play().catch(() => {});
+    if (!ok) {
+      qariAnalyserRef.current = ownQariAnalyserRef.current ?? null;
+      return;
+    }
     setPhaseSync('together');
-  }, [selectedQari, surahNumber, selectedAyah, setupQariAnalyser, openMic]);
+  }, [analyserNode, openMic]);
 
   const finishTogether = useCallback(() => {
     if (phaseRef.current !== 'together') return;
-    audioRef.current?.pause();
+    // Restore qariAnalyser to own (Mode 1) analyser — don't close the main player's node
+    qariAnalyserRef.current = ownQariAnalyserRef.current ?? null;
     closeMic();
     const score = scorePhrase(
       qariPitchesRef.current.map(p => p !== null ? freqToMidi(p) : null),
@@ -235,23 +247,20 @@ export function GuidedPractice({
   const finishTogetherRef = useRef(finishTogether);
   finishTogetherRef.current = finishTogether;
 
-  // ─── Audio `ended` event handler ───
-  // Fires when the own practice audio element finishes
+  // ─── Mode 1 audio `ended` event ───
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
     const handleEnded = () => {
       if (phaseRef.current === 'listening') {
-        // Small delay so last pitch frame is captured
         setTimeout(() => startRecordingRef.current(), 300);
-      } else if (phaseRef.current === 'together') {
-        finishTogetherRef.current();
       }
+      // Mode 2 has no own audio, so 'together' ended event won't fire here
     };
     audio.addEventListener('ended', handleEnded);
     return () => audio.removeEventListener('ended', handleEnded);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // audio element doesn't change
+  }, []);
 
   // ─── Cleanup ───
   useEffect(() => {
@@ -264,7 +273,6 @@ export function GuidedPractice({
   }, [closeMic]);
 
   // ─── Animation + pitch detection loop ───
-  // Deps = empty: everything read from refs so the loop never re-creates
   useEffect(() => {
     const canvas    = canvasRef.current;
     const container = containerRef.current;
@@ -280,7 +288,6 @@ export function GuidedPractice({
       const H = container.clientHeight;
       if (W === 0 || H === 0) return;
 
-      // Only resize when dimensions actually change — prevents flickering
       const dpr = window.devicePixelRatio || 1;
       if (canvasSizeRef.current.w !== W || canvasSizeRef.current.h !== H) {
         canvas.width  = W * dpr;
@@ -312,7 +319,6 @@ export function GuidedPractice({
         const pitch = r?.frequency ?? null;
         userPitchesRef.current.push(pitch);
 
-        // Auto-stop on silence (Mode 1 recording only — Mode 2 stops when audio ends)
         if (currentPhase === 'recording') {
           if (!pitch) {
             silenceFramesRef.current++;
@@ -326,34 +332,29 @@ export function GuidedPractice({
         }
       }
 
-      // ── Draw ──
       if (currentPhase === 'listening' || currentPhase === 'recording' || currentPhase === 'together') {
         drawWaveform(ctx2d, W, H, currentPhase);
       }
     }
 
     function drawWaveform(ctx: CanvasRenderingContext2D, W: number, H: number, phase: Phase) {
-      // Fixed step — both contours share the same x-scale (the scrolling window)
-      const step = W / MAX_HISTORY;
+      const step   = W / MAX_HISTORY;
       const colors = getColors();
 
-      // ── Horizontal frequency guide lines ──
+      // Guide lines
       ctx.strokeStyle = colors.primary + '18';
       ctx.lineWidth   = 1;
       ctx.setLineDash([3, 10]);
       for (const f of [130, 220, 350, 500]) {
         const y = freqToY(f, H);
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(W, y);
-        ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
       }
       ctx.setLineDash([]);
 
       const qari = qariPitchesRef.current;
       const user = userPitchesRef.current;
 
-      // ── Qari contour (teal, scrolling window) ──
+      // Qari contour (teal)
       if (qari.length > 1) {
         const startIdx = Math.max(0, qari.length - MAX_HISTORY);
         const count    = qari.length - startIdx;
@@ -376,7 +377,7 @@ export function GuidedPractice({
         ctx.shadowBlur = 0;
       }
 
-      // ── User contour (color-coded by pitch accuracy) ──
+      // User contour (color-coded by pitch accuracy)
       if (user.length > 1) {
         const startIdx = Math.max(0, user.length - MAX_HISTORY);
         const count    = user.length - startIdx;
@@ -388,15 +389,13 @@ export function GuidedPractice({
 
           let qF: number | null = null;
           if (phase === 'together') {
-            // Mode 2: qari and user collected in the same frame → direct alignment
             qF = qari[startIdx + i] ?? null;
           } else {
-            // Mode 1: proportional mapping (user may sing at different speed than qari)
             const qIdx = Math.floor(((startIdx + i) / user.length) * qari.length);
             qF = qari[qIdx] ?? null;
           }
 
-          let color = colors.accent; // unknown → amber
+          let color = colors.accent;
           if (qF) {
             const cents = Math.abs(1200 * Math.log2(f2 / qF));
             color = cents < 50 ? colors.correct : cents < 150 ? colors.accent : colors.wrong;
@@ -415,8 +414,8 @@ export function GuidedPractice({
         }
       }
 
-      // ── Status label ──
-      ctx.font = 'bold 11px system-ui';
+      // Status label
+      ctx.font      = 'bold 11px system-ui';
       ctx.textAlign = 'left';
       if (phase === 'listening') {
         ctx.fillStyle = colors.primary;
@@ -426,11 +425,11 @@ export function GuidedPractice({
         ctx.fillText('Step 2 — Recite now', 12, 20);
       } else if (phase === 'together') {
         ctx.fillStyle = colors.accent;
-        ctx.fillText('Sing Together', 12, 20);
+        ctx.fillText('Singing Together', 12, 20);
       }
 
-      // ── Legend ──
-      ctx.font = '10px system-ui';
+      // Legend
+      ctx.font      = '10px system-ui';
       ctx.textAlign = 'left';
       ctx.fillStyle = colors.primary;
       ctx.fillRect(10, H - 18, 10, 3);
@@ -446,8 +445,8 @@ export function GuidedPractice({
     return () => cancelAnimationFrame(animFrameRef.current);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const sessionStats       = allScores.length > 0 ? computeSessionStats(allScores) : null;
-  const selectedAyahText   = ayahs.find(a => a.number === selectedAyah)?.textUthmani;
+  const sessionStats     = allScores.length > 0 ? computeSessionStats(allScores) : null;
+  const selectedAyahText = ayahs.find(a => a.number === selectedAyah)?.textUthmani;
 
   return (
     <div ref={containerRef} className="relative w-full h-full" style={{ minHeight: '240px' }}>
@@ -487,42 +486,51 @@ export function GuidedPractice({
           {/* Mode description */}
           <p className="text-xs text-center mb-4" style={{ color: '#57534E', maxWidth: '260px' }}>
             {practiceMode === 'mode1'
-              ? 'Listen to the full ayah once, then recite it back — scored on pitch accuracy'
-              : 'Sing along with the Qari in real-time — your pitch is compared frame-by-frame'
+              ? 'Pauses playback, plays one ayah, then records your recitation — scored on pitch accuracy'
+              : 'Mic opens while the Qari plays — both pitch contours shown in real-time'
             }
           </p>
 
-          {/* Ayah picker */}
-          <div className="flex items-center gap-3 mb-4">
-            <button
-              onClick={() => setSelectedAyah(a => Math.max(1, a - 1))}
-              disabled={selectedAyah <= 1}
-              className="w-8 h-8 rounded-xl flex items-center justify-center text-base font-bold disabled:opacity-30 transition-all"
-              style={{ background: 'rgba(255,255,255,0.05)', color: '#78716C', border: '1px solid rgba(255,255,255,0.08)' }}
-            >
-              ‹
-            </button>
-            <span className="text-sm font-medium min-w-[70px] text-center" style={{ color: '#EDEDEC' }}>
-              Ayah {selectedAyah}
-            </span>
-            <button
-              onClick={() => setSelectedAyah(a => Math.min(totalAyahs, a + 1))}
-              disabled={selectedAyah >= totalAyahs}
-              className="w-8 h-8 rounded-xl flex items-center justify-center text-base font-bold disabled:opacity-30 transition-all"
-              style={{ background: 'rgba(255,255,255,0.05)', color: '#78716C', border: '1px solid rgba(255,255,255,0.08)' }}
-            >
-              ›
-            </button>
-          </div>
+          {/* Ayah picker (Mode 1 only — Mode 2 follows the main player) */}
+          {practiceMode === 'mode1' && (
+            <div className="flex items-center gap-3 mb-4">
+              <button
+                onClick={() => setSelectedAyah(a => Math.max(1, a - 1))}
+                disabled={selectedAyah <= 1}
+                className="w-8 h-8 rounded-xl flex items-center justify-center text-base font-bold disabled:opacity-30 transition-all"
+                style={{ background: 'rgba(255,255,255,0.05)', color: '#78716C', border: '1px solid rgba(255,255,255,0.08)' }}
+              >
+                ‹
+              </button>
+              <span className="text-sm font-medium min-w-[70px] text-center" style={{ color: '#EDEDEC' }}>
+                Ayah {selectedAyah}
+              </span>
+              <button
+                onClick={() => setSelectedAyah(a => Math.min(totalAyahs, a + 1))}
+                disabled={selectedAyah >= totalAyahs}
+                className="w-8 h-8 rounded-xl flex items-center justify-center text-base font-bold disabled:opacity-30 transition-all"
+                style={{ background: 'rgba(255,255,255,0.05)', color: '#78716C', border: '1px solid rgba(255,255,255,0.08)' }}
+              >
+                ›
+              </button>
+            </div>
+          )}
 
-          {/* Arabic preview */}
-          {selectedAyahText && (
+          {/* Arabic preview (Mode 1) */}
+          {practiceMode === 'mode1' && selectedAyahText && (
             <p
               className="font-arabic text-sm text-center mb-4 leading-[2]"
               dir="rtl"
               style={{ color: '#57534E', maxWidth: '280px' }}
             >
               {selectedAyahText}
+            </p>
+          )}
+
+          {/* Mode 2 hint */}
+          {practiceMode === 'mode2' && (
+            <p className="text-xs text-center mb-4" style={{ color: '#3D3C3A', maxWidth: '240px' }}>
+              Keep the Quran playing — hit Start and sing along
             </p>
           )}
 
@@ -547,8 +555,8 @@ export function GuidedPractice({
           {/* Start button */}
           <button
             onClick={practiceMode === 'mode1' ? startListening : startTogether}
-            className="flex items-center gap-2 px-6 py-3 rounded-xl font-medium text-sm text-white transition-all hover:scale-105 active:scale-95"
-            style={{ background: 'linear-gradient(135deg, #D4A246, #C89535)', boxShadow: '0 4px 20px rgba(212,162,70,0.3)' }}
+            className="flex items-center gap-2 px-6 py-3 rounded-xl font-medium text-sm transition-all hover:scale-105 active:scale-95"
+            style={{ background: 'linear-gradient(135deg, #D4A246, #C89535)', boxShadow: '0 4px 20px rgba(212,162,70,0.3)', color: '#0E0D0C' }}
           >
             {practiceMode === 'mode1' ? (
               <>
@@ -562,7 +570,7 @@ export function GuidedPractice({
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" />
                 </svg>
-                Sing Together
+                Start Singing
               </>
             )}
           </button>
@@ -621,7 +629,6 @@ export function GuidedPractice({
             className="rounded-2xl p-5 w-full max-w-xs mx-4 my-2"
             style={{ background: 'rgba(28,27,25,0.98)', border: '1px solid rgba(255,255,255,0.08)' }}
           >
-            {/* Grade */}
             <div className="text-center mb-4">
               <div
                 className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-2 text-2xl font-bold"
@@ -636,14 +643,12 @@ export function GuidedPractice({
               <p className="text-2xl font-bold" style={{ color: '#EDEDEC' }}>{latestScore.overall}%</p>
             </div>
 
-            {/* Score bars */}
             <div className="space-y-2 mb-4">
               <ScoreBar label="Pitch"   value={latestScore.pitch}   />
               <ScoreBar label="Rhythm"  value={latestScore.rhythm}  />
               <ScoreBar label="Sustain" value={latestScore.sustain} />
             </div>
 
-            {/* Feedback */}
             {latestScore.feedback.length > 0 && (
               <div className="space-y-1 mb-4">
                 {latestScore.feedback.slice(0, 2).map((msg, i) => (
@@ -654,7 +659,6 @@ export function GuidedPractice({
               </div>
             )}
 
-            {/* Actions */}
             <div className="flex gap-2">
               <button
                 onClick={() => { setLatestScore(null); setPhaseSync('idle'); }}
@@ -666,15 +670,15 @@ export function GuidedPractice({
                 </svg>
                 Retry
               </button>
-              {selectedAyah < totalAyahs && (
+              {selectedAyah < totalAyahs && practiceMode === 'mode1' && (
                 <button
                   onClick={() => {
                     setSelectedAyah(a => a + 1);
                     setLatestScore(null);
                     setPhaseSync('idle');
                   }}
-                  className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-medium text-white transition-colors"
-                  style={{ background: 'linear-gradient(135deg, #D4A246, #C89535)' }}
+                  className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-medium transition-colors"
+                  style={{ background: 'linear-gradient(135deg, #D4A246, #C89535)', color: '#0E0D0C' }}
                 >
                   Next Ayah
                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
