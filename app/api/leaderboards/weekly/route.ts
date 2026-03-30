@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { db, dbQuery } from '@/db';
 import { users, quizSessions } from '@/db/schema';
-import { gte } from 'drizzle-orm';
+import { eq, gte, desc, sql } from 'drizzle-orm';
 
 export async function GET(req: NextRequest) {
   try {
@@ -13,59 +13,40 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get 7 days ago
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-    // Get all users
-    const allUsers = await dbQuery(() =>
-      db.select({
-        id: users.id,
-        name: users.name,
-        userLevel: users.userLevel,
-      }).from(users)
-    );
-
-    // Get recent sessions (last 7 days)
-    const recentSessions = await dbQuery(() =>
+    // Single SQL query: JOIN users + sessions, GROUP BY user, ORDER BY XP, LIMIT 100
+    const topUsers = await dbQuery(() =>
       db
         .select({
-          userId: quizSessions.userId,
-          correctCount: quizSessions.correctCount,
+          userId: users.id,
+          userName: users.name,
+          userLevel: users.userLevel,
+          totalXP: sql<number>`COALESCE(SUM(${quizSessions.correctCount} * 10), 0)`.as('total_xp'),
         })
         .from(quizSessions)
+        .innerJoin(users, eq(quizSessions.userId, users.id))
         .where(gte(quizSessions.sessionStartedAt, sevenDaysAgo))
+        .groupBy(users.id, users.name, users.userLevel)
+        .orderBy(desc(sql`total_xp`))
+        .limit(100)
     );
 
-    // Calculate XP per user for this week
-    const weeklyXPMap = new Map<string, number>();
-    recentSessions.forEach((session) => {
-      const xp = (session.correctCount || 0) * 10;
-      weeklyXPMap.set(session.userId, (weeklyXPMap.get(session.userId) || 0) + xp);
-    });
-
-    // Build leaderboard
-    const leaderboard = allUsers
-      .map((u) => ({
-        userId: u.id,
-        userName: u.name || 'Anonymous',
-        totalXP: weeklyXPMap.get(u.id) || 0,
-        userLevel: u.userLevel || 1,
-      }))
-      .filter((u) => u.totalXP > 0)
-      .sort((a, b) => b.totalXP - a.totalXP);
-
     // Add ranks
-    const rankedUsers = leaderboard.map((u, idx) => ({
+    const rankedUsers = topUsers.map((u, idx) => ({
       rank: idx + 1,
-      ...u,
+      userId: u.userId,
+      userName: u.userName || 'Anonymous',
+      totalXP: Number(u.totalXP) || 0,
+      userLevel: u.userLevel || 1,
     }));
 
     // Find current user's rank
     const myRank = rankedUsers.find((u) => u.userId === session.user.id) || null;
 
     return NextResponse.json({
-      entries: rankedUsers.slice(0, 100),
+      entries: rankedUsers,
       myRank,
     });
   } catch (error) {
