@@ -159,13 +159,26 @@ export function AudioPlayer({
   const analyserNodeRef = useRef<AnalyserNode | null>(null);
 
   const ensureAnalyser = useCallback(() => {
-    // Already created — just resume if needed and return
+    // Already created in this mount — just resume if needed
     if (analyserNodeRef.current) {
       const existingCtx = audioCtxRef.current;
       if (existingCtx?.state === 'suspended') existingCtx.resume().catch(() => {});
       return analyserNodeRef.current;
     }
     try {
+      // Check if a previous mount already attached a MediaElementSource to this element.
+      // createMediaElementSource can only be called ONCE per element — a second call throws
+      // InvalidStateError. This guard survives React Strict Mode double-mounts.
+      const el = audioElement as any;
+      if (el.__qurootsAnalyser && el.__qurootsCtx) {
+        const ctx = el.__qurootsCtx as AudioContext;
+        audioCtxRef.current = ctx;
+        if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+        analyserNodeRef.current = el.__qurootsAnalyser;
+        setAnalyserNode(el.__qurootsAnalyser);
+        return el.__qurootsAnalyser as AnalyserNode;
+      }
+
       const ctx = new AudioContext();
       audioCtxRef.current = ctx;
       if (!audioElement.paused) ctx.resume().catch(() => {});
@@ -174,12 +187,13 @@ export function AudioPlayer({
       analyser.fftSize = 2048;
       analyser.smoothingTimeConstant = 0.8;
 
-      // createMediaElementSource is the most reliable approach.
-      // It survives audio.src changes and audio.load() calls.
-      // IMPORTANT: can only be called once per element — the ref guard above prevents double-call.
       const source = ctx.createMediaElementSource(audioElement);
       source.connect(analyser);
       analyser.connect(ctx.destination);
+
+      // Persist on the element so future mounts can reuse
+      el.__qurootsCtx = ctx;
+      el.__qurootsAnalyser = analyser;
 
       analyserNodeRef.current = analyser;
       setAnalyserNode(analyser);
