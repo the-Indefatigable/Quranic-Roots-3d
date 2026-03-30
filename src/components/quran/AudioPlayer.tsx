@@ -839,11 +839,12 @@ export function AudioPlayer({
                 isPlaying={isPlaying}
                 currentAyah={currentAyah}
                 totalAyahs={totalAyahs}
-                onPlayAyah={(ayahNum) => seekToAyah(ayahNum)}
+                surahNumber={surahNumber}
+                selectedQari={selectedQari}
+                ayahs={ayahsList}
                 onNextAyah={() => {
                   if (currentAyah < totalAyahs) seekToAyah(currentAyah + 1);
                 }}
-                ayahText={ayahsList.find(a => a.number === currentAyah)?.textUthmani}
               />
             </div>
           </div>
