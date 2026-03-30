@@ -156,35 +156,39 @@ export function AudioPlayer({
   const [analyserNode, setAnalyserNode]   = useState<AnalyserNode | null>(null);
   const audioCtxRef                       = useRef<AudioContext | null>(null);
 
+  const analyserNodeRef = useRef<AnalyserNode | null>(null);
+
   const ensureAnalyser = useCallback(() => {
-    if (analyserNode) return analyserNode;
+    // Already created — just resume if needed and return
+    if (analyserNodeRef.current) {
+      const existingCtx = audioCtxRef.current;
+      if (existingCtx?.state === 'suspended') existingCtx.resume().catch(() => {});
+      return analyserNodeRef.current;
+    }
     try {
       const ctx = new AudioContext();
       audioCtxRef.current = ctx;
-      // If audio is already playing, the 'play' event already fired before this
-      // AudioContext existed — resume it immediately so the analyser gets data.
       if (!audioElement.paused) ctx.resume().catch(() => {});
+
       const analyser = ctx.createAnalyser();
       analyser.fftSize = 2048;
       analyser.smoothingTimeConstant = 0.8;
-      const el = audioElement as any;
-      const captureFn = el.captureStream ?? el.mozCaptureStream;
-      if (captureFn) {
-        const stream = captureFn.call(el) as MediaStream;
-        const source = ctx.createMediaStreamSource(stream);
-        source.connect(analyser);
-      } else {
-        const source = ctx.createMediaElementSource(audioElement);
-        source.connect(analyser);
-        analyser.connect(ctx.destination);
-      }
+
+      // createMediaElementSource is the most reliable approach.
+      // It survives audio.src changes and audio.load() calls.
+      // IMPORTANT: can only be called once per element — the ref guard above prevents double-call.
+      const source = ctx.createMediaElementSource(audioElement);
+      source.connect(analyser);
+      analyser.connect(ctx.destination);
+
+      analyserNodeRef.current = analyser;
       setAnalyserNode(analyser);
       return analyser;
     } catch (e) {
       console.warn('Audio visualizer setup failed:', e);
       return null;
     }
-  }, [audioElement, analyserNode]);
+  }, [audioElement]);
 
   // ── Data fetching ──────────────────────────────────────────────────────────
   useEffect(() => {

@@ -170,6 +170,9 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode, currentAyah }: 
     // Do NOT clear pitchHistoryRef, maqamStateRef, rmsHistoryRef, etc.
   }, [mode]);
 
+  // Canvas size tracking (avoid re-setting canvas.width/height every frame — that clears the canvas)
+  const canvasSizeRef = useRef({ w: 0, h: 0 });
+
   // ─── Animation loop ───
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -188,12 +191,22 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode, currentAyah }: 
       const W = container.clientWidth;
       const H = container.clientHeight;
       if (W === 0 || H === 0) return;
-      canvas.width = W * dpr;
-      canvas.height = H * dpr;
-      canvas.style.width = `${W}px`;
-      canvas.style.height = `${H}px`;
+
+      // Only resize when dimensions actually change — prevents clearing canvas every frame
+      if (canvasSizeRef.current.w !== W || canvasSizeRef.current.h !== H) {
+        canvas.width = W * dpr;
+        canvas.height = H * dpr;
+        canvas.style.width = `${W}px`;
+        canvas.style.height = `${H}px`;
+        canvasSizeRef.current = { w: W, h: H };
+      }
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, W, H);
+
+      // Resume suspended AudioContext (browsers suspend until user gesture)
+      if (analyserNode?.context.state === 'suspended') {
+        (analyserNode.context as AudioContext).resume().catch(() => {});
+      }
 
       if (!analyserNode) {
         const c = getColors();
