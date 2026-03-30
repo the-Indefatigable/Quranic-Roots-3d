@@ -101,26 +101,22 @@ export function GuidedPractice({
   }, []);
 
   const setupQariAnalyser = useCallback(() => {
-    // Only set up once per audio element
+    // Only set up once per audio element lifetime
     if (qariAnalyserRef.current || !audioRef.current) return;
-    const ctx     = ensureAudioCtx();
-    const analyser = ctx.createAnalyser();
-    analyser.fftSize = 2048;
-    analyser.smoothingTimeConstant = 0.75;
-
-    const el = audioRef.current as any;
-    const captureFn = el.captureStream ?? el.mozCaptureStream;
-    if (captureFn) {
-      const stream = (captureFn.call(el) as MediaStream);
-      ctx.createMediaStreamSource(stream).connect(analyser);
-      // Do NOT connect analyser → destination; audio plays normally from element
-    } else {
-      // Fallback: hijacks routing so must connect to destination
+    try {
+      const ctx      = ensureAudioCtx();
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 2048;
+      analyser.smoothingTimeConstant = 0.75;
+      // createMediaElementSource is reliable and doesn't require a src to be set.
+      // Must connect analyser → destination so audio continues to play.
       const src = ctx.createMediaElementSource(audioRef.current);
       src.connect(analyser);
       analyser.connect(ctx.destination);
+      qariAnalyserRef.current = analyser;
+    } catch (e) {
+      console.warn('[Practice] qari analyser setup failed:', e);
     }
-    qariAnalyserRef.current = analyser;
   }, [ensureAudioCtx]);
 
   const openMic = useCallback(async (): Promise<boolean> => {
@@ -128,6 +124,11 @@ export function GuidedPractice({
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: { echoCancellation: true, noiseSuppression: true },
       });
+      // Guard: stream must have at least one audio track
+      if (!stream.getAudioTracks().length) {
+        stream.getTracks().forEach(t => t.stop());
+        return false;
+      }
       micStreamRef.current = stream;
       const ctx = ensureAudioCtx();
       if (ctx.state === 'suspended') await ctx.resume();
@@ -137,7 +138,8 @@ export function GuidedPractice({
       ctx.createMediaStreamSource(stream).connect(analyser);
       micAnalyserRef.current = analyser;
       return true;
-    } catch {
+    } catch (e) {
+      console.warn('[Practice] mic open failed:', e);
       return false;
     }
   }, [ensureAudioCtx]);
@@ -159,11 +161,12 @@ export function GuidedPractice({
   const startListening = useCallback(() => {
     const audio = audioRef.current;
     if (!audio) return;
-    setupQariAnalyser();
     resetBuffers();
+    // Set src BEFORE setupQariAnalyser so createMediaElementSource has a valid element
     const url = buildAyahAudioUrl(selectedQari, surahNumber, selectedAyah);
     audio.src = url;
     audio.load();
+    setupQariAnalyser();
     audio.play().catch(() => {});
     setPhaseSync('listening');
   }, [selectedQari, surahNumber, selectedAyah, setupQariAnalyser]);
@@ -202,13 +205,14 @@ export function GuidedPractice({
   const startTogether = useCallback(async () => {
     const audio = audioRef.current;
     if (!audio) return;
-    setupQariAnalyser();
     resetBuffers();
-    const ok = await openMic();
-    if (!ok) return;
+    // Set src BEFORE setupQariAnalyser so createMediaElementSource has a valid element
     const url = buildAyahAudioUrl(selectedQari, surahNumber, selectedAyah);
     audio.src = url;
     audio.load();
+    setupQariAnalyser();
+    const ok = await openMic();
+    if (!ok) return;
     audio.play().catch(() => {});
     setPhaseSync('together');
   }, [selectedQari, surahNumber, selectedAyah, setupQariAnalyser, openMic]);
