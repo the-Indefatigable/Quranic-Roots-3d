@@ -2,24 +2,37 @@ import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import * as schema from './schema';
 
-const connectionString = process.env.DATABASE_URL!;
+const connectionString = process.env.DATABASE_URL;
 
-// Keep a warm connection — Railway kills idle connections after ~60s
-let client = postgres(connectionString, {
-  max: 5,
-  idle_timeout: 20,
-  connect_timeout: 15,
-  max_lifetime: 60 * 10,
-  prepare: false,
-  connection: {
-    application_name: 'quroots',
-  },
-});
+// Guard: during Next.js build (no DATABASE_URL) create a no-op stub so that
+// importing @/db does not attempt a real TCP connection and hang SSG.
+const isBuildTime = !connectionString;
 
-// Warm up the connection on startup (non-blocking)
-client`SELECT 1`.catch(() => {});
+let client = isBuildTime
+  ? (null as unknown as ReturnType<typeof postgres>)
+  : postgres(connectionString!, {
+      max: 5,
+      idle_timeout: 20,
+      connect_timeout: 10,
+      max_lifetime: 60 * 10,
+      prepare: false,
+      connection: {
+        application_name: 'quroots',
+      },
+    });
 
-const baseDb = drizzle(client, { schema });
+// Warm up the connection at runtime only — fire-and-forget with hard 5s cap
+if (!isBuildTime) {
+  const warmup = client`SELECT 1`;
+  const timeout = new Promise<void>((_, reject) =>
+    setTimeout(() => reject(new Error('warmup timeout')), 5000)
+  );
+  Promise.race([warmup, timeout]).catch(() => {});
+}
+
+const baseDb = isBuildTime
+  ? (null as unknown as ReturnType<typeof drizzle>)
+  : drizzle(client, { schema });
 
 // Proxy that auto-retries on transient Railway errors
 const TRANSIENT_CODES = ['ECONNRESET', 'ECONNREFUSED', 'ETIMEDOUT', 'CONNECT_TIMEOUT', 'CONNECTION_CLOSED', 'ENETUNREACH'];

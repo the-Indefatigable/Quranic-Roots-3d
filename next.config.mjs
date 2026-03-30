@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   compress: true,
+  staticPageGenerationTimeout: 120,
   webpack: (config, { dev }) => {
     if (dev) {
       // Use in-memory cache to avoid the persistent cache ENOENT bug in Next 14.2
