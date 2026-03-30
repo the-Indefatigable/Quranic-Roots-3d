@@ -44,6 +44,11 @@ export async function generateMetadata({ params }: Props) {
   };
 }
 
+const SURAH_TYPES: Record<string, string> = {
+  makkah: 'Meccan',
+  madinah: 'Medinan',
+};
+
 export default async function SurahPage({ params }: Props) {
   const surahNumber = parseInt(params.surahId);
   if (isNaN(surahNumber) || surahNumber < 1 || surahNumber > 114) notFound();
@@ -121,7 +126,7 @@ export default async function SurahPage({ params }: Props) {
     // Table may not exist yet — gracefully degrade
   }
 
-  // Check if tafsir exists for this surah (lightweight count query)
+  // Check if tafsir exists for this surah
   let hasTafsir = false;
   try {
     const [tafsirCount] = await db
@@ -136,10 +141,10 @@ export default async function SurahPage({ params }: Props) {
 
   // Prev/next surah info
   const prevSurah = surahNumber > 1
-    ? (await db.select({ number: surahs.number, englishName: surahs.englishName }).from(surahs).where(eq(surahs.number, surahNumber - 1)).limit(1))[0]
+    ? (await db.select({ number: surahs.number, englishName: surahs.englishName, arabicName: surahs.arabicName }).from(surahs).where(eq(surahs.number, surahNumber - 1)).limit(1))[0]
     : null;
   const nextSurah = surahNumber < 114
-    ? (await db.select({ number: surahs.number, englishName: surahs.englishName }).from(surahs).where(eq(surahs.number, surahNumber + 1)).limit(1))[0]
+    ? (await db.select({ number: surahs.number, englishName: surahs.englishName, arabicName: surahs.arabicName }).from(surahs).where(eq(surahs.number, surahNumber + 1)).limit(1))[0]
     : null;
 
   // Serialize for client
@@ -150,71 +155,185 @@ export default async function SurahPage({ params }: Props) {
     words: wordsByAyah[a.ayahNumber] || [],
   }));
 
+  const revelationType = surah.revelationType ? SURAH_TYPES[surah.revelationType] ?? surah.revelationType : null;
+
   return (
     <div>
       {/* Surah Header */}
-      <div className="text-center mb-10">
-        <div className="flex items-center justify-center gap-4 sm:gap-8 mb-4">
+      <div className="relative text-center mb-10 pt-2 pb-8">
+        {/* Ambient glow behind Arabic name */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: 'radial-gradient(ellipse 60% 80px at 50% 40%, rgba(212,162,70,0.07) 0%, transparent 70%)',
+          }}
+        />
+
+        {/* Surah number badge */}
+        <div className="flex justify-center mb-4">
+          <span
+            className="text-[10px] font-bold uppercase tracking-[0.25em] px-3 py-1 rounded-full"
+            style={{
+              background: 'rgba(212,162,70,0.1)',
+              color: '#D4A246',
+              border: '1px solid rgba(212,162,70,0.2)',
+            }}
+          >
+            Surah {surahNumber}
+            {revelationType && <> &middot; {revelationType}</>}
+          </span>
+        </div>
+
+        {/* Prev / Arabic name / Next */}
+        <div className="flex items-center justify-center gap-4 sm:gap-8">
           {prevSurah ? (
             <Link
               href={`/quran/${prevSurah.number}`}
-              className="flex items-center gap-1.5 text-text-tertiary hover:text-text transition-colors text-sm p-2 -m-2"
+              className="flex flex-col items-center gap-1 group p-2 -m-2"
+              title={prevSurah.englishName}
             >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
-              </svg>
-              <span className="hidden sm:inline">{prevSurah.englishName}</span>
+              <div
+                className="w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-200 group-hover:scale-110"
+                style={{
+                  background: 'rgba(255,255,255,0.04)',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  color: '#78716C',
+                }}
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+                </svg>
+              </div>
+              <span className="hidden sm:block text-[10px]" style={{ color: '#57534E' }}>{prevSurah.arabicName}</span>
             </Link>
-          ) : <div className="w-16" />}
+          ) : <div className="w-10" />}
 
-          <div>
-            <p className="font-arabic text-2xl sm:text-3xl text-primary mb-1">{surah.arabicName}</p>
-            <h1 className="text-lg sm:text-xl font-light text-text">{surah.englishName}</h1>
-            <p className="text-sm text-text-secondary mt-1">
+          <div className="flex-1 max-w-xs">
+            {/* Arabic name — large and glowing */}
+            <p
+              className="font-arabic mb-2 leading-none"
+              style={{
+                fontSize: 'clamp(2.5rem, 8vw, 4rem)',
+                color: '#D4A246',
+                textShadow: '0 0 40px rgba(212,162,70,0.35), 0 0 80px rgba(212,162,70,0.15)',
+              }}
+            >
+              {surah.arabicName}
+            </p>
+            {/* Diamond ornament */}
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <span className="h-px flex-1" style={{ background: 'linear-gradient(to right, transparent, rgba(212,162,70,0.3))' }} />
+              <span style={{ color: '#D4A246', fontSize: '8px', opacity: 0.6 }}>◆</span>
+              <span className="h-px flex-1" style={{ background: 'linear-gradient(to left, transparent, rgba(212,162,70,0.3))' }} />
+            </div>
+            <h1 className="font-heading text-xl sm:text-2xl font-light" style={{ color: '#EDEDEC' }}>
+              {surah.englishName}
+            </h1>
+            <p className="text-sm mt-1" style={{ color: '#57534E' }}>
               {surah.versesCount} Ayahs
-              {surah.revelationType && (
-                <span className="text-text-tertiary"> &middot; {surah.revelationType === 'makkah' ? 'Meccan' : 'Medinan'}</span>
-              )}
             </p>
           </div>
 
           {nextSurah ? (
             <Link
               href={`/quran/${nextSurah.number}`}
-              className="flex items-center gap-1.5 text-text-tertiary hover:text-text transition-colors text-sm p-2 -m-2"
+              className="flex flex-col items-center gap-1 group p-2 -m-2"
+              title={nextSurah.englishName}
             >
-              <span className="hidden sm:inline">{nextSurah.englishName}</span>
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-              </svg>
+              <div
+                className="w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-200 group-hover:scale-110"
+                style={{
+                  background: 'rgba(255,255,255,0.04)',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  color: '#78716C',
+                }}
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                </svg>
+              </div>
+              <span className="hidden sm:block text-[10px]" style={{ color: '#57534E' }}>{nextSurah.arabicName}</span>
             </Link>
-          ) : <div className="w-16" />}
+          ) : <div className="w-10" />}
         </div>
 
+        {/* Bismillah */}
         {surahNumber !== 9 && surahNumber !== 1 && (
-          <p className="font-arabic text-xl text-text-tertiary mb-6">بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ</p>
+          <div className="mt-8">
+            <p
+              className="font-arabic"
+              style={{
+                fontSize: 'clamp(1.25rem, 4vw, 1.75rem)',
+                color: '#78716C',
+                letterSpacing: '0.02em',
+              }}
+            >
+              بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ
+            </p>
+          </div>
         )}
       </div>
 
       {/* Reader */}
-      <SurahReaderClient ayahs={ayahData} surahNumber={surahNumber} surahName={surah.englishName} surahArabicName={surah.arabicName} hasWords={hasWords} hasTafsir={hasTafsir} />
+      <SurahReaderClient
+        ayahs={ayahData}
+        surahNumber={surahNumber}
+        surahName={surah.englishName}
+        surahArabicName={surah.arabicName}
+        hasWords={hasWords}
+        hasTafsir={hasTafsir}
+      />
 
       {/* Bottom navigation */}
-      <div className="flex items-center justify-between mt-12 pt-8 border-t border-border">
+      <div
+        className="flex items-center justify-between mt-16 pt-8"
+        style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
+      >
         {prevSurah ? (
-          <Link href={`/quran/${prevSurah.number}`} className="flex items-center gap-2 text-sm text-text-secondary hover:text-text transition-colors">
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
-            </svg>
-            {prevSurah.englishName}
+          <Link
+            href={`/quran/${prevSurah.number}`}
+            className="flex items-center gap-3 group"
+          >
+            <div
+              className="w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 group-hover:scale-110"
+              style={{
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.08)',
+                color: '#57534E',
+              }}
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-wider mb-0.5" style={{ color: '#57534E' }}>Previous</p>
+              <p className="text-sm font-medium" style={{ color: '#EDEDEC' }}>{prevSurah.englishName}</p>
+            </div>
           </Link>
         ) : <div />}
+
         {nextSurah ? (
-          <Link href={`/quran/${nextSurah.number}`} className="flex items-center gap-2 text-sm text-text-secondary hover:text-text transition-colors">
-            {nextSurah.englishName}
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-            </svg>
+          <Link
+            href={`/quran/${nextSurah.number}`}
+            className="flex items-center gap-3 group text-right"
+          >
+            <div>
+              <p className="text-[10px] uppercase tracking-wider mb-0.5" style={{ color: '#57534E' }}>Next</p>
+              <p className="text-sm font-medium" style={{ color: '#EDEDEC' }}>{nextSurah.englishName}</p>
+            </div>
+            <div
+              className="w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 group-hover:scale-110"
+              style={{
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.08)',
+                color: '#57534E',
+              }}
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+              </svg>
+            </div>
           </Link>
         ) : <div />}
       </div>

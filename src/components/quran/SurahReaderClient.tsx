@@ -73,6 +73,11 @@ function getVisibleSurahAyah(blocks: SurahBlock[]): { surahNumber: number; ayahN
 
 const BISMILLAH = 'بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ';
 
+// Eastern Arabic numerals
+function toEastern(n: number): string {
+  return String(n).replace(/[0-9]/g, d => '٠١٢٣٤٥٦٧٨٩'[parseInt(d)]);
+}
+
 export function SurahReaderClient({ ayahs, surahNumber, surahName, surahArabicName, hasWords, hasTafsir }: Props) {
   const { quranSettings, updateQuranSettings, setLastRead, updateStreak, selectedQariId, setSelectedQariId } = useAppStore();
   const [showSettings, setShowSettings] = useState(false);
@@ -116,13 +121,13 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, surahArabicNa
         arabicName: data.surah.arabicName,
         ayahs: data.ayahs,
         hasWords: data.ayahs[0]?.words?.length > 0,
-        hasTafsir: false, // won't know until we check — not critical for scroll
+        hasTafsir: false,
       };
       setSurahBlocks((prev) => [...prev, nextBlock]);
       lastSurahRef.current = nextNum;
       if (nextNum >= 114) setAllLoaded(true);
     } catch {
-      // silently fail — user can still navigate manually
+      // silently fail
     } finally {
       setLoadingNext(false);
     }
@@ -262,13 +267,15 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, surahArabicNa
       <audio ref={audioRef} crossOrigin="anonymous" className="hidden" />
 
       {/* Toolbar */}
-      <div className="flex justify-end gap-2 mb-6">
+      <div className="flex justify-end gap-2 mb-8">
         {hasWords && (
           <button
             onClick={() => setWordByWord(!wordByWord)}
-            className={`flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg transition-colors ${
-              wordByWord ? 'bg-primary-light text-primary' : 'bg-surface text-text-tertiary hover:text-text'
-            }`}
+            className="flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-xl transition-all duration-200"
+            style={wordByWord
+              ? { background: 'rgba(212,162,70,0.12)', color: '#D4A246', border: '1px solid rgba(212,162,70,0.25)' }
+              : { background: 'rgba(255,255,255,0.04)', color: '#78716C', border: '1px solid rgba(255,255,255,0.07)' }
+            }
           >
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
@@ -279,9 +286,11 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, surahArabicNa
 
         <button
           onClick={() => audioMode ? closeAudioMode() : openAudioMode(surahBlocks[0])}
-          className={`flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg transition-colors ${
-            audioMode ? 'bg-primary-light text-primary' : 'bg-surface text-text-tertiary hover:text-text'
-          }`}
+          className="flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-xl transition-all duration-200"
+          style={audioMode
+            ? { background: 'rgba(212,162,70,0.12)', color: '#D4A246', border: '1px solid rgba(212,162,70,0.25)' }
+            : { background: 'rgba(255,255,255,0.04)', color: '#78716C', border: '1px solid rgba(255,255,255,0.07)' }
+          }
         >
           <svg className="w-3.5 h-3.5" fill={audioMode ? 'currentColor' : 'none'} viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" />
@@ -291,48 +300,64 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, surahArabicNa
 
         <button
           onClick={() => setShowSettings(!showSettings)}
-          className="flex items-center gap-1.5 text-xs text-text-tertiary hover:text-text transition-colors bg-surface px-3 py-1.5 rounded-lg"
+          className="flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-xl transition-all duration-200"
+          style={showSettings
+            ? { background: 'rgba(212,162,70,0.12)', color: '#D4A246', border: '1px solid rgba(212,162,70,0.25)' }
+            : { background: 'rgba(255,255,255,0.04)', color: '#78716C', border: '1px solid rgba(255,255,255,0.07)' }
+          }
         >
           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
           </svg>
-          Settings
+          Display
         </button>
       </div>
 
       {/* Settings panel */}
       {showSettings && (
-        <div className="bg-surface rounded-2xl shadow-card p-4 sm:p-5 mb-8 flex flex-wrap items-center gap-4 sm:gap-6">
+        <div
+          className="rounded-2xl p-4 sm:p-5 mb-8 flex flex-wrap items-center gap-4 sm:gap-6"
+          style={{
+            background: 'rgba(255,255,255,0.03)',
+            border: '1px solid rgba(255,255,255,0.08)',
+            backdropFilter: 'blur(8px)',
+          }}
+        >
+          {/* Font size */}
           <div className="flex items-center gap-3">
-            <span className="text-xs text-text-tertiary">Font size</span>
+            <span className="text-xs" style={{ color: '#78716C' }}>Font size</span>
             <div className="flex items-center gap-1">
               <button
                 onClick={() => updateQuranSettings({ fontSize: Math.max(20, quranSettings.fontSize - 2) })}
-                className="w-7 h-7 rounded-lg bg-border-light text-text-secondary hover:text-text text-sm transition-colors"
+                className="w-7 h-7 rounded-lg text-sm font-bold transition-all duration-200 flex items-center justify-center"
+                style={{ background: 'rgba(255,255,255,0.06)', color: '#78716C', border: '1px solid rgba(255,255,255,0.08)' }}
               >
                 −
               </button>
-              <span className="text-xs text-text-secondary w-8 text-center">{quranSettings.fontSize}</span>
+              <span className="text-xs w-8 text-center font-medium" style={{ color: '#EDEDEC' }}>{quranSettings.fontSize}</span>
               <button
                 onClick={() => updateQuranSettings({ fontSize: Math.min(48, quranSettings.fontSize + 2) })}
-                className="w-7 h-7 rounded-lg bg-border-light text-text-secondary hover:text-text text-sm transition-colors"
+                className="w-7 h-7 rounded-lg text-sm font-bold transition-all duration-200 flex items-center justify-center"
+                style={{ background: 'rgba(255,255,255,0.06)', color: '#78716C', border: '1px solid rgba(255,255,255,0.08)' }}
               >
                 +
               </button>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-text-tertiary">Translation</span>
+
+          {/* Translation toggle */}
+          <div className="flex items-center gap-2.5">
+            <span className="text-xs" style={{ color: '#78716C' }}>Translation</span>
             <button
               onClick={() => updateQuranSettings({ showTranslation: !quranSettings.showTranslation })}
-              className={`w-9 h-5 rounded-full transition-colors relative ${
-                quranSettings.showTranslation ? 'bg-primary' : 'bg-border'
-              }`}
+              className="relative w-9 h-5 rounded-full transition-colors duration-200"
+              style={{
+                background: quranSettings.showTranslation ? '#D4A246' : 'rgba(255,255,255,0.1)',
+              }}
             >
               <div
-                className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${
-                  quranSettings.showTranslation ? 'translate-x-4' : 'translate-x-0.5'
-                }`}
+                className="absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200"
+                style={{ transform: quranSettings.showTranslation ? 'translateX(17px)' : 'translateX(2px)' }}
               />
             </button>
           </div>
@@ -346,19 +371,46 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, surahArabicNa
           <div key={block.surahNumber}>
             {/* Surah divider for subsequent surahs */}
             {!isFirstBlock && (
-              <div className="text-center my-12 pt-8 border-t border-border">
-                <p className="font-arabic text-2xl sm:text-3xl text-primary mb-1">{block.arabicName}</p>
-                <h2 className="text-lg font-light text-text">{block.surahName}</h2>
-                <p className="text-sm text-text-secondary mt-1">{block.ayahs.length} Ayahs</p>
+              <div className="text-center my-16 py-10 relative">
+                {/* Decorative lines */}
+                <div className="absolute inset-x-0 top-0 flex items-center gap-3">
+                  <div className="flex-1 h-px" style={{ background: 'linear-gradient(to right, transparent, rgba(212,162,70,0.2))' }} />
+                  <span style={{ color: 'rgba(212,162,70,0.4)', fontSize: '10px' }}>◆</span>
+                  <div className="flex-1 h-px" style={{ background: 'linear-gradient(to left, transparent, rgba(212,162,70,0.2))' }} />
+                </div>
+
+                <p
+                  className="font-arabic mb-2 leading-none"
+                  style={{
+                    fontSize: 'clamp(2rem, 6vw, 3rem)',
+                    color: '#D4A246',
+                    textShadow: '0 0 30px rgba(212,162,70,0.3)',
+                  }}
+                >
+                  {block.arabicName}
+                </p>
+                <h2 className="font-heading text-lg font-light" style={{ color: '#EDEDEC' }}>{block.surahName}</h2>
+                <p className="text-xs mt-1" style={{ color: '#57534E' }}>{block.ayahs.length} Ayahs</p>
+
                 {/* Bismillah */}
                 {block.surahNumber !== 9 && block.surahNumber !== 1 && (
-                  <p className="font-arabic text-xl text-text-tertiary mt-6">{BISMILLAH}</p>
+                  <p
+                    className="font-arabic mt-6"
+                    style={{ fontSize: '1.25rem', color: '#57534E' }}
+                  >
+                    {BISMILLAH}
+                  </p>
                 )}
+
+                <div className="absolute inset-x-0 bottom-0 flex items-center gap-3">
+                  <div className="flex-1 h-px" style={{ background: 'linear-gradient(to right, transparent, rgba(255,255,255,0.06))' }} />
+                  <div className="flex-1 h-px" style={{ background: 'linear-gradient(to left, transparent, rgba(255,255,255,0.06))' }} />
+                </div>
               </div>
             )}
 
             {/* Ayahs */}
-            <div className={`space-y-6 ${!isFirstBlock ? 'mt-8' : ''}`}>
+            <div className={`space-y-1 ${!isFirstBlock ? 'mt-4' : ''}`}>
               {block.ayahs.map((ayah) => {
                 const isActiveAyah = audioMode && audioSurah?.surahNumber === block.surahNumber && audioCurrentAyah === ayah.number;
                 const showWordHighlight = isActiveAyah;
@@ -366,18 +418,34 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, surahArabicNa
                   <div
                     key={`${block.surahNumber}-${ayah.number}`}
                     id={`s${block.surahNumber}-ayah-${ayah.number}`}
-                    className={`group transition-all duration-300 rounded-2xl ${
-                      isActiveAyah ? 'bg-primary/[0.06] ring-1 ring-primary/20 px-3 -mx-3' : ''
-                    }`}
+                    className="group rounded-2xl transition-all duration-300"
+                    style={{
+                      padding: '16px',
+                      margin: '0 -4px',
+                      background: isActiveAyah ? 'rgba(212,162,70,0.05)' : 'transparent',
+                      border: isActiveAyah ? '1px solid rgba(212,162,70,0.15)' : '1px solid transparent',
+                    }}
                   >
-                    <div className="flex items-start gap-3 pt-1">
-                      <span className={`shrink-0 w-9 h-9 sm:w-8 sm:h-8 flex items-center justify-center rounded-full text-xs font-medium mt-1 transition-colors ${
-                        isActiveAyah ? 'bg-primary text-white' : 'bg-primary-light text-primary'
-                      }`}>
-                        {ayah.number}
-                      </span>
+                    <div className="flex items-start gap-4">
+                      {/* Ayah number — diamond marker */}
+                      <div className="shrink-0 flex flex-col items-center gap-1 mt-1">
+                        <div
+                          className="w-9 h-9 flex items-center justify-center text-xs font-medium transition-all duration-200"
+                          style={{
+                            background: isActiveAyah
+                              ? 'rgba(212,162,70,0.2)'
+                              : 'rgba(255,255,255,0.04)',
+                            border: `1px solid ${isActiveAyah ? 'rgba(212,162,70,0.4)' : 'rgba(255,255,255,0.08)'}`,
+                            borderRadius: '10px',
+                            color: isActiveAyah ? '#D4A246' : '#78716C',
+                            clipPath: 'polygon(29% 0%, 71% 0%, 100% 29%, 100% 71%, 71% 100%, 29% 100%, 0% 71%, 0% 29%)',
+                          }}
+                        >
+                          {toEastern(ayah.number)}
+                        </div>
+                      </div>
 
-                      <div className="flex-1">
+                      <div className="flex-1 min-w-0">
                         {(wordByWord || showWordHighlight) && ayah.words.length > 0 ? (
                           <div className="flex flex-wrap gap-x-3 gap-y-4 justify-end" dir="rtl">
                             {ayah.words
@@ -393,22 +461,41 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, surahArabicNa
                                       setSelectedWord(word);
                                       setWordAnchor(e.currentTarget);
                                     }}
-                                    className={`flex flex-col items-center gap-1 px-2 py-1.5 rounded-xl cursor-pointer group/word border transition-all duration-200 ${
-                                      isActiveWord
-                                        ? 'bg-primary-light border-primary/30 -translate-y-1.5 scale-105'
-                                        : 'border-transparent hover:bg-primary-light hover:border-primary/20'
-                                    }`}
+                                    className="flex flex-col items-center gap-1 px-2 py-1.5 rounded-xl cursor-pointer transition-all duration-200"
+                                    style={{
+                                      background: isActiveWord
+                                        ? 'rgba(212,162,70,0.12)'
+                                        : 'transparent',
+                                      border: `1px solid ${isActiveWord ? 'rgba(212,162,70,0.3)' : 'transparent'}`,
+                                      transform: isActiveWord ? 'translateY(-4px) scale(1.05)' : 'none',
+                                    }}
+                                    onMouseEnter={e => {
+                                      if (!isActiveWord) {
+                                        (e.currentTarget as HTMLElement).style.background = 'rgba(212,162,70,0.06)';
+                                        (e.currentTarget as HTMLElement).style.borderColor = 'rgba(212,162,70,0.15)';
+                                      }
+                                    }}
+                                    onMouseLeave={e => {
+                                      if (!isActiveWord) {
+                                        (e.currentTarget as HTMLElement).style.background = 'transparent';
+                                        (e.currentTarget as HTMLElement).style.borderColor = 'transparent';
+                                      }
+                                    }}
                                   >
                                     <span
-                                      className={`font-arabic leading-loose transition-colors ${
-                                        isActiveWord ? 'text-primary' : 'text-text group-hover/word:text-primary'
-                                      }`}
-                                      style={{ fontSize: `${quranSettings.fontSize}px` }}
+                                      className="font-arabic leading-loose transition-colors"
+                                      style={{
+                                        fontSize: `${quranSettings.fontSize}px`,
+                                        color: isActiveWord ? '#D4A246' : '#F0E8D8',
+                                      }}
                                     >
                                       {word.textUthmani}
                                     </span>
                                     {word.translation && (
-                                      <span className="text-[10px] text-text-secondary leading-tight max-w-[80px] text-center truncate">
+                                      <span
+                                        className="text-[10px] leading-tight max-w-[80px] text-center truncate"
+                                        style={{ color: '#57534E' }}
+                                      >
                                         {word.translation}
                                       </span>
                                     )}
@@ -418,62 +505,79 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, surahArabicNa
                           </div>
                         ) : (
                           <p
-                            className="font-arabic text-text leading-[2.4] text-right"
+                            className="font-arabic leading-[2.4] text-right"
                             dir="rtl"
-                            style={{ fontSize: `${quranSettings.fontSize}px` }}
+                            style={{
+                              fontSize: `${quranSettings.fontSize}px`,
+                              color: '#F0E8D8',
+                            }}
                           >
                             {ayah.textUthmani}
                           </p>
                         )}
 
                         {quranSettings.showTranslation && ayah.translation && (
-                          <p className="text-sm text-text-secondary leading-relaxed mt-3" dir="ltr">
+                          <p
+                            className="text-sm leading-relaxed mt-4 pt-4"
+                            dir="ltr"
+                            style={{
+                              color: '#78716C',
+                              borderTop: '1px solid rgba(255,255,255,0.05)',
+                            }}
+                          >
                             {ayah.translation}
                           </p>
                         )}
                       </div>
                     </div>
 
-                    {/* Ayah actions */}
-                    <div className="flex justify-end gap-2 mt-3 pb-1">
+                    {/* Ayah actions — visible on hover */}
+                    <div
+                      className="flex justify-end gap-1.5 mt-3"
+                      style={{ opacity: isActiveAyah ? 1 : undefined }}
+                    >
                       <button
                         onClick={() => openAudioMode(block, ayah.number)}
-                        className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg transition-colors ${
-                          isActiveAyah
-                            ? 'text-primary bg-primary/[0.12]'
-                            : 'text-text-tertiary hover:text-text-secondary bg-surface hover:bg-border-light'
-                        }`}
+                        className="flex items-center gap-1.5 text-[11px] px-2.5 py-1.5 rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100"
+                        style={isActiveAyah
+                          ? { background: 'rgba(212,162,70,0.12)', color: '#D4A246', border: '1px solid rgba(212,162,70,0.2)', opacity: 1 }
+                          : { background: 'rgba(255,255,255,0.04)', color: '#78716C', border: '1px solid rgba(255,255,255,0.07)' }
+                        }
                       >
-                        <svg className="w-3.5 h-3.5" fill={isActiveAyah ? 'currentColor' : 'none'} viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                        <svg className="w-3 h-3" fill={isActiveAyah ? 'currentColor' : 'none'} viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" />
                         </svg>
                         Listen
                       </button>
+
                       {block.hasTafsir && (
                         <button
                           onClick={() => setTafsirAyah({ surah: block.surahNumber, ayah: ayah.number })}
-                          className="flex items-center gap-1.5 text-xs text-primary/70 hover:text-primary active:text-primary bg-primary/[0.08] hover:bg-primary/[0.12] px-3 py-1.5 rounded-lg transition-colors"
+                          className="flex items-center gap-1.5 text-[11px] px-2.5 py-1.5 rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100"
+                          style={{ background: 'rgba(13,148,136,0.08)', color: '#5AB8A8', border: '1px solid rgba(13,148,136,0.15)' }}
                         >
-                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
                           </svg>
                           Tafsir
                         </button>
                       )}
+
                       <button
                         onClick={() => shareAyah(block.surahNumber, ayah.number, setCopiedKey)}
-                        className="flex items-center gap-1.5 text-xs text-text-tertiary hover:text-text-secondary bg-surface hover:bg-border-light px-3 py-1.5 rounded-lg transition-colors"
+                        className="flex items-center gap-1.5 text-[11px] px-2.5 py-1.5 rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100"
+                        style={{ background: 'rgba(255,255,255,0.04)', color: '#78716C', border: '1px solid rgba(255,255,255,0.07)' }}
                       >
                         {copiedKey === `${block.surahNumber}:${ayah.number}` ? (
                           <>
-                            <svg className="w-3.5 h-3.5 text-correct" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ color: '#5AB8A8' }}>
                               <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                             </svg>
-                            <span className="text-correct">Copied</span>
+                            <span style={{ color: '#5AB8A8' }}>Copied</span>
                           </>
                         ) : (
                           <>
-                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
                             </svg>
                             Share
@@ -482,16 +586,32 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, surahArabicNa
                       </button>
                     </div>
 
-                    <div className="border-b border-border-light mt-3" />
+                    {/* Subtle divider */}
+                    <div
+                      className="mt-4"
+                      style={{ height: '1px', background: 'linear-gradient(to right, transparent, rgba(255,255,255,0.05) 30%, rgba(255,255,255,0.05) 70%, transparent)' }}
+                    />
                   </div>
                 );
               })}
             </div>
 
             {/* End of surah marker */}
-            <div className="text-center mt-12">
-              <p className="font-arabic text-lg text-primary/30">صَدَقَ ٱللَّهُ ٱلْعَظِيمُ</p>
-              <p className="text-xs text-text-tertiary mt-2">End of Surah {block.surahName}</p>
+            <div className="text-center mt-16 mb-4">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex-1 h-px" style={{ background: 'linear-gradient(to right, transparent, rgba(212,162,70,0.15))' }} />
+                <span style={{ color: 'rgba(212,162,70,0.3)', fontSize: '8px' }}>◆ ◆ ◆</span>
+                <div className="flex-1 h-px" style={{ background: 'linear-gradient(to left, transparent, rgba(212,162,70,0.15))' }} />
+              </div>
+              <p
+                className="font-arabic text-lg mb-1"
+                style={{ color: 'rgba(212,162,70,0.35)', textShadow: '0 0 20px rgba(212,162,70,0.15)' }}
+              >
+                صَدَقَ ٱللَّهُ ٱلْعَظِيمُ
+              </p>
+              <p className="text-[11px] tracking-widest uppercase" style={{ color: '#3D3C3A' }}>
+                End of Surah {block.surahName}
+              </p>
             </div>
           </div>
         );
@@ -499,19 +619,30 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, surahArabicNa
 
       {/* Infinite scroll sentinel */}
       {!allLoaded && (
-        <div ref={sentinelRef} className="flex items-center justify-center py-12">
+        <div ref={sentinelRef} className="flex items-center justify-center py-16">
           {loadingNext && (
             <div className="flex items-center gap-3">
-              <div className="w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
-              <span className="text-sm text-text-tertiary">Loading next surah...</span>
+              <div
+                className="w-5 h-5 rounded-full border-2 border-t-transparent animate-spin"
+                style={{ borderColor: 'rgba(212,162,70,0.3)', borderTopColor: '#D4A246' }}
+              />
+              <span className="text-sm" style={{ color: '#57534E' }}>Loading next surah…</span>
             </div>
           )}
         </div>
       )}
 
       {allLoaded && surahBlocks.length > 1 && (
-        <div className="text-center py-12">
-          <p className="text-sm text-text-tertiary">End of the Quran</p>
+        <div className="text-center py-16">
+          <p
+            className="font-arabic text-2xl mb-2"
+            style={{ color: 'rgba(212,162,70,0.3)' }}
+          >
+            الحمد لله
+          </p>
+          <p className="text-xs tracking-widest uppercase" style={{ color: '#3D3C3A' }}>
+            End of the Quran
+          </p>
         </div>
       )}
 
