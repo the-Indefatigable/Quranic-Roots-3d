@@ -110,7 +110,7 @@ export default function RewardsPage() {
         </p>
         <Link
           href="/quiz"
-          className="px-6 py-3 bg-primary text-white font-semibold rounded-xl hover:brightness-110 transition-all"
+          className="btn-primary"
         >
           Start a Quiz
         </Link>
@@ -129,7 +129,10 @@ export default function RewardsPage() {
     <div className="space-y-8">
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="text-3xl sm:text-4xl font-heading text-text mb-2">Your Rewards</h1>
+        <h1
+          className="text-3xl sm:text-4xl font-heading mb-2"
+          style={{ color: '#F0E4CA', textShadow: '0 0 40px rgba(212,162,70,0.15)' }}
+        >Your Rewards</h1>
         <p className="text-text-secondary">Track your progress and achievements</p>
       </motion.div>
 
@@ -227,7 +230,7 @@ export default function RewardsPage() {
           </p>
           <Link
             href="/quiz"
-            className="inline-block px-6 py-3 bg-primary text-white font-semibold rounded-xl hover:brightness-110 transition-all"
+            className="btn-primary"
           >
             Take Your First Quiz
           </Link>

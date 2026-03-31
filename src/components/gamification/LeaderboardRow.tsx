@@ -56,8 +56,8 @@ export function LeaderboardRow({ entry, isCurrentUser = false, isMedal = false }
               {medalEmojis[entry.rank - 1]}
             </motion.div>
           ) : (
-            <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-slate-700/50 border border-slate-600/50">
-              <span className="text-lg font-bold text-slate-300">#{entry.rank}</span>
+            <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-surface border border-border-light shadow-card">
+              <span className="text-lg font-bold text-text-secondary">#{entry.rank}</span>
             </div>
           )}
         </div>
@@ -65,20 +65,20 @@ export function LeaderboardRow({ entry, isCurrentUser = false, isMedal = false }
         {/* User Info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <p className="text-sm font-bold text-white truncate">{entry.userName}</p>
+            <p className="text-sm font-bold text-text truncate">{entry.userName}</p>
             {isCurrentUser && (
               <span className="text-xs px-2 py-0.5 bg-primary/20 border border-primary/30 text-primary rounded-full">
                 You
               </span>
             )}
           </div>
-          <p className="text-xs text-slate-400">Level {entry.userLevel}</p>
+          <p className="text-xs text-text-tertiary">Level {entry.userLevel}</p>
         </div>
 
         {/* XP */}
         <div className="flex-shrink-0 text-right">
           <p className="text-lg font-bold text-primary">{entry.totalXP.toLocaleString()}</p>
-          <p className="text-xs text-slate-400">XP</p>
+          <p className="text-xs text-text-tertiary">XP</p>
         </div>
       </div>
 

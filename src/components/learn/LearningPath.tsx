@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
+import { useEffect, useRef } from 'react';
+import { motion, useInView } from 'framer-motion';
 import { PathNode } from './PathNode';
 import { UnitHeader } from './UnitHeader';
 
@@ -46,11 +46,28 @@ interface LearningPathProps {
   units: PathUnit[];
 }
 
-// Zigzag offsets for nodes — gentler alternating left/center/right
-const ZIGZAG_OFFSETS = [0, 50, 0, -50, 0, 50, 0, -50];
+// Zigzag offsets — subtle left/center/right shift
+const ZIGZAG_X = [-28, 0, 28, 0];
+
+function RevealSection({ children }: { children: React.ReactNode }) {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: '-50px' });
+  return (
+    <motion.div ref={ref} initial="hidden" animate={inView ? 'visible' : 'hidden'}>
+      {children}
+    </motion.div>
+  );
+}
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 24 },
+  visible: (i: number) => ({
+    opacity: 1, y: 0,
+    transition: { duration: 0.55, ease: 'easeOut' as const, delay: i * 0.06 },
+  }),
+};
 
 export function LearningPath({ units }: LearningPathProps) {
-  const scrollRef = useRef<HTMLDivElement>(null);
   const activeRef = useRef<HTMLDivElement>(null);
 
   // Scroll to current active lesson on mount
@@ -60,59 +77,63 @@ export function LearningPath({ units }: LearningPathProps) {
     }
   }, []);
 
-  // Flatten units + lessons into a single node list for the path
-  const nodes: { type: 'unit-header' | 'lesson' | 'checkpoint'; unit: PathUnit; lesson?: PathLesson; globalIndex: number }[] = [];
-  let globalIdx = 0;
-
-  for (const unit of units) {
-    nodes.push({ type: 'unit-header', unit, globalIndex: globalIdx++ });
-    for (const lesson of unit.lessons) {
-      if (lesson.lessonType === 'checkpoint') {
-        nodes.push({ type: 'checkpoint', unit, lesson, globalIndex: globalIdx++ });
-      } else {
-        nodes.push({ type: 'lesson', unit, lesson, globalIndex: globalIdx++ });
-      }
-    }
-  }
-
   return (
-    <div ref={scrollRef} className="relative w-full max-w-md mx-auto py-8 px-4">
-      <div className="relative z-10 flex flex-col items-center gap-3">
-        {nodes.map((node, i) => {
-          const offset = ZIGZAG_OFFSETS[i % ZIGZAG_OFFSETS.length];
-          const isActive = node.lesson?.progress.status === 'available' || node.lesson?.progress.status === 'in_progress';
+    <div className="relative w-full max-w-xl mx-auto px-4">
+      <div className="space-y-20">
+        {units.map((unit, unitIdx) => (
+          <RevealSection key={unit.id}>
+            {/* Unit banner */}
+            <UnitHeader unit={unit} unitIndex={unitIdx} />
 
-          if (node.type === 'unit-header') {
-            return (
-              <motion.div
-                key={`unit-${node.unit.id}`}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.03 }}
-                className="w-full mb-2 mt-6"
-              >
-                <UnitHeader unit={node.unit} />
-              </motion.div>
-            );
-          }
-
-          return (
-            <motion.div
-              key={node.lesson!.id}
-              ref={isActive ? activeRef : undefined}
-              initial={{ opacity: 0, scale: 0.8, x: offset }}
-              animate={{ opacity: 1, scale: 1, x: offset }}
-              transition={{ delay: i * 0.03, type: 'spring', stiffness: 300, damping: 25 }}
-              className="my-3"
-            >
-              <PathNode
-                lesson={node.lesson!}
-                unit={node.unit}
-                isCheckpoint={node.type === 'checkpoint'}
+            {/* Lesson path nodes */}
+            <div className="relative flex flex-col items-center mt-10">
+              {/* Background connector line */}
+              <div
+                className="absolute top-8 bottom-8 w-px"
+                style={{
+                  background: `linear-gradient(to bottom, transparent 0%, ${unit.color}25 15%, ${unit.color}25 85%, transparent 100%)`,
+                }}
               />
-            </motion.div>
-          );
-        })}
+
+              {unit.lessons.map((lesson, lessonIdx) => {
+                const xShift = ZIGZAG_X[lessonIdx % ZIGZAG_X.length];
+                const isActive = lesson.progress.status === 'available' || lesson.progress.status === 'in_progress';
+
+                return (
+                  <motion.div
+                    key={lesson.id}
+                    custom={lessonIdx}
+                    variants={fadeUp}
+                    ref={isActive ? activeRef : undefined}
+                    className="flex flex-col items-center w-full relative z-10"
+                  >
+                    {/* Inter-lesson ornament connector */}
+                    {lessonIdx > 0 && (
+                      <div className="flex flex-col items-center py-0.5">
+                        <div className="w-px h-4" style={{ background: `${unit.color}20` }} />
+                        <div
+                          className="w-1.5 h-1.5 rotate-45"
+                          style={{ background: `${unit.color}25`, border: `1px solid ${unit.color}35` }}
+                        />
+                        <div className="w-px h-4" style={{ background: `${unit.color}20` }} />
+                      </div>
+                    )}
+
+                    {/* Node */}
+                    <div style={{ transform: `translateX(${xShift}px)` }}>
+                      <PathNode
+                        lesson={lesson}
+                        unit={unit}
+                        lessonIndex={lessonIdx}
+                        isCheckpoint={lesson.lessonType === 'checkpoint'}
+                      />
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </RevealSection>
+        ))}
       </div>
     </div>
   );

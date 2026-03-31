@@ -59,8 +59,8 @@ export function Leaderboard({ period, currentUserId }: LeaderboardProps) {
     >
       {/* Header */}
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-white mb-2">🏆 Leaderboard</h2>
-        <p className="text-sm text-slate-400">{periodLabel} Rankings</p>
+        <h2 className="text-2xl font-heading text-text mb-2">Leaderboard</h2>
+        <p className="text-sm text-text-secondary">{periodLabel} Rankings</p>
       </div>
 
       {/* My Rank Card */}
@@ -76,13 +76,13 @@ export function Leaderboard({ period, currentUserId }: LeaderboardProps) {
               </svg>
             </div>
           </div>
-          <p className="text-slate-400 mt-3">Loading leaderboard...</p>
+          <p className="text-text-tertiary mt-3">Loading leaderboard...</p>
         </div>
       )}
 
       {/* Error State */}
       {error && !isLoading && (
-        <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 text-red-300 text-sm text-center">
+        <div className="bg-wrong-light border border-wrong/20 rounded-xl p-4 text-wrong text-sm text-center">
           {error}
         </div>
       )}
@@ -110,7 +110,7 @@ export function Leaderboard({ period, currentUserId }: LeaderboardProps) {
       {/* Empty State */}
       {!isLoading && !error && entries.length === 0 && (
         <div className="text-center py-12">
-          <p className="text-slate-400">No data available yet</p>
+          <p className="text-text-tertiary">No data available yet</p>
         </div>
       )}
     </motion.div>

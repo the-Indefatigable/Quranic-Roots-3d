@@ -52,14 +52,14 @@ export function Sidebar() {
                   : 'text-text-secondary hover:text-text hover:bg-canvas'
               )}
               style={isActive ? {
-                background: 'linear-gradient(135deg, var(--color-primary-light) 0%, transparent 100%)',
-                boxShadow: '0 0 0 1px var(--color-primary-light)',
+                background: 'linear-gradient(135deg, rgba(212,162,70,0.10) 0%, transparent 100%)',
+                boxShadow: '0 0 0 1px rgba(212,162,70,0.12)',
               } : {}}
             >
               {isActive && (
                 <span
                   className="absolute left-0 inset-y-2 w-[3px] rounded-r-full"
-                  style={{ background: 'var(--color-primary)', boxShadow: '0 0 6px var(--color-primary)' }}
+                  style={{ background: '#D4A246', boxShadow: '0 0 6px rgba(212,162,70,0.8)' }}
                 />
               )}
               <navItem.icon className={cn('w-[18px] h-[18px] flex-shrink-0', isActive ? 'text-primary' : 'text-text-tertiary')} />

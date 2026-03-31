@@ -94,8 +94,8 @@ export function Dashboard() {
                 <p className="text-xs text-text-tertiary mb-0.5">{data.nextLesson.unitTitle}</p>
                 <p className="text-lg font-heading font-bold text-text">{data.nextLesson.lessonTitle}</p>
               </div>
-              <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center shadow-[0_3px_0_rgba(13,148,136,0.4)]">
-                <svg className="w-6 h-6 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center shadow-[0_3px_0_rgba(180,132,42,0.5)]">
+                <svg className="w-6 h-6 text-[#0E0D0C] ml-0.5" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M8 5v14l11-7z" />
                 </svg>
               </div>
@@ -200,19 +200,17 @@ export function Dashboard() {
       )}
 
       {/* ── Quick Stats ────────────────────────────── */}
-      <div className="grid grid-cols-3 gap-3">
-        <div className="text-center p-3 rounded-xl bg-surface shadow-card border border-border">
-          <p className="text-2xl font-bold text-text">{data.user.totalXP}</p>
-          <p className="text-xs text-text-secondary">Total XP</p>
-        </div>
-        <div className="text-center p-3 rounded-xl bg-surface shadow-card border border-border">
-          <p className="text-2xl font-bold text-accent">{data.streak.longest}</p>
-          <p className="text-xs text-text-secondary">Best Streak</p>
-        </div>
-        <div className="text-center p-3 rounded-xl bg-surface shadow-card border border-border">
-          <p className="text-2xl font-bold text-text">{data.streak.freezes}</p>
-          <p className="text-xs text-text-secondary">Freezes</p>
-        </div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        {[
+          { value: data.user.totalXP, label: 'Total XP', color: 'text-text' },
+          { value: data.streak.longest, label: 'Best Streak', color: 'text-accent' },
+          { value: data.streak.freezes, label: 'Freezes', color: 'text-text' },
+        ].map((stat) => (
+          <div key={stat.label} className="text-center p-3 rounded-xl bg-surface shadow-card border border-border-light">
+            <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
+            <p className="text-xs text-text-secondary">{stat.label}</p>
+          </div>
+        ))}
       </div>
 
       {/* ── Bottom link to full path ───────────────── */}

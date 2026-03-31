@@ -55,7 +55,7 @@ export function AchievementUnlock({
               transition={{ delay: 0.2 }}
             >
               <p className="text-primary text-sm font-bold uppercase tracking-widest mb-2">🎉 Achievement Unlocked</p>
-              <h3 className="text-2xl font-bold text-white">New Badge Earned!</h3>
+              <h3 className="text-2xl font-heading text-text">New Badge Earned!</h3>
             </motion.div>
 
             {/* Badges */}
@@ -78,9 +78,9 @@ export function AchievementUnlock({
                     />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-white font-semibold text-sm">{achievement.title}</p>
+                    <p className="text-text font-semibold text-sm">{achievement.title}</p>
                     {achievement.description && (
-                      <p className="text-slate-300 text-xs mt-1">{achievement.description}</p>
+                      <p className="text-text-secondary text-xs mt-1">{achievement.description}</p>
                     )}
                     {achievement.xpBonus && achievement.xpBonus > 0 && (
                       <p className="text-primary text-xs font-semibold mt-1">+{achievement.xpBonus} XP Bonus</p>

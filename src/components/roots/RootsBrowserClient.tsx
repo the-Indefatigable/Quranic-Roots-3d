@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { SearchInput } from '@/components/ui/SearchInput';
 import { Card } from '@/components/ui/Card';
@@ -117,7 +118,22 @@ export function RootsBrowserClient({
   const visibleParticles = filteredParticles.slice(0, showCount);
 
   return (
-    <>
+    <div className="relative overflow-hidden">
+      {/* Atmospheric background */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div
+          className="absolute top-0 right-0 w-[400px] h-[400px]"
+          style={{ background: 'radial-gradient(circle, rgba(212,162,70,0.05) 0%, transparent 70%)' }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: 'radial-gradient(circle, rgba(212,162,70,0.03) 1px, transparent 1px)',
+            backgroundSize: '28px 28px',
+          }}
+        />
+      </div>
+      <div className="relative z-10">
       <PageHeader
         title="Roots"
         subtitle={
@@ -135,14 +151,19 @@ export function RootsBrowserClient({
       </PageHeader>
 
       {/* Tab selector */}
-      <div className="flex items-center gap-1.5 mb-5 border-b border-border-light pb-4">
+      <motion.div
+        className="flex items-center gap-1.5 mb-5 border-b border-border-light pb-4"
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.08, duration: 0.35 }}
+      >
         {tabs.map((t) => (
           <button
             key={t.key}
             onClick={() => handleTabChange(t.key)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
               tab === t.key
-                ? 'bg-primary-light text-primary'
+                ? 'bg-primary-light text-primary shadow-card'
                 : 'text-text-tertiary hover:text-text hover:bg-canvas'
             }`}
           >
@@ -157,10 +178,15 @@ export function RootsBrowserClient({
         {search && (
           <span className="text-xs text-text-secondary ml-auto">{currentCount} results</span>
         )}
-      </div>
+      </motion.div>
 
       {/* Sort controls */}
-      <div className="flex items-center gap-2 mb-6">
+      <motion.div
+        className="flex items-center gap-2 mb-6"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.12, duration: 0.3 }}
+      >
         <span className="text-[10px] text-text-tertiary uppercase tracking-wider">Sort</span>
 
         {tab === 'verbs' && (
@@ -210,7 +236,7 @@ export function RootsBrowserClient({
             ))}
           </>
         )}
-      </div>
+      </motion.div>
 
       {/* Verbs grid */}
       {tab === 'verbs' && (
@@ -222,9 +248,9 @@ export function RootsBrowserClient({
                   <ArabicText size="2xl" className="text-primary">{root.root}</ArabicText>
                   <div className="flex items-center gap-1.5">
                     {root.formCount > 0 && (
-                      <span className="text-[10px] text-text-tertiary bg-surface px-1.5 py-0.5 rounded">
+                      <Badge variant="stone">
                         {root.formCount} form{root.formCount !== 1 ? 's' : ''}
-                      </span>
+                      </Badge>
                     )}
                     <Badge variant="amber">{root.totalFreq}x</Badge>
                   </div>
@@ -314,7 +340,8 @@ export function RootsBrowserClient({
           )}
         </>
       )}
-    </>
+      </div>
+    </div>
   );
 }
 

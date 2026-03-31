@@ -9,11 +9,11 @@
   /* Light mode tokens (default) */
   --color-canvas: #FAF9F6;
   --color-surface: #FFFFFF;
-  --color-primary: #0D9488;
-  --color-primary-hover: #0F766E;
-  --color-primary-light: #CCFBF1;
-  --color-accent: #B45309;
-  --color-accent-light: #FEF3C7;
+  --color-primary: #C89535;
+  --color-primary-hover: #B4842A;
+  --color-primary-light: #FEF7E6;
+  --color-accent: #0D9488;
+  --color-accent-light: #CCFBF1;
   --color-correct: #059669;
   --color-correct-light: #D1FAE5;
   --color-wrong: #DC2626;
@@ -62,11 +62,11 @@ html, body {
   /* Warm stone-tinted darks — manuscript feel, not blue/cold */
   --color-canvas: #111110;
   --color-surface: #1C1B19;
-  --color-primary: #5AB8A8;
-  --color-primary-hover: #7DCEC0;
-  --color-primary-light: rgba(90, 184, 168, 0.10);
-  --color-accent: #D4A246;
-  --color-accent-light: rgba(212, 162, 70, 0.10);
+  --color-primary: #D4A246;
+  --color-primary-hover: #E8B84B;
+  --color-primary-light: rgba(212, 162, 70, 0.10);
+  --color-accent: #5AB8A8;
+  --color-accent-light: rgba(90, 184, 168, 0.10);
   --color-correct: #5CB889;
   --color-correct-light: rgba(92, 184, 137, 0.10);
   --color-wrong: #D9635B;
@@ -129,9 +129,9 @@ button {
   border-radius: 12px;
   font-size: 1rem;
   font-weight: 700;
-  color: #FFFFFF;
-  background: var(--color-primary);
-  box-shadow: 0 1px 2px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.15);
+  color: #0E0D0C;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
+  box-shadow: 0 2px 12px rgba(212,162,70,0.25), inset 0 1px 0 rgba(255,255,255,0.2);
   border: none;
   border-bottom: 2px solid rgba(0,0,0,0.15);
   transition: transform 150ms ease, box-shadow 150ms ease;
@@ -140,9 +140,9 @@ button {
 }
 
 .btn-primary:hover {
-  background: var(--color-primary-hover);
+  background: linear-gradient(135deg, var(--color-primary-hover), var(--color-primary));
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.15);
+  box-shadow: 0 6px 20px rgba(212,162,70,0.35), inset 0 1px 0 rgba(255,255,255,0.2);
 }
 
 .btn-primary:active {
@@ -164,7 +164,7 @@ button {
   background: var(--color-accent);
   box-shadow: 0 1px 2px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.15);
   border: none;
-  border-bottom: 2px solid rgba(0,0,0,0.15);
+  border-bottom: 2px solid rgba(0,0,0,0.12);
   transition: transform 150ms ease, box-shadow 150ms ease;
   cursor: pointer;
 }

@@ -162,7 +162,7 @@ export default function QuizSessionPage({ params }: PageProps) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <p className="text-white/60 mb-4">Please sign in to access quizzes</p>
+          <p className="text-text-secondary mb-4">Please sign in to access quizzes</p>
           <button onClick={() => router.push('/')} className="btn-primary">
             Back to Home
           </button>
