@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/cn';
@@ -25,7 +26,8 @@ export function Sidebar() {
     <aside className="hidden lg:flex flex-col fixed left-0 top-0 bottom-0 w-60 bg-surface border-r border-border z-40">
 
       {/* Logo */}
-      <Link href="/" className="flex items-center px-6 h-16 border-b border-border">
+      <Link href="/" className="flex items-center gap-2.5 px-5 h-16 border-b border-border">
+        <Image src="/logo.png" alt="QuRoots" width={32} height={32} className="object-contain" />
         <span className="text-lg font-heading tracking-tight text-text">
           Qu<span className="text-primary">Roots</span>
         </span>

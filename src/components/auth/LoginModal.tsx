@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useAuthStore } from '@/store/useAuthStore';
 
 export function LoginModal() {
@@ -28,9 +29,12 @@ export function LoginModal() {
         </button>
 
         {/* Logo */}
-        <p className="text-lg font-bold tracking-tight text-text mb-1">
-          Qu<span className="text-primary">Roots</span>
-        </p>
+        <div className="flex items-center gap-2 mb-1">
+          <Image src="/logo.png" alt="QuRoots" width={28} height={28} className="object-contain" />
+          <p className="text-lg font-bold tracking-tight text-text">
+            Qu<span className="text-primary">Roots</span>
+          </p>
+        </div>
 
         <h2 className="text-xl font-bold text-text mb-1.5">Welcome</h2>
         <p className="text-sm text-text-secondary mb-6 leading-relaxed">

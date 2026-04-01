@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { useAppStore } from '@/store/useAppStore';
@@ -186,7 +187,8 @@ export function HomepageClient() {
           borderBottom: '1px solid rgba(212,162,70,0.10)',
         }}
       >
-        <Link href="/" className="text-base font-heading tracking-tight text-[#EDEDEC]">
+        <Link href="/" className="flex items-center gap-2 text-base font-heading tracking-tight text-[#EDEDEC]">
+          <Image src="/logo.png" alt="QuRoots" width={26} height={26} className="object-contain" />
           Qu<span style={{ color: '#D4A246' }}>Roots</span>
         </Link>
 
