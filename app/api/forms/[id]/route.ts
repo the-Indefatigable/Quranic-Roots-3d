@@ -6,6 +6,17 @@ import { cacheInvalidate } from '../../../../src/db/cache';
 
 export const dynamic = 'force-dynamic';
 
+import { z } from 'zod';
+
+const FormPatchSchema = z.object({
+  meaning: z.string().optional(),
+  verbMeaning: z.string().optional(),
+  semanticMeaning: z.string().optional(),
+  masdar: z.string().optional(),
+  faaeil: z.string().optional(),
+  mafool: z.string().optional(),
+});
+
 export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -14,18 +25,28 @@ export async function PATCH(
 
   try {
     const body = await req.json();
+    const parsed = FormPatchSchema.safeParse(body);
+    
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid payload', details: parsed.error.format() },
+        { status: 400 }
+      );
+    }
+
     const [form] = await db.select().from(forms).where(eq(forms.id, id)).limit(1);
     if (!form) {
       return NextResponse.json({ error: 'Form not found' }, { status: 404 });
     }
 
     const updates: Record<string, unknown> = {};
-    if (body.meaning !== undefined) updates.meaning = body.meaning;
-    if (body.verbMeaning !== undefined) updates.verbMeaning = body.verbMeaning;
-    if (body.semanticMeaning !== undefined) updates.semanticMeaning = body.semanticMeaning;
-    if (body.masdar !== undefined) updates.masdar = body.masdar;
-    if (body.faaeil !== undefined) updates.faaeil = body.faaeil;
-    if (body.mafool !== undefined) updates.mafool = body.mafool;
+    const { meaning, verbMeaning, semanticMeaning, masdar, faaeil, mafool } = parsed.data;
+    if (meaning !== undefined) updates.meaning = meaning;
+    if (verbMeaning !== undefined) updates.verbMeaning = verbMeaning;
+    if (semanticMeaning !== undefined) updates.semanticMeaning = semanticMeaning;
+    if (masdar !== undefined) updates.masdar = masdar;
+    if (faaeil !== undefined) updates.faaeil = faaeil;
+    if (mafool !== undefined) updates.mafool = mafool;
 
     if (Object.keys(updates).length > 0) {
       await db.update(forms).set(updates).where(eq(forms.id, id));

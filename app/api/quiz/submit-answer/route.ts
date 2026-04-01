@@ -6,6 +6,19 @@ import { db, dbQuery } from '@/db';
 import { quizAttempts } from '@/db/schema';
 import { updateMasteryInDB } from '@/utils/srsEngine';
 import { validateAnswer, validateMCQ, validateStructured } from '@/utils/answerValidator';
+import { z } from 'zod';
+
+const SubmitAnswerSchema = z.object({
+  sessionId: z.string().uuid(),
+  itemId: z.string().uuid(),
+  itemType: z.enum(['root', 'noun', 'particle', 'lesson_vocab', 'quran_verse']),
+  questionType: z.string(),
+  questPrompt: z.any().optional(),
+  userAnswer: z.any(),
+  correctAnswer: z.any(),
+  validAnswers: z.array(z.string()).optional(),
+  responseTime_ms: z.number().int().nonnegative().optional(),
+});
 
 export async function POST(req: NextRequest) {
   try {
@@ -15,6 +28,15 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
+    const parsed = SubmitAnswerSchema.safeParse(body);
+    
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid payload', details: parsed.error.format() },
+        { status: 400 }
+      );
+    }
+    
     const {
       sessionId,
       itemId,
@@ -25,19 +47,7 @@ export async function POST(req: NextRequest) {
       correctAnswer,
       validAnswers,
       responseTime_ms,
-    } = body;
-
-    // Validate input
-    if (
-      !sessionId ||
-      !itemId ||
-      !itemType ||
-      !questionType ||
-      userAnswer === undefined ||
-      !correctAnswer
-    ) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
-    }
+    } = parsed.data;
 
     // Determine if answer is correct based on question type
     let isCorrect = false;

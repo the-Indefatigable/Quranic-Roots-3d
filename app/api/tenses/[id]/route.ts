@@ -6,6 +6,14 @@ import { cacheInvalidate } from '../../../../src/db/cache';
 
 export const dynamic = 'force-dynamic';
 
+import { z } from 'zod';
+
+const TensePatchSchema = z.object({
+  conjugations: z.any().optional(),
+  arabicName: z.string().optional(),
+  englishName: z.string().optional(),
+});
+
 export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -14,15 +22,25 @@ export async function PATCH(
 
   try {
     const body = await req.json();
+    const parsed = TensePatchSchema.safeParse(body);
+    
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid payload', details: parsed.error.format() },
+        { status: 400 }
+      );
+    }
+
     const [tense] = await db.select().from(tenses).where(eq(tenses.id, id)).limit(1);
     if (!tense) {
       return NextResponse.json({ error: 'Tense not found' }, { status: 404 });
     }
 
     const updates: Record<string, unknown> = {};
-    if (body.conjugations !== undefined) updates.conjugations = body.conjugations;
-    if (body.arabicName !== undefined) updates.arabicName = body.arabicName;
-    if (body.englishName !== undefined) updates.englishName = body.englishName;
+    const { conjugations, arabicName, englishName } = parsed.data;
+    if (conjugations !== undefined) updates.conjugations = conjugations;
+    if (arabicName !== undefined) updates.arabicName = arabicName;
+    if (englishName !== undefined) updates.englishName = englishName;
 
     if (Object.keys(updates).length > 0) {
       await db.update(tenses).set(updates).where(eq(tenses.id, id));

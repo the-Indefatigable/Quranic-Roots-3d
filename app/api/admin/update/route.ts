@@ -25,6 +25,14 @@ const EDITABLE_FIELDS: Record<TableName, string[]> = {
   particles: ['form', 'meaning', 'type'],
 };
 
+import { z } from 'zod';
+
+const AdminUpdateSchema = z.object({
+  table: z.enum(['roots', 'forms', 'tenses', 'nouns', 'particles']),
+  id: z.string().uuid(),
+  updates: z.record(z.string(), z.any()),
+});
+
 export async function POST(req: NextRequest) {
   try {
     const session = await auth();
@@ -33,15 +41,16 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { table, id, updates } = body as {
-      table: string;
-      id: string;
-      updates: Record<string, any>;
-    };
-
-    if (!table || !id || !updates || typeof updates !== 'object') {
-      return NextResponse.json({ error: 'Missing table, id, or updates' }, { status: 400 });
+    const parsed = AdminUpdateSchema.safeParse(body);
+    
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid payload', details: parsed.error.format() },
+        { status: 400 }
+      );
     }
+    
+    const { table, id, updates } = parsed.data;
 
     if (!(table in TABLE_MAP)) {
       return NextResponse.json({ error: `Invalid table: ${table}` }, { status: 400 });

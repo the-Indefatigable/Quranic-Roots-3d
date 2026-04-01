@@ -7,6 +7,12 @@ import { quizSessions, quizAttempts, userRootMastery, userNounMastery, userParti
 import { eq, and, gte } from 'drizzle-orm';
 import { addXPToUser } from '@/utils/levelEngine';
 import { checkAndUnlockAchievements } from '@/utils/achievementEngine';
+import { z } from 'zod';
+
+const EndSessionSchema = z.object({
+  sessionId: z.string().uuid(),
+  totalTime: z.number().int().nonnegative(),
+});
 
 export async function POST(req: NextRequest) {
   try {
@@ -16,11 +22,16 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { sessionId, totalTime } = body;
-
-    if (!sessionId) {
-      return NextResponse.json({ error: 'Missing sessionId' }, { status: 400 });
+    const parsed = EndSessionSchema.safeParse(body);
+    
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid payload', details: parsed.error.format() },
+        { status: 400 }
+      );
     }
+    
+    const { sessionId, totalTime } = parsed.data;
 
     // Get all attempts for this session
     const attempts = await dbQuery(() =>

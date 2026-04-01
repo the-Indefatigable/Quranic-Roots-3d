@@ -99,6 +99,12 @@ export async function GET(
   }
 }
 
+import { z } from 'zod';
+
+const RootPatchSchema = z.object({
+  meaning: z.string().optional(),
+});
+
 export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -108,13 +114,23 @@ export async function PATCH(
 
   try {
     const body = await req.json();
+    const parsed = RootPatchSchema.safeParse(body);
+    
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid payload', details: parsed.error.format() },
+        { status: 400 }
+      );
+    }
+
     const [root] = await db.select().from(roots).where(eq(roots.root, rootId)).limit(1);
     if (!root) {
       return NextResponse.json({ error: 'Root not found' }, { status: 404 });
     }
 
     const updates: Record<string, unknown> = {};
-    if (body.meaning !== undefined) updates.meaning = body.meaning;
+    const { meaning } = parsed.data;
+    if (meaning !== undefined) updates.meaning = meaning;
 
     if (Object.keys(updates).length > 0) {
       await db.update(roots).set(updates).where(eq(roots.id, root.id));

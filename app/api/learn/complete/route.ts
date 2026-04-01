@@ -19,15 +19,23 @@ import {
 } from '@/db/schema';
 import { eq, and, sql } from 'drizzle-orm';
 
-interface CompletionPayload {
-  lessonId: string;
-  score: number; // 0-100
-  correctCount: number;
-  totalCount: number;
-  mistakes: Array<{ stepIndex: number; userAnswer: string; correctAnswer: string }>;
-  comboMax: number;
-  timeSpentS: number;
-}
+import { z } from 'zod';
+
+const CompleteLessonSchema = z.object({
+  lessonId: z.string(),
+  score: z.number().min(0).max(100),
+  correctCount: z.number().int().nonnegative(),
+  totalCount: z.number().int().nonnegative(),
+  mistakes: z.array(
+    z.object({
+      stepIndex: z.number().int().nonnegative(),
+      userAnswer: z.any(),
+      correctAnswer: z.any()
+    })
+  ),
+  comboMax: z.number().int().nonnegative(),
+  timeSpentS: z.number().int().nonnegative(),
+});
 
 export async function POST(request: NextRequest) {
   try {
@@ -37,8 +45,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
-    const body: CompletionPayload = await request.json();
-    const { lessonId, score, correctCount, totalCount, mistakes, comboMax, timeSpentS } = body;
+    const body = await request.json();
+    const parsed = CompleteLessonSchema.safeParse(body);
+    
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid payload', details: parsed.error.format() },
+        { status: 400 }
+      );
+    }
+    
+    const { lessonId, score, correctCount, totalCount, mistakes, comboMax, timeSpentS } = parsed.data;
 
     // Qirat lessons are static — skip DB operations, just return success
     if (lessonId.startsWith('qirat-')) {
