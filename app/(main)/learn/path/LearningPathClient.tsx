@@ -10,16 +10,16 @@ export function LearningPathClient() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('/api/learn/path')
+    fetch('/api/learn/units')
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
       })
-      .then((data) => {
-        if (data.error) {
-          setError(data.error);
+      .then((json) => {
+        if (json.error) {
+          setError(json.error);
         } else {
-          setUnits(data.path || []);
+          setUnits(json.data || []);
         }
       })
       .catch((err) => {

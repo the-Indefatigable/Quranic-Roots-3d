@@ -66,6 +66,28 @@ const LEVEL_STYLE: Record<string, { bg: string; text: string }> = {
   Advanced:     { bg: 'rgba(124,58,237,0.12)',  text: '#A78BFA' },
 };
 
+const COMING_SOON_COURSES = [
+  {
+    title: 'Learn Qirat & Maqam',
+    arabic: 'تعلّم القراءة',
+    description: 'Master Quranic recitation with pitch training, ear training, and melodic mode recognition.',
+    color: '#7C3AED',
+    href: '/learn/qirat',
+  },
+  {
+    title: 'Tafsir & Word-by-Word',
+    arabic: 'التفسير',
+    description: 'Deep dive into the meaning of every word and verse — with classical and modern tafsir sources.',
+    color: '#D97706',
+  },
+  {
+    title: 'Conversational Arabic',
+    arabic: 'المحادثة',
+    description: 'Practical dialogue skills built on the Quranic vocabulary you already know.',
+    color: '#1D4ED8',
+  },
+];
+
 export default function LearnPage() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-10">
@@ -86,36 +108,8 @@ export default function LearnPage() {
         </p>
       </div>
 
-      {/* Also try Qirat */}
-      <Link
-        href="/learn/qirat"
-        className="flex items-center justify-between rounded-2xl p-4 mb-8 group transition-all duration-200 hover:-translate-y-0.5"
-        style={{
-          background: 'linear-gradient(135deg, rgba(124,58,237,0.10) 0%, rgba(13,148,136,0.06) 100%)',
-          border: '1px solid rgba(124,58,237,0.2)',
-        }}
-      >
-        <div className="flex items-center gap-3">
-          <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-            style={{ background: 'rgba(124,58,237,0.15)', color: '#A78BFA' }}
-          >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" d="m9 9 10.5-3m0 6.553v3.75a2.25 2.25 0 0 1-1.632 2.163l-1.32.377a1.803 1.803 0 1 1-.99-3.467l2.31-.66a2.25 2.25 0 0 0 1.632-2.163Zm0 0V4.103A2.25 2.25 0 0 0 17.77 2.03l-4.046 1.157A2.25 2.25 0 0 0 12.12 5.35v6.2a2.25 2.25 0 0 1-1.632 2.163l-1.32.377a1.803 1.803 0 1 1-.99-3.467l2.31-.66A2.25 2.25 0 0 0 12.12 7.8V5.35" />
-            </svg>
-          </div>
-          <div>
-            <p className="text-sm font-semibold" style={{ color: '#EDEDEC' }}>Also: Learn Qirat & Maqam</p>
-            <p className="text-xs" style={{ color: '#57534E' }}>Master Quranic recitation with pitch training</p>
-          </div>
-        </div>
-        <svg className="w-4 h-4 transition-transform group-hover:translate-x-0.5" style={{ color: '#A78BFA' }} fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-        </svg>
-      </Link>
-
       {/* Topic cards */}
-      <div className="space-y-3">
+      <div className="space-y-3 mb-16">
         {TOPICS.map((topic) => {
           const lvl = LEVEL_STYLE[topic.level];
           return (
@@ -171,6 +165,79 @@ export default function LearnPage() {
             </Link>
           );
         })}
+      </div>
+
+      {/* ══ COMING SOON ═══════════════════════════════════════════ */}
+      <div className="mb-6">
+        <div className="flex items-center gap-3 mb-6">
+          <span className="h-px flex-1" style={{ background: 'rgba(212,162,70,0.15)' }} />
+          <span className="text-[10px] font-bold uppercase tracking-[0.25em]" style={{ color: '#D4A246' }}>
+            Coming Soon
+          </span>
+          <span className="h-px flex-1" style={{ background: 'rgba(212,162,70,0.15)' }} />
+        </div>
+
+        <div className="space-y-3">
+          {COMING_SOON_COURSES.map((course) => {
+            const inner = (
+              <div
+                className="relative group flex items-start gap-4 rounded-2xl p-5 overflow-hidden transition-all duration-200"
+                style={{
+                  background: 'rgba(255,255,255,0.02)',
+                  border: '1px solid rgba(255,255,255,0.05)',
+                }}
+              >
+                {/* Faded overlay */}
+                <div className="absolute inset-0 z-0" style={{ background: `linear-gradient(135deg, ${course.color}06 0%, transparent 60%)` }} />
+
+                {/* Left: Arabic */}
+                <div className="relative z-10 shrink-0 pt-0.5">
+                  <span
+                    className="font-arabic text-2xl leading-none opacity-40"
+                    style={{ color: course.color }}
+                  >
+                    {course.arabic}
+                  </span>
+                </div>
+
+                {/* Content */}
+                <div className="relative z-10 flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-3 mb-1.5">
+                    <h3 className="text-sm font-semibold leading-snug" style={{ color: '#A09F9B' }}>
+                      {course.title}
+                    </h3>
+                    <span
+                      className="shrink-0 text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"
+                      style={{ background: `${course.color}15`, color: `${course.color}80` }}
+                    >
+                      Soon
+                    </span>
+                  </div>
+                  <p className="text-xs leading-relaxed" style={{ color: '#3D3C3A' }}>
+                    {course.description}
+                  </p>
+                </div>
+              </div>
+            );
+
+            if (course.href) {
+              return <Link key={course.title} href={course.href}>{inner}</Link>;
+            }
+            return <div key={course.title}>{inner}</div>;
+          })}
+        </div>
+      </div>
+
+      {/* Footer ornament */}
+      <div className="mt-12 text-center">
+        <div className="flex items-center justify-center gap-3 mb-3">
+          <span className="h-px w-14 bg-gradient-to-r from-transparent to-[#D4A246]/20" />
+          <div className="w-1.5 h-1.5 rotate-45" style={{ background: '#D4A246', opacity: 0.3 }} />
+          <span className="h-px w-14 bg-gradient-to-l from-transparent to-[#D4A246]/20" />
+        </div>
+        <p className="text-[#2D2C2A] text-[11px] tracking-wider">
+          More courses are being crafted with care
+        </p>
       </div>
     </div>
   );

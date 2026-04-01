@@ -82,11 +82,10 @@ export function LessonPlayer({
     const score = tot > 0 ? Math.round((cor / tot) * 100) : 100;
 
     try {
-      const res = await fetch('/api/learn/complete', {
+      const res = await fetch(`/api/learn/lessons/${lessonId}/complete`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          lessonId,
           score,
           correctCount: cor,
           totalCount: tot,
@@ -96,8 +95,8 @@ export function LessonPlayer({
         }),
       });
 
-      const data = await res.json();
-      setCompletionData(data);
+      const json = await res.json();
+      setCompletionData(json.data ?? json);
     } catch {
       setCompletionData({
         xpEarned: xpReward,

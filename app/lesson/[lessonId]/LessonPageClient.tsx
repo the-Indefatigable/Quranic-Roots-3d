@@ -22,17 +22,17 @@ export function LessonPageClient({ lessonId }: { lessonId: string }) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch(`/api/learn/lesson?id=${lessonId}`)
+    fetch(`/api/learn/lessons/${lessonId}`)
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
       })
-      .then((data) => {
-        if (data.error) {
-          setError(data.error);
+      .then((json) => {
+        if (json.error) {
+          setError(json.error);
         } else {
-          setLesson(data.lesson);
-          setHearts(data.hearts ?? 5);
+          setLesson(json.data);
+          setHearts(json.hearts ?? 5);
         }
       })
       .catch((err) => setError(`Failed to load lesson: ${err.message}`))
