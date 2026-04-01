@@ -69,10 +69,10 @@ export function ClassifyStep({ content, onAnswer }: ClassifyStepProps) {
             className={`w-2.5 h-2.5 rounded-full transition-colors ${
               i < currentItem
                 ? placements[shuffledItems[i].text] === shuffledItems[i].category
-                  ? 'bg-[#58CC02]'
+                  ? 'bg-[#5CB889]'
                   : 'bg-[#FF4B4B]'
                 : i === currentItem
-                ? 'bg-[#1CB0F6]'
+                ? 'bg-[#D4A246]'
                 : 'bg-surface'
             }`}
           />

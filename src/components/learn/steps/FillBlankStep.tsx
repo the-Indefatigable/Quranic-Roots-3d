@@ -50,7 +50,7 @@ export function FillBlankStep({ content, onAnswer }: FillBlankStepProps) {
                     !selected
                       ? 'bg-surface border-border text-white/30 min-w-[80px]'
                       : selected === data.correct_answer
-                      ? 'bg-[#58CC02]/20 border-[#58CC02] text-[#58CC02]'
+                      ? 'bg-[#5CB889]/20 border-[#5CB889] text-[#5CB889]'
                       : 'bg-[#FF4B4B]/20 border-[#FF4B4B] text-[#FF4B4B]'
                   }`}
                 >
@@ -67,10 +67,10 @@ export function FillBlankStep({ content, onAnswer }: FillBlankStepProps) {
           let style = 'border-border bg-surface text-white hover:bg-surface';
           if (answered && option === selected) {
             style = option === data.correct_answer
-              ? 'border-[#58CC02] bg-[#58CC02]/10 text-[#58CC02]'
+              ? 'border-[#5CB889] bg-[#5CB889]/10 text-[#5CB889]'
               : 'border-[#FF4B4B] bg-[#FF4B4B]/10 text-[#FF4B4B]';
           } else if (answered && option === data.correct_answer) {
-            style = 'border-[#58CC02]/50 bg-[#58CC02]/5 text-[#58CC02]/70';
+            style = 'border-[#5CB889]/50 bg-[#5CB889]/5 text-[#5CB889]/70';
           }
 
           return (

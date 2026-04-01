@@ -139,7 +139,7 @@ export function TeachStep({ content, onContinue }: TeachStepProps) {
           transition={{ delay: 0.3, type: 'spring' }}
           className="py-4"
         >
-          <p className="text-5xl font-arabic text-[#58CC02] mb-2">{data.arabic}</p>
+          <p className="text-5xl font-arabic text-[#D4A246] mb-2">{data.arabic}</p>
           {data.transliteration && (
             <p className="text-lg text-white/50 italic">{data.transliteration}</p>
           )}
@@ -171,7 +171,7 @@ export function TeachStep({ content, onContinue }: TeachStepProps) {
       )}
 
       {data.quran_ref && (
-        <p className="text-xs text-[#1CB0F6]">📖 Quran {data.quran_ref}</p>
+        <p className="text-xs text-[#D4A246]">📖 Quran {data.quran_ref}</p>
       )}
 
       {data.fun_fact && (
@@ -190,7 +190,7 @@ export function TeachStep({ content, onContinue }: TeachStepProps) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.35 }}
         onClick={onContinue}
-        className="w-full max-w-xs py-4 rounded-2xl bg-[#58CC02] text-white font-bold text-lg shadow-[0_4px_0_#46a302] hover:shadow-[0_2px_0_#46a302] hover:translate-y-[2px] active:shadow-none active:translate-y-[4px] transition-all mt-2"
+        className="w-full max-w-xs py-4 rounded-2xl bg-[#D4A246] text-[#0E0D0C] font-bold text-lg shadow-[0_4px_0_#B4842A] hover:shadow-[0_2px_0_#B4842A] hover:translate-y-[2px] active:shadow-none active:translate-y-[4px] transition-all mt-2"
       >
         Continue
       </motion.button>

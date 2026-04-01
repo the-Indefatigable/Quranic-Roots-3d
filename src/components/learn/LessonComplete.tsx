@@ -30,18 +30,18 @@ export function LessonComplete({ data, onContinue }: LessonCompleteProps) {
 
   if (outOfHearts) {
     return (
-      <div className="fixed inset-0 z-50 bg-[#131F24] flex flex-col items-center justify-center px-6">
+      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center px-6" style={{ background: '#0E0D0C' }}>
         <motion.div
           initial={{ scale: 0.5, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           className="text-center"
         >
           <span className="text-6xl mb-4 block">💔</span>
-          <h2 className="text-2xl font-bold text-white mb-2">Out of Hearts!</h2>
-          <p className="text-white/50 mb-8">Practice earlier lessons to earn hearts back, or wait for them to refill.</p>
+          <h2 className="text-2xl font-bold text-[#EDEDEC] mb-2">Out of Hearts!</h2>
+          <p className="text-[#57534E] mb-8">Practice earlier lessons to earn hearts back, or wait for them to refill.</p>
           <button
             onClick={onContinue}
-            className="px-8 py-4 rounded-2xl bg-[#1CB0F6] text-white font-bold text-lg shadow-[0_4px_0_#0d8ecf] hover:translate-y-[2px] hover:shadow-[0_2px_0_#0d8ecf] transition-all"
+            className="px-8 py-4 rounded-2xl bg-[#D4A246] text-[#0E0D0C] font-bold text-lg shadow-[0_4px_0_#B4842A] hover:translate-y-[2px] hover:shadow-[0_2px_0_#B4842A] transition-all"
           >
             Back to Path
           </button>
@@ -51,21 +51,38 @@ export function LessonComplete({ data, onContinue }: LessonCompleteProps) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#131F24] flex flex-col items-center justify-center px-6 overflow-hidden">
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center px-6 overflow-hidden" style={{ background: '#0E0D0C' }}>
+      {/* Subtle dot-grid */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-0"
+        style={{
+          backgroundImage: 'radial-gradient(circle, rgba(212,162,70,0.06) 1px, transparent 1px)',
+          backgroundSize: '24px 24px',
+        }}
+      />
+
+      {/* Ambient glow */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute top-0 left-0 right-0 h-64 z-0"
+        style={{ background: 'radial-gradient(ellipse at 50% -20%, rgba(212,162,70,0.12) 0%, transparent 70%)' }}
+      />
+
       {/* Confetti particles */}
       {showConfetti && (
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none overflow-hidden z-10">
           {Array.from({ length: 40 }).map((_, i) => (
             <motion.div
               key={i}
               initial={{
-                x: Math.random() * window.innerWidth,
+                x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 400),
                 y: -20,
                 rotate: 0,
                 opacity: 1,
               }}
               animate={{
-                y: window.innerHeight + 20,
+                y: (typeof window !== 'undefined' ? window.innerHeight : 800) + 20,
                 rotate: Math.random() * 720 - 360,
                 opacity: [1, 1, 0],
               }}
@@ -76,7 +93,7 @@ export function LessonComplete({ data, onContinue }: LessonCompleteProps) {
               }}
               className="absolute w-3 h-3 rounded-sm"
               style={{
-                backgroundColor: ['#D4A246', '#1CB0F6', '#D97706', '#059669', '#CE82FF'][i % 5],
+                backgroundColor: ['#D4A246', '#E8B84B', '#D97706', '#5CB889', '#A78BFA'][i % 5],
               }}
             />
           ))}
@@ -87,7 +104,7 @@ export function LessonComplete({ data, onContinue }: LessonCompleteProps) {
         initial={{ scale: 0.5, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-        className="text-center z-10"
+        className="text-center z-20"
       >
         {/* Trophy/star */}
         <motion.div
@@ -99,7 +116,7 @@ export function LessonComplete({ data, onContinue }: LessonCompleteProps) {
           <span className="text-7xl">{isPerfect ? '🌟' : score >= 80 ? '⭐' : '✅'}</span>
         </motion.div>
 
-        <h2 className="text-3xl font-bold text-white mb-2">
+        <h2 className="text-3xl font-bold text-[#F0E4CA] mb-2">
           {isPerfect ? 'PERFECT!' : 'Lesson Complete!'}
         </h2>
 
@@ -110,8 +127,11 @@ export function LessonComplete({ data, onContinue }: LessonCompleteProps) {
           transition={{ delay: 0.5 }}
           className="flex items-center justify-center gap-3 my-6"
         >
-          <div className="px-6 py-3 rounded-2xl bg-[#D97706]/10 border border-[#D97706]/30">
-            <span className="text-3xl font-bold text-[#D97706]">+{xpEarned} XP</span>
+          <div
+            className="px-6 py-3 rounded-2xl"
+            style={{ background: 'rgba(212,162,70,0.12)', border: '1px solid rgba(212,162,70,0.25)' }}
+          >
+            <span className="text-3xl font-bold text-[#D4A246]">+{xpEarned} XP</span>
           </div>
         </motion.div>
 
@@ -123,19 +143,19 @@ export function LessonComplete({ data, onContinue }: LessonCompleteProps) {
           className="flex items-center justify-center gap-6 mb-6"
         >
           <div className="text-center">
-            <p className="text-2xl font-bold text-white">{score}%</p>
-            <p className="text-xs text-white/40">Accuracy</p>
+            <p className="text-2xl font-bold text-[#EDEDEC]">{score}%</p>
+            <p className="text-xs text-[#57534E]">Accuracy</p>
           </div>
           {streak?.currentStreak && streak.currentStreak > 0 && (
             <div className="text-center">
               <p className="text-2xl font-bold text-[#D97706]">🔥 {streak.currentStreak}</p>
-              <p className="text-xs text-white/40">Day Streak</p>
+              <p className="text-xs text-[#57534E]">Day Streak</p>
             </div>
           )}
           {gemsEarned > 0 && (
             <div className="text-center">
-              <p className="text-2xl font-bold text-[#1CB0F6]">💎 +{gemsEarned}</p>
-              <p className="text-xs text-white/40">Gems</p>
+              <p className="text-2xl font-bold text-[#A78BFA]">💎 +{gemsEarned}</p>
+              <p className="text-xs text-[#57534E]">Gems</p>
             </div>
           )}
         </motion.div>
@@ -146,9 +166,10 @@ export function LessonComplete({ data, onContinue }: LessonCompleteProps) {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.9 }}
-            className="mb-4 px-4 py-2 rounded-full bg-[#58CC02]/10 border border-[#58CC02]/30 inline-block"
+            className="mb-4 px-4 py-2 rounded-full inline-block"
+            style={{ background: 'rgba(92,184,137,0.12)', border: '1px solid rgba(92,184,137,0.25)' }}
           >
-            <span className="text-sm text-[#58CC02] font-bold">🎯 Daily Goal Complete!</span>
+            <span className="text-sm text-[#5CB889] font-bold">🎯 Daily Goal Complete!</span>
           </motion.div>
         )}
 
@@ -157,7 +178,8 @@ export function LessonComplete({ data, onContinue }: LessonCompleteProps) {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 1.0 }}
-            className="mb-4 px-4 py-2 rounded-full bg-[#D97706]/10 border border-[#D97706]/30 inline-block"
+            className="mb-4 px-4 py-2 rounded-full inline-block"
+            style={{ background: 'rgba(217,119,6,0.12)', border: '1px solid rgba(217,119,6,0.25)' }}
           >
             <span className="text-sm text-[#D97706] font-bold">🔥 {streak.milestoneReached}-Day Streak!</span>
           </motion.div>

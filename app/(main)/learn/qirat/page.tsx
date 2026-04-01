@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { motion, useInView } from 'framer-motion';
 import { QIRAT_UNITS } from '@/data/qirat-curriculum';
 
+const QIRAT_UNLOCKED = process.env.NEXT_PUBLIC_UNLOCK_QIRAT === 'true';
+
 // ── Maqam identity badges ─────────────────────────────────────────
 const MAQAM_BADGES = [
   { label: 'Bayati',   arabic: 'بياتي',  color: '#0D9488', tagline: 'Warm · Devotional' },
@@ -44,6 +46,110 @@ function RevealSection({ children }: { children: React.ReactNode }) {
 }
 
 export default function QiratPage() {
+  // ── Coming Soon lock ──────────────────────────────────────────
+  if (!QIRAT_UNLOCKED) {
+    return (
+      <div className="relative min-h-screen" style={{ background: '#0E0D0C' }}>
+        {/* Dot-grid background */}
+        <div
+          aria-hidden
+          className="pointer-events-none fixed inset-0 z-0"
+          style={{
+            backgroundImage: 'radial-gradient(circle, rgba(212,162,70,0.09) 1px, transparent 1px)',
+            backgroundSize: '26px 26px',
+          }}
+        />
+
+        <div className="relative z-10 flex flex-col items-center justify-center min-h-[80vh] px-6 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          >
+            {/* Ornamental label */}
+            <div className="flex items-center justify-center gap-3 mb-6">
+              <span className="h-px w-10 bg-gradient-to-r from-transparent to-[#D4A246]/40" />
+              <span className="text-[#D4A246]/60 text-[10px] tracking-[0.3em] uppercase">
+                Coming Soon
+              </span>
+              <span className="h-px w-10 bg-gradient-to-l from-transparent to-[#D4A246]/40" />
+            </div>
+
+            {/* Large Arabic title */}
+            <h1
+              className="font-arabic leading-none mb-4"
+              style={{
+                fontSize: 'clamp(3rem, 10vw, 5rem)',
+                color: '#F0E4CA',
+                textShadow: '0 0 80px rgba(212,162,70,0.22)',
+                letterSpacing: '0.03em',
+              }}
+            >
+              تعلّم القراءة
+            </h1>
+
+            <p className="text-[#A09F9B] text-lg font-light tracking-wide mb-2">
+              Learn Quranic Recitation & Maqam
+            </p>
+            <p className="text-[#57534E] text-sm mb-8 max-w-md mx-auto leading-relaxed">
+              Master the melodic modes used in Quran recitation — Bayati, Rast, Hijaz, and more.
+              Pitch training, ear training, and phrase scoring — all coming soon.
+            </p>
+
+            {/* Maqam preview chips */}
+            <div className="flex flex-wrap gap-2 justify-center mb-10">
+              {MAQAM_BADGES.map((m) => (
+                <div
+                  key={m.label}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-full"
+                  style={{
+                    background: `${m.color}12`,
+                    border: `1px solid ${m.color}25`,
+                  }}
+                >
+                  <span className="font-arabic text-sm" style={{ color: m.color }}>{m.arabic}</span>
+                  <span className="text-[10px] font-medium" style={{ color: `${m.color}90` }}>{m.label}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Diamond ornament */}
+            <div className="flex items-center justify-center gap-2 mb-8">
+              {[false, false, true, false, false].map((big, i) => (
+                <div
+                  key={i}
+                  className="rotate-45"
+                  style={{
+                    width: big ? 8 : 4,
+                    height: big ? 8 : 4,
+                    background: big ? '#D4A246' : '#3D3C3A',
+                    boxShadow: big ? '0 0 10px rgba(212,162,70,0.6)' : 'none',
+                  }}
+                />
+              ))}
+            </div>
+
+            <Link
+              href="/learn"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all hover:-translate-y-0.5"
+              style={{
+                background: 'rgba(212,162,70,0.10)',
+                border: '1px solid rgba(212,162,70,0.20)',
+                color: '#D4A246',
+              }}
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+              </svg>
+              Back to Learning Hub
+            </Link>
+          </motion.div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Unlocked course ───────────────────────────────────────────
   return (
     <div className="relative min-h-screen" style={{ background: '#0E0D0C' }}>
 

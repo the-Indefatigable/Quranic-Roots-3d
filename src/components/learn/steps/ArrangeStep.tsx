@@ -93,9 +93,9 @@ export function ArrangeStep({ content, onAnswer }: ArrangeStepProps) {
               className={`px-4 py-3 rounded-xl font-arabic text-lg font-medium border-2 shadow-md transition-all ${
                 answered
                   ? JSON.stringify(placed) === JSON.stringify(data.correct_order)
-                    ? 'border-[#58CC02] bg-[#58CC02]/10 text-[#58CC02]'
+                    ? 'border-[#5CB889] bg-[#5CB889]/10 text-[#5CB889]'
                     : 'border-[#FF4B4B] bg-[#FF4B4B]/10 text-[#FF4B4B]'
-                  : 'border-[#1CB0F6] bg-[#1CB0F6]/10 text-[#1CB0F6] hover:bg-[#1CB0F6]/20'
+                  : 'border-[#D4A246] bg-[#D4A246]/10 text-[#D4A246] hover:bg-[#D4A246]/20'
               }`}
             >
               {tile}

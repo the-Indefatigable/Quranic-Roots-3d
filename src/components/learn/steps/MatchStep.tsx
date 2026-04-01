@@ -88,9 +88,9 @@ export function MatchStep({ content, onAnswer }: MatchStepProps) {
                 disabled={isMatched}
                 className={`w-full px-3 py-3 rounded-xl border-2 text-sm font-medium text-center transition-all ${
                   isMatched
-                    ? 'border-[#58CC02]/50 bg-[#58CC02]/10 text-[#58CC02] opacity-60'
+                    ? 'border-[#5CB889]/50 bg-[#5CB889]/10 text-[#5CB889] opacity-60'
                     : isSelected
-                    ? 'border-[#1CB0F6] bg-[#1CB0F6]/10 text-[#1CB0F6]'
+                    ? 'border-[#D4A246] bg-[#D4A246]/10 text-[#D4A246]'
                     : isWrong
                     ? 'border-[#FF4B4B] bg-[#FF4B4B]/10 text-[#FF4B4B]'
                     : 'border-border bg-surface text-white hover:border-border'
@@ -119,9 +119,9 @@ export function MatchStep({ content, onAnswer }: MatchStepProps) {
                 disabled={isMatched}
                 className={`w-full px-3 py-3 rounded-xl border-2 text-sm font-medium text-center transition-all ${
                   isMatched
-                    ? 'border-[#58CC02]/50 bg-[#58CC02]/10 text-[#58CC02] opacity-60'
+                    ? 'border-[#5CB889]/50 bg-[#5CB889]/10 text-[#5CB889] opacity-60'
                     : isSelected
-                    ? 'border-[#1CB0F6] bg-[#1CB0F6]/10 text-[#1CB0F6]'
+                    ? 'border-[#D4A246] bg-[#D4A246]/10 text-[#D4A246]'
                     : isWrong
                     ? 'border-[#FF4B4B] bg-[#FF4B4B]/10 text-[#FF4B4B]'
                     : 'border-border bg-surface text-white hover:border-border'

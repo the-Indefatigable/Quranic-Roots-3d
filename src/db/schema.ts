@@ -386,7 +386,7 @@ export const learningUnits = pgTable('learning_units', {
   titleAr: text('title_ar'),
   description: text('description'),
   iconEmoji: text('icon_emoji').default('📖'),
-  color: text('color').default('#58CC02'), // node color on path
+  color: text('color').default('#D4A246'), // node color on path
   sortOrder: integer('sort_order').notNull(),
   checkpointAfter: boolean('checkpoint_after').default(false), // gate test after this unit
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),

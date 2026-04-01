@@ -472,7 +472,7 @@ export function GuidedPractice({
           let color = '#D4A246'; // amber default
           if (qF) {
             const cents = Math.abs(1200 * Math.log2(f2 / qF));
-            color = cents < 50 ? '#58CC02' : cents < 120 ? '#D4A246' : '#FF4B4B';
+            color = cents < 50 ? '#5CB889' : cents < 120 ? '#D4A246' : '#FF4B4B';
           }
 
           const x1 = GRID_LEFT + (i - 1) * step;
@@ -588,16 +588,16 @@ export function GuidedPractice({
 
       if (phase === 'recording' || phase === 'together') {
         // User legend
-        ctx.fillStyle = '#58CC02';
+        ctx.fillStyle = '#5CB889';
         ctx.fillRect(GRID_LEFT + 65, legendY + 10, 12, 3);
-        ctx.shadowColor = '#58CC02'; ctx.shadowBlur = 4;
+        ctx.shadowColor = '#5CB889'; ctx.shadowBlur = 4;
         ctx.fillRect(GRID_LEFT + 65, legendY + 10, 12, 3);
         ctx.shadowBlur = 0;
         ctx.fillStyle = 'rgba(255,255,255,0.4)';
         ctx.fillText('You', GRID_LEFT + 81, legendY + 14);
 
         // Color key
-        ctx.fillStyle = '#58CC02'; ctx.fillText('● close', GRID_LEFT + 120, legendY + 14);
+        ctx.fillStyle = '#5CB889'; ctx.fillText('● close', GRID_LEFT + 120, legendY + 14);
         ctx.fillStyle = '#D4A246'; ctx.fillText('● near', GRID_LEFT + 168, legendY + 14);
         ctx.fillStyle = '#FF4B4B'; ctx.fillText('● far', GRID_LEFT + 210, legendY + 14);
       }

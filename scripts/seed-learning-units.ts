@@ -18,7 +18,7 @@ async function seed() {
   // ── Unit 1: The 3 Word Types ─────────────────────────
   const [unit1] = await sql`
     INSERT INTO learning_units (slug, title, title_ar, description, icon_emoji, color, sort_order, checkpoint_after)
-    VALUES ('kalimah', 'The 3 Word Types', 'الكلمة', 'Arabic has only 3 types of words. Learn to identify them.', '🔤', '#58CC02', 1, false)
+    VALUES ('kalimah', 'The 3 Word Types', 'الكلمة', 'Arabic has only 3 types of words. Learn to identify them.', '🔤', '#D4A246', 1, false)
     ON CONFLICT (slug) DO UPDATE SET title = EXCLUDED.title
     RETURNING id
   `;
@@ -27,7 +27,7 @@ async function seed() {
   // ── Unit 2: Boy or Girl? ─────────────────────────────
   const [unit2] = await sql`
     INSERT INTO learning_units (slug, title, title_ar, description, icon_emoji, color, sort_order, checkpoint_after)
-    VALUES ('jins', 'Boy or Girl?', 'الجنس', 'Every Ism is either Masculine or Feminine.', '♂️', '#1CB0F6', 2, false)
+    VALUES ('jins', 'Boy or Girl?', 'الجنس', 'Every Ism is either Masculine or Feminine.', '♂️', '#E8B84B', 2, false)
     ON CONFLICT (slug) DO UPDATE SET title = EXCLUDED.title
     RETURNING id
   `;

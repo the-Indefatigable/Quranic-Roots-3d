@@ -5,9 +5,11 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/cn';
 import { useAuthStore } from '@/store/useAuthStore';
 
+const QIRAT_UNLOCKED = process.env.NEXT_PUBLIC_UNLOCK_QIRAT === 'true';
+
 const navItems = [
   { href: '/learn/path', label: 'Learn Arabic', icon: LearnIcon },
-  { href: '/learn/qirat', label: 'Learn Qirat', icon: QiratIcon },
+  { href: '/learn/qirat', label: 'Learn Qirat', icon: QiratIcon, badge: !QIRAT_UNLOCKED ? 'Soon' : undefined },
   { href: '/quran',      label: 'Quran',     icon: BookIcon },
   { href: '/roots',      label: 'Roots',     icon: RootIcon },
   { href: '/search',     label: 'Search',    icon: SearchIcon },
@@ -36,7 +38,7 @@ export function Sidebar() {
             return <div key={`div-${idx}`} className="h-px bg-border my-3 mx-2" />;
           }
 
-          const navItem = item as { href: string; label: string; icon: any; requiresAuth?: boolean; requiresAdmin?: boolean };
+          const navItem = item as { href: string; label: string; icon: any; requiresAuth?: boolean; requiresAdmin?: boolean; badge?: string };
           if (navItem.requiresAuth && !user) return null;
           if (navItem.requiresAdmin && user?.role !== 'admin') return null;
 
@@ -64,6 +66,11 @@ export function Sidebar() {
               )}
               <navItem.icon className={cn('w-[18px] h-[18px] flex-shrink-0', isActive ? 'text-primary' : 'text-text-tertiary')} />
               <span>{navItem.label}</span>
+              {navItem.badge && (
+                <span className="ml-auto text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(212,162,70,0.15)', color: '#D4A246' }}>
+                  {navItem.badge}
+                </span>
+              )}
             </Link>
           );
         })}

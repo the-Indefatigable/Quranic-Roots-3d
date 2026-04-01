@@ -41,10 +41,10 @@ export function LessonPageClient({ lessonId }: { lessonId: string }) {
 
   if (loading) {
     return (
-      <div className="fixed inset-0 bg-[#131F24] flex items-center justify-center">
+      <div className="fixed inset-0 bg-[#0E0D0C] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-[#D4A246] border-t-transparent rounded-full animate-spin" />
-          <p className="text-white/50 text-sm">Loading lesson...</p>
+          <p className="text-[#57534E] text-sm">Loading lesson...</p>
         </div>
       </div>
     );
@@ -52,7 +52,7 @@ export function LessonPageClient({ lessonId }: { lessonId: string }) {
 
   if (error || !lesson) {
     return (
-      <div className="fixed inset-0 bg-[#131F24] flex items-center justify-center">
+      <div className="fixed inset-0 bg-[#0E0D0C] flex items-center justify-center">
         <div className="text-center px-6">
           <p className="text-red-400 mb-4">{error || 'Lesson not found'}</p>
           <button

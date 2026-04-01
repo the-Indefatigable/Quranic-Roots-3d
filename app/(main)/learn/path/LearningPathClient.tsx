@@ -128,6 +128,35 @@ export function LearningPathClient() {
       {/* ══ PATH ═══════════════════════════════════════════════ */}
       <LearningPath units={units} />
 
+      {/* ══ COMING SOON ════════════════════════════════════════ */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-100px' }}
+        transition={{ duration: 0.6 }}
+        className="mt-16 mx-auto max-w-lg px-6"
+      >
+        <div 
+          className="relative overflow-hidden rounded-3xl p-8 text-center border"
+          style={{ 
+            background: 'linear-gradient(180deg, rgba(212,162,70,0.03) 0%, rgba(212,162,70,0.08) 100%)',
+            borderColor: 'rgba(212,162,70,0.15)',
+          }}
+        >
+          {/* Decorative glow */}
+          <div 
+            className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-32 blur-3xl pointer-events-none"
+            style={{ background: 'rgba(212,162,70,0.08)' }}
+          />
+
+          <span className="text-4xl block mb-4 relative z-10 drop-shadow-lg">✨</span>
+          <h3 className="text-[#F0E4CA] text-xl font-bold mb-2 relative z-10">More Modules Coming Soon</h3>
+          <p className="text-[#A09F9B] text-sm leading-relaxed relative z-10 max-w-[280px] mx-auto">
+            We are actively crafting new interactive lessons. Expect advanced Sarf & Nahw mechanics, dialogue practice, and deeper Quranic immersion shortly!
+          </p>
+        </div>
+      </motion.div>
+
       {/* ══ FOOTER ORNAMENT ════════════════════════════════════ */}
       <motion.div
         initial={{ opacity: 0 }}

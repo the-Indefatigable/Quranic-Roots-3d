@@ -43,7 +43,7 @@ export function ListenIdentifyStep({ content, onAnswer }: Props) {
         className={`w-full flex items-center justify-center gap-3 py-5 rounded-2xl mb-6 transition-all ${
           isPlaying
             ? 'bg-[#D4A246] text-[#0E0D0C] shadow-lg shadow-[#D4A246]/20'
-            : 'bg-[#1A2F36] text-white/80 hover:bg-[#1A2F36]/80'
+            : 'bg-[#1A1918] text-white/80 hover:bg-[#1A1918]/80'
         }`}
       >
         {isPlaying ? (
@@ -79,9 +79,9 @@ export function ListenIdentifyStep({ content, onAnswer }: Props) {
           const isCorrect = option === content.correctAnswer;
           const showResult = selected !== null;
           
-          let bgClass = 'bg-[#1A2F36] hover:bg-[#1A2F36]/80 border-transparent';
+          let bgClass = 'bg-[#1A1918] hover:bg-[#1A1918]/80 border-transparent';
           if (showResult && isCorrect) {
-            bgClass = 'bg-[#58CC02]/20 border-[#58CC02]';
+            bgClass = 'bg-[#5CB889]/20 border-[#5CB889]';
           } else if (showResult && isSelected && !isCorrect) {
             bgClass = 'bg-[#FF4B4B]/20 border-[#FF4B4B]';
           }
