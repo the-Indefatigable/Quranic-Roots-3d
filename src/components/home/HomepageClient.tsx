@@ -97,7 +97,7 @@ const SAMPLE_ROOTS = [
 // ── Feature cards data ────────────────────────────────────────────────
 const FEATURES = [
   {
-    color: '#0D9488',
+    color: '#D4A246',
     href: '/quran',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="w-6 h-6">
@@ -467,7 +467,7 @@ export function HomepageClient() {
       ══════════════════════════════════════════════════════ */}
       <section className="px-5 py-20 max-w-3xl mx-auto" data-reveal-group>
         <div className="text-center mb-10">
-          <p className="reveal text-[10px] uppercase tracking-[0.25em] font-bold mb-3" style={{ color: '#0D9488', '--reveal-delay': '0s' } as React.CSSProperties}>
+          <p className="reveal text-[10px] uppercase tracking-[0.25em] font-bold mb-3" style={{ color: '#D4A246', '--reveal-delay': '0s' } as React.CSSProperties}>
             Try it now
           </p>
           <h2 className="reveal font-heading text-3xl sm:text-4xl mb-3" style={{ color: '#F0E8D8', letterSpacing: '-0.02em', '--reveal-delay': '0.07s' } as React.CSSProperties}>
@@ -493,7 +493,7 @@ export function HomepageClient() {
             style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
           >
             <span className="text-xs font-medium" style={{ color: '#636260' }}>{DEMO_AYAH.reference}</span>
-            <Link href={DEMO_AYAH.surahLink} className="text-xs font-medium transition-colors" style={{ color: '#0D9488' }}>
+            <Link href={DEMO_AYAH.surahLink} className="text-xs font-medium transition-colors" style={{ color: '#D4A246' }}>
               Read full surah →
             </Link>
           </div>

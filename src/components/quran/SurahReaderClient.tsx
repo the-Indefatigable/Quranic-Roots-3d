@@ -554,7 +554,7 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, surahArabicNa
                         <button
                           onClick={() => setTafsirAyah({ surah: block.surahNumber, ayah: ayah.number })}
                           className="flex items-center gap-1.5 text-[11px] px-2.5 py-1.5 rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100"
-                          style={{ background: 'rgba(13,148,136,0.08)', color: '#5AB8A8', border: '1px solid rgba(13,148,136,0.15)' }}
+                          style={{ background: 'rgba(212,162,70,0.08)', color: '#D4A246', border: '1px solid rgba(212,162,70,0.15)' }}
                         >
                           <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
@@ -570,10 +570,10 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, surahArabicNa
                       >
                         {copiedKey === `${block.surahNumber}:${ayah.number}` ? (
                           <>
-                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ color: '#5AB8A8' }}>
+                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ color: '#D4A246' }}>
                               <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                             </svg>
-                            <span style={{ color: '#5AB8A8' }}>Copied</span>
+                            <span style={{ color: '#D4A246' }}>Copied</span>
                           </>
                         ) : (
                           <>

@@ -19,7 +19,7 @@ const TOPICS = [
     arabic: 'الإعراب',
     description: 'Understand how Arabic words change their endings based on grammatical function — the foundation of reading the Quran without translation.',
     level: 'Essential',
-    color: '#0D9488',
+    color: '#D4A246',
     icon: '⬡',
   },
   {
@@ -28,7 +28,7 @@ const TOPICS = [
     arabic: 'مفرد · مثنى · جمع',
     description: 'Learn how Arabic nouns and adjectives change form for one, two, or many — including sound plurals and broken plurals throughout the Quran.',
     level: 'Essential',
-    color: '#0D9488',
+    color: '#D4A246',
     icon: '◈',
   },
   {
@@ -61,7 +61,7 @@ const TOPICS = [
 ];
 
 const LEVEL_STYLE: Record<string, { bg: string; text: string }> = {
-  Essential:    { bg: 'rgba(13,148,136,0.12)',  text: '#5AB8A8' },
+  Essential:    { bg: 'rgba(212,162,70,0.12)',   text: '#D4A246' },
   Intermediate: { bg: 'rgba(217,119,6,0.12)',   text: '#D4A246' },
   Advanced:     { bg: 'rgba(124,58,237,0.12)',  text: '#A78BFA' },
 };

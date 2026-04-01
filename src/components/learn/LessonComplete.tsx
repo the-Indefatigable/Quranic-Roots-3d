@@ -76,7 +76,7 @@ export function LessonComplete({ data, onContinue }: LessonCompleteProps) {
               }}
               className="absolute w-3 h-3 rounded-sm"
               style={{
-                backgroundColor: ['#0D9488', '#1CB0F6', '#D97706', '#059669', '#CE82FF'][i % 5],
+                backgroundColor: ['#D4A246', '#1CB0F6', '#D97706', '#059669', '#CE82FF'][i % 5],
               }}
             />
           ))}
@@ -169,7 +169,7 @@ export function LessonComplete({ data, onContinue }: LessonCompleteProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.0 }}
           onClick={onContinue}
-          className="w-full max-w-xs py-4 rounded-2xl bg-[#0D9488] text-white font-bold text-lg shadow-[0_4px_0_#0a756b] hover:shadow-[0_2px_0_#0a756b] hover:translate-y-[2px] active:shadow-none active:translate-y-[4px] transition-all mt-4"
+          className="w-full max-w-xs py-4 rounded-2xl bg-[#D4A246] text-[#0E0D0C] font-bold text-lg shadow-[0_4px_0_#B4842A] hover:shadow-[0_2px_0_#B4842A] hover:translate-y-[2px] active:shadow-none active:translate-y-[4px] transition-all mt-4"
         >
           Continue
         </motion.button>

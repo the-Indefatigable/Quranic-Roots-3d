@@ -38,7 +38,7 @@ const SILENCE_FRAMES = 100; // ~1.7s at 60fps before auto-stop
 function getColors() {
   const s = getComputedStyle(document.documentElement);
   return {
-    primary:      s.getPropertyValue('--color-primary').trim()       || '#5AB8A8',
+    primary:      s.getPropertyValue('--color-primary').trim()       || '#D4A246',
     accent:       s.getPropertyValue('--color-accent').trim()        || '#D4A246',
     correct:      s.getPropertyValue('--color-correct').trim()       || '#5CB889',
     wrong:        s.getPropertyValue('--color-wrong').trim()         || '#D9635B',
@@ -434,8 +434,8 @@ export function GuidedPractice({
         ctx.lineWidth = 2.5;
         ctx.lineJoin = 'round';
         ctx.lineCap = 'round';
-        ctx.strokeStyle = '#0D9488';
-        ctx.shadowColor = '#0D9488';
+        ctx.strokeStyle = '#D4A246';
+        ctx.shadowColor = '#D4A246';
         ctx.shadowBlur = 8;
         let started = false;
         for (let i = 0; i < count; i++) {
@@ -535,7 +535,7 @@ export function GuidedPractice({
 
       // ── Phase badge (top-left, inside canvas) ──
       const badges: Record<string, { text: string; color: string; bg: string }> = {
-        listening: { text: '🎧  LISTENING', color: '#0D9488', bg: 'rgba(13,148,136,0.12)' },
+        listening: { text: '🎧  LISTENING', color: '#D4A246', bg: 'rgba(212,162,70,0.12)' },
         recording: { text: '🎤  YOUR TURN', color: '#FF4B4B', bg: 'rgba(255,75,75,0.12)' },
         together:  { text: '🎵  TOGETHER', color: '#D4A246', bg: 'rgba(212,162,70,0.12)' },
       };
@@ -578,9 +578,9 @@ export function GuidedPractice({
       ctx.font = '9px system-ui';
       ctx.textAlign = 'left';
       // Qari legend
-      ctx.fillStyle = '#0D9488';
+      ctx.fillStyle = '#D4A246';
       ctx.fillRect(GRID_LEFT + 10, legendY + 10, 12, 3);
-      ctx.shadowColor = '#0D9488'; ctx.shadowBlur = 4;
+      ctx.shadowColor = '#D4A246'; ctx.shadowBlur = 4;
       ctx.fillRect(GRID_LEFT + 10, legendY + 10, 12, 3);
       ctx.shadowBlur = 0;
       ctx.fillStyle = 'rgba(255,255,255,0.4)';
@@ -713,8 +713,8 @@ export function GuidedPractice({
               <span
                 className="px-3 py-1 rounded-full text-xs font-bold"
                 style={{
-                  background: sessionStats.averageScore >= 80 ? 'rgba(92,184,168,0.15)' : sessionStats.averageScore >= 50 ? 'rgba(212,162,70,0.15)' : 'rgba(217,99,91,0.15)',
-                  color:      sessionStats.averageScore >= 80 ? '#5AB8A8'               : sessionStats.averageScore >= 50 ? '#D4A246'               : '#D9635B',
+                  background: sessionStats.averageScore >= 80 ? 'rgba(212,162,70,0.15)' : sessionStats.averageScore >= 50 ? 'rgba(212,162,70,0.10)' : 'rgba(217,99,91,0.15)',
+                  color:      sessionStats.averageScore >= 80 ? '#D4A246'               : sessionStats.averageScore >= 50 ? '#D4A246'               : '#D9635B',
                 }}
               >
                 Session avg: {sessionStats.averageScore}%
@@ -752,9 +752,9 @@ export function GuidedPractice({
 
       {/* ── LISTENING badge ── */}
       {phase === 'listening' && (
-        <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 px-3 py-1.5 rounded-full" style={{ background: 'rgba(13,148,136,0.2)', border: '1px solid rgba(13,148,136,0.3)' }}>
-          <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: '#5AB8A8' }} />
-          <span className="text-xs font-medium" style={{ color: '#5AB8A8' }}>Step 1 — Listening to Qari</span>
+        <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 px-3 py-1.5 rounded-full" style={{ background: 'rgba(212,162,70,0.2)', border: '1px solid rgba(212,162,70,0.3)' }}>
+          <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: '#D4A246' }} />
+          <span className="text-xs font-medium" style={{ color: '#D4A246' }}>Step 1 — Listening to Qari</span>
         </div>
       )}
 
@@ -870,14 +870,14 @@ export function GuidedPractice({
 // ─── Sub-components ───
 
 function gradeColor(grade: string) {
-  if (grade === 'A') return { bg: 'rgba(92,184,168,0.15)',  text: '#5AB8A8' };
-  if (grade === 'B') return { bg: 'rgba(92,184,168,0.10)',  text: '#5AB8A8' };
+  if (grade === 'A') return { bg: 'rgba(212,162,70,0.15)',  text: '#D4A246' };
+  if (grade === 'B') return { bg: 'rgba(212,162,70,0.10)',  text: '#D4A246' };
   if (grade === 'C') return { bg: 'rgba(212,162,70,0.15)', text: '#D4A246' };
   return                    { bg: 'rgba(217,99,91,0.15)',  text: '#D9635B' };
 }
 
 function ScoreBar({ label, value }: { label: string; value: number }) {
-  const color = value >= 80 ? '#5AB8A8' : value >= 60 ? '#D4A246' : '#D9635B';
+  const color = value >= 80 ? '#D4A246' : value >= 60 ? '#E8B84B' : '#D9635B';
   return (
     <div className="flex items-center gap-2">
       <span className="text-[10px] w-12 text-right" style={{ color: '#57534E' }}>{label}</span>

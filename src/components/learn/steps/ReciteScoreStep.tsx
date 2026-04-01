@@ -332,7 +332,7 @@ export function ReciteScoreStep({ content, onAnswer }: Props) {
                   className="w-1.5 rounded-full animate-pulse"
                   style={{
                     height: `${h * 2}px`,
-                    background: '#0D9488',
+                    background: '#D4A246',
                     animationDelay: `${i * 0.12}s`,
                     animationDuration: '1s',
                   }}

@@ -36,7 +36,7 @@ const MAX_PITCH_HISTORY = 200;
 function getColors() {
   const s = getComputedStyle(document.documentElement);
   return {
-    primary: s.getPropertyValue('--color-primary').trim() || '#5AB8A8',
+    primary: s.getPropertyValue('--color-primary').trim() || '#D4A246',
     accent: s.getPropertyValue('--color-accent').trim() || '#D4A246',
     correct: s.getPropertyValue('--color-correct').trim() || '#5CB889',
     wrong: s.getPropertyValue('--color-wrong').trim() || '#D9635B',

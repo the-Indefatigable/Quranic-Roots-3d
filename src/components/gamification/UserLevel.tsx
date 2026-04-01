@@ -41,8 +41,8 @@ export function UserLevel({
         <div
           className="absolute inset-0 rounded-full opacity-100"
           style={{
-            background: `conic-gradient(from 0deg, #2DD4BF, #0D9488, #2DD4BF)`,
-            boxShadow: `0 0 20px #2DD4BF40`,
+            background: `conic-gradient(from 0deg, #E8B84B, #D4A246, #E8B84B)`,
+            boxShadow: `0 0 20px #D4A24640`,
           }}
         />
 

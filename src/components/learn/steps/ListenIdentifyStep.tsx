@@ -42,7 +42,7 @@ export function ListenIdentifyStep({ content, onAnswer }: Props) {
         onClick={playAudio}
         className={`w-full flex items-center justify-center gap-3 py-5 rounded-2xl mb-6 transition-all ${
           isPlaying
-            ? 'bg-[#0D9488] text-white shadow-lg shadow-[#0D9488]/20'
+            ? 'bg-[#D4A246] text-[#0E0D0C] shadow-lg shadow-[#D4A246]/20'
             : 'bg-[#1A2F36] text-white/80 hover:bg-[#1A2F36]/80'
         }`}
       >
