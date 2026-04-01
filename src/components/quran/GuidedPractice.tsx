@@ -174,8 +174,10 @@ export function GuidedPractice({
   }, []);
 
   const resetBuffers = () => {
-    qariPitchesRef.current   = [];
-    userPitchesRef.current   = [];
+    // Pre-fill with MAX_HISTORY nulls so the canvas stays full-width and
+    // new data scrolls in from the right rather than growing from nothing.
+    qariPitchesRef.current   = new Array(MAX_HISTORY).fill(null);
+    userPitchesRef.current   = new Array(MAX_HISTORY).fill(null);
     silenceFramesRef.current = 0;
   };
 
@@ -324,6 +326,7 @@ export function GuidedPractice({
         qariAnalyserRef.current.getFloatTimeDomainData(buf);
         const r = detectPitchYIN(buf, sampleRate);
         qariPitchesRef.current.push(r?.frequency ?? null);
+        if (qariPitchesRef.current.length > MAX_HISTORY) qariPitchesRef.current.shift();
       }
 
       // ── Collect user pitch ──
@@ -333,6 +336,7 @@ export function GuidedPractice({
         const r     = detectPitchYIN(buf, sampleRate);
         const pitch = r?.frequency ?? null;
         userPitchesRef.current.push(pitch);
+        if (userPitchesRef.current.length > MAX_HISTORY) userPitchesRef.current.shift();
 
         if (currentPhase === 'recording') {
           if (!pitch) {
