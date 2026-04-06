@@ -5,7 +5,7 @@
 
 import { db, dbQuery } from '@/db';
 import { users } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 
 /**
  * Level threshold configuration
@@ -93,12 +93,12 @@ export async function addXPToUser(
   // Calculate new level
   const { level: newLevel, levelProgress } = calculateLevelFromXP(newTotalXP);
 
-  // Update user
+  // Atomic XP update to prevent race conditions under concurrent requests
   await dbQuery(() =>
     db
       .update(users)
       .set({
-        totalXP: newTotalXP,
+        totalXP: sql`${users.totalXP} + ${xpAmount}`,
         userLevel: newLevel,
         levelProgress,
       })

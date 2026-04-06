@@ -18,15 +18,20 @@ import {
   users,
 } from '@/db/schema';
 import { eq, and, sql } from 'drizzle-orm';
+import { z } from 'zod';
 
-interface CompletionPayload {
-  score: number;
-  correctCount: number;
-  totalCount: number;
-  mistakes: Array<{ stepIndex: number; userAnswer: string; correctAnswer: string }>;
-  comboMax: number;
-  timeSpentS: number;
-}
+const CompletionPayloadSchema = z.object({
+  score: z.number().int().min(0).max(100),
+  correctCount: z.number().int().min(0).max(200),
+  totalCount: z.number().int().min(1).max(200),
+  mistakes: z.array(z.object({
+    stepIndex: z.number().int().min(0),
+    userAnswer: z.string(),
+    correctAnswer: z.string(),
+  })),
+  comboMax: z.number().int().min(0).max(200),
+  timeSpentS: z.number().int().min(0).max(7200), // max 2 hours
+});
 
 /** POST /api/learn/lessons/:lessonId/complete — mark lesson as completed */
 export async function POST(
@@ -41,8 +46,12 @@ export async function POST(
     }
 
     const { lessonId } = await params;
-    const body: CompletionPayload = await request.json();
-    const { score, correctCount, totalCount, mistakes, comboMax, timeSpentS } = body;
+    const rawBody = await request.json();
+    const parsed = CompletionPayloadSchema.safeParse(rawBody);
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid payload', details: parsed.error.format() }, { status: 400 });
+    }
+    const { score, correctCount, totalCount, mistakes, comboMax, timeSpentS } = parsed.data;
 
     // Qirat lessons are static — skip DB operations, just return success
     if (lessonId.startsWith('qirat-')) {

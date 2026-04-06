@@ -105,7 +105,6 @@ export async function GET(
     {
       headers: {
         'Cache-Control': 'public, s-maxage=86400, stale-while-revalidate=604800',
-        'Access-Control-Allow-Origin': '*',
       },
     }
   );

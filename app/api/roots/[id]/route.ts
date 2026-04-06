@@ -100,6 +100,7 @@ export async function GET(
 }
 
 import { z } from 'zod';
+import { auth } from '@/lib/auth';
 
 const RootPatchSchema = z.object({
   meaning: z.string().optional(),
@@ -109,6 +110,11 @@ export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const session = await auth();
+  if (!session?.user?.id || session.user.role !== 'admin') {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+
   const { id } = await params;
   const rootId = decodeURIComponent(id);
 
