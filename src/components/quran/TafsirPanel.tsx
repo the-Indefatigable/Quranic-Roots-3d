@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import DOMPurify from 'isomorphic-dompurify';
 
 interface TafsirEntry {
   ayahNumber: number;
@@ -209,14 +210,17 @@ export function TafsirPanel({ surahNumber, ayahNumber, ayahs, onClose }: Props) 
                     </div>
                   )}
 
-                  <div 
+                  <div
                     className="text-sm text-text-secondary leading-relaxed whitespace-pre-line tafsir-content"
                     dangerouslySetInnerHTML={{
-                      __html: entry.text
-                        // Bold
-                        .replace(/\*\*(.*?)\*\*/g, '<strong class="text-text font-medium">$1</strong>')
-                        // H3 Headers (###)
-                        .replace(/^###\s+(.*)$/gm, '<h3 class="text-base text-primary mt-6 mb-2 font-medium">$1</h3>')
+                      __html: DOMPurify.sanitize(
+                        entry.text
+                          // Bold
+                          .replace(/\*\*(.*?)\*\*/g, '<strong class="text-text font-medium">$1</strong>')
+                          // H3 Headers (###)
+                          .replace(/^###\s+(.*)$/gm, '<h3 class="text-base text-primary mt-6 mb-2 font-medium">$1</h3>'),
+                        { ALLOWED_TAGS: ['strong', 'h3', 'em', 'br', 'p'], ALLOWED_ATTR: ['class'] }
+                      )
                     }}
                   />
                 </div>

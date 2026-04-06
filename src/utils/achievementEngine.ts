@@ -5,7 +5,7 @@
 
 import { db, dbQuery } from '@/db';
 import { achievements, userAchievements, users } from '@/db/schema';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, sql } from 'drizzle-orm';
 
 export interface Achievement {
   id: string;
@@ -98,21 +98,14 @@ export async function unlockAchievement(
     })
   );
 
-  // Award XP if enabled
+  // Award XP if enabled — atomic increment to prevent race conditions
   const xpBonus = achievement.xpBonus || 0;
   if (awardXP && xpBonus > 0) {
-    // Get current XP
-    const [user] = await dbQuery(() =>
-      db.select({ totalXP: users.totalXP }).from(users).where(eq(users.id, userId))
-    );
-    const currentXP = user?.totalXP || 0;
-
-    // Update with new XP
     await dbQuery(() =>
       db
         .update(users)
         .set({
-          totalXP: currentXP + xpBonus,
+          totalXP: sql`${users.totalXP} + ${xpBonus}`,
         })
         .where(eq(users.id, userId))
     );

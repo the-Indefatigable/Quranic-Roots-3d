@@ -3,7 +3,8 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { db, dbQuery } from '@/db';
-import { quizAttempts } from '@/db/schema';
+import { quizAttempts, quizSessions } from '@/db/schema';
+import { eq, and } from 'drizzle-orm';
 import { updateMasteryInDB } from '@/utils/srsEngine';
 import { validateAnswer, validateMCQ, validateStructured } from '@/utils/answerValidator';
 import { z } from 'zod';
@@ -13,9 +14,9 @@ const SubmitAnswerSchema = z.object({
   itemId: z.string().uuid(),
   itemType: z.enum(['root', 'noun', 'particle', 'lesson_vocab', 'quran_verse']),
   questionType: z.string(),
-  questPrompt: z.any().optional(),
-  userAnswer: z.any(),
-  correctAnswer: z.any(),
+  questPrompt: z.union([z.string(), z.record(z.string(), z.unknown())]).optional(),
+  userAnswer: z.union([z.string(), z.record(z.string(), z.unknown())]),
+  correctAnswer: z.union([z.string(), z.record(z.string(), z.unknown())]),
   validAnswers: z.array(z.string()).optional(),
   responseTime_ms: z.number().int().nonnegative().optional(),
 });
@@ -49,23 +50,34 @@ export async function POST(req: NextRequest) {
       responseTime_ms,
     } = parsed.data;
 
+    // Verify session belongs to this user
+    const [quizSession] = await dbQuery(() =>
+      db
+        .select({ id: quizSessions.id })
+        .from(quizSessions)
+        .where(and(eq(quizSessions.id, sessionId), eq(quizSessions.userId, session.user.id)))
+    );
+    if (!quizSession) {
+      return NextResponse.json({ error: 'Session not found' }, { status: 404 });
+    }
+
     // Determine if answer is correct based on question type
     let isCorrect = false;
     let feedback = '';
 
     if (questionType === 'translate_conjugation' || questionType === 'translate_noun' || questionType === 'translate_particle') {
       // Text answer with diacritic flexibility
-      const validation = validateAnswer(userAnswer, validAnswers || [correctAnswer]);
+      const validation = validateAnswer(userAnswer as string, (validAnswers || [correctAnswer]) as string[]);
       isCorrect = validation.isCorrect;
       feedback = validation.feedback;
     } else if (questionType.startsWith('mcq_')) {
       // Multiple choice
-      const validation = validateMCQ(userAnswer, correctAnswer);
+      const validation = validateMCQ(userAnswer as string, correctAnswer as string);
       isCorrect = validation.isCorrect;
       feedback = validation.feedback;
     } else if (questionType === 'identify_conjugation' || questionType === 'identify_root') {
       // Structured answer
-      const validation = validateStructured(userAnswer, correctAnswer);
+      const validation = validateStructured(userAnswer as Record<string, any>, correctAnswer as Record<string, any>);
       isCorrect = validation.isCorrect;
       feedback = validation.feedback;
     }

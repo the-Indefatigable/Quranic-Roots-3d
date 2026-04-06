@@ -33,6 +33,18 @@ export async function POST(req: NextRequest) {
     
     const { sessionId, totalTime } = parsed.data;
 
+    // Verify session belongs to this user
+    const [quizSession] = await dbQuery(() =>
+      db
+        .select({ id: quizSessions.id })
+        .from(quizSessions)
+        .where(and(eq(quizSessions.id, sessionId), eq(quizSessions.userId, session.user.id)))
+    );
+
+    if (!quizSession) {
+      return NextResponse.json({ error: 'Session not found' }, { status: 404 });
+    }
+
     // Get all attempts for this session
     const attempts = await dbQuery(() =>
       db
@@ -42,7 +54,7 @@ export async function POST(req: NextRequest) {
     );
 
     if (attempts.length === 0) {
-      return NextResponse.json({ error: 'Session not found' }, { status: 404 });
+      return NextResponse.json({ error: 'No attempts found' }, { status: 404 });
     }
 
     // Calculate stats

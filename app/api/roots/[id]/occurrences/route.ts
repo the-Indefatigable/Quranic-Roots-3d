@@ -8,8 +8,8 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   const rootSpaced = rootUnspaced.split('').join(' ');
 
   const url = new URL(req.url);
-  const offset = parseInt(url.searchParams.get('offset') || '0');
-  const limit = parseInt(url.searchParams.get('limit') || '10');
+  const offset = Math.max(parseInt(url.searchParams.get('offset') || '0') || 0, 0);
+  const limit = Math.min(Math.max(parseInt(url.searchParams.get('limit') || '10') || 10, 1), 50);
 
   try {
     // Get distinct ayahs with this root, paginated
@@ -32,41 +32,39 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     const pairs = distinctAyahs.map((a) => ({ surah: a.surahNumber, ayah: a.ayahNumber }));
     const pairSql = sql`(${sql.join(pairs.map((p) => sql`(${p.surah}, ${p.ayah})`), sql`, `)})`;
 
-    // Fetch all words for these ayahs
-    const allWords = await db
-      .select({
-        surahNumber: quranWords.surahNumber,
-        ayahNumber: quranWords.ayahNumber,
-        position: quranWords.position,
-        textUthmani: quranWords.textUthmani,
-        charType: quranWords.charType,
-        rootArabic: quranWords.rootArabic,
-      })
-      .from(quranWords)
-      .where(sql`(${quranWords.surahNumber}, ${quranWords.ayahNumber}) IN ${pairSql}`)
-      .orderBy(asc(quranWords.surahNumber), asc(quranWords.ayahNumber), asc(quranWords.position));
-
-    // Fetch translations
-    const transRows = await db
-      .select({
-        surahNumber: translationEntries.surahNumber,
-        ayahNumber: translationEntries.ayahNumber,
-        text: translationEntries.text,
-      })
-      .from(translationEntries)
-      .where(sql`(${translationEntries.surahNumber}, ${translationEntries.ayahNumber}) IN ${pairSql}`);
+    // Fetch words, translations, and surah names in parallel
+    const surahNums = [...new Set(pairs.map((p) => p.surah))];
+    const [allWords, transRows, surahRows] = await Promise.all([
+      db
+        .select({
+          surahNumber: quranWords.surahNumber,
+          ayahNumber: quranWords.ayahNumber,
+          position: quranWords.position,
+          textUthmani: quranWords.textUthmani,
+          charType: quranWords.charType,
+          rootArabic: quranWords.rootArabic,
+        })
+        .from(quranWords)
+        .where(sql`(${quranWords.surahNumber}, ${quranWords.ayahNumber}) IN ${pairSql}`)
+        .orderBy(asc(quranWords.surahNumber), asc(quranWords.ayahNumber), asc(quranWords.position)),
+      db
+        .select({
+          surahNumber: translationEntries.surahNumber,
+          ayahNumber: translationEntries.ayahNumber,
+          text: translationEntries.text,
+        })
+        .from(translationEntries)
+        .where(sql`(${translationEntries.surahNumber}, ${translationEntries.ayahNumber}) IN ${pairSql}`),
+      db
+        .select({ number: surahs.number, englishName: surahs.englishName })
+        .from(surahs)
+        .where(inArray(surahs.number, surahNums)),
+    ]);
 
     const transMap = new Map<string, string>();
     for (const t of transRows) {
       transMap.set(`${t.surahNumber}:${t.ayahNumber}`, t.text);
     }
-
-    // Fetch surah names
-    const surahNums = [...new Set(pairs.map((p) => p.surah))];
-    const surahRows = await db
-      .select({ number: surahs.number, englishName: surahs.englishName })
-      .from(surahs)
-      .where(inArray(surahs.number, surahNums));
 
     const surahNameMap = new Map<number, string>();
     for (const s of surahRows) {

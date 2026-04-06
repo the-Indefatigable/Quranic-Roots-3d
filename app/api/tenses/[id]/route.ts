@@ -7,9 +7,10 @@ import { cacheInvalidate } from '../../../../src/db/cache';
 export const dynamic = 'force-dynamic';
 
 import { z } from 'zod';
+import { auth } from '@/lib/auth';
 
 const TensePatchSchema = z.object({
-  conjugations: z.any().optional(),
+  conjugations: z.record(z.string(), z.string()).optional(),
   arabicName: z.string().optional(),
   englishName: z.string().optional(),
 });
@@ -18,6 +19,11 @@ export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const session = await auth();
+  if (!session?.user?.id || session.user.role !== 'admin') {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+
   const { id } = await params;
 
   try {

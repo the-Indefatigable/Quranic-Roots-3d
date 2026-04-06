@@ -41,22 +41,23 @@ export async function updateMasteryInDB(
   isCorrect: boolean,
   totalInSession: number = 1
 ): Promise<MasteryUpdate> {
-  const table =
-    itemType === 'root'
-      ? userRootMastery
-      : itemType === 'noun'
-        ? userNounMastery
-        : userParticleMastery;
+  // Map to the correct table and item column based on type
+  const tableConfig = {
+    root:     { table: userRootMastery,     itemCol: userRootMastery.rootId },
+    noun:     { table: userNounMastery,     itemCol: userNounMastery.nounId },
+    particle: { table: userParticleMastery, itemCol: userParticleMastery.particleId },
+  } as const;
+  const { table, itemCol } = tableConfig[itemType];
 
   // Fetch current mastery record
   const [current] = await dbQuery(() =>
     db
       .select()
-      .from(table as any)
+      .from(table)
       .where(
         and(
-          eq((table as any).userId, userId),
-          eq((table as any).itemId, itemId)
+          eq(table.userId, userId),
+          eq(itemCol, itemId)
         )
       )
   );
@@ -96,12 +97,15 @@ export async function updateMasteryInDB(
   // Determine XP earned
   const earnedXP = isCorrect ? 10 : 0;
 
+  // Build the item column key for insert (rootId, nounId, or particleId)
+  const itemColumnKey = itemType === 'root' ? 'rootId' : itemType === 'noun' ? 'nounId' : 'particleId';
+
   // Upsert mastery record
   await dbQuery(async () => {
     if (current) {
       // Update existing
       return db
-        .update(table as any)
+        .update(table)
         .set({
           mastery: newMastery,
           nextReview,
@@ -111,21 +115,21 @@ export async function updateMasteryInDB(
         })
         .where(
           and(
-            eq((table as any).userId, userId),
-            eq((table as any).itemId, itemId)
+            eq(table.userId, userId),
+            eq(itemCol, itemId)
           )
         );
     } else {
       // Insert new
-      return db.insert(table as any).values({
+      return db.insert(table).values({
         userId,
-        itemId,
+        [itemColumnKey]: itemId,
         mastery: isCorrect ? 1 : 0,
         nextReview,
         totalAttempts: 1,
         correctAttempts: isCorrect ? 1 : 0,
         updatedAt: new Date(),
-      });
+      } as any);
     }
   });
 

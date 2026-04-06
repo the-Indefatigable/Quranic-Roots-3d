@@ -14,7 +14,14 @@ export async function GET(req: NextRequest) {
     }
 
     const user = await dbQuery(() =>
-      db.select().from(users).where(eq(users.id, session.user.id))
+      db.select({
+        id: users.id,
+        name: users.name,
+        email: users.email,
+        totalXP: users.totalXP,
+        userLevel: users.userLevel,
+        levelProgress: users.levelProgress,
+      }).from(users).where(eq(users.id, session.user.id))
     );
 
     if (!user.length) {
