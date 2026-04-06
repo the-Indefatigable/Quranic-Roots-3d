@@ -5,7 +5,6 @@ import { auth } from '@/lib/auth';
 import { db, dbQuery } from '@/db';
 import { quizSessions, userRootMastery, userNounMastery, userParticleMastery, achievements, userAchievements } from '@/db/schema';
 import { eq } from 'drizzle-orm';
-import { getUserStats } from '@/utils/srsEngine';
 import { getUserLevelInfo } from '@/utils/levelEngine';
 
 export async function GET(req: NextRequest) {
@@ -76,8 +75,12 @@ export async function GET(req: NextRequest) {
       unlockedAt: unlockedMap.get(a.id)?.toISOString() ?? null,
     }));
 
-    // Get mastery stats
-    const srsStats = await getUserStats(userId);
+    // Compute SRS stats from already-fetched mastery data (no extra queries)
+    const allMasteryItems = [...roots, ...nouns, ...particles];
+    const totalLearned = allMasteryItems.filter((item) => (item.mastery ?? 0) >= 1).length;
+    const overallAvgMastery = allMasteryItems.length > 0
+      ? Math.round((allMasteryItems.reduce((sum, item) => sum + (item.mastery ?? 0), 0) / allMasteryItems.length) * 10) / 10
+      : 0;
 
     return NextResponse.json({
       totalSessions,
@@ -94,8 +97,8 @@ export async function GET(req: NextRequest) {
       },
       achievements: mergedAchievements,
       masteryBreakdown,
-      totalLearned: srsStats.totalLearned,
-      overallAvgMastery: srsStats.avgMastery,
+      totalLearned,
+      overallAvgMastery,
     });
   } catch (error) {
     console.error('[quiz/stats] Error:', error);

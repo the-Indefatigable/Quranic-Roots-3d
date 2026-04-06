@@ -12,7 +12,7 @@ function escapeLike(str: string) {
 }
 
 export async function GET(request: NextRequest) {
-  const raw = request.nextUrl.searchParams.get('q')?.trim() ?? '';
+  const raw = request.nextUrl.searchParams.get('q')?.trim()?.slice(0, 200) ?? '';
   if (raw.length < 1) {
     return NextResponse.json({ results: [] });
   }

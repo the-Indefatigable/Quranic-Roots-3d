@@ -14,35 +14,48 @@ export async function GET(
     return NextResponse.json({ error: 'Invalid surah number' }, { status: 400 });
   }
 
-  // Fetch surah info
-  const surahRows = await dbQuery(() =>
+  // Fetch surah info, ayahs, translation ID, and words in parallel
+  const [surahRows, ayahRows, translationRow, wordRows] = await Promise.all([
+    dbQuery(() =>
+      db
+        .select({
+          number: surahs.number,
+          arabicName: surahs.arabicName,
+          englishName: surahs.englishName,
+          versesCount: surahs.versesCount,
+          revelationType: surahs.revelationType,
+        })
+        .from(surahs)
+        .where(eq(surahs.number, surahNumber))
+        .limit(1)
+    ),
+    dbQuery(() =>
+      db.select().from(ayahs).where(eq(ayahs.surahNumber, surahNumber)).orderBy(asc(ayahs.ayahNumber))
+    ),
+    dbQuery(() =>
+      db.select({ id: translations.id }).from(translations).limit(1)
+    ),
     db
       .select({
-        number: surahs.number,
-        arabicName: surahs.arabicName,
-        englishName: surahs.englishName,
-        versesCount: surahs.versesCount,
-        revelationType: surahs.revelationType,
+        ayahNumber: quranWords.ayahNumber,
+        position: quranWords.position,
+        textUthmani: quranWords.textUthmani,
+        transliteration: quranWords.transliteration,
+        translation: quranWords.translation,
+        rootArabic: quranWords.rootArabic,
+        charType: quranWords.charType,
       })
-      .from(surahs)
-      .where(eq(surahs.number, surahNumber))
-      .limit(1)
-  );
+      .from(quranWords)
+      .where(eq(quranWords.surahNumber, surahNumber))
+      .orderBy(asc(quranWords.ayahNumber), asc(quranWords.position))
+      .catch(() => [] as any[]), // Table may not exist yet
+  ]);
 
   if (!surahRows[0]) {
     return NextResponse.json({ error: 'Surah not found' }, { status: 404 });
   }
 
-  // Fetch ayahs
-  const ayahRows = await dbQuery(() =>
-    db.select().from(ayahs).where(eq(ayahs.surahNumber, surahNumber)).orderBy(asc(ayahs.ayahNumber))
-  );
-
-  // Fetch translation
-  const translationRow = await dbQuery(() =>
-    db.select({ id: translations.id }).from(translations).limit(1)
-  );
-
+  // Fetch translation entries (depends on translationRow result)
   let translationMap: Record<number, string> = {};
   if (translationRow[0]) {
     const entries = await db
@@ -61,36 +74,18 @@ export async function GET(
     }
   }
 
-  // Fetch words
+  // Build words lookup
   let wordsByAyah: Record<number, any[]> = {};
-  try {
-    const wordRows = await db
-      .select({
-        ayahNumber: quranWords.ayahNumber,
-        position: quranWords.position,
-        textUthmani: quranWords.textUthmani,
-        transliteration: quranWords.transliteration,
-        translation: quranWords.translation,
-        rootArabic: quranWords.rootArabic,
-        charType: quranWords.charType,
-      })
-      .from(quranWords)
-      .where(eq(quranWords.surahNumber, surahNumber))
-      .orderBy(asc(quranWords.ayahNumber), asc(quranWords.position));
-
-    for (const w of wordRows) {
-      if (!wordsByAyah[w.ayahNumber]) wordsByAyah[w.ayahNumber] = [];
-      wordsByAyah[w.ayahNumber].push({
-        position: w.position,
-        textUthmani: w.textUthmani,
-        transliteration: w.transliteration,
-        translation: w.translation,
-        rootArabic: w.rootArabic,
-        charType: w.charType || 'word',
-      });
-    }
-  } catch {
-    // Table may not exist yet
+  for (const w of wordRows) {
+    if (!wordsByAyah[w.ayahNumber]) wordsByAyah[w.ayahNumber] = [];
+    wordsByAyah[w.ayahNumber].push({
+      position: w.position,
+      textUthmani: w.textUthmani,
+      transliteration: w.transliteration,
+      translation: w.translation,
+      rootArabic: w.rootArabic,
+      charType: w.charType || 'word',
+    });
   }
 
   const ayahData = ayahRows.map((a) => ({
