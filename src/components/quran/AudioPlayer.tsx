@@ -126,6 +126,8 @@ export function AudioPlayer({
   loopModeRef.current    = loopMode;
   totalAyahsRef.current  = totalAyahs;
 
+  const rafRef = useRef<number | null>(null);
+
   const [isPlaying, setIsPlaying]         = useState(false);
   const [currentAyah, _setCurrentAyah]    = useState(startAyah);
   const setCurrentAyah = useCallback((v: number | ((prev: number) => number)) => {
@@ -304,6 +306,14 @@ export function AudioPlayer({
   }, [audioElement, playAyah, startAyah]);
 
   useEffect(() => {
+    const audio = audioElement;
+    // If audio is already playing (e.g. user navigated away and came back),
+    // don't restart — just sync state and start the RAF loop.
+    if (!audio.paused && audio.src !== '') {
+      setIsPlaying(true);
+      startRAF();
+      return;
+    }
     if (playModeRef.current === 'surah') {
       if (timingsLoaded) {
         if (chapterAudioUrlRef.current) { playSurahAudio(startAyah); }
@@ -325,39 +335,60 @@ export function AudioPlayer({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [playMode, timingsLoaded]);
 
+  // ── RAF highlight loop — runs at 60fps for precise word/ayah sync ──────────
+  const doHighlight = useCallback(() => {
+    const audio = audioElement;
+    const ms = audio.currentTime * 1000;
+    if (usingSurahAudioRef.current) {
+      const segments = chapterSegmentsRef.current;
+      let foundAyah: number | null = null;
+      let foundWord: number | null = null;
+      for (let i = segments.length - 1; i >= 0; i--) {
+        if (ms >= segments[i].startMs) {
+          foundAyah = segments[i].ayahNumber;
+          if (ms < segments[i].endMs) foundWord = segments[i].wordPos;
+          break;
+        }
+      }
+      if (foundAyah && foundAyah !== currentAyahRef.current) {
+        setCurrentAyah(foundAyah);
+        onAyahChangeRef.current(foundAyah);
+      }
+      onWordChangeRef.current(foundWord);
+    } else {
+      const segments = ayahDataRef.current.get(currentAyahRef.current)?.segments ?? [];
+      const active = segments.find(([, start, end]) => ms >= start && ms < end);
+      onWordChangeRef.current(active ? active[0] : null);
+    }
+  }, [audioElement]);
+
+  const startRAF = useCallback(() => {
+    if (rafRef.current !== null) return;
+    const tick = () => {
+      doHighlight();
+      rafRef.current = requestAnimationFrame(tick);
+    };
+    rafRef.current = requestAnimationFrame(tick);
+  }, [doHighlight]);
+
+  const stopRAF = useCallback(() => {
+    if (rafRef.current !== null) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+  }, []);
+
   // ── Audio event handlers ───────────────────────────────────────────────────
   useEffect(() => {
     const audio = audioElement;
 
     function handleTimeUpdate() {
+      // Progress bar only — highlights are driven by RAF loop for 60fps precision
       if (!isSeeking) {
         const pct = audio.duration ? audio.currentTime / audio.duration : 0;
         setProgress(pct);
         setCurrentTime(audio.currentTime);
         setDuration(audio.duration || 0);
-      }
-      if (usingSurahAudioRef.current) {
-        const ms       = audio.currentTime * 1000;
-        const segments = chapterSegmentsRef.current;
-        let foundAyah: number | null = null;
-        let foundWord: number | null = null;
-        for (let i = segments.length - 1; i >= 0; i--) {
-          if (ms >= segments[i].startMs) {
-            foundAyah = segments[i].ayahNumber;
-            if (ms < segments[i].endMs) foundWord = segments[i].wordPos;
-            break;
-          }
-        }
-        if (foundAyah && foundAyah !== currentAyahRef.current) {
-          setCurrentAyah(foundAyah);
-          onAyahChangeRef.current(foundAyah);
-        }
-        onWordChangeRef.current(foundWord);
-      } else {
-        const ms       = audio.currentTime * 1000;
-        const segments = ayahDataRef.current.get(currentAyahRef.current)?.segments ?? [];
-        const active   = segments.find(([, start, end]) => ms >= start && ms < end);
-        onWordChangeRef.current(active ? active[0] : null);
       }
     }
 
@@ -400,8 +431,16 @@ export function AudioPlayer({
       }
     }
 
-    function handlePlay()           { setIsPlaying(true); if (audioCtxRef.current?.state === 'suspended') audioCtxRef.current.resume(); }
-    function handlePause()          { setIsPlaying(false); }
+    function handlePlay() {
+      setIsPlaying(true);
+      if (audioCtxRef.current?.state === 'suspended') audioCtxRef.current.resume();
+      startRAF();
+    }
+    function handlePause() {
+      setIsPlaying(false);
+      stopRAF();
+      onWordChangeRef.current(null);
+    }
     function handleLoadedMetadata() { setDuration(audio.duration || 0); }
 
     audio.addEventListener('timeupdate',     handleTimeUpdate);
@@ -415,10 +454,11 @@ export function AudioPlayer({
       audio.removeEventListener('play',           handlePlay);
       audio.removeEventListener('pause',          handlePause);
       audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      stopRAF();
     };
   // currentAyah/totalAyahs accessed via refs to avoid stale closures + re-attaching listeners
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [audioElement, playAyah, playSurahAudio, isSeeking]);
+  }, [audioElement, playAyah, playSurahAudio, isSeeking, startRAF, stopRAF]);
 
   // ── Controls ───────────────────────────────────────────────────────────────
   function togglePlay() {

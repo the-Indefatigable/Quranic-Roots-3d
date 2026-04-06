@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useAppStore } from '@/store/useAppStore';
+import { useGlobalAudioStore } from '@/store/useGlobalAudioStore';
 import { WordPopover, type WordData } from './WordPopover';
 import { TafsirPanel } from './TafsirPanel';
 import { AudioPlayer, type PlayMode, type LoopMode } from './AudioPlayer';
@@ -80,6 +81,7 @@ function toEastern(n: number): string {
 
 export function SurahReaderClient({ ayahs, surahNumber, surahName, surahArabicName, hasWords, hasTafsir }: Props) {
   const { quranSettings, updateQuranSettings, setLastRead, updateStreak, selectedQariId, setSelectedQariId } = useAppStore();
+  const { audioEl, setPlayInfo, updatePlayInfo } = useGlobalAudioStore();
   const [showSettings, setShowSettings] = useState(false);
   const [selectedWord, setSelectedWord] = useState<WordData | null>(null);
   const [wordAnchor, setWordAnchor] = useState<HTMLElement | null>(null);
@@ -231,41 +233,89 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, surahArabicNa
   const [audioPlayMode, setAudioPlayMode] = useState<PlayMode>('ayah');
   const [audioLoopMode, setAudioLoopMode] = useState<LoopMode>('none');
 
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  // Follow-playback toggle: whether reader auto-scrolls to active ayah
+  const [followPlayback, setFollowPlayback] = useState(true);
+  // Detect user-initiated scroll to suppress auto-scroll temporarily
+  const userScrollingRef = useRef(false);
+  const userScrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Auto-scroll to active ayah during playback
+  useEffect(() => {
+    if (!audioMode) return;
+    function onScroll() {
+      userScrollingRef.current = true;
+      if (userScrollTimerRef.current) clearTimeout(userScrollTimerRef.current);
+      userScrollTimerRef.current = setTimeout(() => {
+        userScrollingRef.current = false;
+      }, 2500);
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (userScrollTimerRef.current) clearTimeout(userScrollTimerRef.current);
+    };
+  }, [audioMode]);
+
+  // Auto-scroll to active ayah during playback — only if user isn't scrolling & follow is on
   const scrolledAyahRef = useRef<number | null>(null);
   useEffect(() => {
     if (!audioMode || audioCurrentAyah === null || !audioSurah) return;
+    if (!followPlayback || userScrollingRef.current) return;
     if (scrolledAyahRef.current === audioCurrentAyah) return;
     scrolledAyahRef.current = audioCurrentAyah;
     const el = document.getElementById(`s${audioSurah.surahNumber}-ayah-${audioCurrentAyah}`);
-    el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }, [audioCurrentAyah, audioMode, audioSurah]);
+    if (!el) return;
+    // Only scroll if the ayah is not already visible in viewport
+    const rect = el.getBoundingClientRect();
+    const inView = rect.top >= 80 && rect.bottom <= window.innerHeight - 80;
+    if (!inView) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, [audioCurrentAyah, audioMode, audioSurah, followPlayback]);
+
+  // Sync playback state to global store so PersistentMiniPlayer works across pages
+  useEffect(() => {
+    if (!audioMode || !audioSurah || audioCurrentAyah === null) return;
+    updatePlayInfo({
+      surahNumber: audioSurah.surahNumber,
+      surahName: audioSurah.surahName,
+      currentAyah: audioCurrentAyah,
+      totalAyahs: audioSurah.ayahs.length,
+      isPlaying: true,
+      playMode: audioPlayMode,
+      loopMode: audioLoopMode,
+    });
+  }, [audioCurrentAyah, audioMode, audioSurah, audioPlayMode, audioLoopMode, updatePlayInfo]);
 
   const openAudioMode = useCallback((block: SurahBlock, fromAyah?: number) => {
-    if (audioRef.current) {
-      audioRef.current.play().catch(() => {});
+    if (audioEl) {
+      audioEl.play().catch(() => {});
     }
     const startAyah = fromAyah ?? 1;
     setAudioSurah(block);
     setAudioStartAyah(startAyah);
     setAudioCurrentAyah(startAyah);
     setAudioMode(true);
-  }, []);
+    setPlayInfo({
+      surahNumber: block.surahNumber,
+      surahName: block.surahName,
+      currentAyah: startAyah,
+      totalAyahs: block.ayahs.length,
+      isPlaying: true,
+      playMode: audioPlayMode,
+      loopMode: audioLoopMode,
+    });
+  }, [audioEl, audioPlayMode, audioLoopMode, setPlayInfo]);
 
   const closeAudioMode = useCallback(() => {
+    audioEl?.pause();
     setAudioMode(false);
     setAudioSurah(null);
     setAudioCurrentAyah(null);
     setAudioCurrentWordPos(null);
     scrolledAyahRef.current = null;
-  }, []);
+    setPlayInfo(null);
+  }, [audioEl, setPlayInfo]);
 
   return (
     <div className={audioMode ? 'pb-28 lg:pb-20' : ''}>
-      <audio ref={audioRef} crossOrigin="anonymous" className="hidden" />
-
       {/* Toolbar */}
       <div className="flex justify-end gap-2 mb-8">
         {hasWords && (
@@ -281,6 +331,24 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, surahArabicNa
               <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
             </svg>
             Word by Word
+          </button>
+        )}
+
+        {audioMode && (
+          <button
+            onClick={() => setFollowPlayback(!followPlayback)}
+            className="flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-xl transition-all duration-200"
+            style={followPlayback
+              ? { background: 'rgba(212,162,70,0.12)', color: '#D4A246', border: '1px solid rgba(212,162,70,0.25)' }
+              : { background: 'rgba(255,255,255,0.04)', color: '#78716C', border: '1px solid rgba(255,255,255,0.07)' }
+            }
+            title={followPlayback ? 'Auto-scroll on — click to disable' : 'Auto-scroll off — click to enable'}
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+            </svg>
+            Follow
           </button>
         )}
 
@@ -413,7 +481,8 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, surahArabicNa
             <div className={`space-y-1 ${!isFirstBlock ? 'mt-4' : ''}`}>
               {block.ayahs.map((ayah) => {
                 const isActiveAyah = audioMode && audioSurah?.surahNumber === block.surahNumber && audioCurrentAyah === ayah.number;
-                const showWordHighlight = isActiveAyah;
+                // Word highlight only fires when WxW is explicitly on — decoupled from active-ayah state
+                const showWordHighlight = isActiveAyah && wordByWord;
                 return (
                   <div
                     key={`${block.surahNumber}-${ayah.number}`}
@@ -446,7 +515,7 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, surahArabicNa
                       </div>
 
                       <div className="flex-1 min-w-0">
-                        {(wordByWord || showWordHighlight) && ayah.words.length > 0 ? (
+                        {wordByWord && ayah.words.length > 0 ? (
                           <div className="flex flex-wrap gap-x-3 gap-y-4 justify-end" dir="rtl">
                             {ayah.words
                               .filter((w) => w.charType === 'word')
@@ -660,10 +729,10 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, surahArabicNa
       />
 
       {/* Audio player */}
-      {audioMode && audioSurah && (
+      {audioMode && audioSurah && audioEl && (
         <AudioPlayer
           key={`${audioSurah.surahNumber}-${audioStartAyah}`}
-          audioElement={audioRef.current!}
+          audioElement={audioEl}
           surahNumber={audioSurah.surahNumber}
           surahName={audioSurah.surahName}
           totalAyahs={audioSurah.ayahs.length}
@@ -671,7 +740,7 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, surahArabicNa
           playMode={audioPlayMode}
           loopMode={audioLoopMode}
           ayahs={audioSurah.ayahs.map(a => ({ number: a.number, textUthmani: a.textUthmani, translation: a.translation }))}
-          onAyahChange={setAudioCurrentAyah}
+          onAyahChange={(ayah) => { setAudioCurrentAyah(ayah); updatePlayInfo({ currentAyah: ayah }); }}
           onWordChange={setAudioCurrentWordPos}
           onClose={closeAudioMode}
           onPlayModeChange={setAudioPlayMode}
