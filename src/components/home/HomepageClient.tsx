@@ -175,7 +175,7 @@ export function HomepageClient() {
   const [activeWord, setActiveWord] = useState<number | null>(null);
 
   return (
-    <div className="min-h-screen overflow-x-hidden" style={{ background: '#0E0D0C', color: '#EDEDEC' }}>
+    <div className="min-h-screen overflow-x-hidden relative" style={{ color: '#EDEDEC' }}>
 
       {/* ══════════════════════════════════════════════════════
           TOP NAV
@@ -233,16 +233,6 @@ export function HomepageClient() {
       <section
         className="relative flex flex-col items-center justify-center min-h-screen text-center px-5 pt-14 pb-24 overflow-hidden"
       >
-        {/* Dot-grid texture */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0"
-          style={{
-            backgroundImage: 'radial-gradient(circle, rgba(212,162,70,0.08) 1px, transparent 1px)',
-            backgroundSize: '28px 28px',
-          }}
-        />
-
         {/* Radial center glow */}
         <div
           aria-hidden

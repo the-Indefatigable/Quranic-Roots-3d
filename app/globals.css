@@ -288,6 +288,55 @@ button {
   animation: fade-in 0.25s ease-out;
 }
 
+/* ===== Atmosphere — drifting radial glows ===== */
+.atmosphere-glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(40px);
+  will-change: transform, opacity;
+}
+
+.atmosphere-glow-amber {
+  top: -10%;
+  left: -8%;
+  width: 55vw;
+  height: 55vw;
+  max-width: 700px;
+  max-height: 700px;
+  background: radial-gradient(circle, rgba(212,162,70,0.07) 0%, rgba(212,162,70,0.02) 40%, transparent 70%);
+  animation: atmosphere-drift-a 42s ease-in-out infinite alternate;
+}
+
+.atmosphere-glow-teal {
+  bottom: -12%;
+  right: -10%;
+  width: 60vw;
+  height: 60vw;
+  max-width: 760px;
+  max-height: 760px;
+  background: radial-gradient(circle, rgba(90,184,168,0.05) 0%, rgba(90,184,168,0.015) 40%, transparent 70%);
+  animation: atmosphere-drift-b 38s ease-in-out infinite alternate;
+}
+
+@keyframes atmosphere-drift-a {
+  0%   { transform: translate(0, 0)        scale(1);    opacity: 0.55; }
+  50%  { transform: translate(8vw, 6vh)    scale(1.12); opacity: 0.95; }
+  100% { transform: translate(-4vw, 10vh)  scale(0.95); opacity: 0.65; }
+}
+
+@keyframes atmosphere-drift-b {
+  0%   { transform: translate(0, 0)        scale(1);    opacity: 0.5;  }
+  50%  { transform: translate(-7vw, -5vh)  scale(1.15); opacity: 0.9;  }
+  100% { transform: translate(5vw, -9vh)   scale(0.92); opacity: 0.6;  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .atmosphere-glow-amber,
+  .atmosphere-glow-teal {
+    animation: none;
+  }
+}
+
 /* ===== Scroll bounce indicator ===== */
 @keyframes scroll-bounce {
   0%, 100% { transform: translateY(0); }
