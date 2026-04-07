@@ -116,7 +116,7 @@ html, body {
 /* ===== Base elements ===== */
 a { text-decoration: none; color: inherit; }
 
-button {
+:where(button) {
   border-radius: 12px;
   border: 1px solid transparent;
   font-family: inherit;
@@ -276,6 +276,15 @@ button {
 
 .soft-pulse {
   animation: soft-pulse 2s ease-in-out infinite;
+}
+
+/* ===== Pulse-glow — used by audio player hero glyph halo ===== */
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.8; }
+  50%      { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  @keyframes pulse-glow { 0%, 100% { opacity: 0.9; } }
 }
 
 /* ===== Fade in ===== */
