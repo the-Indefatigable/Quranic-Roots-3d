@@ -5,6 +5,7 @@ import Script from 'next/script';
 import { Suspense } from 'react';
 import { NavigationProgress } from '@/components/ui/NavigationProgress';
 import { GlobalAudioProvider } from '@/components/GlobalAudioProvider';
+import { Atmosphere } from '@/components/ui/Atmosphere';
 import './globals.css';
 
 const jakarta = Plus_Jakarta_Sans({
@@ -126,11 +127,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="bg-canvas font-sans text-text antialiased">
+        <Atmosphere />
         <Suspense fallback={null}>
           <NavigationProgress />
         </Suspense>
         <GlobalAudioProvider>
-          {children}
+          <div className="relative z-10">{children}</div>
         </GlobalAudioProvider>
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-XFLPNVR8VQ"
