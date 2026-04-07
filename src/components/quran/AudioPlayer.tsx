@@ -721,18 +721,25 @@ export function AudioPlayer({
 
             <div className="relative inline-block mt-1">
               <button
-                onClick={() => setShowQariMenu(!showQariMenu)}
-                className="flex items-center gap-1.5 mx-auto text-xs transition-colors"
-                style={{ color: G.textSecond }}
+                onClick={(e) => { e.stopPropagation(); setShowQariMenu(!showQariMenu); }}
+                className="flex items-center gap-1.5 mx-auto text-xs transition-all hover:scale-[1.02] active:scale-[0.98]"
+                style={{
+                  color: G.textPrimary,
+                  background: 'rgba(212,162,70,0.08)',
+                  border: `1px solid ${G.goldBorder}`,
+                  borderRadius: '9999px',
+                  padding: '5px 12px',
+                }}
+                aria-label="Change qari"
               >
                 {selectedQari.name}
                 <span
                   className="px-1.5 py-0.5 rounded text-[9px] font-semibold"
-                  style={{ background: 'rgba(212,162,70,0.12)', color: G.gold }}
+                  style={{ background: 'rgba(212,162,70,0.18)', color: G.gold }}
                 >
                   {selectedQari.styleLabel}
                 </span>
-                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke={G.gold}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
                 </svg>
               </button>
@@ -904,7 +911,7 @@ export function AudioPlayer({
 
           ) : expandedTab === 'qari' ? (
             <div className="flex-1 overflow-hidden" style={{ minHeight: 0 }}>
-              <QariProfile qari={selectedQari} />
+              <QariProfile qari={selectedQari} onQariChange={onQariChange} />
             </div>
 
           ) : expandedTab === 'practice' ? (

@@ -9,11 +9,12 @@
  * "known for" line, and a recommendation. This is the answer to
  * "what is this voice?" — the difference between a player and a teacher.
  */
-import type { QariInfo } from '@/lib/audio/qariLibrary';
+import { QARI_LIBRARY, type QariInfo } from '@/lib/audio/qariLibrary';
 import { G } from './playerTokens';
 
 interface Props {
   qari: QariInfo;
+  onQariChange?: (qariId: string) => void;
 }
 
 const TEMPO_LABEL: Record<NonNullable<QariInfo['tempo']>, string> = {
@@ -22,7 +23,8 @@ const TEMPO_LABEL: Record<NonNullable<QariInfo['tempo']>, string> = {
   fast: 'Brisk',
 };
 
-export function QariProfile({ qari }: Props) {
+export function QariProfile({ qari, onQariChange }: Props) {
+  const otherQaris = QARI_LIBRARY.filter(q => q.id !== qari.id);
   return (
     <div className="w-full h-full overflow-y-auto px-4 sm:px-8 py-6">
       <div className="max-w-xl mx-auto">
@@ -138,6 +140,65 @@ export function QariProfile({ qari }: Props) {
             <p className="text-[13px] leading-[1.6]" style={{ color: G.textSecond }}>
               {qari.recommendedFor}
             </p>
+          </div>
+        )}
+
+        {/* ── Switch qari ───────────────────────────────────────────── */}
+        {onQariChange && (
+          <div className="mt-8">
+            <p
+              className="text-[10px] uppercase tracking-[0.18em] mb-3 font-semibold text-center"
+              style={{ color: G.textTert }}
+            >
+              Try another qari
+            </p>
+            <div className="space-y-2">
+              {otherQaris.map((q) => (
+                <button
+                  key={q.id}
+                  onClick={() => onQariChange(q.id)}
+                  className="w-full text-left rounded-xl px-4 py-3 transition-all hover:scale-[1.01] active:scale-[0.99] flex items-center gap-3 group"
+                  style={{
+                    background: G.surface,
+                    border: `1px solid ${G.border}`,
+                  }}
+                >
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="text-[13px] font-medium truncate"
+                        style={{ color: G.textPrimary }}
+                      >
+                        {q.name}
+                      </span>
+                      <span
+                        className="text-[9px] px-1.5 py-0.5 rounded font-semibold shrink-0"
+                        style={{ background: 'rgba(212,162,70,0.10)', color: G.gold }}
+                      >
+                        {q.styleLabel}
+                      </span>
+                    </div>
+                    {q.signature && (
+                      <p
+                        className="text-[11px] mt-0.5 truncate"
+                        style={{ color: G.textTert }}
+                      >
+                        {q.signature}
+                      </p>
+                    )}
+                  </div>
+                  <svg
+                    className="w-4 h-4 shrink-0 transition-transform group-hover:translate-x-1"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                    stroke={G.gold}
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                  </svg>
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
