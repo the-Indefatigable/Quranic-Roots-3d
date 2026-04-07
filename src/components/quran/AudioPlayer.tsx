@@ -5,6 +5,10 @@ import { createPortal } from 'react-dom';
 import { AudioVisualizer } from './AudioVisualizer';
 import { GuidedPractice } from './GuidedPractice';
 import { QARI_LIBRARY, getDefaultQari, getQariById, buildAyahAudioUrl, type QariInfo } from '@/lib/audio/qariLibrary';
+import { G, SPEED_OPTIONS, formatTime } from './audio/playerTokens';
+import { EqBars, SeekBar, VolumeControl } from './audio/PlayerControls';
+import { useAudioKeyboard } from './audio/useAudioKeyboard';
+import { useQariMenu } from './audio/useQariMenu';
 
 type ExpandedTab = 'lyrics' | 'spectrum' | 'pitch' | 'practice';
 
@@ -41,49 +45,6 @@ interface Props {
   onQariChange?: (qariId: string) => void;
 }
 
-const SPEED_OPTIONS = [0.75, 1, 1.25, 1.5] as const;
-
-// ── Design tokens ─────────────────────────────────────────────────────────
-const G = {
-  bg:           '#0E0D0C',
-  gold:         '#D4A246',
-  goldDim:      '#C89535',
-  teal:         '#0D9488',
-  surface:      'rgba(255,255,255,0.03)',
-  surfaceHover: 'rgba(255,255,255,0.06)',
-  border:       'rgba(255,255,255,0.07)',
-  goldBorder:   'rgba(212,162,70,0.15)',
-  textPrimary:  '#EDEDEC',
-  textSecond:   'rgba(237,237,236,0.55)',
-  textTert:     'rgba(237,237,236,0.3)',
-} as const;
-
-function formatTime(seconds: number): string {
-  if (!seconds || !isFinite(seconds)) return '0:00';
-  const m = Math.floor(seconds / 60);
-  const s = Math.floor(seconds % 60);
-  return `${m}:${s.toString().padStart(2, '0')}`;
-}
-
-// Animated equalizer bars
-function EqBars({ active }: { active: boolean }) {
-  return (
-    <div className="flex items-end gap-[2px] h-4">
-      {[1, 2, 3, 4].map((i) => (
-        <div
-          key={i}
-          className={`w-[3px] rounded-full transition-all ${active ? 'animate-equalizer' : ''}`}
-          style={{
-            background: G.gold,
-            height: active ? undefined : '4px',
-            animationDelay: active ? `${i * 0.12}s` : undefined,
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
 export function AudioPlayer({
   audioElement,
   surahNumber,
@@ -102,7 +63,7 @@ export function AudioPlayer({
   onQariChange,
 }: Props) {
   const selectedQari: QariInfo = getQariById(selectedQariId ?? '') ?? getDefaultQari();
-  const [showQariMenu, setShowQariMenu] = useState(false);
+  const { showQariMenu, setShowQariMenu } = useQariMenu();
   const ayahDataRef        = useRef<Map<number, AyahAudio>>(new Map());
   const chapterAudioUrlRef = useRef<string | null>(null);
   const usingSurahAudioRef = useRef(false);
@@ -542,28 +503,14 @@ export function AudioPlayer({
     audioElement.volume = vol;
   }
 
-  // Keyboard shortcuts
-  useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-      switch (e.code) {
-        case 'Space':      e.preventDefault(); togglePlay(); break;
-        case 'ArrowRight': if (e.shiftKey) { nextAyah(); e.preventDefault(); } break;
-        case 'ArrowLeft':  if (e.shiftKey) { prevAyah(); e.preventDefault(); } break;
-        case 'KeyF':       setExpanded((v) => !v); break;
-      }
-    }
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isPlaying, currentAyah]);
-
-  useEffect(() => {
-    if (!showQariMenu) return;
-    const handler = () => setShowQariMenu(false);
-    window.addEventListener('click', handler);
-    return () => window.removeEventListener('click', handler);
-  }, [showQariMenu]);
+  useAudioKeyboard({
+    togglePlay,
+    nextAyah,
+    prevAyah,
+    toggleExpanded: () => setExpanded((v) => !v),
+    isPlaying,
+    currentAyah,
+  });
 
   const loopLabel = loopMode === 'ayah' ? '1' : loopMode === 'surah' ? '∞' : '';
 
@@ -571,103 +518,22 @@ export function AudioPlayer({
   useEffect(() => setMounted(true), []);
   if (!mounted) return null;
 
-  // ── Shared seekbar ─────────────────────────────────────────────────────────
-  const SeekBar = ({ large }: { large?: boolean }) => (
-    <div className="w-full flex flex-col gap-1.5">
-      <div
-        ref={seekBarRef}
-        className={`relative w-full cursor-pointer group/seek ${large ? 'h-1.5' : 'h-[3px]'} rounded-full`}
-        style={{ background: 'rgba(255,255,255,0.1)' }}
-        onMouseDown={(e) => {
-          setIsSeeking(true);
-          handleSeek(e.clientX);
-          const onMove = (ev: MouseEvent) => handleSeek(ev.clientX);
-          const onUp   = () => { setIsSeeking(false); window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); };
-          window.addEventListener('mousemove', onMove);
-          window.addEventListener('mouseup', onUp);
-        }}
-        onTouchStart={(e) => {
-          setIsSeeking(true);
-          handleSeek(e.touches[0].clientX);
-          const onMove = (ev: TouchEvent) => handleSeek(ev.touches[0].clientX);
-          const onEnd  = () => { setIsSeeking(false); window.removeEventListener('touchmove', onMove); window.removeEventListener('touchend', onEnd); };
-          window.addEventListener('touchmove', onMove);
-          window.addEventListener('touchend', onEnd);
-        }}
-      >
-        {/* Gradient fill */}
-        <div
-          className="absolute inset-y-0 left-0 rounded-full transition-[width] duration-75"
-          style={{
-            width: `${progress * 100}%`,
-            background: `linear-gradient(to right, ${G.teal}, ${G.gold})`,
-            boxShadow: progress > 0.01 ? `0 0 6px rgba(212,162,70,0.35)` : 'none',
-          }}
-        />
-        {/* Gold thumb */}
-        <div
-          className={`absolute top-1/2 -translate-y-1/2 -translate-x-1/2 rounded-full transition-[opacity,transform] ${
-            large
-              ? 'w-3.5 h-3.5 group-hover/seek:scale-125'
-              : 'w-2.5 h-2.5 opacity-0 group-hover/seek:opacity-100 group-hover/seek:scale-110'
-          } ${isSeeking ? '!opacity-100 scale-125' : ''}`}
-          style={{
-            left: `${progress * 100}%`,
-            background: G.gold,
-            boxShadow: `0 0 8px rgba(212,162,70,0.6)`,
-          }}
-        />
-      </div>
-      {large && (
-        <div className="flex justify-between text-[11px] tabular-nums" style={{ color: G.textTert }}>
-          <span>{formatTime(currentTime)}</span>
-          <span>-{formatTime(Math.max(0, duration - currentTime))}</span>
-        </div>
-      )}
-    </div>
-  );
-
-  // ── Volume control ─────────────────────────────────────────────────────────
-  const VolumeControl = () => (
-    <div className="hidden lg:flex items-center gap-2">
-      <button
-        onClick={() => { const v = volume > 0 ? 0 : 1; setVolume(v); audioElement.volume = v; }}
-        className="w-8 h-8 flex items-center justify-center transition-colors"
-        style={{ color: G.textTert }}
-      >
-        {volume === 0 ? (
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 9.75 19.5 12m0 0 2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6 4.72-3.72a.75.75 0 0 1 1.28.53v14.88a.75.75 0 0 1-1.28.53l-4.72-3.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" />
-          </svg>
-        ) : (
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-3.72a.75.75 0 0 1 1.28.53v14.88a.75.75 0 0 1-1.28.53l-4.72-3.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" />
-          </svg>
-        )}
-      </button>
-      <div
-        ref={volumeBarRef}
-        className="relative w-20 h-[3px] rounded-full cursor-pointer group/vol"
-        style={{ background: 'rgba(255,255,255,0.1)' }}
-        onMouseDown={(e) => {
-          handleVolumeChange(e.clientX);
-          const onMove = (ev: MouseEvent) => handleVolumeChange(ev.clientX);
-          const onUp   = () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); };
-          window.addEventListener('mousemove', onMove);
-          window.addEventListener('mouseup', onUp);
-        }}
-      >
-        <div
-          className="absolute inset-y-0 left-0 rounded-full"
-          style={{ width: `${volume * 100}%`, background: G.gold, opacity: 0.7 }}
-        />
-        <div
-          className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full opacity-0 group-hover/vol:opacity-100 transition-opacity"
-          style={{ left: `${volume * 100}%`, background: G.gold }}
-        />
-      </div>
-    </div>
-  );
+  const seekBarProps = {
+    progress,
+    currentTime,
+    duration,
+    isSeeking,
+    setIsSeeking,
+    handleSeek,
+    seekBarRef,
+  };
+  const volumeControlProps = {
+    volume,
+    setVolume,
+    audioElement,
+    handleVolumeChange,
+    volumeBarRef,
+  };
 
   // ── EXPANDED VIEW ──────────────────────────────────────────────────────────
   if (expanded) {
@@ -966,7 +832,7 @@ export function AudioPlayer({
           {/* ── Seekbar ── */}
           <div className="px-8 mt-4">
             <div className="max-w-sm mx-auto">
-              <SeekBar large />
+              <SeekBar large {...seekBarProps} />
             </div>
           </div>
 
@@ -1063,7 +929,7 @@ export function AudioPlayer({
                 {playMode === 'ayah' ? 'Ayah mode' : 'Surah mode'}
               </button>
 
-              <VolumeControl />
+              <VolumeControl {...volumeControlProps} />
 
               {currentAyah > 1 && (
                 <button
@@ -1238,7 +1104,7 @@ export function AudioPlayer({
             )}
           </button>
 
-          <VolumeControl />
+          <VolumeControl {...volumeControlProps} />
         </div>
 
         {/* Close */}
