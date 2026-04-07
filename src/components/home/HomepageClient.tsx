@@ -198,6 +198,7 @@ export function HomepageClient() {
             { href: '/roots',       label: 'Roots'  },
             { href: '/learn/path',  label: 'Learn'  },
             { href: '/learn/qirat', label: 'Qirat'  },
+            { href: '/learn',       label: 'Blog'   },
           ].map((l) => (
             <Link
               key={l.href}
@@ -756,6 +757,7 @@ export function HomepageClient() {
             { href: '/learn/path',  label: 'Learn'   },
             { href: '/learn/qirat', label: 'Qirat'   },
             { href: '/search',      label: 'Search'  },
+            { href: '/learn',       label: 'Blog'    },
           ].map((l) => (
             <Link key={l.href} href={l.href} className="text-sm transition-colors" style={{ color: '#3D3C3A' }}
               onMouseEnter={e => (e.currentTarget.style.color = '#A09F9B')}

@@ -5,6 +5,7 @@ const ALLOWED_ORIGINS = [
   'https://quroots.com',
   'https://www.quroots.com',
   'http://localhost:3000',
+  'http://localhost:3001',
 ];
 
 export function middleware(request: NextRequest) {
@@ -31,5 +32,6 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: '/api/:path*',
+  // Apply to API routes EXCEPT /api/auth/* — NextAuth handles its own redirects & cookies
+  matcher: '/api/((?!auth).*)',
 };

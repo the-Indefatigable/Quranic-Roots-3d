@@ -24,6 +24,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     'murakkab',
     'adad',
     'verb-forms',
+    'arifa-vs-alima-vs-fahima',
+    'verb-forms-meaning-change',
   ].map((slug) => ({
     url: `${baseUrl}/learn/${slug}`,
     changeFrequency: 'monthly' as const,
