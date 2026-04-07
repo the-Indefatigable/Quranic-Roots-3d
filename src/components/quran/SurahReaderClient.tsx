@@ -1,11 +1,19 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import dynamic from 'next/dynamic';
 import { useAppStore } from '@/store/useAppStore';
 import { useGlobalAudioStore } from '@/store/useGlobalAudioStore';
 import { WordPopover, type WordData } from './WordPopover';
 import { TafsirPanel } from './TafsirPanel';
-import { AudioPlayer, type PlayMode, type LoopMode } from './AudioPlayer';
+import type { PlayMode, LoopMode } from './AudioPlayer';
+
+// Lazy-load the 1.3k LOC audio player + its DSP deps. Keeps it out of the
+// initial reader bundle; mounts on first render of the player surface.
+const AudioPlayer = dynamic(
+  () => import('./AudioPlayer').then((m) => ({ default: m.AudioPlayer })),
+  { ssr: false }
+);
 
 interface AyahData {
   number: number;

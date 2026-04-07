@@ -12,21 +12,22 @@ export async function GET() {
     const session = await auth();
     const userId = session?.user?.id;
 
-    const units = await dbQuery(() =>
-      db.select().from(learningUnits).orderBy(asc(learningUnits.sortOrder))
-    );
+    // Run all queries in parallel — the user-progress queries don't depend on units/lessons
+    const [units, lessons, unitProgress, lessonProgress] = await Promise.all([
+      dbQuery(() => db.select().from(learningUnits).orderBy(asc(learningUnits.sortOrder))),
+      dbQuery(() => db.select().from(learningLessons).orderBy(asc(learningLessons.sortOrder))),
+      userId
+        ? dbQuery(() => db.select().from(userUnitProgress).where(eq(userUnitProgress.userId, userId)))
+        : Promise.resolve([] as Awaited<ReturnType<typeof db.select>> extends infer _ ? any[] : never[]),
+      userId
+        ? dbQuery(() => db.select().from(userLessonProgress).where(eq(userLessonProgress.userId, userId)))
+        : Promise.resolve([] as any[]),
+    ]);
 
-    const lessons = await dbQuery(() =>
-      db.select().from(learningLessons).orderBy(asc(learningLessons.sortOrder))
-    );
-
-    let unitProgressMap: Record<string, { status: string; crownLevel: number; lessonsCompleted: number }> = {};
-    let lessonProgressMap: Record<string, { status: string; score: number | null; bestScore: number | null; attempts: number }> = {};
+    const unitProgressMap: Record<string, { status: string; crownLevel: number; lessonsCompleted: number }> = {};
+    const lessonProgressMap: Record<string, { status: string; score: number | null; bestScore: number | null; attempts: number }> = {};
 
     if (userId) {
-      const unitProgress = await dbQuery(() =>
-        db.select().from(userUnitProgress).where(eq(userUnitProgress.userId, userId))
-      );
       for (const up of unitProgress) {
         unitProgressMap[up.unitId] = {
           status: up.status || 'locked',
@@ -35,9 +36,6 @@ export async function GET() {
         };
       }
 
-      const lessonProgress = await dbQuery(() =>
-        db.select().from(userLessonProgress).where(eq(userLessonProgress.userId, userId))
-      );
       for (const lp of lessonProgress) {
         lessonProgressMap[lp.lessonId] = {
           status: lp.status || 'locked',
@@ -48,9 +46,16 @@ export async function GET() {
       }
     }
 
+    // Pre-bucket lessons by unitId — avoids O(units × lessons) filter cost
+    const lessonsByUnit = new Map<string, typeof lessons>();
+    for (const l of lessons) {
+      const arr = lessonsByUnit.get(l.unitId);
+      if (arr) arr.push(l);
+      else lessonsByUnit.set(l.unitId, [l]);
+    }
+
     const data = units.map((unit, idx) => {
-      const unitLessons = lessons
-        .filter((l) => l.unitId === unit.id)
+      const unitLessons = (lessonsByUnit.get(unit.id) || [])
         .map((lesson) => ({
           id: lesson.id,
           slug: lesson.slug,

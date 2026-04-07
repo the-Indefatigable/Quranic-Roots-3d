@@ -11,8 +11,8 @@ const isBuildTime = !connectionString;
 let client = isBuildTime
   ? (null as unknown as ReturnType<typeof postgres>)
   : postgres(connectionString!, {
-      max: 5,
-      idle_timeout: 20,
+      max: 18,
+      idle_timeout: 30,
       connect_timeout: 10,
       max_lifetime: 60 * 10,
       prepare: false,

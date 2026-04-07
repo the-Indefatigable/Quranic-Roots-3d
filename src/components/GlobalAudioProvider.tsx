@@ -1,8 +1,15 @@
 'use client';
 
 import { useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { useGlobalAudioStore } from '@/store/useGlobalAudioStore';
-import { PersistentMiniPlayer } from '@/components/quran/PersistentMiniPlayer';
+
+// Mini player only renders once audio is active — defer it out of the initial
+// shell bundle that loads on every route.
+const PersistentMiniPlayer = dynamic(
+  () => import('@/components/quran/PersistentMiniPlayer').then((m) => ({ default: m.PersistentMiniPlayer })),
+  { ssr: false }
+);
 
 export function GlobalAudioProvider({ children }: { children: React.ReactNode }) {
   const setAudioEl = useGlobalAudioStore((s) => s.setAudioEl);

@@ -26,17 +26,19 @@ export async function GET() {
   }
 
   try {
-    // 3 sequential queries with retry (handles Railway cold starts)
-    const allRoots = await dbQuery(() => db.select().from(roots));
-    const allForms = await dbQuery(() => db.select().from(forms).orderBy(asc(forms.sortOrder)));
-    const allTenses = await dbQuery(() => db.select({
-      id: tenses.id,
-      formId: tenses.formId,
-      type: tenses.type,
-      arabicName: tenses.arabicName,
-      englishName: tenses.englishName,
-      occurrences: tenses.occurrences,
-    }).from(tenses));
+    // 3 independent queries — run in parallel
+    const [allRoots, allForms, allTenses] = await Promise.all([
+      dbQuery(() => db.select().from(roots)),
+      dbQuery(() => db.select().from(forms).orderBy(asc(forms.sortOrder))),
+      dbQuery(() => db.select({
+        id: tenses.id,
+        formId: tenses.formId,
+        type: tenses.type,
+        arabicName: tenses.arabicName,
+        englishName: tenses.englishName,
+        occurrences: tenses.occurrences,
+      }).from(tenses)),
+    ]);
 
     // Index tenses by formId
     const tensesByForm = new Map<string, typeof allTenses>();
