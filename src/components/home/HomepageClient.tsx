@@ -248,19 +248,27 @@ export function HomepageClient() {
           <div style={{ position: 'absolute', bottom: '5%', right: '-8%', width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle, rgba(124,58,237,0.05) 0%, transparent 70%)' }} />
         </div>
 
-        {/* اقْرَأْ watermark */}
+        {/* اقْرَأْ watermark — bleeds off the right edge, asymmetric */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 flex items-center justify-center select-none font-arabic"
-          style={{
-            fontSize: 'clamp(18rem, 42vw, 56rem)',
-            lineHeight: 1,
-            color: 'rgba(212,162,70,0.032)',
-            userSelect: 'none',
-            letterSpacing: '-0.02em',
-          }}
+          className="pointer-events-none absolute inset-0 select-none font-arabic overflow-hidden"
         >
-          اقْرَأْ
+          <div
+            className="absolute"
+            style={{
+              top: '50%',
+              right: '-12vw',
+              transform: 'translateY(-50%)',
+              fontSize: 'clamp(22rem, 52vw, 68rem)',
+              lineHeight: 0.85,
+              color: 'rgba(212,162,70,0.085)',
+              letterSpacing: '-0.04em',
+              textShadow: '0 0 80px rgba(212,162,70,0.15)',
+            }}
+            dir="rtl"
+          >
+            اقْرَأْ
+          </div>
         </div>
 
         {/* Hero content */}

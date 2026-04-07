@@ -270,7 +270,7 @@ export default function VerbFormsMeaningChangePage() {
             How Arabic Verb Forms Change Meaning
           </h1>
 
-          <p className="text-text-secondary text-lg leading-relaxed mb-3 max-w-2xl">
+          <p className="article-lede text-text-secondary text-lg leading-relaxed mb-3 max-w-2xl">
             One root. Ten possible verb forms. Each form shifts the meaning in a predictable way —
             from &ldquo;he knew&rdquo; to &ldquo;he taught&rdquo; to &ldquo;he learned.&rdquo;
             This article shows you exactly how it works, using three of the Quran&apos;s most
@@ -294,7 +294,7 @@ export default function VerbFormsMeaningChangePage() {
         </header>
 
         {/* ── The 4 Key Patterns ───────────────────────────── */}
-        <section className="mb-14" aria-labelledby="patterns-heading">
+        <section className="article-section mb-14" data-num="٠١" aria-labelledby="patterns-heading">
           <h2 id="patterns-heading" className="text-xl font-semibold text-text mb-2">
             Four Verb Forms That Unlock Everything
           </h2>
@@ -347,7 +347,7 @@ export default function VerbFormsMeaningChangePage() {
         </section>
 
         {/* ── Transformation Chain ─────────────────────────── */}
-        <section className="mb-14" aria-labelledby="chain-heading">
+        <section className="article-section mb-14" data-num="٠٢" aria-labelledby="chain-heading">
           <h2 id="chain-heading" className="text-xl font-semibold text-text mb-5">
             Transformation Chains — With Quranic Proof
           </h2>
@@ -442,7 +442,7 @@ export default function VerbFormsMeaningChangePage() {
         </section>
 
         {/* ── Why This Matters ─────────────────────────────── */}
-        <section className="mb-14" aria-labelledby="why-heading">
+        <section className="article-section mb-14" data-num="٠٣" aria-labelledby="why-heading">
           <h2 id="why-heading" className="text-xl font-semibold text-text mb-4">
             Why This Matters for Quran Study
           </h2>

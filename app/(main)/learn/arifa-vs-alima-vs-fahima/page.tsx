@@ -321,7 +321,7 @@ export default function ArifaVsAlimaVsFahimaPage() {
             Three Arabic Verbs of Knowledge — Compared Across Every Verb Form
           </h1>
 
-          <p className="text-text-secondary text-lg leading-relaxed mb-3 max-w-2xl">
+          <p className="article-lede text-text-secondary text-lg leading-relaxed mb-3 max-w-2xl">
             Arabic doesn&apos;t have one word for &ldquo;to know.&rdquo; It has at least three — each
             capturing a different shade of knowing. Understanding when to use{' '}
             <strong className="font-arabic" style={{ color: '#D4A246' }}>عَرَفَ</strong>,{' '}
@@ -347,7 +347,7 @@ export default function ArifaVsAlimaVsFahimaPage() {
         </header>
 
         {/* ── Quick Overview Cards ────────────────────────────── */}
-        <section className="mb-14" aria-labelledby="overview-heading">
+        <section className="article-section mb-14" data-num="٠١" aria-labelledby="overview-heading">
           <h2 id="overview-heading" className="text-xl font-semibold text-text mb-5">
             At a Glance
           </h2>
@@ -381,7 +381,7 @@ export default function ArifaVsAlimaVsFahimaPage() {
         </section>
 
         {/* ── The Core Difference ─────────────────────────────── */}
-        <section className="mb-14" aria-labelledby="difference-heading">
+        <section className="article-section mb-14" data-num="٠٢" aria-labelledby="difference-heading">
           <h2 id="difference-heading" className="text-xl font-semibold text-text mb-5">
             The Core Difference
           </h2>
@@ -446,7 +446,7 @@ export default function ArifaVsAlimaVsFahimaPage() {
         </section>
 
         {/* ── Side-by-Side Verb Form Comparison ───────────────── */}
-        <section className="mb-14" aria-labelledby="comparison-heading">
+        <section className="article-section mb-14" data-num="٠٣" aria-labelledby="comparison-heading">
           <h2 id="comparison-heading" className="text-xl font-semibold text-text mb-2">
             Side-by-Side: All 10 Verb Forms (أبواب)
           </h2>
@@ -583,7 +583,7 @@ export default function ArifaVsAlimaVsFahimaPage() {
         </section>
 
         {/* ── Quranic Examples Highlight ──────────────────────── */}
-        <section className="mb-14" aria-labelledby="quranic-heading">
+        <section className="article-section mb-14" data-num="٠٤" aria-labelledby="quranic-heading">
           <h2 id="quranic-heading" className="text-xl font-semibold text-text mb-5">
             Quranic Examples
           </h2>
@@ -628,7 +628,7 @@ export default function ArifaVsAlimaVsFahimaPage() {
         </section>
 
         {/* ── Key Derivatives ─────────────────────────────────── */}
-        <section className="mb-14" aria-labelledby="derivatives-heading">
+        <section className="article-section mb-14" data-num="٠٥" aria-labelledby="derivatives-heading">
           <h2 id="derivatives-heading" className="text-xl font-semibold text-text mb-5">
             Key Derivatives &amp; Nouns
           </h2>
@@ -660,7 +660,7 @@ export default function ArifaVsAlimaVsFahimaPage() {
         </section>
 
         {/* ── Summary ─────────────────────────────────────────── */}
-        <section className="mb-14" aria-labelledby="summary-heading">
+        <section className="article-section mb-14" data-num="٠٦" aria-labelledby="summary-heading">
           <h2 id="summary-heading" className="text-xl font-semibold text-text mb-4">
             Key Takeaways
           </h2>
