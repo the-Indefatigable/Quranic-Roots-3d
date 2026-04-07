@@ -593,11 +593,29 @@ export function AudioPlayer({
             </button>
           </div>
 
-          {/* ── Surah name + qari selector ── */}
-          <div className="text-center px-8 pt-1 pb-2">
+          {/* ── Surah name + qari selector — with hero glyph ── */}
+          <div className="text-center px-8 pt-1 pb-2 flex flex-col items-center">
+            {/* Hero glyph — the now-playing artwork */}
+            <div className="mb-3 relative">
+              <SurahGlyph surahNumber={surahNumber} size={88} />
+              {isPlaying && (
+                <div
+                  aria-hidden
+                  className="absolute inset-0 rounded-full pointer-events-none"
+                  style={{
+                    boxShadow: '0 0 60px rgba(212,162,70,0.25), 0 0 24px rgba(212,162,70,0.15)',
+                    animation: 'pulse-glow 3s ease-in-out infinite',
+                  }}
+                />
+              )}
+            </div>
             <h3
-              className="text-xl font-heading"
-              style={{ color: G.textPrimary, letterSpacing: '0.01em' }}
+              className="text-2xl sm:text-[26px] font-heading"
+              style={{
+                color: G.textPrimary,
+                letterSpacing: '-0.015em',
+                fontVariationSettings: '"opsz" 144, "SOFT" 30',
+              }}
             >
               {surahName}
             </h3>
@@ -867,15 +885,17 @@ export function AudioPlayer({
                 </svg>
               </button>
 
-              {/* Play/Pause — gold hero button */}
+              {/* Play/Pause — hero button with gradient + inset highlight */}
               <button
                 onClick={togglePlay}
-                className="w-16 h-16 flex items-center justify-center rounded-full transition-all duration-200 hover:scale-105 active:scale-95"
+                className="w-16 h-16 flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95"
                 style={{
-                  background: G.gold,
-                  color: G.bg,
-                  boxShadow: `0 0 30px rgba(212,162,70,0.35), 0 4px 20px rgba(212,162,70,0.2)`,
+                  borderRadius: '9999px',
+                  background: `radial-gradient(circle at 30% 28%, #F0C168, ${G.gold} 65%, ${G.goldDim} 100%)`,
+                  color: '#1A1310',
+                  boxShadow: `0 0 36px rgba(212,162,70,0.4), 0 6px 24px rgba(212,162,70,0.25), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -2px 6px rgba(120,80,20,0.2)`,
                 }}
+                aria-label={isPlaying ? 'Pause' : 'Play'}
               >
                 {isPlaying ? (
                   <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
