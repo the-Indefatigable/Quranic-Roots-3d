@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { useAppStore } from '@/store/useAppStore';
+import { RootBloom } from './RootBloom';
 
 // ── Scroll-reveal via IntersectionObserver ──────────────────────────
 function useScrollReveal() {
@@ -286,13 +287,41 @@ export function HomepageClient() {
             <span style={{ height: 1, width: 32, background: 'rgba(212,162,70,0.4)' }} />
           </div>
 
-          {/* Main headline */}
+          {/* Main headline — Arabic-first, mixed-script */}
           <h1
-            className="font-heading mb-5 leading-[1.1]"
-            style={{ fontSize: 'clamp(2.4rem, 6vw, 4rem)', color: '#F0E8D8', letterSpacing: '-0.02em' }}
+            className="font-heading mb-5 leading-[1.05] flex flex-col items-center gap-1"
+            style={{ fontSize: 'clamp(2.4rem, 6vw, 4rem)', color: '#F0E8D8' }}
           >
-            Understand the Quran.{' '}
-            <span style={{ color: '#D4A246' }}>Word by word.</span>
+            <span className="block">Understand the Quran,</span>
+            <span className="block flex items-baseline justify-center gap-3 flex-wrap">
+              <span
+                className="font-arabic"
+                style={{
+                  color: '#D4A246',
+                  fontSize: 'clamp(2.8rem, 7vw, 4.6rem)',
+                  textShadow: '0 0 36px rgba(212,162,70,0.45)',
+                  letterSpacing: '0.02em',
+                  lineHeight: 1,
+                }}
+                dir="rtl"
+              >
+                كَلِمَة
+              </span>
+              <span style={{ color: '#D4A246', fontStyle: 'italic' }}>by</span>
+              <span
+                className="font-arabic"
+                style={{
+                  color: '#D4A246',
+                  fontSize: 'clamp(2.8rem, 7vw, 4.6rem)',
+                  textShadow: '0 0 36px rgba(212,162,70,0.45)',
+                  letterSpacing: '0.02em',
+                  lineHeight: 1,
+                }}
+                dir="rtl"
+              >
+                كَلِمَة
+              </span>
+            </span>
           </h1>
 
           <p
@@ -628,34 +657,21 @@ export function HomepageClient() {
           ))}
         </div>
 
-        {/* Root tree teaser */}
-        <div
-          className="reveal mt-5 rounded-2xl p-5"
-          style={{
-            background: 'rgba(212,162,70,0.04)',
-            border: '1px solid rgba(212,162,70,0.12)',
-            '--reveal-delay': '0.4s',
-          } as React.CSSProperties}
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <span className="font-arabic text-2xl" style={{ color: '#D4A246' }}>{ROOT_TREE.root}</span>
-            <div>
-              <p className="text-sm font-semibold" style={{ color: '#EDEDEC' }}>The root "{ROOT_TREE.meaning}"</p>
-              <p className="text-xs" style={{ color: '#636260' }}>generates {ROOT_TREE.derivatives.length} words you know</p>
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {ROOT_TREE.derivatives.map((d) => (
-              <div
-                key={d.arabic}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl"
-                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
-              >
-                <span className="font-arabic text-base leading-none" style={{ color: '#D4A246' }}>{d.arabic}</span>
-                <span className="text-[10px]" style={{ color: '#636260' }}>{d.english}</span>
-              </div>
-            ))}
-          </div>
+        {/* ── Signature moment: Root Bloom ── */}
+        <div className="mt-10">
+          <p
+            className="text-center text-[10px] uppercase tracking-[0.3em] font-bold mb-2"
+            style={{ color: '#D4A246', opacity: 0.7 }}
+          >
+            From one root, an entire vocabulary
+          </p>
+          <p
+            className="text-center text-xs mb-2"
+            style={{ color: '#A09F9B' }}
+          >
+            Watch the root <span className="font-arabic" style={{ color: '#D4A246' }}>{ROOT_TREE.root}</span> bloom into {ROOT_TREE.derivatives.length} Quranic words
+          </p>
+          <RootBloom />
         </div>
       </section>
 

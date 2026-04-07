@@ -75,7 +75,7 @@ html, body {
   --color-info-light: rgba(106, 175, 224, 0.10);
   --color-text: #EDEDEC;
   --color-text-secondary: #A09F9B;
-  --color-text-tertiary: #636260;
+  --color-text-tertiary: #7A7975;
   --color-border: rgba(255, 255, 255, 0.07);
   --color-border-light: rgba(255, 255, 255, 0.035);
   /* Shadows carry the elevation — not borders */
@@ -103,6 +103,10 @@ html, body {
 /* ===== Typography ===== */
 @utility font-heading {
   font-family: var(--font-heading);
+  font-optical-sizing: auto;
+  font-variation-settings: "opsz" 144, "SOFT" 0;
+  font-feature-settings: "ss01", "ss02", "lnum", "kern";
+  letter-spacing: -0.022em;
 }
 
 @utility font-arabic {
