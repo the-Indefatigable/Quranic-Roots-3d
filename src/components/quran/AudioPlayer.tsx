@@ -255,12 +255,14 @@ export function AudioPlayer({
     usingSurahAudioRef.current = true;
     audio.src = url;
     audio.load();
+    audio.currentTime = 0;
     audio.playbackRate = playbackSpeedRef.current;
     audio.play().catch(() => setIsPlaying(false));
-    setCurrentAyah(1);
+    setCurrentAyah(0);
     setIsPlaying(true);
     setProgress(0);
-    onAyahChangeRef.current(1);
+    // In surah mode we don't highlight any ayah on the page
+    onAyahChangeRef.current(0);
     onWordChangeRef.current(null);
   }, [audioElement, playAyah]);
 
@@ -806,6 +808,33 @@ export function AudioPlayer({
               style={{ maskImage: 'linear-gradient(to bottom, transparent 0%, black 6%, black 94%, transparent 100%)' }}
             >
               <div className="max-w-lg mx-auto py-6 space-y-3">
+                {playMode === 'surah' ? (
+                  <div
+                    className="flex flex-col items-center justify-center text-center py-16 px-6 rounded-2xl"
+                    style={{ border: `1px solid ${G.border}`, background: G.surface }}
+                  >
+                    <svg className="w-8 h-8 mb-3" fill="none" viewBox="0 0 24 24" strokeWidth={1.2} stroke={G.gold}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 11-.99-3.467l2.31-.66a2.25 2.25 0 001.632-2.163zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 01-.99-3.467l2.31-.66A2.25 2.25 0 009 15.553z" />
+                    </svg>
+                    <p className="text-sm font-medium mb-1" style={{ color: G.textPrimary }}>
+                      Full surah playback
+                    </p>
+                    <p className="text-xs leading-relaxed max-w-[16rem]" style={{ color: G.textSecond }}>
+                      Switch to <span style={{ color: G.gold }}>Ayah mode</span> to see verses and follow along.
+                    </p>
+                    <button
+                      onClick={() => onPlayModeChange('ayah')}
+                      className="mt-5 px-4 py-1.5 rounded-full text-xs font-medium transition-all"
+                      style={{
+                        background: 'rgba(212,162,70,0.1)',
+                        border: `1px solid ${G.goldBorder}`,
+                        color: G.gold,
+                      }}
+                    >
+                      Switch to Ayah mode
+                    </button>
+                  </div>
+                ) : (<>
                 {surahNumber !== 9 && surahNumber !== 1 && (
                   <p
                     className="font-arabic text-xl text-center pb-4"
@@ -858,6 +887,7 @@ export function AudioPlayer({
                     </button>
                   );
                 })}
+                </>)}
                 <div className="h-8" />
               </div>
             </div>
