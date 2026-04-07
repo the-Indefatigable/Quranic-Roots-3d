@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Plus_Jakarta_Sans, DM_Serif_Display } from 'next/font/google';
+import { Plus_Jakarta_Sans, Fraunces } from 'next/font/google';
 import localFont from 'next/font/local';
 import Script from 'next/script';
 import { Suspense } from 'react';
@@ -14,10 +14,14 @@ const jakarta = Plus_Jakarta_Sans({
   display: 'swap',
 });
 
-const dmSerif = DM_Serif_Display({
+// Fraunces — variable display serif with optical sizing & ink traps.
+// SOFT=0 (sharper terminals), opsz auto-adapts at large sizes.
+const fraunces = Fraunces({
   subsets: ['latin'],
   variable: '--font-dm-serif',
-  weight: '400',
+  weight: ['400', '500', '600', '700', '900'],
+  style: ['normal', 'italic'],
+  axes: ['SOFT', 'opsz'],
   display: 'swap',
 });
 
@@ -114,7 +118,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   };
 
   return (
-    <html lang="en" className={`dark ${jakarta.variable} ${dmSerif.variable} ${uthmani.variable}`}>
+    <html lang="en" className={`dark ${jakarta.variable} ${fraunces.variable} ${uthmani.variable}`}>
       <head>
         <link rel="manifest" href="/manifest.json" />
         <script
