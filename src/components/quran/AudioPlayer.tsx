@@ -9,6 +9,7 @@ import { G, SPEED_OPTIONS, formatTime } from './audio/playerTokens';
 import { EqBars, SeekBar, VolumeControl } from './audio/PlayerControls';
 import { useAudioKeyboard } from './audio/useAudioKeyboard';
 import { useQariMenu } from './audio/useQariMenu';
+import { SurahGlyph } from './audio/SurahGlyph';
 
 type ExpandedTab = 'lyrics' | 'spectrum' | 'pitch' | 'practice';
 
@@ -955,11 +956,11 @@ export function AudioPlayer({
       className="fixed bottom-16 left-0 right-0 lg:bottom-0 lg:left-60 z-30"
       style={{ pointerEvents: 'auto' }}
     >
-      {/* Top seekbar */}
+      {/* Refined top seekbar — 2px hairline, gold-on-warm */}
       <div
         ref={!expanded ? seekBarRef : undefined}
-        className="relative w-full h-[3px] cursor-pointer group/seek"
-        style={{ background: 'rgba(255,255,255,0.08)' }}
+        className="relative w-full h-[2px] cursor-pointer group/seek"
+        style={{ background: 'rgba(212,162,70,0.10)' }}
         onMouseDown={(e) => {
           setIsSeeking(true);
           handleSeek(e.clientX);
@@ -982,93 +983,141 @@ export function AudioPlayer({
           style={{
             width: `${progress * 100}%`,
             background: `linear-gradient(to right, ${G.teal}, ${G.gold})`,
+            boxShadow: progress > 0.01 ? `0 0 8px rgba(212,162,70,0.5)` : 'none',
           }}
         />
+        {/* Larger invisible hit area */}
         <div className="absolute -top-3 -bottom-3 left-0 right-0" />
       </div>
 
-      {/* Bar body */}
+      {/* Bar body — warm radial backdrop, manuscript hairline above */}
       <div
-        className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 cursor-pointer"
+        className="relative flex items-center gap-3 sm:gap-4 px-3 sm:px-5 py-3 cursor-pointer"
         style={{
-          background: 'rgba(14,13,12,0.96)',
-          backdropFilter: 'blur(20px)',
+          background:
+            'radial-gradient(ellipse 80% 140% at 20% 50%, rgba(36,28,18,0.98) 0%, rgba(14,13,12,0.98) 60%), rgba(14,13,12,0.96)',
+          backdropFilter: 'blur(24px) saturate(1.2)',
+          WebkitBackdropFilter: 'blur(24px) saturate(1.2)',
           borderTop: `1px solid ${G.goldBorder}`,
+          boxShadow: '0 -8px 32px rgba(0,0,0,0.4)',
         }}
         onClick={(e) => {
           if ((e.target as HTMLElement).closest('button')) return;
           setExpanded(true);
         }}
       >
-        {/* Art / now-playing indicator */}
-        <div
-          className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
-          style={{ background: 'rgba(212,162,70,0.1)', border: `1px solid ${G.goldBorder}` }}
-        >
-          {isPlaying ? (
-            <EqBars active />
-          ) : (
-            <span className="text-sm font-heading" style={{ color: G.gold }}>{surahNumber}</span>
+        {/* Procedural surah glyph — replaces the number-in-square */}
+        <div className="shrink-0 relative flex items-center justify-center">
+          <SurahGlyph surahNumber={surahNumber} size={44} dim={!isPlaying} />
+          {isPlaying && (
+            <div
+              className="absolute inset-0 rounded-full pointer-events-none"
+              style={{
+                boxShadow: '0 0 24px rgba(212,162,70,0.25)',
+              }}
+            />
           )}
         </div>
 
-        {/* Info */}
+        {/* Info — quieter type, more breathing room */}
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium truncate" style={{ color: G.textPrimary }}>{surahName}</p>
-          <p className="text-[11px] truncate" style={{ color: G.textTert }}>
-            Ayah {currentAyah} of {totalAyahs}
-            {duration > 0 && ` · ${formatTime(currentTime)} / ${formatTime(duration)}`}
+          <p
+            className="text-[15px] font-heading leading-tight truncate"
+            style={{ color: G.textPrimary, letterSpacing: '-0.01em' }}
+          >
+            {surahName}
+          </p>
+          <p
+            className="text-[11px] truncate mt-0.5 tabular-nums"
+            style={{ color: G.textTert, letterSpacing: '0.01em' }}
+          >
+            {playMode === 'surah'
+              ? `Surah ${surahNumber}`
+              : `Ayah ${currentAyah} · ${totalAyahs}`}
+            {duration > 0 && ` — ${formatTime(currentTime)} / ${formatTime(duration)}`}
             {timingsError && ' · sync unavailable'}
           </p>
         </div>
 
-        {/* Transport */}
-        <div className="flex items-center gap-0.5">
+        {/* Transport — hero play with circular progress ring */}
+        <div className="flex items-center gap-1">
           <button
             onClick={prevAyah}
             disabled={currentAyah <= 1}
-            className="w-9 h-9 flex items-center justify-center disabled:opacity-25 transition-colors active:scale-90"
+            className="w-9 h-9 flex items-center justify-center disabled:opacity-20 transition-all hover:scale-110 active:scale-90"
             style={{ color: G.textSecond }}
+            aria-label="Previous ayah"
           >
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <svg className="w-[18px] h-[18px]" fill="currentColor" viewBox="0 0 24 24">
               <path d="M6 6h2v12H6zm3.5 6 8.5 6V6z" />
             </svg>
           </button>
 
-          <button
-            onClick={togglePlay}
-            className="w-11 h-11 flex items-center justify-center rounded-full transition-all active:scale-90"
-            style={{
-              background: G.gold,
-              color: G.bg,
-              boxShadow: `0 0 16px rgba(212,162,70,0.3)`,
-            }}
-          >
-            {isPlaying ? (
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
-              </svg>
-            ) : (
-              <svg className="w-5 h-5 translate-x-[1px]" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M8 5v14l11-7z" />
-              </svg>
-            )}
-          </button>
+          {/* Hero play button with circular progress ring */}
+          <div className="relative w-12 h-12 flex items-center justify-center">
+            {/* Progress ring */}
+            <svg className="absolute inset-0 -rotate-90" width="48" height="48" viewBox="0 0 48 48" aria-hidden>
+              <circle
+                cx="24"
+                cy="24"
+                r="22"
+                fill="none"
+                stroke="rgba(212,162,70,0.15)"
+                strokeWidth="1.5"
+              />
+              <circle
+                cx="24"
+                cy="24"
+                r="22"
+                fill="none"
+                stroke={G.gold}
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeDasharray={2 * Math.PI * 22}
+                strokeDashoffset={2 * Math.PI * 22 * (1 - progress)}
+                style={{
+                  transition: 'stroke-dashoffset 0.1s linear',
+                  filter: 'drop-shadow(0 0 4px rgba(212,162,70,0.5))',
+                }}
+              />
+            </svg>
+            <button
+              onClick={togglePlay}
+              className="w-10 h-10 flex items-center justify-center rounded-full transition-all active:scale-90 hover:scale-105"
+              style={{
+                background: `radial-gradient(circle at 30% 30%, #E8B85C, ${G.gold} 70%)`,
+                color: '#1A1310',
+                boxShadow: `0 4px 16px rgba(212,162,70,0.4), inset 0 1px 0 rgba(255,255,255,0.25)`,
+              }}
+              aria-label={isPlaying ? 'Pause' : 'Play'}
+            >
+              {isPlaying ? (
+                <svg className="w-[18px] h-[18px]" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+                </svg>
+              ) : (
+                <svg className="w-[18px] h-[18px] translate-x-[1px]" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              )}
+            </button>
+          </div>
 
           <button
             onClick={nextAyah}
             disabled={currentAyah >= totalAyahs}
-            className="w-9 h-9 flex items-center justify-center disabled:opacity-25 transition-colors active:scale-90"
+            className="w-9 h-9 flex items-center justify-center disabled:opacity-20 transition-all hover:scale-110 active:scale-90"
             style={{ color: G.textSecond }}
+            aria-label="Next ayah"
           >
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <svg className="w-[18px] h-[18px]" fill="currentColor" viewBox="0 0 24 24">
               <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
             </svg>
           </button>
         </div>
 
-        {/* Right-side mini controls */}
-        <div className="hidden sm:flex items-center gap-1">
+        {/* Right-side mini controls — visually demoted, secondary tier */}
+        <div className="hidden sm:flex items-center gap-0.5 opacity-70 hover:opacity-100 transition-opacity">
           <button
             onClick={(e) => { e.stopPropagation(); cycleSpeed(); }}
             className="text-[11px] font-bold px-2 py-1 rounded-md transition-colors"
