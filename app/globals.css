@@ -116,7 +116,7 @@ html, body {
 /* ===== Base elements ===== */
 a { text-decoration: none; color: inherit; }
 
-button {
+:where(button) {
   border-radius: 12px;
   border: 1px solid transparent;
   font-family: inherit;

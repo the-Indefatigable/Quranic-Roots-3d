@@ -1053,38 +1053,13 @@ export function AudioPlayer({
             </svg>
           </button>
 
-          {/* Hero play button with circular progress ring */}
-          <div className="relative w-12 h-12 flex items-center justify-center">
-            {/* Progress ring */}
-            <svg className="absolute inset-0 -rotate-90" width="48" height="48" viewBox="0 0 48 48" aria-hidden>
-              <circle
-                cx="24"
-                cy="24"
-                r="22"
-                fill="none"
-                stroke="rgba(212,162,70,0.15)"
-                strokeWidth="1.5"
-              />
-              <circle
-                cx="24"
-                cy="24"
-                r="22"
-                fill="none"
-                stroke={G.gold}
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeDasharray={2 * Math.PI * 22}
-                strokeDashoffset={2 * Math.PI * 22 * (1 - progress)}
-                style={{
-                  transition: 'stroke-dashoffset 0.1s linear',
-                  filter: 'drop-shadow(0 0 4px rgba(212,162,70,0.5))',
-                }}
-              />
-            </svg>
+          {/* Hero play button with circular progress ring — ring sits flush around button */}
+          <div className="relative w-11 h-11 flex items-center justify-center shrink-0">
             <button
               onClick={togglePlay}
-              className="w-10 h-10 flex items-center justify-center rounded-full transition-all active:scale-90 hover:scale-105"
+              className="w-10 h-10 flex items-center justify-center transition-all active:scale-90 hover:scale-105 shrink-0"
               style={{
+                borderRadius: '9999px',
                 background: `radial-gradient(circle at 30% 30%, #E8B85C, ${G.gold} 70%)`,
                 color: '#1A1310',
                 boxShadow: `0 4px 16px rgba(212,162,70,0.4), inset 0 1px 0 rgba(255,255,255,0.25)`,
@@ -1101,6 +1076,38 @@ export function AudioPlayer({
                 </svg>
               )}
             </button>
+            {/* Progress ring — pointer-events-none so the button stays clickable */}
+            <svg
+              className="absolute inset-0 -rotate-90 pointer-events-none"
+              width="44"
+              height="44"
+              viewBox="0 0 44 44"
+              aria-hidden
+            >
+              <circle
+                cx="22"
+                cy="22"
+                r="21"
+                fill="none"
+                stroke="rgba(212,162,70,0.18)"
+                strokeWidth="1.5"
+              />
+              <circle
+                cx="22"
+                cy="22"
+                r="21"
+                fill="none"
+                stroke={G.gold}
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeDasharray={2 * Math.PI * 21}
+                strokeDashoffset={2 * Math.PI * 21 * (1 - progress)}
+                style={{
+                  transition: 'stroke-dashoffset 0.1s linear',
+                  filter: 'drop-shadow(0 0 4px rgba(212,162,70,0.6))',
+                }}
+              />
+            </svg>
           </div>
 
           <button
