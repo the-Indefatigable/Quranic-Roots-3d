@@ -106,6 +106,8 @@ export function AudioPlayer({
   const ayahDataRef        = useRef<Map<number, AyahAudio>>(new Map());
   const chapterAudioUrlRef = useRef<string | null>(null);
   const usingSurahAudioRef = useRef(false);
+  const playingBismillahRef = useRef(false);
+  const hasBismillah = surahNumber !== 1 && surahNumber !== 9;
   const onAyahChangeRef   = useRef(onAyahChange);
   const onWordChangeRef   = useRef(onWordChange);
   onAyahChangeRef.current = onAyahChange;
@@ -235,6 +237,7 @@ export function AudioPlayer({
     const ayahData = ayahDataRef.current.get(ayahNumber);
     const src     = ayahData?.url ?? buildAyahAudioUrl(selectedQari, surahNumber, ayahNumber);
     usingSurahAudioRef.current = false;
+    playingBismillahRef.current = false;
     audio.src = src;
     audio.load();
     audio.playbackRate = playbackSpeedRef.current;
@@ -248,12 +251,20 @@ export function AudioPlayer({
   }, [audioElement, surahNumber, preloadNextAyah]);
 
   // Play the full chapter audio file (surah mode). No ayah/word highlighting.
+  // For surahs that have Bismillah, play it first then seamlessly switch to
+  // the chapter audio (handled in handleEnded via playingBismillahRef).
   const playChapterAudio = useCallback(() => {
     const audio = audioElement;
     const url = chapterAudioUrlRef.current;
     if (!url) { playAyah(1); return; }
     usingSurahAudioRef.current = true;
-    audio.src = url;
+    if (hasBismillah) {
+      playingBismillahRef.current = true;
+      audio.src = buildAyahAudioUrl(selectedQari, 1, 1);
+    } else {
+      playingBismillahRef.current = false;
+      audio.src = url;
+    }
     audio.load();
     audio.currentTime = 0;
     audio.playbackRate = playbackSpeedRef.current;
@@ -264,7 +275,7 @@ export function AudioPlayer({
     // In surah mode we don't highlight any ayah on the page
     onAyahChangeRef.current(0);
     onWordChangeRef.current(null);
-  }, [audioElement, playAyah]);
+  }, [audioElement, playAyah, hasBismillah, selectedQari]);
 
   useEffect(() => {
     const audio = audioElement;
@@ -365,8 +376,23 @@ export function AudioPlayer({
       setIsPlaying(false);
       onWordChangeRef.current(null);
       const loop = loopModeRef.current;
-      // Surah mode = single chapter audio. Loop or stop.
+      // Surah mode = bismillah (optional) → chapter audio. Loop or stop.
       if (usingSurahAudioRef.current) {
+        // Bismillah just finished — swap to the chapter audio file
+        if (playingBismillahRef.current) {
+          playingBismillahRef.current = false;
+          const url = chapterAudioUrlRef.current;
+          if (url) {
+            audio.src = url;
+            audio.load();
+            audio.currentTime = 0;
+            audio.playbackRate = playbackSpeedRef.current;
+            audio.play().catch(() => setIsPlaying(false));
+            setIsPlaying(true);
+            setProgress(0);
+          }
+          return;
+        }
         if (loop === 'surah') {
           audio.currentTime = 0;
           audio.play().catch(() => setIsPlaying(false));

@@ -58,6 +58,24 @@ const TOPICS = [
     color: '#7C3AED',
     icon: '⬠',
   },
+  {
+    href: '/learn/arifa-vs-alima-vs-fahima',
+    title: 'Arifa vs Alima vs Fahima — 3 Verbs of Knowledge',
+    arabic: 'عَرَفَ · عَلِمَ · فَهِمَ',
+    description: 'Side-by-side comparison of three Arabic verbs meaning "to know" across all 10 verb forms, with Quranic examples and key derivatives.',
+    level: 'Intermediate',
+    color: '#D97706',
+    icon: '◆',
+  },
+  {
+    href: '/learn/verb-forms-meaning-change',
+    title: 'How Verb Forms Change Meaning',
+    arabic: 'تحويل المعنى',
+    description: 'See how one Arabic root generates dozens of words through the verb form system — from عَلِمَ (to know) to عَلَّمَ (to teach) to تَعَلَّمَ (to learn).',
+    level: 'Intermediate',
+    color: '#D97706',
+    icon: '◇',
+  },
 ];
 
 const LEVEL_STYLE: Record<string, { bg: string; text: string }> = {
