@@ -96,6 +96,83 @@ const SAMPLE_ROOTS = [
   { root: '\u0631 \u062d \u0645', meaning: 'to have mercy', freq: 339  },
 ];
 
+// ── Latin → Arabic-Indic digit conversion ────────────────────────────
+const ARABIC_INDIC = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+function toArabicIndic(value: string): string {
+  return value.replace(/[0-9]/g, (d) => ARABIC_INDIC[parseInt(d, 10)]);
+}
+
+// ── Per-feature ornaments — each card gets its own visual personality ──
+function QuranOrnament() {
+  // Manuscript ruling lines like a real mushaf page
+  return (
+    <div
+      aria-hidden
+      className="absolute inset-0 pointer-events-none"
+      style={{
+        backgroundImage:
+          'linear-gradient(to bottom, transparent 0px, transparent 17px, rgba(212,162,70,0.10) 18px)',
+        backgroundSize: '100% 18px',
+        maskImage: 'linear-gradient(to bottom, transparent 0%, black 30%, black 70%, transparent 100%)',
+        WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 30%, black 70%, transparent 100%)',
+      }}
+    />
+  );
+}
+
+function RootsOrnament() {
+  // A small SVG sprout: trunk + 4 branches with leaf nodes
+  return (
+    <svg
+      aria-hidden
+      viewBox="0 0 200 120"
+      className="absolute right-3 bottom-3 w-24 h-16 pointer-events-none"
+      style={{ opacity: 0.25 }}
+    >
+      <g stroke="#D4A246" strokeWidth="1.4" fill="none" strokeLinecap="round">
+        <path d="M100 115 L100 60" />
+        <path d="M100 80 Q70 70 50 50" />
+        <path d="M100 80 Q130 70 150 50" />
+        <path d="M100 60 Q80 45 60 30" />
+        <path d="M100 60 Q120 45 140 30" />
+        <path d="M100 50 L100 25" />
+      </g>
+      <g fill="#D4A246">
+        <circle cx="50" cy="50" r="2.5" />
+        <circle cx="150" cy="50" r="2.5" />
+        <circle cx="60" cy="30" r="2.5" />
+        <circle cx="140" cy="30" r="2.5" />
+        <circle cx="100" cy="25" r="3" />
+      </g>
+    </svg>
+  );
+}
+
+function QiratOrnament() {
+  // Animated waveform — 24 vertical bars on staggered ease loops
+  const bars = Array.from({ length: 24 });
+  return (
+    <div
+      aria-hidden
+      className="absolute left-0 right-0 bottom-0 flex items-end justify-center gap-[2px] h-12 px-5 pointer-events-none"
+      style={{ opacity: 0.35 }}
+    >
+      {bars.map((_, i) => (
+        <span
+          key={i}
+          className="qirat-wave-bar"
+          style={{
+            width: 2,
+            background: 'linear-gradient(to top, #7C3AED, #A78BFA)',
+            borderRadius: 1,
+            animationDelay: `${(i * 90) % 1800}ms`,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
 // ── Feature cards data ────────────────────────────────────────────────
 const FEATURES = [
   {
@@ -109,6 +186,7 @@ const FEATURES = [
     title: 'Quran Reader',
     body: 'Read every ayah with word-by-word translation, root analysis, and audio recitation by world-class Qaaris.',
     cta: 'Open Quran',
+    Ornament: QuranOrnament,
   },
   {
     color: '#D4A246',
@@ -121,6 +199,7 @@ const FEATURES = [
     title: 'Root Explorer',
     body: '1,716 Arabic roots. Understand how one 3-letter root generates dozens of Quranic words you already know.',
     cta: 'Explore Roots',
+    Ornament: RootsOrnament,
   },
   {
     color: '#7C3AED',
@@ -133,6 +212,7 @@ const FEATURES = [
     title: 'Learn Qirat',
     body: 'Train your ear to the 6 maqamat of Quranic recitation. From Bayati to Hijaz — pitch training for every Muslim.',
     cta: 'Start Qirat',
+    Ornament: QiratOrnament,
   },
 ];
 
@@ -401,10 +481,17 @@ export function HomepageClient() {
             ].map((s) => (
               <div key={s.label} className="flex flex-col items-center py-5 px-2" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
                 <span
-                  className="text-2xl font-bold tabular-nums leading-none mb-1"
+                  className="text-2xl font-bold tabular-nums leading-none mb-0.5"
                   style={{ color: '#D4A246', fontVariantNumeric: 'tabular-nums' }}
                 >
                   {s.value}{s.suffix}
+                </span>
+                <span
+                  className="font-arabic text-[11px] leading-none mb-1.5"
+                  style={{ color: '#D4A246', opacity: 0.55, letterSpacing: '0.04em' }}
+                  dir="rtl"
+                >
+                  {toArabicIndic(s.value)}{s.suffix}
                 </span>
                 <span className="text-[10px] uppercase tracking-widest" style={{ color: '#57534E' }}>
                   {s.label}
@@ -465,7 +552,10 @@ export function HomepageClient() {
               {/* Top color bar */}
               <div style={{ height: 3, background: `linear-gradient(to right, ${f.color}, ${f.color}60)` }} />
 
-              <div className="flex flex-col flex-1 p-6">
+              {/* Per-feature ornament — manuscript lines / sprout / waveform */}
+              <f.Ornament />
+
+              <div className="relative z-10 flex flex-col flex-1 p-6">
                 {/* Icon */}
                 <div
                   className="w-11 h-11 rounded-xl flex items-center justify-center mb-5 transition-transform duration-300 group-hover:scale-110"
