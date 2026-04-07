@@ -285,8 +285,12 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, surahArabicNa
   }, [audioCurrentAyah, audioMode, audioSurah, audioPlayMode, audioLoopMode, updatePlayInfo]);
 
   const openAudioMode = useCallback((block: SurahBlock, fromAyah?: number) => {
+    // Stop any existing playback and reset the shared audio element
+    // so the old and new AudioPlayer don't fight over the same element
     if (audioEl) {
-      audioEl.play().catch(() => {});
+      audioEl.pause();
+      audioEl.removeAttribute('src');
+      audioEl.load();
     }
     const startAyah = fromAyah ?? 1;
     setAudioSurah(block);

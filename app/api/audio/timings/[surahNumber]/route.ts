@@ -14,7 +14,6 @@ export async function GET(
   const recitationId = parseInt(url.searchParams.get('recitationId') ?? '7') || 7;
 
   try {
-    // Fetch per-ayah segments and full chapter audio URL in parallel
     const [segRes, chapterRes] = await Promise.all([
       fetch(
         `https://api.quran.com/api/v4/recitations/${recitationId}/by_chapter/${surahNumber}?per_page=300&fields=segments`,
@@ -53,37 +52,14 @@ export async function GET(
       return { ayahNumber: parseInt(ayahStr), url, segments };
     });
 
-    // Extract full chapter audio URL and verse-level timestamps
     let chapterAudioUrl: string | null = null;
-    let chapterVerseTimings: { ayahNumber: number; timestampFrom: number; timestampTo: number; segments: [number, number, number][] }[] = [];
-
     if (chapterRes.ok) {
       const chapterData = await chapterRes.json();
       chapterAudioUrl = chapterData?.audio_file?.audio_url ?? null;
-
-      // verse_timings contains absolute timestamps for the chapter audio file
-      const verseTimings = chapterData?.audio_file?.verse_timings ?? [];
-      chapterVerseTimings = verseTimings.map((vt: {
-        verse_key: string;
-        timestamp_from: number;
-        timestamp_to: number;
-        segments: number[][];
-      }) => {
-        const [, ayahStr] = vt.verse_key.split(':');
-        // Chapter-level segments: [wordPosition, startMs, endMs] — absolute in chapter audio
-        const segments: [number, number, number][] = (vt.segments ?? []).map(
-          (s: number[]) => [s[0], s[1], s[2]] as [number, number, number]
-        );
-        return {
-          ayahNumber: parseInt(ayahStr),
-          timestampFrom: vt.timestamp_from,
-          timestampTo: vt.timestamp_to,
-          segments,
-        };
-      });
+      if (chapterAudioUrl?.startsWith('//')) chapterAudioUrl = `https:${chapterAudioUrl}`;
     }
 
-    return Response.json({ ayahs, chapterAudioUrl, chapterVerseTimings }, {
+    return Response.json({ ayahs, chapterAudioUrl }, {
       headers: { 'Cache-Control': 'public, s-maxage=31536000, immutable' },
     });
   } catch {
