@@ -10,8 +10,9 @@ import { EqBars, SeekBar, VolumeControl } from './audio/PlayerControls';
 import { useAudioKeyboard } from './audio/useAudioKeyboard';
 import { useQariMenu } from './audio/useQariMenu';
 import { SurahGlyph } from './audio/SurahGlyph';
+import { QariProfile } from './audio/QariProfile';
 
-type ExpandedTab = 'lyrics' | 'spectrum' | 'pitch' | 'practice';
+type ExpandedTab = 'lyrics' | 'qari' | 'pitch' | 'practice';
 
 interface AyahAudio {
   ayahNumber: number;
@@ -68,6 +69,10 @@ export function AudioPlayer({
   const ayahDataRef        = useRef<Map<number, AyahAudio>>(new Map());
   const chapterAudioUrlRef = useRef<string | null>(null);
   const usingSurahAudioRef = useRef(false);
+  /** Surah-mode fallback: no chapter audio file available, so play ayahs back-to-back. */
+  const usingStitchedSurahRef = useRef(false);
+  /** Internal ayah index used by stitched-surah mode (no UI highlight). */
+  const stitchedAyahRef = useRef(1);
   const playingBismillahRef = useRef(false);
   const hasBismillah = surahNumber !== 1 && surahNumber !== 9;
   const onAyahChangeRef   = useRef(onAyahChange);
@@ -162,9 +167,25 @@ export function AudioPlayer({
     }
   }, [audioElement]);
 
-  // ── Data fetching ──────────────────────────────────────────────────────────
+  // ── Data fetching — refetches when surah OR qari changes ──────────────────
+  // Track qari changes so we can re-trigger playback at the same ayah
+  // when the user switches reciters mid-session.
+  const prevRecitationIdRef = useRef(selectedQari.quranComRecitationId);
+  const [pendingQariSwap, setPendingQariSwap] = useState(false);
   useEffect(() => {
-    fetch(`/api/audio/timings/${surahNumber}?recitationId=${selectedQari.quranComRecitationId}`)
+    const recitationId = selectedQari.quranComRecitationId;
+    const isQariChange = prevRecitationIdRef.current !== recitationId;
+    if (isQariChange) {
+      prevRecitationIdRef.current = recitationId;
+      setPendingQariSwap(true);
+      // Reset transient state so the timings-arrived effect picks it up cleanly
+      usingSurahAudioRef.current = false;
+      usingStitchedSurahRef.current = false;
+      playingBismillahRef.current = false;
+    }
+    setTimingsLoaded(false);
+    setTimingsError(false);
+    fetch(`/api/audio/timings/${surahNumber}?recitationId=${recitationId}`)
       .then((r) => r.json())
       .then((data) => {
         const ayahList: AyahAudio[] = Array.isArray(data) ? data : data.ayahs ?? [];
@@ -178,7 +199,7 @@ export function AudioPlayer({
         setTimingsError(true);
         setTimingsLoaded(true);
       });
-  }, [surahNumber]);
+  }, [surahNumber, selectedQari.quranComRecitationId]);
 
   // ── Playback ───────────────────────────────────────────────────────────────
   const preloadNextAyah = useCallback((currentAyahNumber: number) => {
@@ -199,6 +220,7 @@ export function AudioPlayer({
     const ayahData = ayahDataRef.current.get(ayahNumber);
     const src     = ayahData?.url ?? buildAyahAudioUrl(selectedQari, surahNumber, ayahNumber);
     usingSurahAudioRef.current = false;
+    usingStitchedSurahRef.current = false;
     playingBismillahRef.current = false;
     audio.src = src;
     audio.load();
@@ -212,14 +234,39 @@ export function AudioPlayer({
     preloadNextAyah(ayahNumber);
   }, [audioElement, surahNumber, preloadNextAyah]);
 
+  // Stitched surah mode: when no chapter audio file is available (some
+  // surahs/qaris have only per-ayah files), play ayah audio back-to-back
+  // continuously with NO highlighting — true "listen straight through".
+  const playStitchedSurah = useCallback((startAt: number = 1) => {
+    const audio = audioElement;
+    usingSurahAudioRef.current = true;
+    usingStitchedSurahRef.current = true;
+    playingBismillahRef.current = false;
+    stitchedAyahRef.current = startAt;
+    const ayahData = ayahDataRef.current.get(startAt);
+    audio.src = ayahData?.url ?? buildAyahAudioUrl(selectedQari, surahNumber, startAt);
+    audio.load();
+    audio.currentTime = 0;
+    audio.playbackRate = playbackSpeedRef.current;
+    audio.play().catch(() => setIsPlaying(false));
+    setCurrentAyah(0);
+    setIsPlaying(true);
+    setProgress(0);
+    // No highlighting in stitched surah mode
+    onAyahChangeRef.current(0);
+    onWordChangeRef.current(null);
+  }, [audioElement, selectedQari, surahNumber]);
+
   // Play the full chapter audio file (surah mode). No ayah/word highlighting.
   // For surahs that have Bismillah, play it first then seamlessly switch to
   // the chapter audio (handled in handleEnded via playingBismillahRef).
+  // Falls back to stitched mode when no chapter audio file is available.
   const playChapterAudio = useCallback(() => {
     const audio = audioElement;
     const url = chapterAudioUrlRef.current;
-    if (!url) { playAyah(1); return; }
+    if (!url) { playStitchedSurah(1); return; }
     usingSurahAudioRef.current = true;
+    usingStitchedSurahRef.current = false;
     if (hasBismillah) {
       playingBismillahRef.current = true;
       audio.src = buildAyahAudioUrl(selectedQari, 1, 1);
@@ -237,7 +284,7 @@ export function AudioPlayer({
     // In surah mode we don't highlight any ayah on the page
     onAyahChangeRef.current(0);
     onWordChangeRef.current(null);
-  }, [audioElement, playAyah, hasBismillah, selectedQari]);
+  }, [audioElement, playStitchedSurah, hasBismillah, selectedQari]);
 
   useEffect(() => {
     const audio = audioElement;
@@ -257,14 +304,24 @@ export function AudioPlayer({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // When timings (and chapterAudioUrl) arrive after mount in surah mode
+  // When timings (and chapterAudioUrl) arrive after mount OR after a qari swap
   useEffect(() => {
     if (!timingsLoaded) return;
+    // Qari was swapped mid-session: restart at the same position in the same mode
+    if (pendingQariSwap) {
+      setPendingQariSwap(false);
+      if (playModeRef.current === 'surah') {
+        playChapterAudio();
+      } else {
+        playAyah(currentAyahRef.current || 1);
+      }
+      return;
+    }
     if (playModeRef.current === 'surah' && !usingSurahAudioRef.current) {
       playChapterAudio();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [timingsLoaded]);
+  }, [timingsLoaded, pendingQariSwap]);
 
   // React to playMode changes mid-session
   const prevPlayModeRef = useRef(playMode);
@@ -338,6 +395,35 @@ export function AudioPlayer({
       setIsPlaying(false);
       onWordChangeRef.current(null);
       const loop = loopModeRef.current;
+      // Stitched surah mode: advance to next ayah audio without highlighting
+      if (usingSurahAudioRef.current && usingStitchedSurahRef.current) {
+        const next = stitchedAyahRef.current + 1;
+        const total = totalAyahsRef.current;
+        if (next <= total) {
+          stitchedAyahRef.current = next;
+          const ayahData = ayahDataRef.current.get(next);
+          audio.src = ayahData?.url ?? buildAyahAudioUrl(selectedQari, surahNumber, next);
+          audio.load();
+          audio.currentTime = 0;
+          audio.playbackRate = playbackSpeedRef.current;
+          audio.play().catch(() => setIsPlaying(false));
+          setIsPlaying(true);
+          setProgress(0);
+        } else if (loop === 'surah') {
+          // Loop the whole stitched surah
+          setPlayRevision(r => r + 1);
+          stitchedAyahRef.current = 1;
+          const ayahData = ayahDataRef.current.get(1);
+          audio.src = ayahData?.url ?? buildAyahAudioUrl(selectedQari, surahNumber, 1);
+          audio.load();
+          audio.currentTime = 0;
+          audio.playbackRate = playbackSpeedRef.current;
+          audio.play().catch(() => setIsPlaying(false));
+          setIsPlaying(true);
+          setProgress(0);
+        }
+        return;
+      }
       // Surah mode = bismillah (optional) → chapter audio. Loop or stop.
       if (usingSurahAudioRef.current) {
         // Bismillah just finished — swap to the chapter audio file
@@ -428,6 +514,12 @@ export function AudioPlayer({
   }
 
   function prevAyah() {
+    // Stitched surah mode: jump to previous ayah audio
+    if (usingStitchedSurahRef.current) {
+      const prev = Math.max(1, stitchedAyahRef.current - 1);
+      playStitchedSurah(prev);
+      return;
+    }
     if (usingSurahAudioRef.current) {
       audioElement.currentTime = Math.max(0, audioElement.currentTime - 10);
       return;
@@ -437,6 +529,13 @@ export function AudioPlayer({
   }
 
   function nextAyah() {
+    // Stitched surah mode: jump to next ayah audio
+    if (usingStitchedSurahRef.current) {
+      const next = Math.min(totalAyahsRef.current, stitchedAyahRef.current + 1);
+      if (next === stitchedAyahRef.current) return;
+      playStitchedSurah(next);
+      return;
+    }
     if (usingSurahAudioRef.current) {
       audioElement.currentTime = Math.min(audioElement.duration || 0, audioElement.currentTime + 10);
       return;
@@ -688,7 +787,7 @@ export function AudioPlayer({
           >
             {([
               { id: 'lyrics'   as ExpandedTab, label: 'Lyrics',    icon: <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" /></svg> },
-              { id: 'spectrum' as ExpandedTab, label: 'Spectrum',  icon: <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" /></svg> },
+              { id: 'qari'     as ExpandedTab, label: 'Qari',      icon: <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" /></svg> },
               { id: 'pitch'    as ExpandedTab, label: 'Melody',    icon: <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m9 9 10.5-3m0 6.553v3.75a2.25 2.25 0 0 1-1.632 2.163l-1.32.377a1.803 1.803 0 1 1-.99-3.467l2.31-.66a2.25 2.25 0 0 0 1.632-2.163Zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 0 1-1.632 2.163l-1.32.377a1.803 1.803 0 0 1-.99-3.467l2.31-.66A2.25 2.25 0 0 0 9 15.553Z" /></svg> },
               { id: 'practice' as ExpandedTab, label: 'Practice',  icon: <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" /></svg> },
             ]).map((tab) => {
@@ -803,6 +902,11 @@ export function AudioPlayer({
               </div>
             </div>
 
+          ) : expandedTab === 'qari' ? (
+            <div className="flex-1 overflow-hidden" style={{ minHeight: 0 }}>
+              <QariProfile qari={selectedQari} />
+            </div>
+
           ) : expandedTab === 'practice' ? (
             <div className="flex-1 overflow-hidden px-4 sm:px-6 py-3" style={{ minHeight: 0 }}>
               <div
@@ -833,16 +937,14 @@ export function AudioPlayer({
                 <AudioVisualizer
                   analyserNode={analyserNode}
                   isPlaying={isPlaying}
-                  mode={expandedTab === 'spectrum' ? 'spectrum' : 'pitch'}
+                  mode="pitch"
                   currentAyah={currentAyah}
                 />
                 <div
                   className="absolute top-3 right-3 text-[10px] px-2 py-1 rounded-md"
                   style={{ background: 'rgba(14,13,12,0.8)', color: G.textTert, backdropFilter: 'blur(6px)' }}
                 >
-                  {expandedTab === 'spectrum'
-                    ? 'FFT frequency spectrum · Harmonics highlighted'
-                    : "Pitch contour shows the Qari's melody"}
+                  The qari&apos;s melody — copy the contour
                 </div>
               </div>
             </div>
