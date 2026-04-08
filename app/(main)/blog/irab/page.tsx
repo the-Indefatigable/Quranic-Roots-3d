@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'I\'rab — Arabic Case Endings | QuRoots',
     description: 'Master the Arabic case system with Quranic examples.',
-    url: 'https://quroots.com/learn/irab',
+    url: 'https://quroots.com/blog/irab',
     images: [{ url: '/og-image.png', width: 1200, height: 630 }],
   },
   twitter: {
@@ -25,7 +25,7 @@ export default function IrabPage() {
     '@type': 'Article',
     'headline': 'I\'rab (الإعراب) — Arabic Grammatical Case Endings Explained',
     'description': 'A comprehensive guide to Arabic case endings (i\'rab) with Quranic examples.',
-    'url': 'https://quroots.com/learn/irab',
+    'url': 'https://quroots.com/blog/irab',
     'publisher': { '@type': 'Organization', 'name': 'QuRoots' },
     'educationalLevel': 'Beginner',
     'inLanguage': ['en', 'ar'],
@@ -196,7 +196,7 @@ export default function IrabPage() {
           <Link href="/learn" className="text-sm text-white/30 hover:text-white/60 transition-colors">
             &larr; All Lessons
           </Link>
-          <Link href="/learn/mufrad-muthanna-jam" className="text-sm text-primary/70 hover:text-primary transition-colors">
+          <Link href="/blog/mufrad-muthanna-jam" className="text-sm text-primary/70 hover:text-primary transition-colors">
             Next: Singular, Dual & Plural &rarr;
           </Link>
         </div>

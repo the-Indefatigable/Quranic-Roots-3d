@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Murakkab — Arabic Compound Phrases | QuRoots',
     description: 'Master idaafi, wasfi, and mazji compounds with Quranic examples.',
-    url: 'https://quroots.com/learn/murakkab',
+    url: 'https://quroots.com/blog/murakkab',
     images: [{ url: '/og-image.png', width: 1200, height: 630 }],
   },
 };
@@ -18,7 +18,7 @@ export default function MurakkabPage() {
     '@context': 'https://schema.org',
     '@type': 'Article',
     'headline': 'Murakkab — Compound Phrases in Arabic Grammar',
-    'url': 'https://quroots.com/learn/murakkab',
+    'url': 'https://quroots.com/blog/murakkab',
     'publisher': { '@type': 'Organization', 'name': 'QuRoots' },
     'educationalLevel': 'Intermediate',
     'inLanguage': ['en', 'ar'],
@@ -128,10 +128,10 @@ export default function MurakkabPage() {
         </section>
 
         <div className="flex items-center justify-between pt-8 border-t border-border-light">
-          <Link href="/learn/mufrad-muthanna-jam" className="text-sm text-white/30 hover:text-white/60 transition-colors">
+          <Link href="/blog/mufrad-muthanna-jam" className="text-sm text-white/30 hover:text-white/60 transition-colors">
             &larr; Singular, Dual & Plural
           </Link>
-          <Link href="/learn/adad" className="text-sm text-primary/70 hover:text-primary transition-colors">
+          <Link href="/blog/adad" className="text-sm text-primary/70 hover:text-primary transition-colors">
             Next: Numbers in Arabic &rarr;
           </Link>
         </div>

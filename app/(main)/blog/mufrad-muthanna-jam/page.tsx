@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Singular, Dual & Plural in Arabic | QuRoots',
     description: 'Master mufrad, muthanna, and jam\' with Quranic examples.',
-    url: 'https://quroots.com/learn/mufrad-muthanna-jam',
+    url: 'https://quroots.com/blog/mufrad-muthanna-jam',
     images: [{ url: '/og-image.png', width: 1200, height: 630 }],
   },
 };
@@ -18,7 +18,7 @@ export default function MufradPage() {
     '@context': 'https://schema.org',
     '@type': 'Article',
     'headline': 'Mufrad, Muthanna & Jam\' — Singular, Dual & Plural in Arabic',
-    'url': 'https://quroots.com/learn/mufrad-muthanna-jam',
+    'url': 'https://quroots.com/blog/mufrad-muthanna-jam',
     'publisher': { '@type': 'Organization', 'name': 'QuRoots' },
     'educationalLevel': 'Beginner',
     'inLanguage': ['en', 'ar'],
@@ -179,10 +179,10 @@ export default function MufradPage() {
         </section>
 
         <div className="flex items-center justify-between pt-8 border-t border-border-light">
-          <Link href="/learn/irab" className="text-sm text-white/30 hover:text-white/60 transition-colors">
+          <Link href="/blog/irab" className="text-sm text-white/30 hover:text-white/60 transition-colors">
             &larr; I&apos;rab
           </Link>
-          <Link href="/learn/murakkab" className="text-sm text-primary/70 hover:text-primary transition-colors">
+          <Link href="/blog/murakkab" className="text-sm text-primary/70 hover:text-primary transition-colors">
             Next: Compound Phrases &rarr;
           </Link>
         </div>

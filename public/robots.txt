@@ -3,6 +3,7 @@ Allow: /
 Allow: /quran
 Allow: /roots
 Allow: /learn
+Allow: /blog
 Allow: /search
 Disallow: /quiz
 Disallow: /bookmarks

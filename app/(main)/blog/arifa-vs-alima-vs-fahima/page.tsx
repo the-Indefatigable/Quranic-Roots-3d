@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     title: 'Arifa vs Alima vs Fahima — 3 Verbs of Knowledge Compared | QuRoots',
     description:
       'Master the subtle differences between عَرَفَ, عَلِمَ, and فَهِمَ across all 10 Arabic verb forms with Quranic examples.',
-    url: 'https://quroots.com/learn/arifa-vs-alima-vs-fahima',
+    url: 'https://quroots.com/blog/arifa-vs-alima-vs-fahima',
     type: 'article',
     images: [{ url: '/og-image.png', width: 1200, height: 630 }],
   },
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     images: ['/og-image.png'],
   },
   alternates: {
-    canonical: 'https://quroots.com/learn/arifa-vs-alima-vs-fahima',
+    canonical: 'https://quroots.com/blog/arifa-vs-alima-vs-fahima',
   },
 };
 
@@ -255,7 +255,7 @@ export default function ArifaVsAlimaVsFahimaPage() {
       'Arifa vs Alima vs Fahima — Three Arabic Verbs of Knowledge Compared Across All Verb Forms',
     description:
       'A comprehensive side-by-side comparison of three Quranic Arabic verbs meaning "to know" — showing how each transforms through the 10 verb forms (awzaan) with examples from the Quran.',
-    url: 'https://quroots.com/learn/arifa-vs-alima-vs-fahima',
+    url: 'https://quroots.com/blog/arifa-vs-alima-vs-fahima',
     publisher: { '@type': 'Organization', name: 'QuRoots' },
     educationalLevel: 'Intermediate',
     inLanguage: ['en', 'ar'],
@@ -707,7 +707,7 @@ export default function ArifaVsAlimaVsFahimaPage() {
         {/* ── Related Articles / Navigation ───────────────────── */}
         <div className="flex items-center justify-between pt-8 border-t border-border-light">
           <Link
-            href="/learn/verb-forms"
+            href="/blog/verb-forms"
             className="text-sm text-text-tertiary hover:text-text-secondary transition-colors"
           >
             &larr; The 10 Verb Forms

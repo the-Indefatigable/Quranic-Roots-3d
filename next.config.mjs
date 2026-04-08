@@ -12,12 +12,27 @@ const nextConfig = {
   // Redirect old static JSON paths (pre-DB-migration) so stale browser caches
   // get a clean reload instead of a confusing 404.
   async redirects() {
+    const movedArticles = [
+      'irab',
+      'mufrad-muthanna-jam',
+      'murakkab',
+      'adad',
+      'verb-forms',
+      'verb-forms-meaning-change',
+      'arifa-vs-alima-vs-fahima',
+    ];
     return [
       {
         source: '/data/:path*',
         destination: '/',
         permanent: false,
       },
+      // /learn/<article>  →  /blog/<article>  (301)
+      ...movedArticles.map((slug) => ({
+        source: `/learn/${slug}`,
+        destination: `/blog/${slug}`,
+        permanent: true,
+      })),
     ];
   },
   async headers() {

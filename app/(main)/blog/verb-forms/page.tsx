@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'The 10 Arabic Verb Forms | QuRoots',
     description: 'Master Arabic verb patterns (awzaan) with Quranic examples for Forms I–X.',
-    url: 'https://quroots.com/learn/verb-forms',
+    url: 'https://quroots.com/blog/verb-forms',
     images: [{ url: '/og-image.png', width: 1200, height: 630 }],
   },
 };
@@ -141,7 +141,7 @@ export default function VerbFormsPage() {
     '@context': 'https://schema.org',
     '@type': 'Article',
     'headline': 'The 10 Arabic Verb Forms — A Complete Guide with Quranic Examples',
-    'url': 'https://quroots.com/learn/verb-forms',
+    'url': 'https://quroots.com/blog/verb-forms',
     'publisher': { '@type': 'Organization', 'name': 'QuRoots' },
     'educationalLevel': 'Advanced',
     'inLanguage': ['en', 'ar'],
@@ -235,7 +235,7 @@ export default function VerbFormsPage() {
         </section>
 
         <div className="flex items-center justify-between pt-8 border-t border-border-light">
-          <Link href="/learn/adad" className="text-sm text-text-tertiary hover:text-text-secondary transition-colors">
+          <Link href="/blog/adad" className="text-sm text-text-tertiary hover:text-text-secondary transition-colors">
             &larr; Numbers in Arabic
           </Link>
           <Link href="/learn" className="text-sm text-primary hover:text-primary transition-colors">

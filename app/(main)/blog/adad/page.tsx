@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Adad — Arabic Numbers | QuRoots',
     description: 'Master Arabic number rules with Quranic examples.',
-    url: 'https://quroots.com/learn/adad',
+    url: 'https://quroots.com/blog/adad',
     images: [{ url: '/og-image.png', width: 1200, height: 630 }],
   },
 };
@@ -18,7 +18,7 @@ export default function AdadPage() {
     '@context': 'https://schema.org',
     '@type': 'Article',
     'headline': 'Adad — Numbers in Arabic Grammar',
-    'url': 'https://quroots.com/learn/adad',
+    'url': 'https://quroots.com/blog/adad',
     'publisher': { '@type': 'Organization', 'name': 'QuRoots' },
     'educationalLevel': 'Intermediate',
     'inLanguage': ['en', 'ar'],
@@ -151,10 +151,10 @@ export default function AdadPage() {
         </section>
 
         <div className="flex items-center justify-between pt-8 border-t border-border-light">
-          <Link href="/learn/murakkab" className="text-sm text-white/30 hover:text-white/60 transition-colors">
+          <Link href="/blog/murakkab" className="text-sm text-white/30 hover:text-white/60 transition-colors">
             &larr; Compound Phrases
           </Link>
-          <Link href="/learn/verb-forms" className="text-sm text-primary/70 hover:text-primary transition-colors">
+          <Link href="/blog/verb-forms" className="text-sm text-primary/70 hover:text-primary transition-colors">
             Next: The 10 Verb Forms &rarr;
           </Link>
         </div>

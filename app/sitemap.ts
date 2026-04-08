@@ -14,11 +14,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/quran`, changeFrequency: 'monthly', priority: 0.9 },
     { url: `${baseUrl}/roots`, changeFrequency: 'monthly', priority: 0.9 },
     { url: `${baseUrl}/learn`, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${baseUrl}/blog`, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${baseUrl}/search`, changeFrequency: 'monthly', priority: 0.6 },
   ];
 
-  // Learn / grammar pages
+  // Blog articles (formerly /learn/*)
   const learnPages: MetadataRoute.Sitemap = [
+    'daily-arabic-words',
+    'beginner-arabic-islamic-books',
     'irab',
     'mufrad-muthanna-jam',
     'murakkab',
@@ -27,7 +30,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     'arifa-vs-alima-vs-fahima',
     'verb-forms-meaning-change',
   ].map((slug) => ({
-    url: `${baseUrl}/learn/${slug}`,
+    url: `${baseUrl}/blog/${slug}`,
     changeFrequency: 'monthly' as const,
     priority: 0.85,
   }));

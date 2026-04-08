@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     title: 'How Verb Forms Change Meaning in the Quran | QuRoots',
     description:
       'See how one Arabic root generates dozens of words through the verb form system — with real Quranic examples.',
-    url: 'https://quroots.com/learn/verb-forms-meaning-change',
+    url: 'https://quroots.com/blog/verb-forms-meaning-change',
     type: 'article',
     images: [{ url: '/og-image.png', width: 1200, height: 630 }],
   },
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     images: ['/og-image.png'],
   },
   alternates: {
-    canonical: 'https://quroots.com/learn/verb-forms-meaning-change',
+    canonical: 'https://quroots.com/blog/verb-forms-meaning-change',
   },
 };
 
@@ -218,7 +218,7 @@ export default function VerbFormsMeaningChangePage() {
       'How Arabic Verb Forms Change Meaning — عَرَفَ, عَلِمَ, فَهِمَ in the Quran',
     description:
       'Discover how the Arabic verb form system transforms three roots of knowledge into dozens of Quranic words.',
-    url: 'https://quroots.com/learn/verb-forms-meaning-change',
+    url: 'https://quroots.com/blog/verb-forms-meaning-change',
     publisher: { '@type': 'Organization', name: 'QuRoots' },
     educationalLevel: 'Intermediate',
     inLanguage: ['en', 'ar'],
@@ -519,7 +519,7 @@ export default function VerbFormsMeaningChangePage() {
               </svg>
             </Link>
             <Link
-              href="/learn/arifa-vs-alima-vs-fahima"
+              href="/blog/arifa-vs-alima-vs-fahima"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-200 hover:scale-105"
               style={{
                 background: 'rgba(255,255,255,0.04)',
@@ -535,7 +535,7 @@ export default function VerbFormsMeaningChangePage() {
         {/* ── Navigation ───────────────────────────────────── */}
         <div className="flex items-center justify-between pt-8 border-t border-border-light">
           <Link
-            href="/learn/arifa-vs-alima-vs-fahima"
+            href="/blog/arifa-vs-alima-vs-fahima"
             className="text-sm text-text-tertiary hover:text-text-secondary transition-colors"
           >
             &larr; Arifa vs Alima vs Fahima

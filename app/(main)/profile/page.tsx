@@ -8,11 +8,11 @@ import { useAppStore } from '@/store/useAppStore';
 import { cn } from '@/lib/cn';
 
 const grammarArticles = [
-  { href: '/learn/irab', title: "I'rab — Case Endings", arabic: 'الإعراب', level: 'Essential' },
-  { href: '/learn/mufrad-muthanna-jam', title: 'Singular, Dual & Plural', arabic: 'مفرد · مثنى · جمع', level: 'Essential' },
-  { href: '/learn/murakkab', title: 'Compound Phrases', arabic: 'المركّب', level: 'Intermediate' },
-  { href: '/learn/adad', title: 'Numbers in Arabic', arabic: 'العدد', level: 'Intermediate' },
-  { href: '/learn/verb-forms', title: 'The 10 Verb Forms', arabic: 'أوزان الفعل', level: 'Advanced' },
+  { href: '/blog/irab', title: "I'rab — Case Endings", arabic: 'الإعراب', level: 'Essential' },
+  { href: '/blog/mufrad-muthanna-jam', title: 'Singular, Dual & Plural', arabic: 'مفرد · مثنى · جمع', level: 'Essential' },
+  { href: '/blog/murakkab', title: 'Compound Phrases', arabic: 'المركّب', level: 'Intermediate' },
+  { href: '/blog/adad', title: 'Numbers in Arabic', arabic: 'العدد', level: 'Intermediate' },
+  { href: '/blog/verb-forms', title: 'The 10 Verb Forms', arabic: 'أوزان الفعل', level: 'Advanced' },
 ];
 
 export default function ProfilePage() {
