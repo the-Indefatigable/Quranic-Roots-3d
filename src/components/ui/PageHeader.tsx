@@ -5,25 +5,34 @@ import { motion } from 'framer-motion';
 interface PageHeaderProps {
   title: string;
   subtitle?: string;
+  eyebrow?: string;
   children?: React.ReactNode;
 }
 
-export function PageHeader({ title, subtitle, children }: PageHeaderProps) {
+export function PageHeader({ title, subtitle, eyebrow, children }: PageHeaderProps) {
   return (
     <motion.div
-      className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8"
+      className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-10"
       initial={{ opacity: 0, y: -16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
     >
       <div>
+        {eyebrow && (
+          <div
+            className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em]"
+            style={{ color: 'var(--color-primary)' }}
+          >
+            {eyebrow}
+          </div>
+        )}
         <h1
-          className="text-2xl sm:text-3xl font-heading tracking-tight"
-          style={{ color: '#F0E4CA', textShadow: '0 0 40px rgba(212,162,70,0.15)' }}
+          className="text-3xl sm:text-4xl font-heading tracking-tight leading-[1.05]"
+          style={{ color: 'var(--color-ivory)', textShadow: 'var(--glow-ivory)' }}
         >{title}</h1>
         {subtitle && (
           <motion.p
-            className="mt-1.5 text-sm text-text-secondary"
+            className="mt-2 text-sm sm:text-[15px] text-text-secondary max-w-xl leading-relaxed"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.15, duration: 0.3 }}

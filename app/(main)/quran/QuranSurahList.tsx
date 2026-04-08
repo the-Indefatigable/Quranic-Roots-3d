@@ -3,7 +3,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Badge } from '@/components/ui/Badge';
 
 interface Surah {
   number: number;
@@ -48,28 +47,34 @@ export function QuranSurahList() {
         <div
           className="absolute inset-0"
           style={{
-            backgroundImage: 'radial-gradient(circle, rgba(212,162,70,0.04) 1px, transparent 1px)',
-            backgroundSize: '28px 28px',
+            backgroundImage: 'radial-gradient(circle, rgba(212,162,70,0.025) 1px, transparent 1px)',
+            backgroundSize: '32px 32px',
           }}
         />
       </div>
 
       {/* Header */}
       <motion.div
-        className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8 relative z-10"
+        className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-10 relative z-10"
         initial={{ opacity: 0, y: -16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
       >
         <div>
+          <div
+            className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em]"
+            style={{ color: 'var(--color-primary)' }}
+          >
+            The Holy Book
+          </div>
           <h1
-            className="text-2xl sm:text-3xl font-heading tracking-tight"
-            style={{ color: '#F0E4CA', textShadow: '0 0 40px rgba(212,162,70,0.15)' }}
+            className="text-3xl sm:text-4xl font-heading tracking-tight leading-[1.05]"
+            style={{ color: 'var(--color-ivory)', textShadow: 'var(--glow-ivory)' }}
           >
             Quran
           </h1>
           <motion.p
-            className="mt-1.5 text-sm text-text-secondary"
+            className="mt-2 text-sm sm:text-[15px] text-text-secondary leading-relaxed"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.15, duration: 0.3 }}
@@ -173,49 +178,49 @@ export function QuranSurahList() {
             >
               <Link
                 href={`/quran/${surah.number}`}
-                className="group flex items-center gap-4 rounded-2xl px-5 py-4 transition-all duration-200"
+                className="group flex items-center gap-4 rounded-2xl px-5 py-4 transition-colors duration-200 hover:[background:rgba(212,162,70,0.06)] hover:[border-color:rgba(212,162,70,0.2)]"
                 style={{
                   background: 'rgba(255,255,255,0.03)',
                   border: '1px solid rgba(255,255,255,0.06)',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.25)',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'rgba(212,162,70,0.06)';
-                  e.currentTarget.style.borderColor = 'rgba(212,162,70,0.2)';
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.35), 0 0 0 1px rgba(212,162,70,0.12)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
-                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.25)';
                 }}
               >
                 <div
-                  className="flex items-center justify-center w-10 h-10 rounded-xl text-sm font-medium"
-                  style={{ background: 'rgba(212,162,70,0.10)', color: '#D4A246' }}
+                  className="flex items-center justify-center w-11 h-11 rounded-xl font-heading text-base shrink-0"
+                  style={{
+                    background: 'rgba(212,162,70,0.08)',
+                    color: 'var(--color-primary)',
+                    fontVariantNumeric: 'tabular-nums',
+                  }}
                 >
                   {surah.number}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium text-text truncate">
+                  <div className="flex items-center justify-between gap-2">
+                    <p
+                      className="font-heading text-[17px] truncate leading-tight"
+                      style={{ color: 'var(--color-ivory)' }}
+                    >
                       {surah.englishName}
                     </p>
                     <span
-                      className="font-arabic text-lg ml-2 shrink-0"
-                      style={{ color: '#D4A246' }}
+                      className="font-arabic text-xl shrink-0"
+                      style={{ color: 'var(--color-primary)' }}
                     >
                       {surah.arabicName}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <Badge>{surah.versesCount} ayahs</Badge>
+                  <div
+                    className="flex items-center gap-2 mt-1 text-[11px] text-text-tertiary"
+                    style={{ fontVariantNumeric: 'tabular-nums' }}
+                  >
+                    <span>{surah.versesCount} ayahs</span>
                     {surah.revelationType && (
-                      <Badge variant={surah.revelationType === 'makkah' ? 'amber' : 'emerald'}>
-                        {surah.revelationType === 'makkah' ? 'Meccan' : 'Medinan'}
-                      </Badge>
+                      <>
+                        <span className="opacity-40">·</span>
+                        <span className="uppercase tracking-wider">
+                          {surah.revelationType === 'makkah' ? 'Meccan' : 'Medinan'}
+                        </span>
+                      </>
                     )}
                   </div>
                 </div>

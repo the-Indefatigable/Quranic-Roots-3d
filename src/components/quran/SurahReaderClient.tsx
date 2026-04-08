@@ -469,8 +469,18 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, surahArabicNa
                 >
                   {block.arabicName}
                 </p>
-                <h2 className="font-heading text-lg font-light" style={{ color: '#EDEDEC' }}>{block.surahName}</h2>
-                <p className="text-xs mt-1" style={{ color: '#57534E' }}>{block.ayahs.length} Ayahs</p>
+                <h2
+                  className="font-heading text-2xl tracking-tight leading-tight"
+                  style={{ color: 'var(--color-ivory)', textShadow: 'var(--glow-ivory)' }}
+                >
+                  {block.surahName}
+                </h2>
+                <p
+                  className="text-[11px] mt-1.5 uppercase tracking-[0.16em]"
+                  style={{ color: '#57534E', fontVariantNumeric: 'tabular-nums' }}
+                >
+                  {block.ayahs.length} Ayahs
+                </p>
 
                 {/* Bismillah */}
                 {block.surahNumber !== 9 && block.surahNumber !== 1 && (
