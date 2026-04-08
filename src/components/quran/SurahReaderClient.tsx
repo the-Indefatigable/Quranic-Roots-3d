@@ -703,6 +703,10 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, surahArabicNa
               <p className="text-[11px] tracking-widest uppercase" style={{ color: '#3D3C3A' }}>
                 End of Surah {block.surahName}
               </p>
+              <p className="mt-3 text-[10px] tracking-wider" style={{ color: '#3D3C3A' }}>
+                Translation: <span style={{ color: '#57534E' }}>Kanzul Iman</span>
+                {' · '}Imam Ahmad Raza Khan
+              </p>
             </div>
           </div>
         );
