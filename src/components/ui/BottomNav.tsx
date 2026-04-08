@@ -10,7 +10,6 @@ const NAV = [
   { href: '/learn/qirat', label: 'Qirat',  icon: QiratIcon  },
   { href: '/quran',       label: 'Quran',  icon: BookIcon   },
   { href: '/roots',       label: 'Roots',  icon: RootIcon   },
-  { href: '/search',      label: 'Search', icon: SearchIcon },
 ];
 
 export function BottomNav() {
@@ -30,12 +29,13 @@ export function BottomNav() {
       style={{ pointerEvents: 'none' }}
     >
       <div
-        className="flex items-center justify-around w-full max-w-sm rounded-2xl px-2 h-[60px]"
+        className="flex items-center justify-around w-full max-w-md rounded-2xl px-2 h-[64px]"
         style={{
-          background: 'rgba(20,19,18,0.92)',
-          backdropFilter: 'blur(16px)',
-          border: '1px solid rgba(255,255,255,0.08)',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.5), 0 1px 0 rgba(255,255,255,0.05) inset',
+          background: 'var(--color-nav-glass)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          border: '1px solid var(--color-nav-border)',
+          boxShadow: 'var(--shadow-nav)',
           pointerEvents: 'auto',
         }}
       >
@@ -45,22 +45,19 @@ export function BottomNav() {
             <Link
               key={item.href}
               href={item.href}
-              className="relative flex flex-col items-center justify-center gap-[3px] w-12 h-12 rounded-xl transition-all duration-200 active:scale-90 interactive"
+              aria-label={item.label}
+              aria-current={isActive ? 'page' : undefined}
+              className="relative flex flex-col items-center justify-center gap-1 min-w-[48px] h-12 px-2 rounded-xl transition-colors duration-200 active:scale-95 interactive"
               style={{
-                background: isActive ? 'rgba(212,162,70,0.12)' : 'transparent',
-                color: isActive ? '#D4A246' : '#57534E',
+                background: isActive ? 'rgba(212,162,70,0.14)' : 'transparent',
+                color: isActive ? 'var(--color-primary)' : 'var(--color-nav-inactive)',
               }}
             >
-              {isActive && (
-                <span
-                  className="absolute top-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full"
-                  style={{ background: '#D4A246', boxShadow: '0 0 6px rgba(212,162,70,0.8)' }}
-                />
-              )}
-              <item.icon
-                className={cn('w-[18px] h-[18px] transition-all duration-200', isActive ? 'scale-110' : '')}
-              />
-              <span className={cn('text-[9px] tracking-wide font-medium leading-none', isActive ? 'font-bold' : '')}>
+              <item.icon className="w-[20px] h-[20px]" />
+              <span
+                className="text-[10px] tracking-wide leading-none"
+                style={{ fontWeight: isActive ? 600 : 500 }}
+              >
                 {item.label}
               </span>
             </Link>
@@ -71,11 +68,12 @@ export function BottomNav() {
         {!isLoading && !user && (
           <button
             onClick={() => setShowLoginModal(true)}
-            className="flex flex-col items-center justify-center gap-[3px] w-12 h-12 rounded-xl transition-all active:scale-90 interactive"
-            style={{ color: '#57534E' }}
+            aria-label="Sign in"
+            className="flex flex-col items-center justify-center gap-1 min-w-[48px] h-12 px-2 rounded-xl transition-colors active:scale-95 interactive"
+            style={{ color: 'var(--color-nav-inactive)' }}
           >
-            <UserIcon className="w-[18px] h-[18px]" />
-            <span className="text-[9px] font-medium leading-none">Sign in</span>
+            <UserIcon className="w-[20px] h-[20px]" />
+            <span className="text-[10px] font-medium leading-none">Sign in</span>
           </button>
         )}
       </div>
