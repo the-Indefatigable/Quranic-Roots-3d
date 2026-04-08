@@ -24,24 +24,41 @@ export async function generateMetadata({ params }: Props) {
 
   if (!surah[0]) return {};
   const s = surah[0];
-  const title = `Surah ${s.englishName} (${s.arabicName}) — ${s.versesCount} Ayahs`;
-  const description = `Read Surah ${s.englishName} (${s.arabicName}), Surah ${s.number} of the Quran — ${s.versesCount} ayahs with word-by-word analysis and English translation.`;
+  const url = `https://quroots.com/quran/${s.number}`;
+  const title = `Surah ${s.englishName} (${s.arabicName}) — Read Word-by-Word with Translation`;
+  const description = `Read Surah ${s.englishName} (${s.arabicName}), the ${ordinal(s.number)} chapter of the Quran. ${s.versesCount} ayahs with word-by-word Arabic analysis, English translation, and root-level study tools.`;
   return {
     title,
     description,
+    alternates: { canonical: url },
+    keywords: [
+      `Surah ${s.englishName}`,
+      `${s.englishName} translation`,
+      `${s.arabicName}`,
+      `Quran chapter ${s.number}`,
+      'word by word Quran',
+      'Quranic Arabic',
+      'Quran with translation',
+    ],
     openGraph: {
-      title: `${title} | QuRoots`,
+      type: 'article',
+      title,
       description,
-      url: `https://quroots.com/quran/${s.number}`,
-      images: [{ url: '/og-image.png', width: 1200, height: 630 }],
+      url,
+      siteName: 'QuRoots',
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${title} | QuRoots`,
+      title,
       description,
-      images: ['/og-image.png'],
     },
   };
+}
+
+function ordinal(n: number): string {
+  const s = ['th', 'st', 'nd', 'rd'];
+  const v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
 }
 
 const SURAH_TYPES: Record<string, string> = {
@@ -157,8 +174,40 @@ export default async function SurahPage({ params }: Props) {
 
   const revelationType = surah.revelationType ? SURAH_TYPES[surah.revelationType] ?? surah.revelationType : null;
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Chapter',
+        '@id': `https://quroots.com/quran/${surahNumber}#chapter`,
+        'name': `Surah ${surah.englishName}`,
+        'alternateName': surah.arabicName,
+        'position': surahNumber,
+        'url': `https://quroots.com/quran/${surahNumber}`,
+        'isPartOf': {
+          '@type': 'Book',
+          'name': 'The Holy Quran',
+          'inLanguage': 'ar',
+        },
+        'inLanguage': ['ar', 'en'],
+      },
+      {
+        '@type': 'BreadcrumbList',
+        'itemListElement': [
+          { '@type': 'ListItem', 'position': 1, 'name': 'Home', 'item': 'https://quroots.com' },
+          { '@type': 'ListItem', 'position': 2, 'name': 'Quran', 'item': 'https://quroots.com/quran' },
+          { '@type': 'ListItem', 'position': 3, 'name': `Surah ${surah.englishName}`, 'item': `https://quroots.com/quran/${surahNumber}` },
+        ],
+      },
+    ],
+  };
+
   return (
     <div>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Surah Header */}
       <div className="relative text-center mb-10 pt-2 pb-8">
         {/* Ambient glow behind Arabic name */}

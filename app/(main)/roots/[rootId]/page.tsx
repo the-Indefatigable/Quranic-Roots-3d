@@ -27,19 +27,31 @@ export async function generateMetadata({ params }: Props) {
 
   if (!rootRow[0]) return { title: 'Root Not Found' };
   const r = rootRow[0];
-  const title = `${r.root} — ${r.meaning} | Quranic Root`;
-  const description = `Explore the Quranic Arabic root ${r.root} meaning "${r.meaning}". ${r.totalFreq} occurrences in the Quran. View verb forms, derived nouns, and Quranic verses.`;
+  const url = `https://quroots.com/roots/${encodeURIComponent(r.root)}`;
+  const title = `${r.root} (${r.meaning}) — Quranic Arabic Root, Verb Forms & Occurrences`;
+  const description = `Study the Quranic Arabic root ${r.root} meaning "${r.meaning}". ${r.totalFreq} occurrences in the Quran with all 10 verb forms, derived nouns, conjugation tables, and verse-by-verse usage.`;
   return {
     title,
     description,
+    alternates: { canonical: url },
+    keywords: [
+      `${r.root} root`,
+      `${r.meaning} Arabic`,
+      'Quranic root',
+      'Arabic verb forms',
+      'Arabic morphology',
+      'sarf',
+      'Quranic Arabic vocabulary',
+    ],
     openGraph: {
+      type: 'article',
       title,
       description,
-      url: `https://quroots.com/roots/${encodeURIComponent(r.root)}`,
-      images: [{ url: '/og-image.png', width: 1200, height: 630 }],
+      url,
+      siteName: 'QuRoots',
     },
     twitter: {
-      card: 'summary',
+      card: 'summary_large_image',
       title,
       description,
     },
@@ -278,8 +290,39 @@ export default async function RootDetailPage({ params }: Props) {
     proper_noun: 'Proper Noun',
   };
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'DefinedTerm',
+        '@id': `https://quroots.com/roots/${encodeURIComponent(root.root)}#term`,
+        'name': root.root,
+        'description': `Quranic Arabic root meaning "${root.meaning}". ${root.totalFreq} occurrences in the Quran.`,
+        'inDefinedTermSet': {
+          '@type': 'DefinedTermSet',
+          'name': 'Quranic Arabic Roots',
+          'url': 'https://quroots.com/roots',
+        },
+        'url': `https://quroots.com/roots/${encodeURIComponent(root.root)}`,
+        'inLanguage': 'ar',
+      },
+      {
+        '@type': 'BreadcrumbList',
+        'itemListElement': [
+          { '@type': 'ListItem', 'position': 1, 'name': 'Home', 'item': 'https://quroots.com' },
+          { '@type': 'ListItem', 'position': 2, 'name': 'Roots', 'item': 'https://quroots.com/roots' },
+          { '@type': 'ListItem', 'position': 3, 'name': `${root.root} — ${root.meaning}`, 'item': `https://quroots.com/roots/${encodeURIComponent(root.root)}` },
+        ],
+      },
+    ],
+  };
+
   return (
     <div>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Back link */}
       <Link href="/roots" className="inline-flex items-center gap-1 text-xs text-text-tertiary hover:text-text transition-colors mb-6">
         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
