@@ -29,6 +29,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     'verb-forms',
     'arifa-vs-alima-vs-fahima',
     'verb-forms-meaning-change',
+    'classical-arabic-rebukes',
   ].map((slug) => ({
     url: `${baseUrl}/blog/${slug}`,
     changeFrequency: 'monthly' as const,

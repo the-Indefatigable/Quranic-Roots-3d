@@ -34,6 +34,15 @@ const TOPICS: Topic[] = [
     category: 'Vocabulary',
   },
   {
+    href: '/blog/classical-arabic-rebukes',
+    title: 'Uskut! — Rebukes & Curse-Idioms of 7th-Century Arabic',
+    arabic: 'اُسْكُتْ',
+    description: 'How classical Arabic scolded and cursed — uskut, ikhsaʼ, thakilatka ummuka, taribat yadaka, qataʼa Allahu lisanak — decoded root by root, with the past-tense-as-invocation pattern behind them and the Quranic or hadith source for each.',
+    level: 'Intermediate',
+    color: '#D97706',
+    category: 'Vocabulary',
+  },
+  {
     href: '/blog/beginner-arabic-islamic-books',
     title: 'Beginner-Friendly Arabic & Islamic Books — Free & Cheap',
     arabic: 'كُتُبٌ لِلْمُبْتَدِئِين',
