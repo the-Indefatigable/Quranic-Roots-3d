@@ -155,7 +155,7 @@ export default function VerbFormsPage() {
       />
       <article className="max-w-3xl mx-auto px-4 py-12">
         <nav className="flex items-center gap-2 text-xs text-text-tertiary mb-8">
-          <Link href="/learn" className="hover:text-text-secondary transition-colors">Learn</Link>
+          <Link href="/blog" className="hover:text-text-secondary transition-colors">Blog</Link>
           <span>/</span>
           <span className="text-text-secondary">Verb Forms</span>
         </nav>
@@ -238,8 +238,8 @@ export default function VerbFormsPage() {
           <Link href="/blog/adad" className="text-sm text-text-tertiary hover:text-text-secondary transition-colors">
             &larr; Numbers in Arabic
           </Link>
-          <Link href="/learn" className="text-sm text-primary hover:text-primary transition-colors">
-            All Lessons &rarr;
+          <Link href="/blog" className="text-sm text-primary hover:text-primary transition-colors">
+            All Articles &rarr;
           </Link>
         </div>
       </article>

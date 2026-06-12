@@ -281,9 +281,7 @@ export default function ArifaVsAlimaVsFahimaPage() {
       <article className="max-w-4xl mx-auto px-4 py-12">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-xs text-text-tertiary mb-8" aria-label="Breadcrumb">
-          <Link href="/learn" className="hover:text-text-secondary transition-colors">
-            Learn
-          </Link>
+          <Link href="/blog" className="hover:text-text-secondary transition-colors">Blog</Link>
           <span>/</span>
           <span className="text-text-secondary">Arifa vs Alima vs Fahima</span>
         </nav>
@@ -713,10 +711,10 @@ export default function ArifaVsAlimaVsFahimaPage() {
             &larr; The 10 Verb Forms
           </Link>
           <Link
-            href="/learn"
+            href="/blog"
             className="text-sm text-primary hover:text-primary transition-colors"
           >
-            All Lessons &rarr;
+            All Articles &rarr;
           </Link>
         </div>
       </article>

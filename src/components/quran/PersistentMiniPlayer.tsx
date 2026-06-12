@@ -31,6 +31,11 @@ export function PersistentMiniPlayer() {
   const isOnSurahPage = pathname?.startsWith('/quran/');
   const visible = !!playInfo && !isOnSurahPage;
 
+  // Routes inside the (main) layout render BottomNav (mobile) and Sidebar (lg+),
+  // so the player must float above the nav pill / clear of the sidebar there.
+  const inMainLayout =
+    pathname !== '/' && !pathname?.startsWith('/lesson') && !pathname?.startsWith('/root/');
+
   // Sync audio events to local state while on non-surah pages
   useEffect(() => {
     if (!audioEl || !visible) return;
@@ -92,7 +97,11 @@ export function PersistentMiniPlayer() {
 
   return (
     <div
-      className="fixed bottom-0 left-0 right-0 z-50"
+      className={
+        inMainLayout
+          ? 'fixed z-50 left-3 right-3 bottom-[calc(env(safe-area-inset-bottom)+80px)] rounded-2xl overflow-hidden shadow-modal lg:left-60 lg:right-0 lg:bottom-0 lg:rounded-none'
+          : 'fixed z-50 left-0 right-0 bottom-0'
+      }
       style={{ pointerEvents: 'auto' }}
     >
       {/* Progress bar */}
@@ -108,32 +117,38 @@ export function PersistentMiniPlayer() {
 
       {/* Bar body */}
       <div
-        className="flex items-center gap-3 px-4 py-2.5"
+        className={`flex items-center gap-3 px-4 py-2.5 ${inMainLayout ? '' : 'pb-[calc(0.625rem+env(safe-area-inset-bottom))]'}`}
         style={{ background: G.bg, backdropFilter: 'blur(20px)', borderTop: `1px solid ${G.goldBorder}` }}
       >
         {/* Surah art / indicator */}
-        <div
+        <button
           className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 text-sm font-heading cursor-pointer"
           style={{ background: 'rgba(212,162,70,0.1)', border: `1px solid ${G.goldBorder}`, color: G.gold }}
           onClick={goToSurah}
+          aria-label={`Return to ${surahName} reader`}
         >
           {surahNumber}
-        </div>
+        </button>
 
         {/* Info */}
-        <div className="flex-1 min-w-0 cursor-pointer" onClick={goToSurah}>
-          <p className="text-sm font-medium truncate" style={{ color: G.textPrimary }}>{surahName}</p>
-          <p className="text-[11px] truncate" style={{ color: G.textTert }}>
+        <button
+          className="flex-1 min-w-0 cursor-pointer text-left bg-transparent border-0 p-0"
+          onClick={goToSurah}
+          aria-label={`Return to ${surahName} reader`}
+        >
+          <span className="block text-sm font-medium truncate" style={{ color: G.textPrimary }}>{surahName}</span>
+          <span className="block text-[11px] truncate" style={{ color: G.textTert }}>
             Ayah {currentAyah} of {totalAyahs}
             {duration > 0 && ` · ${formatTime(currentTime)} / ${formatTime(duration)}`}
             <span className="ml-2" style={{ color: G.gold }}>↑ Return to reader</span>
-          </p>
-        </div>
+          </span>
+        </button>
 
         {/* Play/Pause */}
         <button
           onClick={togglePlay}
-          className="w-10 h-10 flex items-center justify-center rounded-full transition-all active:scale-90"
+          aria-label={isPlaying ? 'Pause' : 'Play'}
+          className="w-10 h-10 flex items-center justify-center rounded-full transition-all active:scale-90 shrink-0"
           style={{ background: G.gold, color: '#0E0D0C', boxShadow: '0 0 14px rgba(212,162,70,0.3)' }}
         >
           {isPlaying ? (
@@ -150,9 +165,10 @@ export function PersistentMiniPlayer() {
         {/* Stop */}
         <button
           onClick={stop}
-          className="w-8 h-8 flex items-center justify-center transition-colors"
+          className="w-10 h-10 flex items-center justify-center transition-colors shrink-0"
           style={{ color: G.textTert }}
           title="Stop playback"
+          aria-label="Stop playback"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />

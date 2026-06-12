@@ -235,9 +235,7 @@ export default function VerbFormsMeaningChangePage() {
       <article className="max-w-3xl mx-auto px-4 py-12">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-xs text-text-tertiary mb-8" aria-label="Breadcrumb">
-          <Link href="/learn" className="hover:text-text-secondary transition-colors">
-            Learn
-          </Link>
+          <Link href="/blog" className="hover:text-text-secondary transition-colors">Blog</Link>
           <span>/</span>
           <span className="text-text-secondary">Verb Forms &amp; Meaning</span>
         </nav>
@@ -541,10 +539,10 @@ export default function VerbFormsMeaningChangePage() {
             &larr; Arifa vs Alima vs Fahima
           </Link>
           <Link
-            href="/learn"
+            href="/blog"
             className="text-sm text-primary hover:text-primary transition-colors"
           >
-            All Lessons &rarr;
+            All Articles &rarr;
           </Link>
         </div>
       </article>

@@ -39,7 +39,7 @@
   /* Chrome (nav surfaces) — used by Sidebar + BottomNav for unified look */
   --color-nav-glass: rgba(20, 19, 18, 0.92);
   --color-nav-border: rgba(255, 255, 255, 0.08);
-  --color-nav-inactive: #57534E;
+  --color-nav-inactive: #8A8783; /* ≥4.5:1 on the dark nav glass — was #57534E (~2.5:1) */
   --shadow-nav: 0 8px 32px rgba(0, 0, 0, 0.5), 0 1px 0 rgba(255, 255, 255, 0.05) inset;
 
   /* Display ivory — used for serif page titles */
@@ -125,6 +125,13 @@ html, body {
 
 /* ===== Base elements ===== */
 a { text-decoration: none; color: inherit; }
+
+/* Keyboard focus — the app has no other focus affordance, so this must stay */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
 
 :where(button) {
   border-radius: 12px;
@@ -295,16 +302,6 @@ a { text-decoration: none; color: inherit; }
 }
 @media (prefers-reduced-motion: reduce) {
   @keyframes pulse-glow { 0%, 100% { opacity: 0.9; } }
-}
-
-/* ===== Fade in ===== */
-@keyframes fade-in {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-.animate-fade-in {
-  animation: fade-in 0.25s ease-out;
 }
 
 /* ===== Qirat waveform — animated equalizer bars ===== */
@@ -486,7 +483,7 @@ a { text-decoration: none; color: inherit; }
   animation: slide-up 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-/* ===== Audio Teaching Tool — Scorecard fade-in ===== */
+/* ===== Fade in — content reveals (word detail panel, scorecard) ===== */
 @keyframes fade-in {
   from { opacity: 0; transform: scale(0.95); }
   to   { opacity: 1; transform: scale(1); }

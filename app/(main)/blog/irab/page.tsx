@@ -40,7 +40,7 @@ export default function IrabPage() {
       <article className="max-w-3xl mx-auto px-4 py-12">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-xs text-white/30 mb-8">
-          <Link href="/learn" className="hover:text-white/60 transition-colors">Learn</Link>
+          <Link href="/blog" className="hover:text-white/60 transition-colors">Blog</Link>
           <span>/</span>
           <span className="text-white/50">I&apos;rab</span>
         </nav>
@@ -193,8 +193,8 @@ export default function IrabPage() {
 
         {/* Next topic */}
         <div className="flex items-center justify-between pt-8 border-t border-border-light">
-          <Link href="/learn" className="text-sm text-white/30 hover:text-white/60 transition-colors">
-            &larr; All Lessons
+          <Link href="/blog" className="text-sm text-white/30 hover:text-white/60 transition-colors">
+            &larr; All Articles
           </Link>
           <Link href="/blog/mufrad-muthanna-jam" className="text-sm text-primary/70 hover:text-primary transition-colors">
             Next: Singular, Dual & Plural &rarr;

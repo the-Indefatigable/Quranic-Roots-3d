@@ -32,7 +32,7 @@ export default function MurakkabPage() {
       />
       <article className="max-w-3xl mx-auto px-4 py-12">
         <nav className="flex items-center gap-2 text-xs text-white/30 mb-8">
-          <Link href="/learn" className="hover:text-white/60 transition-colors">Learn</Link>
+          <Link href="/blog" className="hover:text-white/60 transition-colors">Blog</Link>
           <span>/</span>
           <span className="text-white/50">Murakkab</span>
         </nav>
