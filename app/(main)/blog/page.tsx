@@ -20,10 +20,19 @@ type Topic = {
   description: string;
   level: string;
   color: string;
-  category: 'Vocabulary' | 'Books' | 'Grammar';
+  category: 'Worship' | 'Vocabulary' | 'Books' | 'Grammar';
 };
 
 const TOPICS: Topic[] = [
+  {
+    href: '/blog/quranic-duas',
+    title: 'Duas of the Quran — The Supplications, Grouped & Sourced',
+    arabic: 'أَدْعِيَةُ الْقُرْآن',
+    description: 'A complete, grouped collection of the duas in the Quran — the Rabbana supplications, the duas of the Prophets (Adam, Nuh, Ibrahim, Musa, Yunus, Ayyub, Zakariyya), and the short duas of reliance — each with fully-vowelled Arabic, transliteration, translation, the speaker, and the exact surah:ayah.',
+    level: 'Essential',
+    color: '#D4A246',
+    category: 'Worship',
+  },
   {
     href: '/blog/daily-arabic-words',
     title: 'Daily Arabic — 30 Fusha Words & Sentences to Live With',
@@ -123,7 +132,7 @@ const LEVEL_STYLE: Record<string, { bg: string; text: string }> = {
   Advanced:     { bg: 'rgba(124,58,237,0.12)',  text: '#A78BFA' },
 };
 
-const CATEGORIES: Array<Topic['category']> = ['Vocabulary', 'Books', 'Grammar'];
+const CATEGORIES: Array<Topic['category']> = ['Worship', 'Vocabulary', 'Books', 'Grammar'];
 
 export default function BlogPage() {
   return (
