@@ -566,3 +566,16 @@ export const checkpointTests = pgTable('checkpoint_tests', {
 }, (table) => [
   uniqueIndex('checkpoint_tests_unit_unique').on(table.afterUnitId),
 ]);
+
+// ── Community Chat ───────────────────────────────────────────
+export const chatMessages = pgTable('chat_messages', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  room: text('room').default('general').notNull(),
+  body: text('body').notNull(),
+  deletedAt: timestamp('deleted_at', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => [
+  index('chat_messages_room_created_idx').on(table.room, table.createdAt),
+  index('chat_messages_user_created_idx').on(table.userId, table.createdAt),
+]);
