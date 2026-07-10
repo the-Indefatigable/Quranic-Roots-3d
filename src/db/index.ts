@@ -4,22 +4,23 @@ import * as schema from './schema';
 
 const connectionString = process.env.DATABASE_URL;
 
-// Guard: during Next.js build (no DATABASE_URL) create a no-op stub so that
-// importing @/db does not attempt a real TCP connection and hang SSG.
+// Guard: during Next.js build (no DATABASE_URL) fall back to a placeholder
+// connection string. postgres.js is lazy — no TCP connection is opened until
+// the first query — so this cannot hang SSG. Crucially, `db` stays a REAL
+// drizzle instance: the Auth.js Drizzle adapter type-checks it at import time
+// and a null stub fails the build with "Unsupported database type (object)".
 const isBuildTime = !connectionString;
 
-let client = isBuildTime
-  ? (null as unknown as ReturnType<typeof postgres>)
-  : postgres(connectionString!, {
-      max: 18,
-      idle_timeout: 30,
-      connect_timeout: 10,
-      max_lifetime: 60 * 10,
-      prepare: false,
-      connection: {
-        application_name: 'quroots',
-      },
-    });
+const client = postgres(connectionString ?? 'postgres://build:build@localhost:5432/build', {
+  max: isBuildTime ? 1 : 18,
+  idle_timeout: 30,
+  connect_timeout: 10,
+  max_lifetime: 60 * 10,
+  prepare: false,
+  connection: {
+    application_name: 'quroots',
+  },
+});
 
 // Warm up the connection at runtime only — fire-and-forget with hard 5s cap
 if (!isBuildTime) {
@@ -30,9 +31,7 @@ if (!isBuildTime) {
   Promise.race([warmup, timeout]).catch(() => {});
 }
 
-const baseDb = isBuildTime
-  ? (null as unknown as ReturnType<typeof drizzle>)
-  : drizzle(client, { schema });
+const baseDb = drizzle(client, { schema });
 
 // Transient error detection for retry logic
 const TRANSIENT_CODES = ['ECONNRESET', 'ECONNREFUSED', 'ETIMEDOUT', 'CONNECT_TIMEOUT', 'CONNECTION_CLOSED', 'ENETUNREACH'];
