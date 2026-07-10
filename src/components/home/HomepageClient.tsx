@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { useAppStore } from '@/store/useAppStore';
 import { RootBloom } from './RootBloom';
+import { CommunityStrip } from './CommunityStrip';
 
 // ── Scroll-reveal via IntersectionObserver ──────────────────────────
 function useScrollReveal() {
@@ -511,6 +512,11 @@ export function HomepageClient() {
           </svg>
         </div>
       </section>
+
+      {/* ══════════════════════════════════════════════════════
+          COMMUNITY — live social proof strip
+      ══════════════════════════════════════════════════════ */}
+      <CommunityStrip />
 
       {/* ══════════════════════════════════════════════════════
           FEATURES
