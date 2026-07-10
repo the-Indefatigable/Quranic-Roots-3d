@@ -8,13 +8,17 @@ export const alt = 'QuRoots — Surah';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
+// NOTE: This image is intentionally English-only. Satori (the @vercel/og
+// renderer bundled in Next 14) cannot parse the OpenType tables required to
+// shape Arabic ("substFormat: 3 is not yet supported"), so rendering the
+// Arabic surah name here 500s. Keep all text Latin; draw glyphs like ◆/· with
+// CSS shapes rather than font characters.
 export default async function Image({ params }: { params: { surahId: string } }) {
   const n = parseInt(params.surahId);
   const row = await db
     .select({
       number: surahs.number,
       englishName: surahs.englishName,
-      arabicName: surahs.arabicName,
       versesCount: surahs.versesCount,
       revelationType: surahs.revelationType,
     })
@@ -24,7 +28,6 @@ export default async function Image({ params }: { params: { surahId: string } })
 
   const s = row[0];
   const englishName = s?.englishName ?? 'Quran';
-  const arabicName = s?.arabicName ?? '';
   const number = s?.number ?? n;
   const versesCount = s?.versesCount ?? 0;
   const revelation = s?.revelationType === 'makkah' ? 'Meccan' : s?.revelationType === 'madinah' ? 'Medinan' : '';
@@ -51,7 +54,7 @@ export default async function Image({ params }: { params: { surahId: string } })
             display: 'flex',
             alignItems: 'center',
             gap: 14,
-            fontSize: 22,
+            fontSize: 24,
             letterSpacing: 6,
             textTransform: 'uppercase',
             color: '#D4A246',
@@ -61,7 +64,7 @@ export default async function Image({ params }: { params: { surahId: string } })
           <span>Surah {number}</span>
           {revelation && (
             <>
-              <span style={{ opacity: 0.5 }}>·</span>
+              <div style={{ width: 6, height: 6, borderRadius: 3, background: '#D4A246', opacity: 0.5 }} />
               <span>{revelation}</span>
             </>
           )}
@@ -70,18 +73,19 @@ export default async function Image({ params }: { params: { surahId: string } })
         {/* spacer */}
         <div style={{ flex: 1, display: 'flex' }} />
 
-        {/* arabic name */}
+        {/* english name — hero */}
         <div
           style={{
             display: 'flex',
-            fontSize: 180,
-            color: '#D4A246',
+            fontSize: 128,
+            color: '#F0E4CA',
+            fontWeight: 400,
             lineHeight: 1,
-            marginBottom: 16,
-            textShadow: '0 0 60px rgba(212,162,70,0.4)',
+            letterSpacing: -2,
+            textShadow: '0 0 60px rgba(212,162,70,0.25)',
           }}
         >
-          {arabicName}
+          {englishName}
         </div>
 
         {/* divider */}
@@ -90,36 +94,22 @@ export default async function Image({ params }: { params: { surahId: string } })
             display: 'flex',
             alignItems: 'center',
             gap: 16,
+            marginTop: 24,
             marginBottom: 14,
           }}
         >
+          <div style={{ width: 10, height: 10, background: '#D4A246', opacity: 0.7, transform: 'rotate(45deg)' }} />
           <div style={{ flex: 1, height: 1, background: 'rgba(212,162,70,0.3)' }} />
-          <div style={{ color: '#D4A246', fontSize: 14, opacity: 0.7 }}>◆</div>
-          <div style={{ flex: 1, height: 1, background: 'rgba(212,162,70,0.3)' }} />
-        </div>
-
-        {/* english name */}
-        <div
-          style={{
-            display: 'flex',
-            fontSize: 64,
-            color: '#F0E4CA',
-            fontWeight: 400,
-            letterSpacing: -1,
-          }}
-        >
-          {englishName}
         </div>
 
         {/* footer */}
         <div
           style={{
-            marginTop: 28,
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
             color: '#7A7975',
-            fontSize: 22,
+            fontSize: 24,
           }}
         >
           <span>{versesCount} Ayahs</span>
