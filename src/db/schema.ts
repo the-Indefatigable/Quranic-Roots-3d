@@ -567,6 +567,20 @@ export const checkpointTests = pgTable('checkpoint_tests', {
   uniqueIndex('checkpoint_tests_unit_unique').on(table.afterUnitId),
 ]);
 
+// ── User Feedback ────────────────────────────────────────────
+export const feedback = pgTable('feedback', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  category: text('category').default('suggestion').notNull(), // 'suggestion' | 'bug' | 'content' | 'other'
+  body: text('body').notNull(),
+  page: text('page'),
+  status: text('status').default('new').notNull(), // 'new' | 'seen' | 'done'
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => [
+  index('feedback_status_created_idx').on(table.status, table.createdAt),
+  index('feedback_user_created_idx').on(table.userId, table.createdAt),
+]);
+
 // ── Community Chat ───────────────────────────────────────────
 export const chatMessages = pgTable('chat_messages', {
   id: uuid('id').primaryKey().defaultRandom(),
