@@ -16,7 +16,9 @@ import {
   leagueMembers,
   weeklyLeagues,
 } from '@/db/schema';
+import { userWordReviews } from '@/db/schema';
 import { eq, and, sql, desc } from 'drizzle-orm';
+import { getCoverage } from '@/lib/coverage';
 
 export async function GET() {
   try {
@@ -38,6 +40,8 @@ export async function GET() {
       quests,
       nextLessonResult,
       leagueResult,
+      coverage,
+      [reviewCounts],
     ] = await Promise.all([
       dbQuery(() => db.select().from(users).where(eq(users.id, userId))),
       dbQuery(() => db.select().from(userHearts).where(eq(userHearts.userId, userId))),
@@ -73,6 +77,17 @@ export async function GET() {
           .where(eq(leagueMembers.userId, userId))
           .orderBy(desc(weeklyLeagues.weekStart))
           .limit(1)
+      ),
+      // Quran coverage meter
+      getCoverage(userId),
+      // Review queue counts (deck itself lazily syncs on the review page)
+      dbQuery(() =>
+        db.select({
+          due: sql<number>`count(*) filter (where ${userWordReviews.dueAt} <= now())::int`,
+          total: sql<number>`count(*)::int`,
+        })
+          .from(userWordReviews)
+          .where(eq(userWordReviews.userId, userId))
       ),
     ]);
 
@@ -113,6 +128,12 @@ export async function GET() {
         gemReward: q.gemReward,
         completed: q.completed,
       })),
+      coverage,
+      review: {
+        due: reviewCounts?.due ?? 0,
+        deckSize: reviewCounts?.total ?? 0,
+      },
+      digestOptIn: user?.digestOptIn ?? false,
       nextLesson: nextLessonResult[0] || null,
       league: leagueResult[0]
         ? { tier: leagueResult[0].tier, name: LEAGUE_NAMES[leagueResult[0].tier] || 'Bronze', rank: leagueResult[0].rank, weeklyXp: leagueResult[0].weeklyXp }

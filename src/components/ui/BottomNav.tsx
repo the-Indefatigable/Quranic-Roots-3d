@@ -6,8 +6,8 @@ import { cn } from '@/lib/cn';
 import { useAuthStore } from '@/store/useAuthStore';
 
 const NAV = [
+  { href: '/dashboard',   label: 'Home',   icon: HomeIcon   },
   { href: '/learn/path',  label: 'Arabic', icon: LearnIcon  },
-  { href: '/learn/qirat', label: 'Qirat',  icon: QiratIcon  },
   { href: '/quran',       label: 'Quran',  icon: BookIcon   },
   { href: '/roots',       label: 'Roots',  icon: RootIcon   },
   { href: '/community',   label: 'Chat',   icon: ChatIcon   },
@@ -106,10 +106,10 @@ function RootIcon({ className }: { className?: string }) {
     </svg>
   );
 }
-function QiratIcon({ className }: { className?: string }) {
+function HomeIcon({ className }: { className?: string }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" d="m9 9 10.5-3m0 6.553v3.75a2.25 2.25 0 0 1-1.632 2.163l-1.32.377a1.803 1.803 0 1 1-.99-3.467l2.31-.66a2.25 2.25 0 0 0 1.632-2.163Zm0 0V4.103A2.25 2.25 0 0 0 17.77 2.03l-4.046 1.157A2.25 2.25 0 0 0 12.12 5.35v6.2a2.25 2.25 0 0 1-1.632 2.163l-1.32.377a1.803 1.803 0 1 1-.99-3.467l2.31-.66A2.25 2.25 0 0 0 12.12 7.8V5.35" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
     </svg>
   );
 }

@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, integer, jsonb, timestamp, boolean, date, uniqueIndex, index, primaryKey, smallint } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, text, integer, jsonb, timestamp, boolean, date, uniqueIndex, index, primaryKey, smallint, real } from 'drizzle-orm/pg-core';
 
 // ── Roots ──────────────────────────────────────────
 export const roots = pgTable('roots', {
@@ -425,10 +425,30 @@ export const vocabularyBank = pgTable('vocabulary_bank', {
   unitId: uuid('unit_id').references(() => learningUnits.id),
   quranicRef: text('quranic_ref'), // e.g. "2:255"
   difficulty: smallint('difficulty').default(1), // 1-3
+  rootArabic: text('root_arabic'), // links to quran_words.root_arabic for coverage
+  tokenCount: integer('token_count').default(0).notNull(), // Quran tokens unlocked (text-matched harf entries)
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 }, (table) => [
   index('vocabulary_bank_unit_idx').on(table.unitId),
   index('vocabulary_bank_type_idx').on(table.wordType),
+  index('vocabulary_bank_root_idx').on(table.rootArabic),
+]);
+
+// ── Word Review Queue (spaced repetition, SM-2 lite) ─────────
+export const userWordReviews = pgTable('user_word_reviews', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  vocabId: uuid('vocab_id').notNull().references(() => vocabularyBank.id, { onDelete: 'cascade' }),
+  dueAt: timestamp('due_at', { withTimezone: true }).defaultNow().notNull(),
+  intervalDays: real('interval_days').default(0).notNull(),
+  ease: real('ease').default(2.5).notNull(),
+  reps: integer('reps').default(0).notNull(),
+  lapses: integer('lapses').default(0).notNull(),
+  lastAnswered: timestamp('last_answered', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex('user_word_reviews_unique').on(table.userId, table.vocabId),
+  index('user_word_reviews_due_idx').on(table.userId, table.dueAt),
 ]);
 
 // ── User Lesson Progress ─────────────────────────────────────
