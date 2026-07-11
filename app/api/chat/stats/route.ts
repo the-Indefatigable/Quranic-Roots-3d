@@ -29,7 +29,9 @@ export async function GET() {
           .select({
             totalMessages: sql<number>`count(*)::int`,
             totalParticipants: sql<number>`count(distinct ${chatMessages.userId})::int`,
-            messages24h: sql<number>`count(*) filter (where ${chatMessages.createdAt} >= ${dayAgo})::int`,
+            // NOTE: raw Date params inside sql`` fragments serialize as
+            // "Fri Jul 10 2026..." which Postgres rejects — use ISO string.
+            messages24h: sql<number>`count(*) filter (where ${chatMessages.createdAt} >= ${dayAgo.toISOString()})::int`,
           })
           .from(chatMessages)
           .where(isNull(chatMessages.deletedAt))
