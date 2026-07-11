@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useAppStore } from '@/store/useAppStore';
+import { DigestToggle } from '@/components/ui/DigestToggle';
 import { cn } from '@/lib/cn';
 
 const grammarArticles = [
@@ -159,6 +160,16 @@ export default function ProfilePage() {
             </motion.div>
           ))}
         </div>
+      </motion.div>
+
+      {/* Email preferences */}
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2, duration: 0.35 }}
+      >
+        <h2 className="text-xs font-semibold uppercase tracking-widest text-text-tertiary mb-3 px-1">Email</h2>
+        <DigestToggle />
       </motion.div>
 
       {/* Grammar Articles */}

@@ -186,6 +186,8 @@ export const users = pgTable('users', {
   totalXP: integer('total_xp').default(0),
   userLevel: integer('user_level').default(1),
   levelProgress: integer('level_progress').default(0),
+  digestOptIn: boolean('digest_opt_in').default(false).notNull(),
+  unsubscribeToken: uuid('unsubscribe_token').defaultRandom().notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
 });
