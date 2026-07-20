@@ -1,6 +1,7 @@
 import { Sidebar } from '@/components/ui/Sidebar';
 import { BottomNav } from '@/components/ui/BottomNav';
 import { FeedbackWidget } from '@/components/ui/FeedbackWidget';
+import { DigestNudge } from '@/components/ui/DigestNudge';
 import { AuthProvider } from '@/components/auth/AuthProvider';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
@@ -16,6 +17,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         </main>
         <BottomNav />
         <FeedbackWidget />
+        <DigestNudge />
       </div>
     </AuthProvider>
   );
