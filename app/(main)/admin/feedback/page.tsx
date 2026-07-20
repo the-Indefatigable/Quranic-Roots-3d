@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { PageHeader } from '@/components/ui/PageHeader';
 import { useAuthStore } from '@/store/useAuthStore';
 
 interface FeedbackItem {
@@ -65,15 +64,11 @@ export default function AdminFeedbackPage() {
 
   return (
     <div>
-      <PageHeader
-        eyebrow="Admin"
-        title="User Feedback"
-        subtitle={
-          loaded
-            ? `${items.length} item${items.length === 1 ? '' : 's'}${filter === 'all' && newCount ? ` — ${newCount} new` : ''}`
-            : 'Loading…'
-        }
-      />
+      <p className="text-sm text-text-tertiary mb-6">
+        {loaded
+          ? `${items.length} item${items.length === 1 ? '' : 's'}${filter === 'all' && newCount ? ` — ${newCount} new` : ''}`
+          : 'Loading…'}
+      </p>
 
       {/* Filter tabs */}
       <div className="flex gap-2 mb-6">

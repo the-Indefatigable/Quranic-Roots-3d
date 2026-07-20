@@ -49,3 +49,7 @@ scripts/*.report.txt
 scripts/*_report.txt
 scripts/*_errors.json
 .vercel
+
+# Agent tooling / build metadata (should not be tracked)
+.claude-flow/
+tsconfig.tsbuildinfo
