@@ -89,7 +89,7 @@ function toEastern(n: number): string {
 
 export function SurahReaderClient({ ayahs, surahNumber, surahName, surahArabicName, hasWords, hasTafsir }: Props) {
   const { quranSettings, updateQuranSettings, setLastRead, updateStreak, selectedQariId, setSelectedQariId } = useAppStore();
-  const { audioEl, setPlayInfo, updatePlayInfo } = useGlobalAudioStore();
+  const { audioEl, playInfo, setPlayInfo, updatePlayInfo } = useGlobalAudioStore();
   const [showSettings, setShowSettings] = useState(false);
   const [selectedWord, setSelectedWord] = useState<WordData | null>(null);
   const [wordAnchor, setWordAnchor] = useState<HTMLElement | null>(null);
@@ -325,6 +325,27 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, surahArabicNa
     scrolledAyahRef.current = null;
     setPlayInfo(null);
   }, [audioEl, setPlayInfo]);
+
+  // Adopt ongoing global playback when arriving at the reader (e.g. via the
+  // mini-player's "Return to reader"). The audio element lives in the root
+  // layout and keeps playing across route changes, so we re-open the in-reader
+  // player and sync to it WITHOUT resetting the element — unlike openAudioMode,
+  // which stops and reloads for a fresh start. This fixes playback stopping /
+  // the player vanishing when returning to the reader.
+  const adoptedRef = useRef(false);
+  useEffect(() => {
+    if (adoptedRef.current || audioMode) return;
+    if (!playInfo || !audioEl) return;
+    const block = surahBlocks.find((b) => b.surahNumber === playInfo.surahNumber);
+    if (!block) return; // this surah isn't loaded in the reader yet
+    adoptedRef.current = true;
+    setAudioSurah(block);
+    setAudioStartAyah(playInfo.currentAyah);
+    setAudioCurrentAyah(playInfo.currentAyah);
+    setAudioPlayMode(playInfo.playMode);
+    setAudioLoopMode(playInfo.loopMode);
+    setAudioMode(true);
+  }, [playInfo, audioEl, audioMode, surahBlocks]);
 
   return (
     <div className={audioMode ? 'pb-28 lg:pb-20' : ''}>

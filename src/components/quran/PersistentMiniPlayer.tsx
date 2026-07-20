@@ -27,9 +27,12 @@ export function PersistentMiniPlayer() {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
 
-  // Hide on surah reader pages — AudioPlayer handles its own UI there
-  const isOnSurahPage = pathname?.startsWith('/quran/');
-  const visible = !!playInfo && !isOnSurahPage;
+  // Hide only on the reader page of the surah that's actually playing — there
+  // the in-reader AudioPlayer takes over. On every other page (including a
+  // DIFFERENT surah's reader) the mini-player stays visible so playback is
+  // always reachable and never silently vanishes.
+  const isOnPlayingSurahPage = !!playInfo && pathname === `/quran/${playInfo.surahNumber}`;
+  const visible = !!playInfo && !isOnPlayingSurahPage;
 
   // Routes inside the (main) layout render BottomNav (mobile) and Sidebar (lg+),
   // so the player must float above the nav pill / clear of the sidebar there.

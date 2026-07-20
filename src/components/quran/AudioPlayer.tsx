@@ -317,7 +317,10 @@ export function AudioPlayer({
       }
       return;
     }
-    if (playModeRef.current === 'surah' && !usingSurahAudioRef.current) {
+    // Only auto-start chapter audio if nothing is already playing. When we
+    // adopt ongoing playback on return to the reader, the element is still
+    // playing — restarting it would jump back to the first ayah.
+    if (playModeRef.current === 'surah' && !usingSurahAudioRef.current && audioElement.paused) {
       playChapterAudio();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

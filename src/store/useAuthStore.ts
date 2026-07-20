@@ -43,7 +43,7 @@ export function useAuthStore() {
     isLoading: status === 'loading',
     showLoginModal,
     setShowLoginModal,
-    login: () => signIn('google', { callbackUrl: '/' }),
+    login: () => signIn('google', { callbackUrl: '/dashboard' }),
     logout: () => signOut({ callbackUrl: '/' }),
   };
 }
