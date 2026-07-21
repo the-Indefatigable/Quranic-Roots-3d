@@ -19,6 +19,7 @@ import {
 } from '@/db/schema';
 import { eq, and, sql } from 'drizzle-orm';
 import { z } from 'zod';
+import { checkAndUnlockAchievements, checkCurriculumAchievements } from '@/utils/achievementEngine';
 
 const CompletionPayloadSchema = z.object({
   score: z.number().int().min(0).max(100),
@@ -396,6 +397,24 @@ export async function POST(
         .where(eq(leagueMembers.userId, userId))
     );
 
+    // ── 8. Unlock badges (milestone XP + streak + curriculum) — non-fatal ──
+    let newBadges: string[] = [];
+    try {
+      const [u] = await dbQuery(() =>
+        db.select({ totalXP: users.totalXP }).from(users).where(eq(users.id, userId))
+      );
+      const [byStats, byCurriculum] = await Promise.all([
+        checkAndUnlockAchievements(userId, {
+          totalXP: u?.totalXP ?? 0,
+          streakDays: streakData.currentStreak,
+        }),
+        checkCurriculumAchievements(userId),
+      ]);
+      newBadges = [...byStats.unlockedAchievements.map((a) => a.title), ...byCurriculum.unlocked];
+    } catch (e) {
+      console.warn('[complete] achievement check failed (non-fatal):', e);
+    }
+
     return NextResponse.json({
       data: {
         xpEarned,
@@ -405,6 +424,7 @@ export async function POST(
         dailyGoalCompleted,
         gemsEarned,
         nextLessonId: nextLesson?.id || null,
+        newBadges,
       },
     });
   } catch (error) {

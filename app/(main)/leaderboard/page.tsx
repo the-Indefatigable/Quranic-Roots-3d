@@ -2,6 +2,7 @@ import { sql } from 'drizzle-orm';
 import { db, dbQuery } from '@/db';
 import { auth } from '@/lib/auth';
 import { LeaderboardTabs } from '@/components/gamification/LeaderboardTabs';
+import { ShareButton } from '@/components/gamification/ShareButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,7 +34,7 @@ export default async function LeaderboardPage({
     ? sql`u.streak_days DESC NULLS LAST, u.total_xp DESC NULLS LAST`
     : sql`u.total_xp DESC NULLS LAST`;
 
-  const [session, rows] = await Promise.all([
+  const [session, rows, statsRows] = await Promise.all([
     auth().catch(() => null),
     dbQuery(() =>
       db.execute(sql`
@@ -44,7 +45,17 @@ export default async function LeaderboardPage({
         LIMIT 100
       `)
     ) as Promise<unknown> as Promise<Row[]>,
+    dbQuery(() =>
+      db.execute(sql`
+        SELECT
+          (SELECT count(*) FROM users WHERE COALESCE(total_xp,0) > 0)::int AS learners,
+          (SELECT count(*) FROM user_lesson_progress WHERE status = 'completed')::int AS lessons,
+          (SELECT coalesce(sum(total_xp),0) FROM users)::int AS xp
+      `)
+    ) as Promise<any[]>,
   ]);
+
+  const stats = statsRows[0] ?? { learners: 0, lessons: 0, xp: 0 };
 
   const meId = session?.user?.id ?? null;
   const myIndex = meId ? rows.findIndex((r) => r.id === meId) : -1;
@@ -63,6 +74,20 @@ export default async function LeaderboardPage({
         </p>
       </div>
 
+      {/* Community momentum — social proof */}
+      <div className="grid grid-cols-3 gap-2.5 mb-5">
+        {[
+          { n: stats.learners, label: 'learners' },
+          { n: stats.lessons, label: 'lessons done' },
+          { n: stats.xp, label: 'XP earned' },
+        ].map((s) => (
+          <div key={s.label} className="rounded-xl border border-border p-3 text-center" style={{ background: 'var(--color-surface)' }}>
+            <div className="text-xl font-heading" style={{ color: 'var(--color-primary)' }}>{s.n.toLocaleString()}</div>
+            <div className="text-[10px] uppercase tracking-wider text-text-tertiary">{s.label}</div>
+          </div>
+        ))}
+      </div>
+
       <LeaderboardTabs active={sort} />
 
       {/* Your rank banner */}
@@ -74,7 +99,7 @@ export default async function LeaderboardPage({
           <span className="text-2xl font-heading" style={{ color: 'var(--color-primary)' }}>
             #{myIndex + 1}
           </span>
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-text">You</p>
             <p className="text-xs text-text-tertiary">
               {sort === 'streak'
@@ -82,6 +107,10 @@ export default async function LeaderboardPage({
                 : `${(rows[myIndex].total_xp ?? 0).toLocaleString()} XP · Level ${rows[myIndex].user_level ?? 1}`}
             </p>
           </div>
+          <ShareButton
+            text={`I'm #${myIndex + 1} on QuRoots with ${(rows[myIndex].total_xp ?? 0).toLocaleString()} XP learning Quranic Arabic! 📖`}
+            label="Share rank"
+          />
           {myIndex < 3 && <span className="text-2xl">{MEDALS[myIndex]}</span>}
         </div>
       )}

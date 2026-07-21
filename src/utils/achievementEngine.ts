@@ -284,6 +284,55 @@ export async function checkAndUnlockAchievements(
 }
 
 /**
+ * Curriculum + daily-habit achievements. Awards prestige badges for reaching
+ * the capstone lessons of the 50-unit course, and the Daily Devotee habit badge.
+ * Safe to call from any completion route (idempotent).
+ */
+export async function checkCurriculumAchievements(
+  userId: string
+): Promise<{ unlocked: string[] }> {
+  const unlocked: string[] = [];
+
+  // [badge title, unit sort_order, lesson slug that marks completion]
+  const CAPSTONES: [string, number, string][] = [
+    ['Foundation Complete', 19, 'ayat-al-kursi-legendary'],
+    ['Iʿrāb Adept', 24, 'read-quran-special-signs'],
+    ["The Grammarian's Ijāzah", 50, 'the-exam'],
+  ];
+
+  for (const [title, sortOrder, slug] of CAPSTONES) {
+    if (await hasAchievement(userId, title)) continue;
+    const rows = await dbQuery(() =>
+      db.execute(sql`
+        SELECT 1 FROM user_lesson_progress p
+        JOIN learning_lessons l ON l.id = p.lesson_id
+        JOIN learning_units u ON u.id = l.unit_id
+        WHERE p.user_id = ${userId} AND p.status = 'completed'
+          AND u.sort_order = ${sortOrder} AND l.slug = ${slug}
+        LIMIT 1
+      `)
+    );
+    if ((rows as unknown as unknown[]).length > 0) {
+      const r = await unlockAchievement(userId, title, true);
+      if (r.newlyUnlocked) unlocked.push(title);
+    }
+  }
+
+  // Daily Devotee — 7+ daily reviews of any kind.
+  if (!(await hasAchievement(userId, 'Daily Devotee'))) {
+    const [d] = (await dbQuery(() =>
+      db.execute(sql`SELECT count(*)::int AS c FROM daily_reviews WHERE user_id = ${userId}`)
+    )) as any[];
+    if ((d?.c ?? 0) >= 7) {
+      const r = await unlockAchievement(userId, 'Daily Devotee', true);
+      if (r.newlyUnlocked) unlocked.push('Daily Devotee');
+    }
+  }
+
+  return { unlocked };
+}
+
+/**
  * Get achievement by title (helper)
  */
 async function getAchievementByTitle(title: string): Promise<UnlockedAchievement | null> {

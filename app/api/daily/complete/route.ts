@@ -6,7 +6,7 @@ import { sql } from 'drizzle-orm';
 import { auth } from '@/lib/auth';
 import { db, dbQuery } from '@/db';
 import { addXPToUser } from '@/utils/levelEngine';
-import { checkAndUnlockAchievements } from '@/utils/achievementEngine';
+import { checkAndUnlockAchievements, checkCurriculumAchievements } from '@/utils/achievementEngine';
 
 const Body = z.object({ kind: z.enum(['ayah', 'hadith', 'quiz']) });
 const XP_REWARD = 10;
@@ -80,11 +80,14 @@ export async function POST(req: NextRequest) {
       const [u] = (await dbQuery(() =>
         db.execute(sql`SELECT total_xp FROM users WHERE id = ${userId}`)
       )) as any[];
-      const result = await checkAndUnlockAchievements(userId, {
-        totalXP: u?.total_xp ?? 0,
-        streakDays: currentStreak,
-      });
-      newBadges = result.unlockedAchievements.map((a) => ({ title: a.title, xpBonus: a.xpBonus }));
+      const [byStats, byCurriculum] = await Promise.all([
+        checkAndUnlockAchievements(userId, { totalXP: u?.total_xp ?? 0, streakDays: currentStreak }),
+        checkCurriculumAchievements(userId),
+      ]);
+      newBadges = [
+        ...byStats.unlockedAchievements.map((a) => ({ title: a.title, xpBonus: a.xpBonus })),
+        ...byCurriculum.unlocked.map((title) => ({ title, xpBonus: null })),
+      ];
     } catch (e) {
       console.warn('[daily/complete] achievement check failed (non-fatal):', e);
     }
