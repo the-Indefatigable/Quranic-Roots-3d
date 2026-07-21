@@ -30,7 +30,7 @@ export async function GET() {
     const hadith = hadithRows.length ? hadithRows[idx % hadithRows.length] : null;
 
     const session = await auth().catch(() => null);
-    const reviewed: Record<string, boolean> = { ayah: false, hadith: false };
+    const reviewed: Record<string, boolean> = { ayah: false, hadith: false, quiz: false };
     if (session?.user?.id) {
       const rows = (await dbQuery(() =>
         db.execute(sql`SELECT kind FROM daily_reviews WHERE user_id = ${session.user.id} AND review_date = CURRENT_DATE`)

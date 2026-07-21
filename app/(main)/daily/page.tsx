@@ -2,17 +2,18 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useAuthStore } from '@/store/useAuthStore';
+import { DailyQuiz } from '@/components/daily/DailyQuiz';
 
 interface Word { position: number; ar: string; translit: string | null; translation: string | null; root: string | null }
 interface Ayah { surah: number; ayah: number; surahName: string; translation: string; words: Word[] }
 interface Hadith { number: number; title: string | null; arabic: string; english: string; narrator: string | null; grade: string | null }
-interface DailyData { ayah: Ayah; hadith: Hadith | null; reviewed: { ayah: boolean; hadith: boolean }; loggedIn: boolean }
+interface DailyData { ayah: Ayah; hadith: Hadith | null; reviewed: { ayah: boolean; hadith: boolean; quiz: boolean }; loggedIn: boolean }
 
 export default function DailyPage() {
   const { user, setShowLoginModal } = useAuthStore();
   const [data, setData] = useState<DailyData | null>(null);
   const [openWord, setOpenWord] = useState<number | null>(null);
-  const [reviewed, setReviewed] = useState({ ayah: false, hadith: false });
+  const [reviewed, setReviewed] = useState({ ayah: false, hadith: false, quiz: false });
   const [toast, setToast] = useState<string | null>(null);
 
   const load = useCallback(async () => {
@@ -26,7 +27,7 @@ export default function DailyPage() {
 
   useEffect(() => { load(); }, [load, user]);
 
-  const markReviewed = async (kind: 'ayah' | 'hadith') => {
+  const markReviewed = async (kind: 'ayah' | 'hadith' | 'quiz') => {
     if (!user) { setShowLoginModal(true); return; }
     if (reviewed[kind]) return;
     setReviewed((r) => ({ ...r, [kind]: true }));
@@ -94,6 +95,9 @@ export default function DailyPage() {
 
             <ReviewButton done={reviewed.ayah} onClick={() => markReviewed('ayah')} loggedIn={!!user} />
           </section>
+
+          {/* Self-quiz — generated from the ayah's authentic word data */}
+          <DailyQuiz words={data.ayah.words} done={reviewed.quiz} onComplete={() => markReviewed('quiz')} />
 
           {/* Daily Hadith */}
           {data.hadith && (

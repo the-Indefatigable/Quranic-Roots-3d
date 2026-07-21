@@ -7,7 +7,7 @@ import { auth } from '@/lib/auth';
 import { db, dbQuery } from '@/db';
 import { addXPToUser } from '@/utils/levelEngine';
 
-const Body = z.object({ kind: z.enum(['ayah', 'hadith']) });
+const Body = z.object({ kind: z.enum(['ayah', 'hadith', 'quiz']) });
 const XP_REWARD = 10;
 
 // POST /api/daily/complete { kind } — grant XP once per user per day per kind,
