@@ -41,9 +41,13 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // Dry-run: ?dryRun=1 returns exactly who WOULD be emailed + a sample render,
+    // without sending anything. A safety valve for previewing the cron.
+    const dryRun = req.nextUrl.searchParams.get('dryRun') === '1';
+
     const apiKey = process.env.RESEND_API_KEY;
     const from = process.env.DIGEST_FROM || 'QuRoots <digest@quroots.com>';
-    if (!apiKey) {
+    if (!apiKey && !dryRun) {
       return NextResponse.json({ skipped: true, reason: 'RESEND_API_KEY not configured' });
     }
 
@@ -58,6 +62,20 @@ export async function GET(req: NextRequest) {
           AND s.last_active_date = CURRENT_DATE - 1
       `)
     )) as any[];
+
+    if (dryRun) {
+      return NextResponse.json({
+        dryRun: true,
+        wouldSend: targets.length,
+        recipients: targets.map((t) => ({ email: t.email, streak: t.streak })),
+        sampleHtml: renderEmail({
+          firstName: (targets[0]?.name ?? 'Aisha').split(' ')[0],
+          streak: targets[0]?.streak ?? 5,
+          unsubscribeUrl: `${SITE}/api/digest/unsubscribe?token=…`,
+        }),
+        resendConfigured: !!apiKey,
+      });
+    }
 
     if (targets.length === 0) return NextResponse.json({ sent: 0, reason: 'no at-risk streaks' });
 
