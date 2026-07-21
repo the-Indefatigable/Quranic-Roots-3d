@@ -1,0 +1,24 @@
+<svg width="460" height="130" viewBox="0 0 460 130" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="QuRoots">
+  <defs>
+    <linearGradient id="goldW" x1="65" y1="20" x2="65" y2="112" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#E7C877"/>
+      <stop offset="0.55" stop-color="#D4A246"/>
+      <stop offset="1" stop-color="#B4822E"/>
+    </linearGradient>
+  </defs>
+  <!-- mark -->
+  <g transform="translate(5,7)">
+    <path d="M60 20 L74 36 L60 52 L46 36 Z" fill="url(#goldW)"/>
+    <g stroke="url(#goldW)" stroke-width="6" stroke-linecap="round" fill="none">
+      <path d="M60 50 L60 100"/>
+      <path d="M60 56 C 55 72 46 78 30 96"/>
+      <path d="M60 56 C 65 72 74 78 90 96"/>
+      <path d="M45 76 C 42 82 40 86 36 92" stroke-width="4.5"/>
+      <path d="M75 76 C 78 82 80 86 84 92" stroke-width="4.5"/>
+    </g>
+  </g>
+  <!-- wordmark -->
+  <text x="132" y="84" font-family="Georgia, 'Times New Roman', 'Amiri', serif" font-size="62" font-weight="600" letter-spacing="0.5">
+    <tspan fill="#EDE7D6">Qu</tspan><tspan fill="url(#goldW)">Roots</tspan>
+  </text>
+</svg>

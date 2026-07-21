@@ -1,0 +1,26 @@
+<svg width="240" height="240" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="QuRoots app icon">
+  <defs>
+    <linearGradient id="goldT" x1="120" y1="52" x2="120" y2="200" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#E7C877"/>
+      <stop offset="0.55" stop-color="#D4A246"/>
+      <stop offset="1" stop-color="#B4822E"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.28" r="0.75">
+      <stop offset="0" stop-color="#D4A246" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#D4A246" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect x="0" y="0" width="240" height="240" rx="54" fill="#12110F"/>
+  <rect x="0.75" y="0.75" width="238.5" height="238.5" rx="53.25" stroke="#D4A246" stroke-opacity="0.18" stroke-width="1.5"/>
+  <rect x="0" y="0" width="240" height="240" rx="54" fill="url(#glow)"/>
+  <g transform="translate(60,44) scale(1)">
+    <path d="M60 20 L74 36 L60 52 L46 36 Z" fill="url(#goldT)"/>
+    <g stroke="url(#goldT)" stroke-width="6" stroke-linecap="round" fill="none">
+      <path d="M60 50 L60 100"/>
+      <path d="M60 56 C 55 72 46 78 30 96"/>
+      <path d="M60 56 C 65 72 74 78 90 96"/>
+      <path d="M45 76 C 42 82 40 86 36 92" stroke-width="4.5"/>
+      <path d="M75 76 C 78 82 80 86 84 92" stroke-width="4.5"/>
+    </g>
+  </g>
+</svg>

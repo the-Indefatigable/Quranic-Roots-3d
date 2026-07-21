@@ -1,0 +1,19 @@
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="QuRoots">
+  <defs>
+    <linearGradient id="gold" x1="60" y1="18" x2="60" y2="104" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#E7C877"/>
+      <stop offset="0.55" stop-color="#D4A246"/>
+      <stop offset="1" stop-color="#B4822E"/>
+    </linearGradient>
+  </defs>
+  <!-- seed -->
+  <path d="M60 20 L74 36 L60 52 L46 36 Z" fill="url(#gold)"/>
+  <!-- roots -->
+  <g stroke="url(#gold)" stroke-width="6" stroke-linecap="round" fill="none">
+    <path d="M60 50 L60 100"/>
+    <path d="M60 56 C 55 72 46 78 30 96"/>
+    <path d="M60 56 C 65 72 74 78 90 96"/>
+    <path d="M45 76 C 42 82 40 86 36 92" stroke-width="4.5"/>
+    <path d="M75 76 C 78 82 80 86 84 92" stroke-width="4.5"/>
+  </g>
+</svg>
