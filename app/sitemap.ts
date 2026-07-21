@@ -8,14 +8,21 @@ export const dynamic = 'force-dynamic';
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://quroots.com';
 
+  const now = new Date();
+
   // Static pages
   const staticPages: MetadataRoute.Sitemap = [
-    { url: baseUrl, changeFrequency: 'weekly', priority: 1.0 },
-    { url: `${baseUrl}/quran`, changeFrequency: 'monthly', priority: 0.9 },
-    { url: `${baseUrl}/roots`, changeFrequency: 'monthly', priority: 0.9 },
-    { url: `${baseUrl}/learn`, changeFrequency: 'weekly', priority: 0.9 },
-    { url: `${baseUrl}/blog`, changeFrequency: 'weekly', priority: 0.9 },
-    { url: `${baseUrl}/search`, changeFrequency: 'monthly', priority: 0.6 },
+    { url: baseUrl, lastModified: now, changeFrequency: 'weekly', priority: 1.0 },
+    { url: `${baseUrl}/quran`, lastModified: now, changeFrequency: 'monthly', priority: 0.9 },
+    { url: `${baseUrl}/roots`, lastModified: now, changeFrequency: 'monthly', priority: 0.9 },
+    { url: `${baseUrl}/learn`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${baseUrl}/learn/path`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${baseUrl}/blog`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${baseUrl}/daily`, lastModified: now, changeFrequency: 'daily', priority: 0.8 },
+    { url: `${baseUrl}/leaderboard`, lastModified: now, changeFrequency: 'daily', priority: 0.6 },
+    { url: `${baseUrl}/achievements`, lastModified: now, changeFrequency: 'weekly', priority: 0.5 },
+    { url: `${baseUrl}/community`, lastModified: now, changeFrequency: 'daily', priority: 0.5 },
+    { url: `${baseUrl}/search`, lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
   ];
 
   // Blog articles (formerly /learn/*)
@@ -32,6 +39,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     'classical-arabic-rebukes',
   ].map((slug) => ({
     url: `${baseUrl}/blog/${slug}`,
+    lastModified: now,
     changeFrequency: 'monthly' as const,
     priority: 0.85,
   }));
@@ -43,6 +51,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const surahPages: MetadataRoute.Sitemap = allSurahs.map((s) => ({
     url: `${baseUrl}/quran/${s.number}`,
+    lastModified: now,
     changeFrequency: 'monthly' as const,
     priority: 0.8,
   }));
@@ -54,6 +63,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const rootPages: MetadataRoute.Sitemap = allRoots.map((r) => ({
     url: `${baseUrl}/roots/${encodeURIComponent(r.root)}`,
+    lastModified: now,
     changeFrequency: 'monthly' as const,
     priority: 0.7,
   }));

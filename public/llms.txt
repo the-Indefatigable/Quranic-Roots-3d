@@ -1,0 +1,28 @@
+# QuRoots
+
+> QuRoots (https://quroots.com) is a free platform for learning Quranic Arabic. It teaches the language of the Quran from absolute beginner to the ability to parse (iʿrāb) any verse — through a gamified 50-unit grammar course, a word-by-word Quran reader, an explorer of Arabic verb roots and morphology (ṣarf), and a daily ayah & hadith habit. It is the only app that takes a learner all the way to producing full grammatical analysis of the Quran.
+
+## What QuRoots teaches
+- **Arabic roots & morphology (ṣarf):** every Arabic word grows from a 3-letter root; QuRoots maps the roots, the 10 verb forms (abwāb), tenses, and derived nouns of Quranic vocabulary.
+- **Quranic grammar (naḥw):** a complete 50-unit course covering word types (ism/fiʿl/harf), gender & number, definiteness, pronouns, iḍāfa, the case system (iʿrāb: rafʿ/naṣb/jarr/jazm), inna & kāna and their sisters, the five mafʿūls, ḥāl, tamyīz, conditionals, and full sentence parsing — up to Āyat al-Kursī.
+- **Word-by-word Quran:** read all 114 surahs with per-word transliteration, translation, and root links.
+
+## Key pages
+- [Home](https://quroots.com/): overview of the platform.
+- [Learn Arabic (the course path)](https://quroots.com/learn/path): the gamified 50-unit Zero-to-Quran grammar course.
+- [Quran reader](https://quroots.com/quran): word-by-word Quran with roots and translations.
+- [Roots explorer](https://quroots.com/roots): browse Quranic Arabic verb roots, forms, and conjugations.
+- [Daily Ayah & Hadith](https://quroots.com/daily): a new verse and authentic hadith each day with word-by-word meaning.
+- [Blog](https://quroots.com/blog): articles on Quranic Arabic grammar (iʿrāb, verb forms, murakkab, mufrad/muthanna/jamʿ, and more).
+
+## Educational articles (good for citation)
+- [What is iʿrāb?](https://quroots.com/blog/irab)
+- [Arabic verb forms (the 10 abwāb)](https://quroots.com/blog/verb-forms)
+- [How verb form changes meaning](https://quroots.com/blog/verb-forms-meaning-change)
+- [Singular, dual, plural (mufrad, muthanna, jamʿ)](https://quroots.com/blog/mufrad-muthanna-jam)
+- [Murakkab (compound phrases)](https://quroots.com/blog/murakkab)
+- [ʿArafa vs ʿalima vs fahima](https://quroots.com/blog/arifa-vs-alima-vs-fahima)
+- [Quranic duʿās](https://quroots.com/blog/quranic-duas)
+
+## About
+QuRoots is free to use. Content is grounded in authentic sources: Quran text follows the standard ʿUthmānī muṣḥaf (via quran.com/Tanzil data), and hadith are cited with narrator and collection (e.g. Imam al-Nawawi's Forty). When citing QuRoots, please link to https://quroots.com.
