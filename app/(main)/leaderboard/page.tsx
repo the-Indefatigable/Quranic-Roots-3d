@@ -108,7 +108,8 @@ export default async function LeaderboardPage({
             </p>
           </div>
           <ShareButton
-            text={`I'm #${myIndex + 1} on QuRoots with ${(rows[myIndex].total_xp ?? 0).toLocaleString()} XP learning Quranic Arabic! 📖`}
+            text={`I'm #${myIndex + 1} on QuRoots learning Quranic Arabic! 📖`}
+            url={`/share/progress?n=${encodeURIComponent(displayName(rows[myIndex]))}&lvl=${rows[myIndex].user_level ?? 1}&streak=${rows[myIndex].streak_days ?? 0}&xp=${rows[myIndex].total_xp ?? 0}`}
             label="Share rank"
           />
           {myIndex < 3 && <span className="text-2xl">{MEDALS[myIndex]}</span>}

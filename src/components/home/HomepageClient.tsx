@@ -248,8 +248,11 @@ export function HomepageClient() {
   }, []);
 
   const [verse] = useState(() => {
+    // UTC-based day index so the server render and client hydration agree
+    // (avoids a hydration mismatch now that this component is server-rendered).
     const now = new Date();
-    const day = Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000);
+    const start = Date.UTC(now.getUTCFullYear(), 0, 0);
+    const day = Math.floor((Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()) - start) / 86400000);
     return FEATURED_VERSES[day % FEATURED_VERSES.length];
   });
 

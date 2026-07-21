@@ -4,11 +4,12 @@ import { useState } from 'react';
 
 // Lightweight share: uses the native share sheet on mobile, falls back to
 // copying the text + link on desktop. A cheap virality lever.
-export function ShareButton({ text, className, label = 'Share' }: { text: string; className?: string; label?: string }) {
+export function ShareButton({ text, url: sharePath, className, label = 'Share' }: { text: string; url?: string; className?: string; label?: string }) {
   const [copied, setCopied] = useState(false);
 
   const onShare = async () => {
-    const url = typeof window !== 'undefined' ? window.location.origin : 'https://quroots.com';
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://quroots.com';
+    const url = sharePath ? `${origin}${sharePath}` : origin;
     const shareData = { title: 'QuRoots', text, url };
     try {
       if (navigator.share) {

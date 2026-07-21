@@ -22,9 +22,12 @@ export const metadata: Metadata = {
   alternates: { canonical: '/' },
 };
 
+// Server-rendered (ssr: true) so the homepage's hero copy is in the initial HTML
+// for search engines and AI answer engines — its browser-only work is confined
+// to effects, and the day-of-year verse is computed in UTC to avoid mismatch.
 const HomepageClient = dynamic(
   () => import('@/components/home/HomepageClient').then((m) => ({ default: m.HomepageClient })),
-  { ssr: false, loading: () => <div className="min-h-screen bg-canvas" /> }
+  { ssr: true, loading: () => <div className="min-h-screen bg-canvas" /> }
 );
 
 // AEO: FAQ + Course structured data so answer engines (Google rich results,
