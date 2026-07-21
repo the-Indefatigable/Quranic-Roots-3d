@@ -13,6 +13,7 @@ import { ListenIdentifyStep } from './steps/ListenIdentifyStep';
 import { PitchMatchStep } from './steps/PitchMatchStep';
 import { ReciteScoreStep } from './steps/ReciteScoreStep';
 import { LessonComplete } from './LessonComplete';
+import { AchievementUnlock } from '@/components/gamification/AchievementUnlock';
 
 export interface LessonStep {
   type: 'teach' | 'mcq' | 'match' | 'fill_blank' | 'arrange' | 'classify' | 'translate' | 'listen_identify' | 'pitch_match' | 'recite_score';
@@ -50,6 +51,7 @@ export function LessonPlayer({
   const [recycledSteps, setRecycledSteps] = useState<LessonStep[]>([]);
   const [isComplete, setIsComplete] = useState(false);
   const [completionData, setCompletionData] = useState<Record<string, unknown> | null>(null);
+  const [badgesDismissed, setBadgesDismissed] = useState(false);
   const [startTime] = useState(Date.now());
   const [showFeedback, setShowFeedback] = useState<'correct' | 'wrong' | null>(null);
   const [feedbackExplanation, setFeedbackExplanation] = useState('');
@@ -183,11 +185,23 @@ export function LessonPlayer({
   }, [hearts, isComplete]);
 
   if (isComplete && completionData) {
+    const newBadges = (completionData.newBadges as string[] | undefined) ?? [];
+    const badgeAchievements = newBadges.map((title) => ({
+      id: title,
+      title,
+      description: null,
+      category: 'milestone',
+      xpBonus: null,
+    }));
     return (
-      <LessonComplete
-        data={completionData}
-        onContinue={onExit}
-      />
+      <>
+        <LessonComplete data={completionData} onContinue={onExit} />
+        <AchievementUnlock
+          achievements={badgeAchievements}
+          isVisible={badgeAchievements.length > 0 && !badgesDismissed}
+          onClose={() => setBadgesDismissed(true)}
+        />
+      </>
     );
   }
 
