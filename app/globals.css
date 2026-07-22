@@ -267,7 +267,11 @@ a { text-decoration: none; color: inherit; }
 }
 
 .page-enter {
-  animation: page-enter 0.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  /* NB: no `forwards` — the fill would retain `transform: translateY(0)`, and a
+     non-`none` transform creates a containing block that breaks `position: fixed`
+     descendants (e.g. centered modals). The resting state already equals the
+     animation's end frame, so dropping the fill is visually identical. */
+  animation: page-enter 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* ===== Scroll reveal ===== */
