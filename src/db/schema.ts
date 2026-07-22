@@ -188,6 +188,10 @@ export const users = pgTable('users', {
   levelProgress: integer('level_progress').default(0),
   digestOptIn: boolean('digest_opt_in').default(false).notNull(),
   unsubscribeToken: uuid('unsubscribe_token').defaultRandom().notNull(),
+  // ── Founding Supporter (one-time lifetime purchase via LemonSqueezy) ──
+  isSupporter: boolean('is_supporter').default(false).notNull(),
+  supporterSince: timestamp('supporter_since', { withTimezone: true }),
+  supporterOrderId: text('supporter_order_id'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
 });

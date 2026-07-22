@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useAppStore } from '@/store/useAppStore';
 import { DigestToggle } from '@/components/ui/DigestToggle';
+import { SupporterCard } from '@/components/profile/SupporterCard';
 import { cn } from '@/lib/cn';
 
 const grammarArticles = [
@@ -161,6 +162,9 @@ export default function ProfilePage() {
           ))}
         </div>
       </motion.div>
+
+      {/* Founding Supporter */}
+      <SupporterCard userId={user.id} />
 
       {/* Email preferences */}
       <motion.div
