@@ -6,11 +6,15 @@ import { eq } from 'drizzle-orm';
 
 export const dynamic = 'force-dynamic';
 
-/** Returns whether the signed-in user is a Founding Supporter. */
+/**
+ * Returns whether the signed-in user is a Founding Supporter, plus whether the
+ * checkout flow is configured (so the profile card knows to show the CTA).
+ */
 export async function GET() {
+  const checkoutEnabled = !!process.env.STRIPE_SECRET_KEY;
   const session = await auth();
   if (!session?.user?.id) {
-    return NextResponse.json({ isSupporter: false, authed: false });
+    return NextResponse.json({ isSupporter: false, authed: false, checkoutEnabled });
   }
 
   try {
@@ -24,9 +28,10 @@ export async function GET() {
       isSupporter: !!row?.isSupporter,
       since: row?.since ?? null,
       authed: true,
+      checkoutEnabled,
     });
   } catch (err) {
     console.error('[supporter] lookup failed:', err);
-    return NextResponse.json({ isSupporter: false, authed: true, error: true });
+    return NextResponse.json({ isSupporter: false, authed: true, checkoutEnabled, error: true });
   }
 }

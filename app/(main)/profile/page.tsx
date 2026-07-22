@@ -164,7 +164,7 @@ export default function ProfilePage() {
       </motion.div>
 
       {/* Founding Supporter */}
-      <SupporterCard userId={user.id} />
+      <SupporterCard />
 
       {/* Email preferences */}
       <motion.div
