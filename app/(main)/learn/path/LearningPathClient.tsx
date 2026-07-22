@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { LearningPath, type PathUnit } from '@/components/learn/LearningPath';
+import { SupportPrompt } from '@/components/support/SupportPrompt';
 
 export function LearningPathClient() {
   const [units, setUnits] = useState<PathUnit[]>([]);
@@ -171,8 +172,11 @@ export function LearningPathClient() {
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 1, delay: 0.3 }}
-        className="mt-20 text-center"
+        className="mt-16 text-center"
       >
+        <div className="max-w-md mx-auto mb-16 text-left">
+          <SupportPrompt />
+        </div>
         <div className="flex items-center justify-center gap-3 mb-3">
           <span className="h-px w-14 bg-gradient-to-r from-transparent to-[#D4A246]/25" />
           <div className="w-2 h-2 rotate-45" style={{ background: '#D4A246', opacity: 0.35, boxShadow: '0 0 8px rgba(212,162,70,0.5)' }} />

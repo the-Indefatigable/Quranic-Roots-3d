@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { SupportPrompt } from '@/components/support/SupportPrompt';
 
 interface DashboardData {
   user: { name: string | null; level: number; totalXP: number };
@@ -383,6 +384,8 @@ export function Dashboard() {
       <Link href="/learn/path" className="block text-center py-3 text-primary font-medium hover:underline text-sm">
         View full learning path →
       </Link>
+
+      <SupportPrompt className="mt-2" />
     </div>
   );
 }

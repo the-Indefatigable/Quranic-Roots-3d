@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useAppStore } from '@/store/useAppStore';
 import { RootBloom } from './RootBloom';
 import { CommunityStrip } from './CommunityStrip';
+import { SupportPrompt } from '@/components/support/SupportPrompt';
 
 // ── Scroll-reveal via IntersectionObserver ──────────────────────────
 function useScrollReveal() {
@@ -284,6 +285,7 @@ export function HomepageClient() {
             { href: '/learn/path',  label: 'Learn'  },
             { href: '/learn/qirat', label: 'Qirat'  },
             { href: '/blog',        label: 'Blog'   },
+            { href: '/support',     label: 'Support' },
           ].map((l) => (
             <Link
               key={l.href}
@@ -467,6 +469,21 @@ export function HomepageClient() {
               </span>
             ))}
           </div>
+
+          {/* Quiet support line — QuRoots is free, keep it that way */}
+          <p className="text-xs mb-4" style={{ color: '#57534E' }}>
+            Free for every Muslim, forever.{' '}
+            <Link
+              href="/support"
+              className="inline-flex items-center gap-1 font-medium transition-colors"
+              style={{ color: '#D4A246' }}
+            >
+              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+              </svg>
+              Support QuRoots
+            </Link>
+          </p>
         </div>
 
         {/* Stats bar */}
@@ -820,6 +837,15 @@ export function HomepageClient() {
             </p>
             <p className="text-xs" style={{ color: '#57534E' }}>{verse.reference}</p>
           </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════════════
+          SUPPORT — quiet nudge before the final CTA
+      ══════════════════════════════════════════════════════ */}
+      <section className="px-5 pb-4 max-w-2xl mx-auto w-full" data-reveal-group>
+        <div className="reveal" style={{ '--reveal-delay': '0s' } as React.CSSProperties}>
+          <SupportPrompt />
         </div>
       </section>
 
