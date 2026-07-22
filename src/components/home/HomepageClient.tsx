@@ -446,21 +446,24 @@ export function HomepageClient() {
           {/* Feature badges */}
           <div className="flex flex-wrap items-center justify-center gap-2 mb-14">
             {[
-              { icon: '📖', label: 'Word-by-Word' },
-              { icon: '🎵', label: 'Qirat Training' },
-              { icon: '🌱', label: 'Root Analysis' },
-              { icon: '📚', label: 'Grammar Lessons' },
+              { label: 'Word-by-Word', d: 'M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25' },
+              { label: 'Qirat Training', d: 'M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 0 1-1.632 2.163l-1.32.377a1.803 1.803 0 1 1-.99-3.467l2.31-.66a2.25 2.25 0 0 0 1.632-2.163Zm0 0V4.103A2.25 2.25 0 0 0 17.77 2.03l-4.046 1.157A2.25 2.25 0 0 0 12.12 5.35v6.2a2.25 2.25 0 0 1-1.632 2.163l-1.32.377a1.803 1.803 0 1 1-.99-3.467l2.31-.66A2.25 2.25 0 0 0 12.12 7.8' },
+              { label: 'Root Analysis', d: 'm3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z' },
+              { label: 'Grammar Lessons', d: 'M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342' },
             ].map((b) => (
               <span
                 key={b.label}
-                className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full"
+                className="flex items-center gap-1.5 text-xs font-medium px-3.5 py-1.5 rounded-full"
                 style={{
                   background: 'rgba(255,255,255,0.05)',
                   border: '1px solid rgba(255,255,255,0.09)',
                   color: '#A09F9B',
                 }}
               >
-                {b.icon} {b.label}
+                <svg className="w-3.5 h-3.5" style={{ color: '#D4A246' }} fill="none" viewBox="0 0 24 24" strokeWidth={1.6} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d={b.d} />
+                </svg>
+                {b.label}
               </span>
             ))}
           </div>
@@ -871,6 +874,7 @@ export function HomepageClient() {
             { href: '/learn/qirat', label: 'Qirat'   },
             { href: '/search',      label: 'Search'  },
             { href: '/blog',        label: 'Blog'    },
+            { href: '/support',     label: 'Support' },
           ].map((l) => (
             <Link key={l.href} href={l.href} className="text-sm transition-colors" style={{ color: '#8A8783' }}
               onMouseEnter={e => (e.currentTarget.style.color = '#EDEDEC')}
