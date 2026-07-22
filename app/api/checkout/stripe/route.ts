@@ -13,10 +13,11 @@ export const dynamic = 'force-dynamic';
  * Body: { amount: number }  // whole US dollars
  */
 export async function POST(request: NextRequest) {
+  // Donations are frictionless — anyone can give, signed in or not. When we do
+  // know the user we attribute the gift (for the thank-you badge); otherwise the
+  // donation is simply anonymous.
   const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Not signed in' }, { status: 401 });
-  }
+  const userId = session?.user?.id;
 
   const stripe = getStripe();
   if (!stripe) {
@@ -43,10 +44,10 @@ export async function POST(request: NextRequest) {
     const checkout = await stripe.checkout.sessions.create({
       mode: 'payment',
       submit_type: 'donate',
-      client_reference_id: session.user.id,
-      customer_email: session.user.email ?? undefined,
-      metadata: { user_id: session.user.id, kind: 'donation' },
-      payment_intent_data: { metadata: { user_id: session.user.id, kind: 'donation' } },
+      client_reference_id: userId,
+      customer_email: session?.user?.email ?? undefined,
+      metadata: { user_id: userId ?? '', kind: 'donation' },
+      payment_intent_data: { metadata: { user_id: userId ?? '', kind: 'donation' } },
       line_items: [
         {
           quantity: 1,
