@@ -18,7 +18,25 @@ interface Row {
   streak_days: number;
 }
 
-const MEDALS = ['🥇', '🥈', '🥉'];
+// Gold / silver / bronze medallions for the top three — a crafted rank chip
+// rather than an emoji.
+const MEDAL = [
+  { bg: 'rgba(212,162,70,0.18)', fg: '#E8C877', border: 'rgba(212,162,70,0.65)' },
+  { bg: 'rgba(198,200,210,0.14)', fg: '#D4D5DC', border: 'rgba(198,200,210,0.5)' },
+  { bg: 'rgba(176,141,87,0.18)', fg: '#D2A878', border: 'rgba(176,141,87,0.6)' },
+];
+
+function RankMedal({ rank }: { rank: number }) {
+  const m = MEDAL[rank - 1];
+  return (
+    <span
+      className="inline-flex items-center justify-center w-6 h-6 rounded-full text-[11px] font-bold tabular-nums"
+      style={{ background: m.bg, color: m.fg, border: `1px solid ${m.border}` }}
+    >
+      {rank}
+    </span>
+  );
+}
 
 function displayName(r: Row) {
   return (r.name || 'Anonymous').trim().split(' ')[0] || 'Anonymous';
@@ -112,7 +130,7 @@ export default async function LeaderboardPage({
             url={`/share/progress?n=${encodeURIComponent(displayName(rows[myIndex]))}&lvl=${rows[myIndex].user_level ?? 1}&streak=${rows[myIndex].streak_days ?? 0}&xp=${rows[myIndex].total_xp ?? 0}`}
             label="Share rank"
           />
-          {myIndex < 3 && <span className="text-2xl">{MEDALS[myIndex]}</span>}
+          {myIndex < 3 && <RankMedal rank={myIndex + 1} />}
         </div>
       )}
       {meId && myIndex < 0 && (
@@ -134,8 +152,8 @@ export default async function LeaderboardPage({
                 borderColor: isMe ? 'var(--color-primary)' : 'var(--color-border-light)',
               }}
             >
-              <span className="w-8 text-center font-semibold tabular-nums" style={{ color: i < 3 ? 'var(--color-primary)' : 'var(--color-text-tertiary)' }}>
-                {i < 3 ? MEDALS[i] : i + 1}
+              <span className="w-8 flex justify-center font-semibold tabular-nums" style={{ color: 'var(--color-text-tertiary)' }}>
+                {i < 3 ? <RankMedal rank={i + 1} /> : i + 1}
               </span>
               <div className="w-9 h-9 rounded-full bg-primary-light flex items-center justify-center shrink-0 overflow-hidden">
                 {r.image ? (
@@ -155,8 +173,11 @@ export default async function LeaderboardPage({
                 <p className="text-[11px] text-text-tertiary">Level {r.user_level ?? 1}</p>
               </div>
               {sort === 'streak' ? (
-                <span className="text-sm font-semibold tabular-nums text-text-secondary whitespace-nowrap">
-                  🔥 {r.streak_days ?? 0}
+                <span className="flex items-center gap-1 text-sm font-semibold tabular-nums text-text-secondary whitespace-nowrap">
+                  <svg className="w-4 h-4" style={{ color: 'var(--color-primary)' }} fill="none" viewBox="0 0 24 24" strokeWidth={1.6} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.362 5.214A8.252 8.252 0 0 1 12 21 8.25 8.25 0 0 1 6.038 7.048 8.287 8.287 0 0 0 9 9.6a8.983 8.983 0 0 1 3.361-6.867 8.21 8.21 0 0 0 3 2.48Z" />
+                  </svg>
+                  {r.streak_days ?? 0}
                 </span>
               ) : (
                 <span className="text-sm font-semibold tabular-nums whitespace-nowrap" style={{ color: 'var(--color-primary)' }}>

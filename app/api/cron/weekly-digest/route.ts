@@ -52,6 +52,15 @@ function renderEmail(opts: {
       </td></tr>`
     : '';
 
+  const supportBlock = `<tr><td style="padding:0 32px 24px">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#111110;border:1px solid rgba(212,162,70,0.2);border-radius:12px">
+        <tr><td style="padding:20px 22px;text-align:center">
+          <p style="margin:0;font-size:14px;line-height:1.6;color:#F0E4CA">Enjoying QuRoots? It stays free for everyone — a small gift keeps it growing.</p>
+          <a href="${SITE}/support" style="display:inline-block;margin-top:12px;background:${gold};color:#1a1206;font-weight:bold;font-size:13px;text-decoration:none;padding:11px 22px;border-radius:10px">Support QuRoots</a>
+        </td></tr>
+      </table>
+    </td></tr>`;
+
   return `<!doctype html><html><body style="margin:0;padding:0;background:#0E0D0C">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#0E0D0C;padding:24px 0">
 <tr><td align="center">
@@ -74,6 +83,7 @@ function renderEmail(opts: {
   </td></tr>
   ${lessonsBlock}
   ${chatBlock}
+  ${supportBlock}
   <tr><td style="padding:8px 32px 28px;border-top:1px solid rgba(255,255,255,0.06)">
     <p style="margin:16px 0 0;font-size:11px;color:#57534E">
       You're receiving this because you subscribed on QuRoots.
