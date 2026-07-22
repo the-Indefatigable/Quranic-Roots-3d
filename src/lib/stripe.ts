@@ -11,4 +11,7 @@ export function getStripe(): Stripe | null {
   return _stripe;
 }
 
-export const SUPPORTER_PRICE_CENTS = 9900; // $99 one-time
+// Donation bounds (cents). Stripe's floor is $0.50; we ask for at least $1.
+export const MIN_DONATION_CENTS = 100;      // $1
+export const MAX_DONATION_CENTS = 1_000_000; // $10,000
+export const DONATION_PRESETS = [5, 10, 25, 50]; // dollars
