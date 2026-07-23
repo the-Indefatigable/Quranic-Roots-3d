@@ -58,11 +58,11 @@ export function FeedbackWidget() {
 
   return (
     <>
-      {/* Launcher button — above BottomNav on mobile, corner on desktop */}
+      {/* Launcher button — bottom corner (no bottom nav to clear on mobile now) */}
       <button
         onClick={() => setOpen((v) => !v)}
         aria-label="Send feedback"
-        className="fixed z-40 right-4 bottom-[calc(env(safe-area-inset-bottom)+92px)] lg:bottom-6 lg:right-6 flex items-center justify-center w-11 h-11 rounded-full transition-transform hover:scale-105 active:scale-95"
+        className="fixed z-40 right-4 bottom-[calc(env(safe-area-inset-bottom)+16px)] lg:bottom-6 lg:right-6 flex items-center justify-center w-11 h-11 rounded-full transition-transform hover:scale-105 active:scale-95"
         style={{
           background: 'var(--color-nav-glass)',
           backdropFilter: 'blur(20px)',
@@ -90,7 +90,7 @@ export function FeedbackWidget() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 12, scale: 0.97 }}
             transition={{ duration: 0.18 }}
-            className="fixed z-40 right-4 bottom-[calc(env(safe-area-inset-bottom)+148px)] lg:bottom-20 lg:right-6 w-[calc(100vw-2rem)] max-w-sm rounded-2xl p-4"
+            className="fixed z-40 right-4 bottom-[calc(env(safe-area-inset-bottom)+72px)] lg:bottom-20 lg:right-6 w-[calc(100vw-2rem)] max-w-sm rounded-2xl p-4"
             style={{
               background: 'var(--color-surface)',
               border: '1px solid var(--color-border-light)',

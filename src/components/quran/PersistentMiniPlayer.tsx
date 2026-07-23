@@ -102,7 +102,7 @@ export function PersistentMiniPlayer() {
     <div
       className={
         inMainLayout
-          ? 'fixed z-50 left-3 right-3 bottom-[calc(env(safe-area-inset-bottom)+80px)] rounded-2xl overflow-hidden shadow-modal lg:left-60 lg:right-0 lg:bottom-0 lg:rounded-none'
+          ? 'fixed z-50 left-3 right-3 bottom-[calc(env(safe-area-inset-bottom)+12px)] rounded-2xl overflow-hidden shadow-modal lg:left-60 lg:right-0 lg:bottom-0 lg:rounded-none'
           : 'fixed z-50 left-0 right-0 bottom-0'
       }
       style={{ pointerEvents: 'auto' }}
