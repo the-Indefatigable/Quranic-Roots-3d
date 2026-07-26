@@ -12,6 +12,12 @@ dist
 dist-ssr
 *.local
 
+# Environment / secrets
+# (*.local above already covers .env.local — these catch the rest)
+.env
+.env.*
+!.env.example
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -29,6 +35,7 @@ data/quranRoots.json
 data/verbs_raw.json
 quranic-corpus-morphology*.txt
 *.corpus.txt
+archive/*.json
 
 # Enrichment scripts (contain API keys / raw corpus data)
 enrich_with_claude.mjs
