@@ -56,9 +56,13 @@ export function updateSRS(data: SRSData, rootId: string, correct: number, total:
     intervalMultiplier = 0; // 1-hour retry
   }
 
-  const interval = newMastery === 0 && intervalMultiplier === 0
+  // A multiplier of 0 means "retry in an hour". Note this must be checked
+  // explicitly: `x * 0 || SRS_INTERVALS[m]` swallows the zero and falls through
+  // to the full interval, which sent failed items days away instead of back
+  // into the queue.
+  const interval = intervalMultiplier === 0
     ? 3_600_000
-    : Math.round(SRS_INTERVALS[newMastery] * intervalMultiplier || SRS_INTERVALS[newMastery]);
+    : Math.round(SRS_INTERVALS[newMastery] * intervalMultiplier);
 
   return {
     ...data,

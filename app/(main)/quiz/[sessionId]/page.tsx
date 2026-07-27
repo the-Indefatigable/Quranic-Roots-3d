@@ -73,15 +73,11 @@ export default function QuizSessionPage({ params }: PageProps) {
       const response = await fetch('/api/quiz/submit-answer', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        // Only the answer is sent — the server holds the answer key.
         body: JSON.stringify({
           sessionId: params.sessionId,
-          itemId: quizStore.currentQuestion.itemId,
-          itemType: quizStore.currentQuestion.itemType,
-          questionType: quizStore.currentQuestion.type,
-          questPrompt: quizStore.currentQuestion.prompt,
+          questionId: quizStore.currentQuestion.id,
           userAnswer: quizStore.userAnswer,
-          correctAnswer: quizStore.currentQuestion.correctAnswer,
-          validAnswers: quizStore.currentQuestion.validAnswers,
           responseTime_ms: elapsedSeconds * 1000,
         }),
       });
@@ -94,8 +90,9 @@ export default function QuizSessionPage({ params }: PageProps) {
         return;
       }
 
-      // Update store with result
-      quizStore.submitAnswer(data.isCorrect, data.feedback);
+      // Update store with result. The correct answer is only known now that
+      // the server has graded it, so it comes back with the response.
+      quizStore.submitAnswer(data.isCorrect, data.feedback, data.correctAnswer);
       setIsSubmitting(false);
     } catch (err) {
       setError('Failed to submit answer');
@@ -222,6 +219,7 @@ export default function QuizSessionPage({ params }: PageProps) {
               }}
               isAnswered={quizStore.isAnswered}
               feedback={quizStore.feedback}
+              revealedAnswer={quizStore.revealedAnswer}
               isLoading={isSubmitting}
             />
           </div>

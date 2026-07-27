@@ -12,6 +12,8 @@ interface QuizCardProps {
   onSubmit: () => void;
   isAnswered: boolean;
   feedback: string | null;
+  /** Correct answer, supplied by the server after grading. */
+  revealedAnswer?: string | null;
   isLoading: boolean;
 }
 
@@ -24,6 +26,7 @@ export function QuizCard({
   onSubmit,
   isAnswered,
   feedback,
+  revealedAnswer,
   isLoading,
 }: QuizCardProps) {
   if (!question) return null;
@@ -107,9 +110,9 @@ export function QuizCard({
         {isAnswered && feedback && (
           <div className="mb-6 p-4 bg-surface rounded-lg shadow-card">
             <p className="text-sm text-text-secondary">{feedback}</p>
-            {question.correctAnswer && typeof question.correctAnswer === 'string' && (
+            {revealedAnswer && (
               <p className="text-primary text-sm mt-2">
-                Correct answer: <span className="font-semibold">{question.correctAnswer}</span>
+                Correct answer: <span className="font-semibold">{revealedAnswer}</span>
               </p>
             )}
           </div>
