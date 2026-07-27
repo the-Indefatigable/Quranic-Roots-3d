@@ -921,6 +921,8 @@ export function HomepageClient() {
             { href: '/search',      label: 'Search'  },
             { href: '/blog',        label: 'Blog'    },
             { href: '/support',     label: 'Support' },
+            { href: '/privacy',     label: 'Privacy' },
+            { href: '/terms',       label: 'Terms'   },
           ].map((l) => (
             <Link key={l.href} href={l.href} className="text-sm transition-colors" style={{ color: '#8A8783' }}
               onMouseEnter={e => (e.currentTarget.style.color = '#EDEDEC')}
