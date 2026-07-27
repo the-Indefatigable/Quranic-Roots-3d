@@ -6,10 +6,14 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/cn';
 import { useAuthStore } from '@/store/useAuthStore';
 import { navItems, UserIcon } from './navItems';
+import { isActiveNav, navHrefs } from './isActiveNav';
+
+const allHrefs = navHrefs(navItems);
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { user, isLoading, setShowLoginModal, logout } = useAuthStore();
+  // `logout` was destructured but never used.
+  const { user, isLoading, setShowLoginModal } = useAuthStore();
 
   return (
     <aside
@@ -57,7 +61,7 @@ export function Sidebar() {
           if (navItem.requiresAuth && !user) return null;
           if (navItem.requiresAdmin && user?.role !== 'admin') return null;
 
-          const isActive = pathname.startsWith(navItem.href);
+          const isActive = isActiveNav(pathname, navItem.href, allHrefs);
           return (
             <Link
               key={navItem.href}
@@ -101,12 +105,12 @@ export function Sidebar() {
           >
             <div className="w-8 h-8 rounded-full bg-primary-light flex items-center justify-center flex-shrink-0">
               <span className="text-xs font-bold text-primary uppercase">
-                {user.name?.[0] || user.email[0]}
+                {user.name?.[0] || user.email?.[0] || '?'}
               </span>
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs font-semibold text-text truncate">
-                {user.name || user.email.split('@')[0]}
+                {user.name || user.email?.split('@')[0] || 'Learner'}
               </p>
               <p className="text-[10px] text-text-tertiary">Profile & Rewards</p>
             </div>
