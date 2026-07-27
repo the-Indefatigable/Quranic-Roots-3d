@@ -3,10 +3,20 @@ import { NextRequest } from 'next/server';
 import { db, dbQuery } from '@/db';
 import { translationEntries, translations, surahs } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
+import { rateLimit, clientKey, tooManyRequests } from '@/lib/rateLimit';
 
 export const runtime = 'nodejs';
 
+// Satori rendering plus a DB read, on an unauthenticated endpoint driven by
+// query params. Capped and cached — a given ayah always renders the same card.
+const LIMIT = 60;
+const WINDOW_MS = 60_000;
+const CACHE_CONTROL = 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800';
+
 export async function GET(request: NextRequest) {
+  const limited = rateLimit(clientKey(request, 'og-ayah'), LIMIT, WINDOW_MS);
+  if (!limited.ok) return tooManyRequests(limited);
+
   const s = parseInt(request.nextUrl.searchParams.get('s') ?? '1');
   const a = parseInt(request.nextUrl.searchParams.get('a') ?? '1');
 
@@ -89,6 +99,6 @@ export async function GET(request: NextRequest) {
         </div>
       </div>
     ),
-    { width: 1200, height: 630 }
+    { width: 1200, height: 630, headers: { 'Cache-Control': CACHE_CONTROL } }
   );
 }
