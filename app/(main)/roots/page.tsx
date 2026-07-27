@@ -6,18 +6,18 @@ import { RootsBrowserClient } from '@/components/roots/RootsBrowserClient';
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-  title: 'All 1,716 Quranic Arabic Roots — Browse, Search & Learn',
+  title: 'All 1,517 Quranic Arabic Roots — Browse, Search & Learn',
   description:
-    'Browse all 1,716 Quranic Arabic verb roots with meanings, frequencies, verb forms, and derived nouns. The most comprehensive Quranic root dictionary online.',
+    'Browse all 1,517 Quranic Arabic verb roots with meanings, frequencies, verb forms, and derived nouns. The most comprehensive Quranic root dictionary online.',
   openGraph: {
-    title: 'All 1,716 Quranic Arabic Roots | QuRoots',
+    title: 'All 1,517 Quranic Arabic Roots | QuRoots',
     description: 'Browse Quranic Arabic verb roots with meanings, frequencies, and verb forms.',
     url: 'https://quroots.com/roots',
     images: [{ url: '/og-image.png', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'All 1,716 Quranic Arabic Roots | QuRoots',
+    title: 'All 1,517 Quranic Arabic Roots | QuRoots',
     description: 'The most comprehensive Quranic root dictionary online.',
     images: ['/og-image.png'],
   },

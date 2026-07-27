@@ -4,11 +4,11 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'QuRoots — Learn Quranic Arabic Roots, Understand Every Word',
   description:
-    'Master Quranic Arabic through root analysis. Explore 1,716 verb roots, read the Quran word-by-word with translation, study verb conjugations, and track your learning progress.',
+    'Master Quranic Arabic through root analysis. Explore 1,517 verb roots, read the Quran word-by-word with translation, study verb conjugations, and track your learning progress.',
   openGraph: {
     title: 'QuRoots — Learn Quranic Arabic Roots, Understand Every Word',
     description:
-      'Master Quranic Arabic through root analysis. Explore 1,716 verb roots, read the Quran word-by-word, and study Arabic morphology.',
+      'Master Quranic Arabic through root analysis. Explore 1,517 verb roots, read the Quran word-by-word, and study Arabic morphology.',
     url: 'https://quroots.com/',
     images: [{ url: '/og-image.png', width: 1200, height: 630 }],
   },
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'QuRoots — Learn Quranic Arabic Roots',
     description:
-      'Explore 1,716 Quranic Arabic roots, read the Quran word-by-word, and master Arabic verb conjugations.',
+      'Explore 1,517 Quranic Arabic roots, read the Quran word-by-word, and master Arabic verb conjugations.',
     images: ['/og-image.png'],
   },
   alternates: { canonical: '/' },

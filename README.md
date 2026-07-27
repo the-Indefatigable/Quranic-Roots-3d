@@ -10,7 +10,7 @@ QuRoots is a free platform for learning Quranic Arabic. It combines a gamified g
 
 - **50-unit grammar course** — Duolingo-style lessons with hearts, XP, streaks and checkpoint tests, taking you from the three word types (ism, fiʿl, harf) to full grammatical parsing (iʿrāb).
 - **Word-by-word Quran reader** — all 114 surahs with translation, tafsir, and a popover on every word showing its root, form and meaning.
-- **Roots explorer** — 1,716 Quranic verb roots with meanings, frequencies, all ten verb forms (أبواب), conjugation tables across five tense types, and derived nouns and particles.
+- **Roots explorer** — 1,517 Quranic verb roots with meanings, frequencies, all ten verb forms (أبواب), conjugation tables across five tense types, and derived nouns and particles.
 - **Daily ayah & hadith** — a small daily habit with streak tracking.
 - **Spaced repetition** — vocabulary review scheduled by an SRS engine.
 - **Qirat training** — recitation practice with pitch and maqam analysis.
@@ -74,7 +74,7 @@ Launch screenshots and social cards live in `marketing/` — see
 The Quranic linguistic data was collected from publicly available sources and
 consolidated into a single structured dataset:
 
-- **1,716 verb roots** extracted from the Quranic corpus
+- **1,517 verb roots** extracted from the Quranic corpus
 - **Conjugation tables** covering 10 verb forms (أبواب) and 5 tense types (ماضي، مضارع، أمر، مبني للمجهول)
 - **Derivational forms** per bab: masdar (مصدر), active participle (اسم فاعل), passive participle (اسم مفعول)
 - **Quranic references** — every surah:ayah occurrence for each root across all 114 surahs
