@@ -276,7 +276,7 @@ export function GuidedPractice({
     };
     audio.addEventListener('ended', handleEnded);
     return () => audio.removeEventListener('ended', handleEnded);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, []);
 
   // ─── Cleanup ───
@@ -609,7 +609,7 @@ export function GuidedPractice({
 
     animFrameRef.current = requestAnimationFrame(draw);
     return () => cancelAnimationFrame(animFrameRef.current);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);  
 
   const sessionStats     = allScores.length > 0 ? computeSessionStats(allScores) : null;
   const selectedAyahText = ayahs.find(a => a.number === selectedAyah)?.textUthmani;

@@ -8,6 +8,10 @@
     "build": "NODE_OPTIONS='--dns-result-order=ipv4first' next build",
     "start": "next start",
     "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio",
     "migrate-db": "node scripts/migrate-to-db.mjs",
     "generate-data": "node scripts/generate-data.mjs",
     "watch-data": "node scripts/watch-data.mjs",
@@ -42,11 +46,14 @@
     "zustand": "^4.5.7"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.6",
     "@eslint/js": "^9.39.1",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
+    "drizzle-kit": "^0.31.10",
     "eslint": "^9.39.1",
+    "eslint-config-next": "^16.2.12",
     "globals": "^16.5.0",
     "playwright-core": "^1.62.0",
     "typescript": "^5.9.3"

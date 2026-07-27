@@ -68,7 +68,7 @@ export function LoginModal() {
         </button>
 
         <p className="text-[11px] text-text-tertiary mt-4 text-center leading-relaxed">
-          We'll never post on your behalf.
+          We&rsquo;ll never post on your behalf.
         </p>
       </div>
     </div>

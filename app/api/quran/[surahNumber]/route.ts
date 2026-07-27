@@ -56,7 +56,7 @@ export async function GET(
   }
 
   // Fetch translation entries (depends on translationRow result)
-  let translationMap: Record<number, string> = {};
+  const translationMap: Record<number, string> = {};
   if (translationRow[0]) {
     const entries = await db
       .select({ ayahNumber: translationEntries.ayahNumber, text: translationEntries.text })
@@ -75,7 +75,7 @@ export async function GET(
   }
 
   // Build words lookup
-  let wordsByAyah: Record<number, any[]> = {};
+  const wordsByAyah: Record<number, any[]> = {};
   for (const w of wordRows) {
     if (!wordsByAyah[w.ayahNumber]) wordsByAyah[w.ayahNumber] = [];
     wordsByAyah[w.ayahNumber].push({

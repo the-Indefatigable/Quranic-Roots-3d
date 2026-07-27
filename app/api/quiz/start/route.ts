@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
     const limit = Math.min(Math.max(parseInt(searchParams.get('limit') || '10', 10) || 10, 1), MAX_LIMIT);
 
     // Get due items for user (SRS-based)
-    let dueItems = await getDueItemsForUser(session.user.id, limit * 2);
+    const dueItems = await getDueItemsForUser(session.user.id, limit * 2);
 
     // Filter by quiz type
     let filteredItems = dueItems;

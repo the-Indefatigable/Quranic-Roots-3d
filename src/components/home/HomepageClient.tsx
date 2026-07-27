@@ -853,7 +853,7 @@ export function HomepageClient() {
               className="text-lg font-heading italic mb-4 leading-relaxed"
               style={{ color: '#A09F9B' }}
             >
-              "{verse.translation}"
+              &ldquo;{verse.translation}&rdquo;
             </p>
             <p className="text-xs" style={{ color: '#57534E' }}>{verse.reference}</p>
           </div>
