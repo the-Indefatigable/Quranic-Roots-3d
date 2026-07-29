@@ -31,7 +31,7 @@ function matches(v: DailyVerb, q: string): boolean {
   );
 }
 
-const CATEGORIES = ['All', 'Everyday', 'Speaking', 'Movement', 'Feelings', 'Mind', 'Work & Money', 'Home', 'People', 'Faith', 'Action'];
+const CATEGORIES = ['All', 'Everyday', 'Speaking', 'Movement', 'Feelings', 'Mind', 'Work & Money', 'Home', 'Food', 'Body', 'People', 'Faith', 'Nature', 'Action'];
 
 export function DailyVerbsClient() {
   const [query, setQuery] = useState('');
