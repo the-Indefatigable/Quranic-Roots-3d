@@ -6,6 +6,14 @@ import { ShareButton } from '@/components/gamification/ShareButton';
 
 export const dynamic = 'force-dynamic';
 
+export const metadata = {
+  title: 'Leaderboard — Top Quranic Arabic Learners | QuRoots',
+  description:
+    'See who is furthest along in learning Quranic Arabic, ranked by all-time XP and current streak. Free to join.',
+  alternates: { canonical: '/leaderboard' },
+};
+
+
 // Public leaderboard — visible to everyone, signed in or not. Shows how the
 // whole community is doing, ranked by all-time XP or by current streak.
 
