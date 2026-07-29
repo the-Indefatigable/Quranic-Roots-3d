@@ -11,6 +11,7 @@ export const metadata: Metadata = {
     url: 'https://quroots.com/blog/adad',
     images: [{ url: '/og-image.png', width: 1200, height: 630 }],
   },
+  alternates: { canonical: '/blog/adad' },
 };
 
 export default function AdadPage() {

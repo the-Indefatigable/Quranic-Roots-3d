@@ -11,6 +11,7 @@ export const metadata: Metadata = {
     url: 'https://quroots.com/blog/verb-forms',
     images: [{ url: '/og-image.png', width: 1200, height: 630 }],
   },
+  alternates: { canonical: '/blog/verb-forms' },
 };
 
 const forms = [

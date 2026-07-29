@@ -1,20 +1,32 @@
 /**
  * Corpus figures quoted in marketing copy, page metadata and the homepage
- * counters.
+ * counters. These are asserted in a dozen places (titles, OG descriptions,
+ * JSON-LD, hero counters), so they live here to stay consistent.
  *
- * These are asserted in a dozen places (titles, OG descriptions, JSON-LD, hero
- * counters). Keeping them in one module is the only way they stay consistent
- * with each other — the site previously advertised "1,716 Arabic roots" on the
- * homepage and in every /roots meta tag while /roots itself rendered a live
- * count of 1,517 from the database.
+ * Note there are TWO legitimate root counts, and they are not interchangeable:
  *
- * If the corpus changes, update these and re-check against:
- *   SELECT count(*) FROM roots;
+ *   TOTAL_ROOTS (1,716)  every row in `roots` — what the sitemap enumerates
+ *                        and what /roots/[rootId] pages exist for.
+ *   VERB_ROOTS  (1,517)  roots with at least one entry in `forms`. This is what
+ *                        /roots and /api/roots show, because the browser's
+ *                        Verbs tab only lists roots that have conjugations.
+ *
+ * Marketing copy uses TOTAL_ROOTS ("1,716 Arabic roots"); the roots browser
+ * renders VERB_ROOTS live from the database. Both are correct in context —
+ * don't "reconcile" them into one number.
+ *
+ * If the corpus changes, re-check against:
+ *   SELECT count(*) FROM roots;                                   -- TOTAL_ROOTS
+ *   SELECT count(*) FROM roots r
+ *     WHERE EXISTS (SELECT 1 FROM forms f WHERE f.root_id = r.id); -- VERB_ROOTS
  *   SELECT count(*) FROM quran_words WHERE char_type = 'word';
  */
 
-/** Rows in `roots`. Verified against production: SELECT count(*) FROM roots. */
-export const TOTAL_ROOTS = 1517;
+/** Every row in `roots`. Verified: production's sitemap emits 1,716 root URLs. */
+export const TOTAL_ROOTS = 1716;
+
+/** Roots that have at least one verb form. Rendered live by /roots. */
+export const VERB_ROOTS = 1517;
 
 /** Ayahs in the Quran. Fixed. */
 export const TOTAL_AYAHS = 6236;
@@ -26,5 +38,5 @@ export const TOTAL_AYAHS = 6236;
  */
 export const TOTAL_WORD_TOKENS = 77429;
 
-/** Pre-formatted for copy, e.g. "1,517". */
+/** Pre-formatted for copy, e.g. "1,716". */
 export const fmt = (n: number) => n.toLocaleString('en-US');

@@ -16,6 +16,7 @@ export const metadata = {
     description: 'Browse all 114 surahs with word-by-word analysis and translation.',
     images: ['/og-image.png'],
   },
+  alternates: { canonical: '/quran' },
 };
 
 export default function QuranPage() {

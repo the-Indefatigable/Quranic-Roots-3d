@@ -51,7 +51,7 @@ doesn't carry a permanent 60MB of PNGs in its history.
 ## Where each shot came from
 
 Content pages are captured from **production** (`quroots.com`) so the data is
-real — 1,517 verb roots, 3,000 nouns, 455 particles, the full word-by-word
+real — 1,716 roots (1,517 with verb forms), 3,000 nouns, 455 particles, the full word-by-word
 Quran. The signed-in gamified screens are captured from a **local instance**
 seeded with a demo learner, because production can only be browsed signed-out.
 

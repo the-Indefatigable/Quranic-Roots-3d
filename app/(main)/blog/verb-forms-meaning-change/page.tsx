@@ -498,7 +498,7 @@ export default function VerbFormsMeaningChangePage() {
             Ready to explore every root?
           </p>
           <p className="text-sm mb-6" style={{ color: '#636260' }}>
-            The Root Explorer lets you see all verb forms, derivatives, and Quranic occurrences for any of the 1,517
+            The Root Explorer lets you see all verb forms, derivatives, and Quranic occurrences for any of the 1,716
             Arabic roots.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
