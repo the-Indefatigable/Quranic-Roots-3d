@@ -1,8 +1,8 @@
 import { Sidebar } from '@/components/ui/Sidebar';
 import { MobileNav } from '@/components/ui/MobileNav';
 import { FeedbackWidget } from '@/components/ui/FeedbackWidget';
-import { DigestNudge } from '@/components/ui/DigestNudge';
 import { StreakGuard } from '@/components/ui/StreakGuard';
+import { SignupModal } from '@/components/ui/SignupModal';
 import { AuthProvider } from '@/components/auth/AuthProvider';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
@@ -18,7 +18,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           </div>
         </main>
         <FeedbackWidget />
-        <DigestNudge />
+        <SignupModal />
         <StreakGuard />
       </div>
     </AuthProvider>
