@@ -43,11 +43,19 @@ async function main() {
     )
   `;
 
-  // Get surah list
-  const surahs = await sql`SELECT number, verses_count FROM surahs ORDER BY number`;
+  // Get surah list. SURAHS=1,18,36 limits the run to those chapters — useful
+  // for bringing up a partial local instance without fetching all 6,236 ayahs.
+  const only = process.env.SURAHS
+    ? new Set(process.env.SURAHS.split(',').map((n) => Number(n.trim())))
+    : null;
+  let surahs = await sql`SELECT number, verses_count FROM surahs ORDER BY number`;
   if (surahs.length === 0) {
     console.error('❌ No surahs found! Run populate-surahs.mjs first.');
     process.exit(1);
+  }
+  if (only) {
+    surahs = surahs.filter((s) => only.has(s.number));
+    console.log(`  Limited to surahs: ${[...only].join(', ')}\n`);
   }
 
   // Check how many words already exist (for resuming)

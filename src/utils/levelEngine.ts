@@ -5,7 +5,7 @@
 
 import { db, dbQuery } from '@/db';
 import { users } from '@/db/schema';
-import { eq, sql } from 'drizzle-orm';
+import { and, eq, lte, sql } from 'drizzle-orm';
 
 /**
  * Level threshold configuration
@@ -70,43 +70,57 @@ export function calculateLevelFromXP(totalXP: number): { level: number; levelPro
 }
 
 /**
- * Add XP to user and update level
- * Returns the new level if user leveled up, null otherwise
+ * Add XP to a user and recompute their level.
+ *
+ * This is the ONLY place `users.total_xp` should be written. Level is derived
+ * from the value the database actually landed on (via RETURNING), not from a
+ * value read beforehand — otherwise two concurrent awards each compute a level
+ * from the same stale total and one of them writes a level that is too low.
+ *
+ * Returns the new level when the user levelled up, otherwise null.
  */
 export async function addXPToUser(
   userId: string,
   xpAmount: number
 ): Promise<{ newLevel: number | null; newTotalXP: number; totalXPEarned: number }> {
-  // Get current user XP and level
-  const [user] = await dbQuery(() =>
-    db.select({ totalXP: users.totalXP, userLevel: users.userLevel }).from(users).where(eq(users.id, userId))
-  );
-
-  if (!user) {
-    return { newLevel: null, newTotalXP: 0, totalXPEarned: 0 };
+  if (!Number.isFinite(xpAmount) || xpAmount <= 0) {
+    const [user] = await dbQuery(() =>
+      db.select({ totalXP: users.totalXP }).from(users).where(eq(users.id, userId))
+    );
+    return { newLevel: null, newTotalXP: user?.totalXP ?? 0, totalXPEarned: 0 };
   }
 
-  const currentTotalXP = user.totalXP || 0;
-  const currentLevel = user.userLevel || 1;
-  const newTotalXP = currentTotalXP + xpAmount;
-
-  // Calculate new level
-  const { level: newLevel, levelProgress } = calculateLevelFromXP(newTotalXP);
-
-  // Atomic XP update to prevent race conditions under concurrent requests
-  await dbQuery(() =>
+  // Increment atomically and read back the resulting total in one statement.
+  const [row] = await dbQuery(() =>
     db
       .update(users)
       .set({
-        totalXP: sql`${users.totalXP} + ${xpAmount}`,
-        userLevel: newLevel,
-        levelProgress,
+        totalXP: sql`coalesce(${users.totalXP}, 0) + ${xpAmount}`,
+        updatedAt: new Date(),
       })
       .where(eq(users.id, userId))
+      .returning({ totalXP: users.totalXP, previousLevel: users.userLevel })
+  );
+
+  if (!row) {
+    return { newLevel: null, newTotalXP: 0, totalXPEarned: 0 };
+  }
+
+  const newTotalXP = row.totalXP ?? 0;
+  const previousLevel = row.previousLevel || 1;
+  const { level, levelProgress } = calculateLevelFromXP(newTotalXP);
+
+  // Second write, but derived from the authoritative total. Guarded so a
+  // slower concurrent request can't drag the level back down.
+  await dbQuery(() =>
+    db
+      .update(users)
+      .set({ userLevel: level, levelProgress })
+      .where(and(eq(users.id, userId), lte(users.userLevel, level)))
   );
 
   return {
-    newLevel: newLevel > currentLevel ? newLevel : null,
+    newLevel: level > previousLevel ? level : null,
     newTotalXP,
     totalXPEarned: xpAmount,
   };

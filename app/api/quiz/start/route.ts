@@ -7,6 +7,7 @@ import { roots, forms, tenses, nouns, particles, quizSessions } from '@/db/schem
 import { eq, sql, inArray } from 'drizzle-orm';
 import { getDueItemsForUser } from '@/utils/srsEngine';
 import { generateConjugationQuestion, generateNounQuestion, generateParticleQuestion } from '@/utils/quizGenerator';
+import type { QuizQuestion } from '@/utils/quizGenerator';
 
 const MAX_LIMIT = 50;
 
@@ -24,7 +25,7 @@ export async function GET(req: NextRequest) {
     const limit = Math.min(Math.max(parseInt(searchParams.get('limit') || '10', 10) || 10, 1), MAX_LIMIT);
 
     // Get due items for user (SRS-based)
-    let dueItems = await getDueItemsForUser(session.user.id, limit * 2);
+    const dueItems = await getDueItemsForUser(session.user.id, limit * 2);
 
     // Filter by quiz type
     let filteredItems = dueItems;
@@ -79,8 +80,11 @@ export async function GET(req: NextRequest) {
         }
       }
 
-      // Shuffle the combined items
-      filteredItems.sort(() => Math.random() - 0.5);
+      // Shuffle the combined items (Fisher-Yates — see shuffle() in quizGenerator)
+      for (let i = filteredItems.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [filteredItems[i], filteredItems[j]] = [filteredItems[j], filteredItems[i]];
+      }
       filteredItems = filteredItems.slice(0, limit);
     }
 
@@ -143,7 +147,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Generate questions from pre-fetched data (no more DB calls)
-    const questions = [];
+    const questions: QuizQuestion[] = [];
     for (const item of filteredItems) {
       try {
         if (item.type === 'root') {
@@ -163,7 +167,12 @@ export async function GET(req: NextRequest) {
         } else if (item.type === 'noun') {
           const noun = nounMap.get(item.id);
           if (!noun) continue;
-          questions.push(generateNounQuestion(noun));
+          // Use the other nouns in this batch as distractors so the choices are
+          // real meanings rather than the same three hardcoded words each time.
+          const pool = allNouns
+            .filter((n) => n.id !== noun.id && n.meaning)
+            .map((n) => n.meaning as string);
+          questions.push(generateNounQuestion(noun, undefined, pool));
         } else if (item.type === 'particle') {
           const particle = particleMap.get(item.id);
           if (!particle) continue;
@@ -183,7 +192,7 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    // Create quiz session
+    // Create the quiz session, storing the answer key server-side.
     const [newSession] = await dbQuery(() =>
       db
         .insert(quizSessions)
@@ -193,15 +202,30 @@ export async function GET(req: NextRequest) {
           itemCount: questions.length,
           correctCount: 0,
           score: 0,
+          questions: questions.map((q) => ({
+            id: q.id,
+            type: q.type,
+            itemType: q.itemType,
+            itemId: q.itemId,
+            correctAnswer: q.correctAnswer,
+            validAnswers: q.validAnswers ?? null,
+            correctAnswerLabel: q.correctAnswerLabel ?? null,
+          })),
         })
         .returning()
     );
 
+    // Strip the answer key from the payload. The client only needs the prompt;
+    // grading happens in /api/quiz/submit-answer against the stored questions.
+    const clientQuestions = questions.map(
+      ({ correctAnswer, validAnswers, correctAnswerLabel, ...rest }) => rest
+    );
+
     return NextResponse.json({
       sessionId: newSession.id,
-      items: questions,
+      items: clientQuestions,
       quizType,
-      itemCount: questions.length,
+      itemCount: clientQuestions.length,
     });
   } catch (error) {
     console.error('[quiz/start] Error:', error);

@@ -122,7 +122,7 @@ export function ResultCard({
           >
             <p className="text-sm font-bold text-primary uppercase tracking-wider mb-3">🎉 Level Up! 🎉</p>
             <p className="text-4xl font-bold text-text">Level {newLevel}</p>
-            <p className="text-text-secondary text-sm mt-2">You've unlocked new potential!</p>
+            <p className="text-text-secondary text-sm mt-2">You&rsquo;ve unlocked new potential!</p>
           </motion.div>
         </motion.div>
       )}

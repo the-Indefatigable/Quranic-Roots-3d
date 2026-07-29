@@ -1,11 +1,11 @@
 import type { Metadata, Viewport } from 'next';
 import { Plus_Jakarta_Sans, Fraunces } from 'next/font/google';
 import localFont from 'next/font/local';
-import Script from 'next/script';
 import { Suspense } from 'react';
 import { NavigationProgress } from '@/components/ui/NavigationProgress';
 import { GlobalAudioProvider } from '@/components/GlobalAudioProvider';
 import { Atmosphere } from '@/components/ui/Atmosphere';
+import { Analytics } from '@/components/ui/Analytics';
 import './globals.css';
 
 const jakarta = Plus_Jakarta_Sans({
@@ -134,18 +134,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <GlobalAudioProvider>
           <div className="relative z-10">{children}</div>
         </GlobalAudioProvider>
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-XFLPNVR8VQ"
-          strategy="afterInteractive"
-        />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-XFLPNVR8VQ');
-          `}
-        </Script>
+        {/* Loads GA only after the visitor opts in — see the component. */}
+        <Analytics />
       </body>
     </html>
   );

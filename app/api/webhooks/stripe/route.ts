@@ -29,6 +29,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
   }
 
+  // A test-mode event delivered to a live endpoint is correctly signed, so the
+  // signature check above passes — but it must not grant supporter status.
+  // Acknowledge (200) so Stripe stops retrying, without acting on it.
+  const expectLive = process.env.STRIPE_SECRET_KEY?.startsWith('sk_live');
+  if (expectLive && !event.livemode) {
+    console.warn('[stripe] ignoring test-mode event on a live endpoint:', event.id);
+    return NextResponse.json({ received: true, ignored: 'test_mode_event' });
+  }
+
   // A completed, paid Checkout Session grants Founding Supporter status.
   if (event.type === 'checkout.session.completed') {
     const s = event.data.object as {

@@ -17,6 +17,7 @@ export const metadata: Metadata = {
     description: 'Master the Arabic case system with Quranic examples.',
     images: ['/og-image.png'],
   },
+  alternates: { canonical: '/blog/irab' },
 };
 
 export default function IrabPage() {

@@ -4,8 +4,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { auth } from '@/lib/auth';
 import { db, dbQuery } from '@/db';
-import { userWordReviews, users } from '@/db/schema';
-import { and, eq, sql } from 'drizzle-orm';
+import { userWordReviews } from '@/db/schema';
+import { and, eq, gte, sql } from 'drizzle-orm';
+import { addXPToUser } from '@/utils/levelEngine';
 
 const Schema = z.object({
   reviewId: z.string().uuid(),
@@ -13,6 +14,10 @@ const Schema = z.object({
 });
 
 const XP_PER_REVIEW = 2;
+
+// Ceiling on review XP per day. Even with the due-date check below, a user with
+// a large backlog shouldn't be able to sit and grind the leaderboard.
+const MAX_REVIEW_XP_PER_DAY = 200;
 
 // POST /api/review/answer — SM-2 lite scheduling.
 // again → relearn in 10 min, ease down, lapse.
@@ -41,6 +46,22 @@ export async function POST(req: NextRequest) {
     }
 
     const now = new Date();
+
+    // A card that isn't due yet is not a review. Without this, replaying the
+    // same reviewId pays out XP on every call, indefinitely.
+    if (card.dueAt && new Date(card.dueAt) > now) {
+      return NextResponse.json({
+        success: true,
+        skipped: true,
+        reason: 'not_due',
+        nextDueInDays: Math.max(
+          0,
+          Math.round(((new Date(card.dueAt).getTime() - now.getTime()) / 86_400_000) * 10) / 10
+        ),
+        xpEarned: 0,
+      });
+    }
+
     let { intervalDays, ease, reps, lapses } = card;
 
     if (grade === 'again') {
@@ -67,15 +88,29 @@ export async function POST(req: NextRequest) {
         .where(eq(userWordReviews.id, reviewId))
     );
 
-    // Small XP reward for successful recall
+    // Small XP reward for successful recall, under a daily ceiling.
     let xpEarned = 0;
     if (grade !== 'again') {
-      xpEarned = XP_PER_REVIEW;
-      await dbQuery(() =>
-        db.update(users)
-          .set({ totalXP: sql`coalesce(${users.totalXP}, 0) + ${XP_PER_REVIEW}`, updatedAt: now })
-          .where(eq(users.id, session.user.id))
+      const startOfDay = new Date(now);
+      startOfDay.setUTCHours(0, 0, 0, 0);
+
+      const [{ count: reviewsToday } = { count: 0 }] = await dbQuery(() =>
+        db
+          .select({ count: sql<number>`count(*)::int` })
+          .from(userWordReviews)
+          .where(
+            and(
+              eq(userWordReviews.userId, session.user.id),
+              gte(userWordReviews.lastAnswered, startOfDay)
+            )
+          )
       );
+
+      if (reviewsToday * XP_PER_REVIEW <= MAX_REVIEW_XP_PER_DAY) {
+        xpEarned = XP_PER_REVIEW;
+        // Routed through addXPToUser so level stays consistent with total_xp.
+        await addXPToUser(session.user.id, XP_PER_REVIEW);
+      }
     }
 
     return NextResponse.json({

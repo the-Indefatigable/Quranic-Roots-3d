@@ -7,6 +7,7 @@ import { useAppStore } from '@/store/useAppStore';
 import { RootBloom } from './RootBloom';
 import { CommunityStrip } from './CommunityStrip';
 import { SupportPrompt } from '@/components/support/SupportPrompt';
+import { TOTAL_ROOTS, TOTAL_AYAHS, TOTAL_WORD_TOKENS, fmt } from '@/lib/corpusStats';
 
 // ── Scroll-reveal via IntersectionObserver ──────────────────────────
 function useScrollReveal() {
@@ -199,7 +200,7 @@ const FEATURES = [
       </svg>
     ),
     title: 'Root Explorer',
-    body: '1,716 Arabic roots. Understand how one 3-letter root generates dozens of Quranic words you already know.',
+    body: `${fmt(TOTAL_ROOTS)} Arabic roots. Understand how one 3-letter root generates dozens of Quranic words you already know.`,
     cta: 'Explore Roots',
     Ornament: RootsOrnament,
   },
@@ -226,9 +227,9 @@ export function HomepageClient() {
 
   useScrollReveal();
 
-  const roots = useCounter(1716, 1800);
-  const ayahs = useCounter(6236, 2200);
-  const words = useCounter(77429, 2400);
+  const roots = useCounter(TOTAL_ROOTS, 1800);
+  const ayahs = useCounter(TOTAL_AYAHS, 2200);
+  const words = useCounter(TOTAL_WORD_TOKENS, 2400);
 
   const statsRef = useRef<HTMLElement>(null);
   useEffect(() => {
@@ -522,10 +523,17 @@ export function HomepageClient() {
                 >
                   {s.value}{s.suffix}
                 </span>
+                {/*
+                  Deliberately NOT font-arabic. That maps to UthmanicHafs, a
+                  Quran-text face with no Arabic-Indic digit glyphs (U+0660-0669),
+                  so these numerals rendered as tofu boxes. The UI font stack
+                  covers them on every mainstream platform.
+                */}
                 <span
-                  className="font-arabic text-[11px] leading-none mb-1.5"
+                  className="text-[11px] leading-none mb-1.5"
                   style={{ color: '#D4A246', opacity: 0.55, letterSpacing: '0.04em' }}
                   dir="rtl"
+                  lang="ar"
                 >
                   {toArabicIndic(s.value)}{s.suffix}
                 </span>
@@ -845,7 +853,7 @@ export function HomepageClient() {
               className="text-lg font-heading italic mb-4 leading-relaxed"
               style={{ color: '#A09F9B' }}
             >
-              "{verse.translation}"
+              &ldquo;{verse.translation}&rdquo;
             </p>
             <p className="text-xs" style={{ color: '#57534E' }}>{verse.reference}</p>
           </div>
@@ -913,6 +921,8 @@ export function HomepageClient() {
             { href: '/search',      label: 'Search'  },
             { href: '/blog',        label: 'Blog'    },
             { href: '/support',     label: 'Support' },
+            { href: '/privacy',     label: 'Privacy' },
+            { href: '/terms',       label: 'Terms'   },
           ].map((l) => (
             <Link key={l.href} href={l.href} className="text-sm transition-colors" style={{ color: '#8A8783' }}
               onMouseEnter={e => (e.currentTarget.style.color = '#EDEDEC')}

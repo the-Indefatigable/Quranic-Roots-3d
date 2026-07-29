@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 export const metadata = {
   title: 'All 1,716 Quranic Arabic Roots — Browse, Search & Learn',
   description:
-    'Browse all 1,716 Quranic Arabic verb roots with meanings, frequencies, verb forms, and derived nouns. The most comprehensive Quranic root dictionary online.',
+    'Browse all 1,716 Quranic Arabic roots with meanings, frequencies, verb forms, and derived nouns. The most comprehensive Quranic root dictionary online.',
   openGraph: {
     title: 'All 1,716 Quranic Arabic Roots | QuRoots',
     description: 'Browse Quranic Arabic verb roots with meanings, frequencies, and verb forms.',
@@ -21,6 +21,7 @@ export const metadata = {
     description: 'The most comprehensive Quranic root dictionary online.',
     images: ['/og-image.png'],
   },
+  alternates: { canonical: '/roots' },
 };
 
 export default async function RootsPage() {

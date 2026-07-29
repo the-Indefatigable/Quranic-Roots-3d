@@ -3,8 +3,27 @@
  * Generates adaptive questions based on learning items (roots, nouns, particles)
  */
 
+import { randomUUID } from 'crypto';
 import type { InferSelectModel } from 'drizzle-orm';
 import type { roots, forms, tenses, nouns, particles } from '@/db/schema';
+
+/**
+ * Fisher-Yates. `sort(() => Math.random() - 0.5)` is not a valid comparator —
+ * it is non-transitive, so it leaves the first element in place far more often
+ * than chance. For a quiz that means the correct option lands in a predictable
+ * position.
+ */
+function shuffle<T>(items: T[]): T[] {
+  const out = [...items];
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
+}
+
+/** Opaque option id, so the correct choice isn't identifiable from the DOM. */
+const optionId = () => randomUUID();
 
 export type Root = InferSelectModel<typeof roots>;
 export type Form = InferSelectModel<typeof forms>;
@@ -24,8 +43,22 @@ export interface QuizQuestion {
   itemType: 'root' | 'noun' | 'particle';
   itemId: string;
   prompt: QuestionPrompt;
+  /**
+   * The answer key. For MCQ questions this is the correct option's opaque id.
+   * Server-side only — /api/quiz/start strips this (and validAnswers and
+   * correctAnswerLabel) before responding.
+   */
   correctAnswer: string | Record<string, any>;
   validAnswers?: string[]; // For flexible matching
+  /** Human-readable form of the answer, revealed after the user has answered. */
+  correctAnswerLabel?: string;
+}
+
+/** A shuffled MCQ option set plus the id and label of the correct choice. */
+interface MCQOptions {
+  options: NonNullable<QuestionPrompt['options']>;
+  correctId: string;
+  correctLabel: string;
 }
 
 export type QuestionType =
@@ -120,7 +153,13 @@ export function generateConjugationQuestion(
     };
   }
 
-  // MCQ variant
+  // MCQ variant. correctAnswer is the *option id*, because that is what the
+  // client submits and what validateMCQ compares against.
+  const mcqOptions = generateConjugationMCQOptions(
+    randomConj.person,
+    tense.englishName,
+    root.meaning
+  );
   return {
     id: `mcq-conj-${root.id}-${form.id}-${tense.id}`,
     type: 'mcq_conjugation',
@@ -129,16 +168,21 @@ export function generateConjugationQuestion(
     prompt: {
       text: `What does this mean? ${randomConj.arabic} (Form ${form.formNumber})`,
       arabicText: randomConj.arabic,
-      options: generateConjugationMCQOptions(randomConj.person, tense.englishName, root.meaning),
+      options: mcqOptions.options,
     },
-    correctAnswer: randomConj.arabic,
+    correctAnswer: mcqOptions.correctId,
+    correctAnswerLabel: mcqOptions.correctLabel,
   };
 }
 
 /**
  * Generate question from a noun
  */
-export function generateNounQuestion(noun: Noun, rootMeaning?: string): QuizQuestion {
+export function generateNounQuestion(
+  noun: Noun,
+  rootMeaning?: string,
+  distractorPool: string[] = []
+): QuizQuestion {
   const questionTypes: QuestionType[] = ['translate_noun', 'mcq_noun'];
   const questionType = questionTypes[Math.floor(Math.random() * questionTypes.length)];
   const nounMeaning = noun.meaning || 'word';
@@ -158,7 +202,8 @@ export function generateNounQuestion(noun: Noun, rootMeaning?: string): QuizQues
     };
   }
 
-  // MCQ variant
+  // MCQ variant — correctAnswer is the option id (see above).
+  const mcqOptions = generateNounMCQOptions(nounMeaning, distractorPool);
   return {
     id: `mcq-noun-${noun.id}`,
     type: 'mcq_noun',
@@ -167,9 +212,10 @@ export function generateNounQuestion(noun: Noun, rootMeaning?: string): QuizQues
     prompt: {
       text: `What does this word mean? ${noun.lemma}`,
       arabicText: noun.lemma,
-      options: generateNounMCQOptions(nounMeaning),
+      options: mcqOptions.options,
     },
-    correctAnswer: nounMeaning,
+    correctAnswer: mcqOptions.correctId,
+    correctAnswerLabel: mcqOptions.correctLabel,
   };
 }
 
@@ -194,6 +240,28 @@ export function generateParticleQuestion(particle: Particle): QuizQuestion {
 
 // ── Helper functions for generating multiple choice options ──
 
+/** Build a shuffled option list from one correct label and some distractors. */
+function buildOptions(correctLabel: string, distractorLabels: string[]): MCQOptions {
+  // Dedupe against the correct label and against each other, so the same
+  // choice can't appear twice (which would make the question unanswerable).
+  const seen = new Set([correctLabel]);
+  const distractors: string[] = [];
+  for (const label of distractorLabels) {
+    if (seen.has(label)) continue;
+    seen.add(label);
+    distractors.push(label);
+    if (distractors.length === 3) break;
+  }
+
+  const correctId = optionId();
+  const options = shuffle([
+    { id: correctId, label: correctLabel },
+    ...distractors.map((label) => ({ id: optionId(), label })),
+  ]);
+
+  return { options, correctId, correctLabel };
+}
+
 function generateConjugationOptions(
   correctPerson: string,
   correctTense: string
@@ -201,31 +269,20 @@ function generateConjugationOptions(
   const persons = ['1s', '2ms', '3ms', '1p', '3mp'];
   const tenses = ['Past', 'Present', 'Imperative'];
 
-  const correct = { id: 'correct', label: `${correctPerson} - ${correctTense}` };
-  const options = [correct];
+  // Enumerate the grid and shuffle, rather than sampling blindly — the old
+  // loop could pick the same person/tense pair twice.
+  const pairs = shuffle(
+    persons.flatMap((p) => tenses.map((t) => `${p} - ${t}`))
+  ).filter((label) => label !== `${correctPerson} - ${correctTense}`);
 
-  // Add distractors
-  while (options.length < 4) {
-    const person = persons[Math.floor(Math.random() * persons.length)];
-    const tense = tenses[Math.floor(Math.random() * tenses.length)];
-
-    if (person !== correctPerson || tense !== correctTense) {
-      options.push({
-        id: `distractor-${options.length}`,
-        label: `${person} - ${tense}`,
-      });
-    }
-  }
-
-  // Shuffle
-  return options.sort(() => Math.random() - 0.5);
+  return buildOptions(`${correctPerson} - ${correctTense}`, pairs).options;
 }
 
 function generateConjugationMCQOptions(
   correctPerson: string,
   correctTense: string,
   rootMeaning: string
-): QuizQuestion['prompt']['options'] {
+): MCQOptions {
   const personLabels: Record<string, string> = {
     '1s': 'I',
     '2ms': 'you',
@@ -236,53 +293,25 @@ function generateConjugationMCQOptions(
   };
 
   const person = personLabels[correctPerson] || correctPerson;
-  const correct = {
-    id: 'correct',
-    label: `${person} ${correctTense.toLowerCase()} (${rootMeaning})`,
-  };
-  const options = [correct];
+  const tense = correctTense.toLowerCase();
+  const others = Object.values(personLabels).filter((p) => p !== person);
 
-  // Add distractors (different persons/tenses)
-  const distractors = [
+  return buildOptions(`${person} ${tense} (${rootMeaning})`, [
     `${person} will ${rootMeaning}`,
-    `He ${correctTense.toLowerCase()} (${rootMeaning})`,
-    `She ${correctTense.toLowerCase()} (${rootMeaning})`,
-  ];
-
-  for (const distractor of distractors) {
-    if (options.length >= 4) break;
-    if (distractor !== correct.label) {
-      options.push({
-        id: `distractor-${options.length}`,
-        label: distractor,
-      });
-    }
-  }
-
-  return options;
+    ...others.map((p) => `${p} ${tense} (${rootMeaning})`),
+  ]);
 }
 
-function generateNounMCQOptions(correctMeaning: string): QuizQuestion['prompt']['options'] {
-  const correct = { id: 'correct', label: correctMeaning };
-  const options = [correct];
+/**
+ * Distractors for a noun's meaning. `pool` should be other real noun meanings
+ * from the same quiz batch; the generic fallback is only used when the caller
+ * has nothing better, since a fixed three-word list makes every question
+ * guessable after the first.
+ */
+function generateNounMCQOptions(correctMeaning: string, pool: string[] = []): MCQOptions {
+  const fallback = ['knowledge', 'book', 'writing', 'student', 'teacher', 'school', 'mercy', 'light'];
+  const distractors = shuffle(pool.length >= 3 ? pool : [...pool, ...fallback])
+    .filter((d) => d && d !== correctMeaning);
 
-  // Add plausible distractors (similar semantic field)
-  const distractors = [
-    'knowledge',
-    'book',
-    'writing',
-    'student',
-    'teacher',
-    'school',
-    'learned',
-  ].filter((d) => d !== correctMeaning);
-
-  for (let i = 0; i < Math.min(3, distractors.length); i++) {
-    options.push({
-      id: `distractor-${i}`,
-      label: distractors[i],
-    });
-  }
-
-  return options.sort(() => Math.random() - 0.5);
+  return buildOptions(correctMeaning, distractors);
 }

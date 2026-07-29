@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { getStripe, MIN_DONATION_CENTS, MAX_DONATION_CENTS } from '@/lib/stripe';
+import { rateLimit, clientKey, tooManyRequests } from '@/lib/rateLimit';
 
 export const dynamic = 'force-dynamic';
+
+// Anonymous callers can create Checkout Sessions, so cap how many.
+const LIMIT = 10;
+const WINDOW_MS = 60_000;
 
 /**
  * Creates a Stripe Checkout Session for a one-time, pay-what-you-want donation
@@ -13,6 +18,9 @@ export const dynamic = 'force-dynamic';
  * Body: { amount: number }  // whole US dollars
  */
 export async function POST(request: NextRequest) {
+  const limited = rateLimit(clientKey(request, 'checkout'), LIMIT, WINDOW_MS);
+  if (!limited.ok) return tooManyRequests(limited);
+
   // Donations are frictionless — anyone can give, signed in or not. When we do
   // know the user we attribute the gift (for the thank-you badge); otherwise the
   // donation is simply anonymous.

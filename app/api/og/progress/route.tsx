@@ -1,12 +1,23 @@
 import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
+import { rateLimit, clientKey, tooManyRequests } from '@/lib/rateLimit';
 
 export const runtime = 'nodejs';
+
+// Satori rendering is CPU-heavy and every parameter is attacker-controlled, so
+// an uncapped endpoint is a cheap way to burn compute. Cards are also cached:
+// the same query string always produces the same image.
+const LIMIT = 60;
+const WINDOW_MS = 60_000;
+const CACHE_CONTROL = 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800';
 
 // Dynamic OG "progress card" for social shares — a virality lever. English only
 // (Satori in Next 14 cannot shape Arabic). Reads self-reported stats from the
 // query string, so no private data is exposed.
 export async function GET(req: NextRequest) {
+  const limited = rateLimit(clientKey(req, 'og-progress'), LIMIT, WINDOW_MS);
+  if (!limited.ok) return tooManyRequests(limited);
+
   const p = req.nextUrl.searchParams;
   const name = (p.get('n') || 'A learner').slice(0, 40);
   const level = p.get('lvl') || '1';
@@ -58,7 +69,7 @@ export async function GET(req: NextRequest) {
         </div>
       </div>
     ),
-    { width: 1200, height: 630 }
+    { width: 1200, height: 630, headers: { 'Cache-Control': CACHE_CONTROL } }
   );
 }
 

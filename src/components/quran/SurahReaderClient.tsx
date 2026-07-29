@@ -606,9 +606,17 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, surahArabicNa
                                       {word.textUthmani}
                                     </span>
                                     {word.translation && (
+                                      // dir="ltr" because the gloss is English
+                                      // sitting inside the RTL word row — without
+                                      // it the truncation ellipsis rendered at the
+                                      // start ("…y crookedness"). Short glosses
+                                      // wrap rather than truncate so no word is
+                                      // silently cut off.
                                       <span
-                                        className="text-[10px] leading-tight max-w-[80px] text-center truncate"
+                                        className="text-[10px] leading-tight max-w-[80px] text-center break-words hyphens-auto"
                                         style={{ color: '#57534E' }}
+                                        dir="ltr"
+                                        lang="en"
                                       >
                                         {word.translation}
                                       </span>

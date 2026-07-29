@@ -11,6 +11,7 @@ export const metadata: Metadata = {
     url: 'https://quroots.com/blog/murakkab',
     images: [{ url: '/og-image.png', width: 1200, height: 630 }],
   },
+  alternates: { canonical: '/blog/murakkab' },
 };
 
 export default function MurakkabPage() {

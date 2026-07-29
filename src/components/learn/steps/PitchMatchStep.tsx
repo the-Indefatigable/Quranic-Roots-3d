@@ -566,7 +566,7 @@ export function PitchMatchStep({ content, onAnswer }: Props) {
           </div>
           <p className="text-[#5CB889] font-bold text-xl">All notes matched!</p>
           <p className="text-[#636260] text-sm">
-            You've trained your ear to the {content.jinsName} melody.
+            You&rsquo;ve trained your ear to the {content.jinsName} melody.
           </p>
         </div>
       )}

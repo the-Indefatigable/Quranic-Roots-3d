@@ -256,7 +256,7 @@ export async function POST(
     );
 
     // ── 5. Update streak ─────────────────────────────────
-    let streakData = { currentStreak: 1, isNewStreak: false, milestoneReached: 0 };
+    const streakData = { currentStreak: 1, isNewStreak: false, milestoneReached: 0 };
     const [streak] = await dbQuery(() =>
       db.select().from(userStreaks).where(eq(userStreaks.userId, userId))
     );

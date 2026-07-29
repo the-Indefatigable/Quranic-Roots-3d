@@ -144,7 +144,8 @@ export function DailyQuiz({ words, done, onComplete }: { words: Word[]; done: bo
       <div className="space-y-2 mt-3">
         {q.options.map((o, i) => {
           const isPicked = picked === i;
-          let bg = 'var(--color-canvas)', border = 'var(--color-border-light)', color = 'var(--color-text)';
+          let bg = 'var(--color-canvas)', border = 'var(--color-border-light)';
+          const color = 'var(--color-text)';
           if (answered) {
             if (o.correct) { bg = 'rgba(95,181,122,0.14)'; border = '#5FB57A'; }
             else if (isPicked) { bg = 'rgba(224,90,90,0.12)'; border = '#E05A5A'; }

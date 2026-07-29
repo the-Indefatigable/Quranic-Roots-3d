@@ -1,11 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
 import { navItems } from './navItems';
+import { isActiveNav, navHrefs } from './isActiveNav';
+
+const allHrefs = navHrefs(navItems);
 
 /**
  * Mobile navigation: a fixed top bar with the logo and a hamburger (☰) that
@@ -16,14 +19,52 @@ export function MobileNav() {
   const pathname = usePathname();
   const { user, isLoading, setShowLoginModal } = useAuthStore();
   const [open, setOpen] = useState(false);
+  const drawerRef = useRef<HTMLElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   // Close the drawer whenever the route changes.
   useEffect(() => { setOpen(false); }, [pathname]);
 
-  // Lock body scroll while the drawer is open.
+  // Lock body scroll while the drawer is open. Only clear the lock we set —
+  // unconditionally resetting it clobbered any other component's lock (the
+  // login modal sets one too).
   useEffect(() => {
-    document.body.style.overflow = open ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
+    if (!open) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = previous; };
+  }, [open]);
+
+  // Escape closes the drawer, and focus returns to the button that opened it.
+  useEffect(() => {
+    if (!open) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setOpen(false);
+        triggerRef.current?.focus();
+        return;
+      }
+      if (e.key !== 'Tab') return;
+
+      // Trap focus inside the drawer while it is open.
+      const focusable = drawerRef.current?.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      if (!focusable?.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener('keydown', onKeyDown);
+    // Move focus into the drawer when it opens.
+    drawerRef.current?.querySelector<HTMLElement>('button, a[href]')?.focus();
+    return () => document.removeEventListener('keydown', onKeyDown);
   }, [open]);
 
   return (
@@ -45,9 +86,11 @@ export function MobileNav() {
           </span>
         </Link>
         <button
+          ref={triggerRef}
           onClick={() => setOpen(true)}
           aria-label="Open menu"
           aria-expanded={open}
+          aria-controls="mobile-nav-drawer"
           className="w-10 h-10 -mr-2 flex items-center justify-center rounded-xl active:scale-95 transition-transform"
           style={{ color: 'var(--color-text-secondary)' }}
         >
@@ -65,8 +108,19 @@ export function MobileNav() {
         style={{ background: 'rgba(8,7,6,0.6)', backdropFilter: 'blur(2px)' }}
       />
 
-      {/* Drawer */}
+      {/*
+        Drawer. `inert` when closed is essential: sliding it off-screen with
+        translate-x-full leaves every nav link in the tab order and visible to
+        screen readers, so keyboard users tabbed through an invisible menu on
+        every page — including on desktop, where the drawer never appears.
+      */}
       <aside
+        ref={drawerRef}
+        id="mobile-nav-drawer"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Site navigation"
+        {...(open ? {} : { inert: '' as unknown as boolean })}
         className={`lg:hidden fixed top-0 right-0 bottom-0 z-50 w-[82%] max-w-[320px] flex flex-col transition-transform duration-300 ease-out ${open ? 'translate-x-0' : 'translate-x-full'}`}
         style={{ background: '#161410', borderLeft: '1px solid var(--color-nav-border)', boxShadow: '-8px 0 40px rgba(0,0,0,0.4)' }}
       >
@@ -104,7 +158,7 @@ export function MobileNav() {
             if (navItem.requiresAuth && !user) return null;
             if (navItem.requiresAdmin && user?.role !== 'admin') return null;
 
-            const isActive = pathname.startsWith(navItem.href);
+            const isActive = isActiveNav(pathname, navItem.href, allHrefs);
             return (
               <Link
                 key={navItem.href}
@@ -144,11 +198,11 @@ export function MobileNav() {
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={user.image} alt="" className="w-full h-full object-cover" />
                 ) : (
-                  <span className="text-xs font-bold text-primary uppercase">{user.name?.[0] || user.email[0]}</span>
+                  <span className="text-xs font-bold text-primary uppercase">{user.name?.[0] || user.email?.[0] || '?'}</span>
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold text-text truncate">{user.name || user.email.split('@')[0]}</p>
+                <p className="text-xs font-semibold text-text truncate">{user.name || user.email?.split('@')[0] || 'Learner'}</p>
                 <p className="text-[10px] text-text-tertiary">Profile & Rewards</p>
               </div>
             </Link>

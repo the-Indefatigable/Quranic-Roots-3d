@@ -1,14 +1,55 @@
 {
+  "id": "/",
   "name": "QuRoots — Quranic Arabic Learning Platform",
   "short_name": "QuRoots",
   "description": "Learn Quranic Arabic roots, read the Quran word-by-word, and study verb conjugations.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait-primary",
   "background_color": "#14120F",
   "theme_color": "#14120F",
+  "categories": ["education", "books", "lifestyle"],
+  "lang": "en",
+  "dir": "ltr",
   "icons": [
-    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
     { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/mobile-learn.png",
+      "sizes": "780x1688",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "The 50-unit Quranic Arabic course"
+    },
+    {
+      "src": "/screenshots/mobile-quran.png",
+      "sizes": "780x1688",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Word-by-word Quran reader"
+    },
+    {
+      "src": "/screenshots/desktop-roots.png",
+      "sizes": "2880x1800",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Browse every Quranic Arabic root"
+    },
+    {
+      "src": "/screenshots/desktop-quran.png",
+      "sizes": "2880x1800",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Read the Quran word by word"
+    }
+  ],
+  "shortcuts": [
+    { "name": "Continue learning", "url": "/learn/path" },
+    { "name": "Read the Quran", "url": "/quran" },
+    { "name": "Daily ayah", "url": "/daily" }
   ]
 }

@@ -6,6 +6,13 @@ import { auth } from '@/lib/auth';
 import { db, dbQuery } from '@/db';
 import { chatMessages, users } from '@/db/schema';
 import { and, eq, gt, isNull, desc, asc } from 'drizzle-orm';
+import { rateLimit, clientKey, tooManyRequests } from '@/lib/rateLimit';
+
+// The community page polls this every 4s per open tab (15 req/min each), so the
+// ceiling only needs to catch tabs that poll faster than intended or clients
+// that ignore the interval.
+const POLL_LIMIT = 45;
+const POLL_WINDOW_MS = 60_000;
 
 const ROOM = 'general';
 const PAGE_SIZE = 50;
@@ -53,6 +60,10 @@ export async function GET(req: NextRequest) {
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    // Keyed by user, not IP — the poll budget belongs to the account.
+    const limited = rateLimit(`chat-poll:${session.user.id}`, POLL_LIMIT, POLL_WINDOW_MS);
+    if (!limited.ok) return tooManyRequests(limited);
 
     const afterParam = req.nextUrl.searchParams.get('after');
     const after = afterParam ? new Date(afterParam) : null;

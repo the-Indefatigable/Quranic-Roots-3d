@@ -25,6 +25,8 @@ interface QuizState {
   userAnswer: string | Record<string, any> | null;
   isAnswered: boolean;
   feedback: string | null;
+  /** Correct answer, returned by the server after grading. Null until then. */
+  revealedAnswer: string | null;
 
   // Actions
   startSession: (
@@ -33,7 +35,7 @@ interface QuizState {
     questions: QuizQuestion[]
   ) => void;
   setUserAnswer: (answer: string | Record<string, any>) => void;
-  submitAnswer: (isCorrect: boolean, feedback: string) => void;
+  submitAnswer: (isCorrect: boolean, feedback: string, correctAnswer?: string) => void;
   nextQuestion: () => void;
   endSession: () => void;
   resetQuiz: () => void;
@@ -49,6 +51,7 @@ export const useQuizStore = create<QuizState>((set) => ({
   userAnswer: null,
   isAnswered: false,
   feedback: null,
+  revealedAnswer: null,
 
   startSession: (sessionId, quizType, questions) =>
     set({
@@ -65,14 +68,16 @@ export const useQuizStore = create<QuizState>((set) => ({
       userAnswer: null,
       isAnswered: false,
       feedback: null,
+      revealedAnswer: null,
       error: null,
     }),
 
   setUserAnswer: (answer) => set({ userAnswer: answer }),
 
-  submitAnswer: (isCorrect, feedback) =>
+  submitAnswer: (isCorrect, feedback, correctAnswer) =>
     set((state) => {
-      if (!state.session) return state;
+      // Guard against a double-click double-counting correctCount.
+      if (!state.session || state.isAnswered) return state;
       return {
         session: {
           ...state.session,
@@ -81,6 +86,7 @@ export const useQuizStore = create<QuizState>((set) => ({
         },
         isAnswered: true,
         feedback,
+        revealedAnswer: correctAnswer ?? null,
       };
     }),
 
@@ -91,11 +97,11 @@ export const useQuizStore = create<QuizState>((set) => ({
       const isComplete = nextIndex >= state.session.questions.length;
 
       return {
-        currentIndex: nextIndex,
         currentQuestion: isComplete ? null : state.session.questions[nextIndex] || null,
         userAnswer: null,
         isAnswered: false,
         feedback: null,
+        revealedAnswer: null,
         session: {
           ...state.session,
           currentIndex: nextIndex,
@@ -117,6 +123,9 @@ export const useQuizStore = create<QuizState>((set) => ({
       userAnswer: null,
       isAnswered: false,
       feedback: null,
+      revealedAnswer: null,
+      // Without this a failed start leaves the spinner running forever.
+      isLoading: false,
       error: null,
     }),
 

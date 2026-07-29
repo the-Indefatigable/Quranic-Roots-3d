@@ -301,6 +301,11 @@ export const quizSessions = pgTable('quiz_sessions', {
   correctCount: integer('correct_count').notNull(),
   score: integer('score').notNull(), // percentage 0-100
   duration_s: integer('duration_s'), // session duration in seconds
+  // The generated questions *including their answers*. The answer key never
+  // leaves the server: /api/quiz/start strips it before responding, and
+  // /api/quiz/submit-answer grades against this column. Without it the client
+  // would supply its own answer key and every score would be forgeable.
+  questions: jsonb('questions').default([]),
   sessionStartedAt: timestamp('session_started_at', { withTimezone: true }).defaultNow(),
   sessionEndedAt: timestamp('session_ended_at', { withTimezone: true }),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
@@ -314,6 +319,9 @@ export const quizAttempts = pgTable('quiz_attempts', {
   id: uuid('id').primaryKey().defaultRandom(),
   sessionId: uuid('session_id').notNull().references(() => quizSessions.id, { onDelete: 'cascade' }),
   userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  // Id of the question within quiz_sessions.questions. Unique per session so a
+  // question can only be answered — and paid out for — once.
+  questionId: text('question_id'),
   itemType: text('item_type').notNull(), // 'root' | 'noun' | 'particle'
   itemId: uuid('item_id').notNull(),
   questionType: text('question_type').notNull(), // 'translate_conjugation', 'translate_noun', 'identify_conjugation', 'identify_root', 'mcq_*'
@@ -326,6 +334,7 @@ export const quizAttempts = pgTable('quiz_attempts', {
 }, (table) => [
   index('quiz_attempts_session_id_idx').on(table.sessionId),
   index('quiz_attempts_user_item_idx').on(table.userId, table.itemId, table.itemType),
+  uniqueIndex('quiz_attempts_session_question_unique').on(table.sessionId, table.questionId),
 ]);
 
 // ── Edit History ───────────────────────────────────

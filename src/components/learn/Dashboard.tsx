@@ -66,7 +66,11 @@ function CoverageHero({ coverage, name }: { coverage: DashboardData['coverage'];
         boxShadow: 'var(--shadow-raised)',
       }}
     >
-      <p className="text-sm text-text-secondary mb-1">Salaam, <span className="font-semibold" style={{ color: 'var(--color-ivory)' }}>{firstName}</span> 👋</p>
+      {/* The greeting is the page's heading — it was a <p>, leaving the
+          dashboard with no h1 at all for screen-reader navigation. */}
+      <h1 className="text-sm text-text-secondary mb-1 font-normal">
+        Salaam, <span className="font-semibold" style={{ color: 'var(--color-ivory)' }}>{firstName}</span> 👋
+      </h1>
       <p className="text-[10px] font-bold uppercase tracking-[0.22em] mb-4" style={{ color: 'var(--color-primary)' }}>
         Your Quran Coverage
       </p>

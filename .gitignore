@@ -12,6 +12,12 @@ dist
 dist-ssr
 *.local
 
+# Environment / secrets
+# (*.local above already covers .env.local — these catch the rest)
+.env
+.env.*
+!.env.example
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -25,10 +31,14 @@ dist-ssr
 
 # Copyright-sensitive raw data sources (never push these)
 public/data/quranRoots.json
-data/quranRoots.json
-data/verbs_raw.json
+data/
 quranic-corpus-morphology*.txt
 *.corpus.txt
+archive/*.json
+
+# Raw marketing captures — regenerable via scripts/capture-screenshots.mjs,
+# and ~32MB that would otherwise sit in history forever.
+marketing/raw/
 
 # Enrichment scripts (contain API keys / raw corpus data)
 enrich_with_claude.mjs

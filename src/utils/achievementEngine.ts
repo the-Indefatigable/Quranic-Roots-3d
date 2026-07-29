@@ -6,6 +6,7 @@
 import { db, dbQuery } from '@/db';
 import { achievements, userAchievements, users } from '@/db/schema';
 import { eq, and, sql } from 'drizzle-orm';
+import { addXPToUser } from './levelEngine';
 
 export interface Achievement {
   id: string;
@@ -84,31 +85,25 @@ export async function unlockAchievement(
     return { newlyUnlocked: false, xpBonus: 0 };
   }
 
-  // Check if already unlocked
-  const alreadyUnlocked = await hasAchievement(userId, achievementTitle);
-  if (alreadyUnlocked) {
+  // Unlock. The insert itself decides whether this is new: a check-then-insert
+  // races two concurrent completions against the (user_id, achievement_id)
+  // primary key, and the loser threw a duplicate-key error.
+  const inserted = await dbQuery(() =>
+    db
+      .insert(userAchievements)
+      .values({ userId, achievementId: achievement.id })
+      .onConflictDoNothing()
+      .returning({ achievementId: userAchievements.achievementId })
+  );
+
+  if (inserted.length === 0) {
     return { newlyUnlocked: false, xpBonus: 0 };
   }
 
-  // Unlock achievement
-  await dbQuery(() =>
-    db.insert(userAchievements).values({
-      userId,
-      achievementId: achievement.id,
-    })
-  );
-
-  // Award XP if enabled — atomic increment to prevent race conditions
+  // Award XP through the single entry point so userLevel is recomputed too.
   const xpBonus = achievement.xpBonus || 0;
   if (awardXP && xpBonus > 0) {
-    await dbQuery(() =>
-      db
-        .update(users)
-        .set({
-          totalXP: sql`${users.totalXP} + ${xpBonus}`,
-        })
-        .where(eq(users.id, userId))
-    );
+    await addXPToUser(userId, xpBonus);
   }
 
   return { newlyUnlocked: true, xpBonus };

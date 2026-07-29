@@ -1,6 +1,22 @@
 'use client';
 
-export default function Error({ reset }: { error: Error & { digest?: string }; reset: () => void }) {
+import { useEffect } from 'react';
+
+export default function Error({
+  error,
+  reset,
+}: {
+  error: Error & { digest?: string };
+  reset: () => void;
+}) {
+  // The error argument used to be discarded, so production failures left no
+  // trace anywhere. At minimum it belongs in the console with its digest, which
+  // is the key for correlating with server logs. Swap this for Sentry (or
+  // similar) when error monitoring is wired up.
+  useEffect(() => {
+    console.error('[app/error]', error.digest ?? '(no digest)', error);
+  }, [error]);
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-32 text-center px-6">
       <p className="font-arabic text-2xl text-primary/40 mb-4">
@@ -14,6 +30,11 @@ export default function Error({ reset }: { error: Error & { digest?: string }; r
       >
         Try again
       </button>
+      {error.digest && (
+        <p className="text-[10px] text-text-tertiary/60 mt-6 font-mono">
+          Reference: {error.digest}
+        </p>
+      )}
     </div>
   );
 }

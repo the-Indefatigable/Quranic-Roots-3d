@@ -88,7 +88,7 @@ export default async function SurahPage({ params }: Props) {
     db.select({ id: translations.id }).from(translations).limit(1)
   );
 
-  let translationMap: Record<number, string> = {};
+  const translationMap: Record<number, string> = {};
   if (translationRow[0]) {
     const entries = await db
       .select({
@@ -110,7 +110,7 @@ export default async function SurahPage({ params }: Props) {
   }
 
   // Fetch word-by-word data
-  let wordsByAyah: Record<number, WordData[]> = {};
+  const wordsByAyah: Record<number, WordData[]> = {};
   let hasWords = false;
   try {
     const wordRows = await db

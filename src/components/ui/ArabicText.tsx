@@ -16,8 +16,11 @@ const sizeMap = {
 
 export function ArabicText({ children, size = 'xl', className, ...props }: ArabicTextProps) {
   return (
+    // lang="ar" matters as much as dir here: without it a screen reader keeps
+    // its English voice and pronounces Arabic letter-by-letter or as gibberish.
     <span
       dir="rtl"
+      lang="ar"
       className={cn('font-arabic leading-relaxed', sizeMap[size], className)}
       {...props}
     >

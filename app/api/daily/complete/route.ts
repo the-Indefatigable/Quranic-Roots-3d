@@ -40,8 +40,17 @@ export async function POST(req: NextRequest) {
     await addXPToUser(userId, XP_REWARD);
 
     // ── Keep the daily streak alive (mirrors the lesson-complete logic) ──
-    const today = new Date().toISOString().slice(0, 10);
-    const yesterday = new Date(Date.now() - 86_400_000).toISOString().slice(0, 10);
+    //
+    // "Today" must be the same day the idempotency insert above used, which is
+    // Postgres CURRENT_DATE (the database server's timezone). Deriving it from
+    // the Node process in UTC instead meant the two disagreed either side of a
+    // timezone boundary, so a streak could be double-counted or dropped.
+    const [{ today, yesterday }] = (await dbQuery(() =>
+      db.execute(sql`
+        SELECT CURRENT_DATE::text AS today,
+               (CURRENT_DATE - INTERVAL '1 day')::date::text AS yesterday
+      `)
+    )) as unknown as { today: string; yesterday: string }[];
 
     const [streak] = (await dbQuery(() =>
       db.execute(sql`SELECT current_streak, longest_streak, last_active_date FROM user_streaks WHERE user_id = ${userId}`)

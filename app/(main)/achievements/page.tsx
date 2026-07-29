@@ -4,6 +4,14 @@ import { auth } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
+export const metadata = {
+  title: 'Achievements & Badges — Quranic Arabic Milestones | QuRoots',
+  description:
+    'Every badge on QuRoots, what it takes to earn it, and how many learners have. Track your Quranic Arabic milestones.',
+  alternates: { canonical: '/achievements' },
+};
+
+
 // Public badge gallery — every achievement, how many learners have earned it,
 // and (when signed in) which ones you hold.
 

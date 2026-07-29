@@ -90,7 +90,7 @@ export default function WordReviewPage() {
             ? 'No words due right now. Complete lessons to grow your deck.'
             : `${answered} words reviewed${xp > 0 ? ` · +${xp} XP earned` : ''}`}
         </p>
-        <p className="text-xs text-text-tertiary mb-8">Spaced repetition brings words back right before you'd forget them.</p>
+        <p className="text-xs text-text-tertiary mb-8">Spaced repetition brings words back right before you&rsquo;d forget them.</p>
         <div className="flex items-center justify-center gap-3">
           <Link href="/dashboard" className="px-5 py-2.5 rounded-xl text-sm font-semibold" style={{ background: 'var(--color-primary)', color: '#1a1206' }}>Dashboard</Link>
           <Link href="/learn/path" className="px-5 py-2.5 rounded-xl text-sm font-semibold" style={{ background: 'var(--color-surface)', color: 'var(--color-text-secondary)', border: '1px solid var(--color-border-light)' }}>Learn more words</Link>
