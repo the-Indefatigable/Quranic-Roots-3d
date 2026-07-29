@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { SupportPrompt } from '@/components/support/SupportPrompt';
+import { DigestSubscribeBanner } from '@/components/ui/DigestSubscribeBanner';
 
 interface DashboardData {
   user: { name: string | null; level: number; totalXP: number };
@@ -244,6 +245,9 @@ export function Dashboard() {
 
   return (
     <div className="max-w-lg mx-auto px-4 py-5 space-y-5">
+      {/* Weekly digest — one-click subscribe for new / non-subscribed accounts */}
+      <DigestSubscribeBanner />
+
       {/* ── Stat pills ─────────────────────────────── */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}

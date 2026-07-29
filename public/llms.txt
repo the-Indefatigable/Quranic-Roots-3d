@@ -10,6 +10,8 @@
 ## Key pages
 - [Home](https://quroots.com/): overview of the platform.
 - [Learn Arabic (the course path)](https://quroots.com/learn/path): the gamified 50-unit Zero-to-Quran grammar course.
+- [Daily Verbs](https://quroots.com/verbs): the most-used everyday Arabic verbs (to want, to go, to love, to accept…) with past & present tense, transliteration, and example sentences — searchable in English or Arabic.
+- [Everyday Words](https://quroots.com/words): common Arabic expressions (e.g. بِصَراحة = honestly), discourse connectors (على العَكْس = on the contrary), feeling words, and describing adjectives — searchable in English or Arabic.
 - [Quran reader](https://quroots.com/quran): word-by-word Quran with roots and translations.
 - [Roots explorer](https://quroots.com/roots): browse Quranic Arabic verb roots, forms, and conjugations.
 - [Daily Ayah & Hadith](https://quroots.com/daily): a new verse and authentic hadith each day with word-by-word meaning.
