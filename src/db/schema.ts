@@ -99,6 +99,13 @@ export const ayahs = pgTable('ayahs', {
   ayahNumber: integer('ayah_number').notNull(),
   textUthmani: text('text_uthmani').notNull(),
   textSimple: text('text_simple'),
+  /**
+   * Diacritic-stripped, letter-folded copy of the ayah text, maintained by
+   * Postgres as a generated column (db/014). This is what Arabic search
+   * matches against — text_simple keeps full tashkeel, so bare Arabic queries
+   * never matched it. Read-only from the app's perspective.
+   */
+  textSearch: text('text_search'),
   juzNumber: integer('juz_number'),
   hizbQuarter: integer('hizb_quarter'),
   pageNumber: integer('page_number'),

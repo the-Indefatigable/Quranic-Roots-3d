@@ -17,6 +17,21 @@ function escapeLike(str: string) {
   return str.replace(/[%_\\]/g, '\\$&');
 }
 
+/**
+ * Apply the same normalization to the query that ayahs.text_search stores:
+ * strip diacritics and fold alef/ya/ta-marbuta variants. Both sides must be
+ * normalized identically or nothing matches.
+ *
+ * Must stay in sync with the generated column in db/014.
+ */
+function normalizeArabic(str: string) {
+  return str
+    .replace(/[ً-ٰۖ-ۭـ]/g, '')
+    .replace(/[أإآٱ]/g, 'ا') // أ إ آ ٱ -> ا
+    .replace(/ى/g, 'ي')                      // ى -> ي
+    .replace(/ة/g, 'ه');                     // ة -> ه
+}
+
 export async function GET(request: NextRequest) {
   const limited = rateLimit(clientKey(request, 'search'), LIMIT, WINDOW_MS);
   if (!limited.ok) return tooManyRequests(limited);
@@ -66,7 +81,9 @@ export async function GET(request: NextRequest) {
                   eq(translationEntries.ayahNumber, ayahs.ayahNumber)
                 )
           )
-          .where(ilike(ayahs.textSimple, `%${q}%`))
+          // text_search, not text_simple: the latter still carries full tashkeel
+          // (it comes from quran.com's text_imlaei), so bare Arabic never matched.
+          .where(ilike(ayahs.textSearch, `%${normalizeArabic(q)}%`))
           .limit(20)
       );
 
