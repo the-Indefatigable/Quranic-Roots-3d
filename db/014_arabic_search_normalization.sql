@@ -1,35 +1,29 @@
--- Migration 014: make Arabic search actually return results.
+-- Migration 014: make Arabic search return results.
 --
 -- /api/search matched `ayahs.text_simple ILIKE '%q%'`, with a comment claiming
--- text_simple was diacritic-free ("so رحمة matches رَحْمَةً"). It isn't:
+-- text_simple was diacritic-free ("so رحمة matches رَحْمَةً"). It never was:
 -- populate-ayahs.mjs fills it from quran.com's `text_imlaei`, which keeps full
--- tashkeel — بِسْمِ اللَّهِ الرَّحْمَٰنِ. A user typing bare Arabic therefore
--- matched nothing, ever. Arabic search returned zero results for every query.
+-- tashkeel — بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ. A bare-form query therefore could not match,
+-- and Arabic search returned zero results for every term.
 --
--- Fixes it with a stored generated column that strips diacritics and folds the
--- alef/ya/ta-marbuta variants, plus a trigram index on it. Stripping in the
--- WHERE clause instead would work but could not use an index.
+-- The route now normalizes text_simple inline. This adds a matching functional
+-- index so that expression is indexed rather than sequentially scanned.
+--
+-- IMPORTANT: the expression below must stay byte-identical to the one in
+-- app/api/search/route.ts, or the planner will not use this index. The search
+-- still returns correct results without it — just slower — so this migration
+-- is safe to apply before or after the deploy, in either order.
+--
+-- Characters are listed explicitly rather than as ranges: range semantics over
+-- non-ASCII depend on the server collation, so '[ً-ٰ]' can strip correctly on
+-- one Postgres and nothing at all on another.
 
--- Diacritics: harakat + tanwin (064B-065F), superscript alef (0670),
--- Quranic annotation signs (06D6-06ED), and tatweel (0640).
--- Letter folding: أإآٱ -> ا, ى -> ي, ة -> ه, so spelling variants match.
-ALTER TABLE ayahs
-  ADD COLUMN IF NOT EXISTS text_search TEXT
-  GENERATED ALWAYS AS (
-    translate(
-      regexp_replace(
-        coalesce(text_simple, text_uthmani),
-        '[ً-ٰٟۖ-ۭـ]',
-        '',
-        'g'
-      ),
-      'أإآٱىة',
-      'اااايه'
-    )
-  ) STORED;
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
-CREATE INDEX IF NOT EXISTS ayahs_text_search_trgm
-  ON ayahs USING gin (text_search gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS ayahs_text_normalized_trgm
+  ON ayahs USING gin (
+    (translate(translate(text_simple, 'ًٌٍَُِّْٰٕٖٓٔٗ٘ـۖۗۘۙۚۛۜ۝۞ۣ۟۠ۡۢۤۥۦۧۨ۩۪ۭ۫۬', ''), 'أإآٱىة', 'اااايه')) gin_trgm_ops
+  );
 
--- The old index is now unused by the search path.
+-- Superseded: the search path no longer matches raw text_simple.
 DROP INDEX IF EXISTS ayahs_text_simple_trgm;

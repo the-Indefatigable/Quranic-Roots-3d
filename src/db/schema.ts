@@ -99,13 +99,12 @@ export const ayahs = pgTable('ayahs', {
   ayahNumber: integer('ayah_number').notNull(),
   textUthmani: text('text_uthmani').notNull(),
   textSimple: text('text_simple'),
-  /**
-   * Diacritic-stripped, letter-folded copy of the ayah text, maintained by
-   * Postgres as a generated column (db/014). This is what Arabic search
-   * matches against — text_simple keeps full tashkeel, so bare Arabic queries
-   * never matched it. Read-only from the app's perspective.
-   */
-  textSearch: text('text_search'),
+  // NOTE: the database also carries a generated `text_search` column (db/014),
+  // used only by /api/search. It is deliberately NOT declared here: adding it
+  // puts it in every `db.select()` on this table, so a database missing the
+  // column fails unrelated queries — including the surah pages that prerender
+  // at build time, which took down a whole deploy. The search route references
+  // it through raw SQL instead, so only search depends on it.
   juzNumber: integer('juz_number'),
   hizbQuarter: integer('hizb_quarter'),
   pageNumber: integer('page_number'),
