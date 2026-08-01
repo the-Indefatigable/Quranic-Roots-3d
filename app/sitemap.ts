@@ -32,6 +32,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Blog articles (formerly /learn/*)
   const learnPages: MetadataRoute.Sitemap = [
+    'qasida-burda',
+    // Was missing from the sitemap despite being published on /blog.
+    'quranic-duas',
     'daily-arabic-words',
     'beginner-arabic-islamic-books',
     'irab',
