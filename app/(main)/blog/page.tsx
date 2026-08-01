@@ -25,6 +25,16 @@ type Topic = {
 
 const TOPICS: Topic[] = [
   {
+    href: '/blog/qasida-burda',
+    title: 'Qasida Burda — Decoded Root by Root, Word by Word',
+    arabic: 'قَصِيدَةُ الْبُرْدَة',
+    description:
+      "Al-Busiri's Qasidat al-Burda broken down line by line: every word traced to its three-letter root, every harf named, and the Quranic vocabulary hiding inside the poem — including the khalq/khuluq contrast and the three duals of Muhammadun sayyidu'l-kawnayn.",
+    level: 'Intermediate',
+    color: '#8B5CF6',
+    category: 'Vocabulary',
+  },
+  {
     href: '/blog/quranic-duas',
     title: 'Duas of the Quran — The Supplications, Grouped & Sourced',
     arabic: 'أَدْعِيَةُ الْقُرْآن',
