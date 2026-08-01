@@ -100,10 +100,22 @@ export default function PrivacyPage() {
         </ul>
       </Section>
 
-      <Section title="Cookies">
+      <Section title="Cookies & analytics">
         <p>
           A session cookie keeps you signed in. It is required — without it the site cannot tell
-          who you are. Google Analytics also sets cookies to count visits.
+          who you are.
+        </p>
+        <p>
+          Google Analytics also sets cookies, and it currently loads for everyone rather than
+          asking first. We say so plainly rather than implying a choice you do not have. It is
+          configured with IP anonymisation, we use it only to see which parts of the site are
+          used, and we do not use it for advertising or share it with anyone.
+        </p>
+        <p>
+          If you would rather not be counted, your browser&rsquo;s &ldquo;do not track&rdquo; or
+          cookie-blocking settings, or any standard content blocker, will stop it — and nothing on
+          QuRoots will work any differently. You can also email us and we will delete anything
+          associated with you.
         </p>
       </Section>
 
