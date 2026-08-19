@@ -27,7 +27,9 @@ function matches(v: DailyVerb, q: string): boolean {
     norm(v.ar).includes(n) ||
     norm(v.present).includes(n) ||
     norm(v.translit).includes(n) ||
-    v.examples.some((e) => norm(e.en).includes(n) || norm(e.ar).includes(n))
+    v.examples.some((e) => norm(e.en).includes(n) || norm(e.ar).includes(n)) ||
+    // Searching "to boycott" should surface قَطَعَ, whose family carries قاطَعَ.
+    (v.family ?? []).some((f) => norm(f.en).includes(n) || norm(f.ar).includes(n))
   );
 }
 
@@ -147,6 +149,31 @@ export function DailyVerbsClient() {
                   </div>
                 ))}
               </div>
+
+              {/* Same root, other wazn — the point of the whole site, in miniature */}
+              {v.family && v.family.length > 0 && (
+                <div className="mt-3 pt-3" style={{ borderTop: '1px solid var(--color-border-light)' }}>
+                  <p className="text-[9px] font-semibold uppercase tracking-[0.16em] mb-2" style={{ color: GOLD, opacity: 0.75 }}>
+                    Same root, other forms
+                  </p>
+                  <ul className="space-y-1.5">
+                    {v.family.map((f) => (
+                      <li key={f.ar} className="flex items-baseline gap-2">
+                        <span
+                          className="shrink-0 text-[9px] font-bold px-1.5 py-0.5 rounded"
+                          style={{ background: 'rgba(212,162,70,0.1)', color: GOLD, minWidth: '1.9rem', textAlign: 'center' }}
+                        >
+                          {f.form}
+                        </span>
+                        <span className="font-arabic leading-none" style={{ fontSize: '1.15rem', color: '#E8DFC9' }} dir="rtl">
+                          {f.ar}
+                        </span>
+                        <span className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>{f.en}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </article>
           ))}
         </div>
@@ -155,7 +182,8 @@ export function DailyVerbsClient() {
       {/* Footnote */}
       <p className="text-center text-[11px] mt-8" style={{ color: 'var(--color-text-tertiary)' }}>
         Showing {dailyVerbs.length} everyday verbs — more added regularly. The gold word is the present tense
-        (يفعل), the form you use to say “I do it”.
+        (يفعل), the form you use to say “I do it”. Where a root has other common measures, they are
+        listed under “same root, other forms” — learn one, half-know the rest.
       </p>
     </div>
   );

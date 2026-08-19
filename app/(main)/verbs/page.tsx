@@ -35,6 +35,10 @@ const FAQ: FaqItem[] = [
     a: 'Roughly 250–500 high-frequency verbs cover the vast majority of everyday conversation. Focus on the common ones first — the present tense (يفعل) is the form you use to say “I do it”.',
   },
   {
+    q: 'Why do some verbs list other forms of the same root?',
+    a: 'Arabic builds whole families of verbs from one three-letter root by putting it through different patterns (awzān). قَطَعَ is “to cut”; the same root gives قَطَّعَ (Form II, “to chop up”), قاطَعَ (Form III, “to boycott, to interrupt”) and اِنْقَطَعَ (Form VII, “to be cut off”). Where a root has other measures you will actually hear, they are listed under “same root, other forms” — so learning one verb gets you most of the way to three or four more.',
+  },
+  {
     q: 'What is the difference between the past and present tense shown here?',
     a: 'Each verb shows the past tense (the base/dictionary form, e.g. ذَهَبَ “he went”) and the present tense in gold (يَذْهَب “he goes / is going”), which is the form you build “I / you / we do” from.',
   },

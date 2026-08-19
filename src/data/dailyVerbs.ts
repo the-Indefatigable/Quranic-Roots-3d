@@ -10,6 +10,20 @@ export interface VerbExample {
   en: string;
 }
 
+/**
+ * A sibling verb from the same root, in a different wazn (measure).
+ *
+ * Arabic derives whole families from one root: قَطَعَ (to cut) also gives
+ * قَطَّعَ (to chop up), قاطَعَ (to boycott) and اِنْقَطَعَ (to be cut off).
+ * Learners who only meet the Form I verb miss the fact that the "new" word
+ * they keep seeing is one they already half-know.
+ */
+export interface VerbFamily {
+  ar: string;    // e.g. 'قَطَّعَ'
+  form: string;  // Roman numeral of the wazn, e.g. 'II'
+  en: string;    // e.g. 'to cut into pieces'
+}
+
 export interface DailyVerb {
   en: string;        // English gloss, e.g. "to love"
   ar: string;        // past tense (base form), e.g. "أَحَبَّ"
@@ -17,6 +31,8 @@ export interface DailyVerb {
   translit: string;  // "aḥabba · yuḥibb"
   cat: string;       // loose category for browsing
   examples: VerbExample[];
+  /** Other common wazn built on the same root. Optional. */
+  family?: VerbFamily[];
 }
 
 export const VERB_CATEGORIES = [
@@ -39,7 +55,7 @@ export const dailyVerbs: DailyVerb[] = [
   // ── Speaking / communication ──────────────────────────────
   { en: 'to say', ar: 'قالَ', present: 'يَقول', translit: 'qāla · yaqūl', cat: 'Speaking', examples: [{ ar: 'ماذا قُلْتَ لَه؟', en: 'What did you say to him?' }] },
   { en: 'to speak', ar: 'تَكَلَّمَ', present: 'يَتَكَلَّم', translit: 'takallama · yatakallam', cat: 'Speaking', examples: [{ ar: 'أَتَكَلَّمُ العَرَبِيّةَ قَليلًا.', en: 'I speak a little Arabic.' }] },
-  { en: 'to ask', ar: 'سَأَلَ', present: 'يَسْأَل', translit: 'saʾala · yasʾal', cat: 'Speaking', examples: [{ ar: 'سَأَلْتُ المُعَلِّمَ سُؤالًا.', en: 'I asked the teacher a question.' }] },
+  { en: 'to ask', ar: 'سَأَلَ', present: 'يَسْأَل', translit: 'saʾala · yasʾal', cat: 'Speaking', family: [{ ar: 'تَساءَلَ', form: 'VI', en: 'to wonder, to ask one another' }, { ar: 'سائَلَ', form: 'III', en: 'to question' }], examples: [{ ar: 'سَأَلْتُ المُعَلِّمَ سُؤالًا.', en: 'I asked the teacher a question.' }] },
   { en: 'to answer', ar: 'أَجابَ', present: 'يُجيب', translit: 'ajāba · yujīb', cat: 'Speaking', examples: [{ ar: 'أَجابَ عَنِ السُّؤالِ بِسُرْعة.', en: 'He answered the question quickly.' }] },
   { en: 'to talk / to converse', ar: 'تَحَدَّثَ', present: 'يَتَحَدَّث', translit: 'taḥaddatha · yataḥaddath', cat: 'Speaking', examples: [{ ar: 'تَحَدَّثْنا طَويلًا عَنِ السَّفَر.', en: 'We talked for a long time about travel.' }] },
   { en: 'to call (phone)', ar: 'اِتَّصَلَ', present: 'يَتَّصِل', translit: 'ittaṣala · yattaṣil', cat: 'Speaking', examples: [{ ar: 'اِتَّصَلْتُ بِأُمّي مَساءً.', en: 'I called my mother in the evening.' }] },
@@ -49,22 +65,22 @@ export const dailyVerbs: DailyVerb[] = [
   { en: 'to explain', ar: 'شَرَحَ', present: 'يَشْرَح', translit: 'sharaḥa · yashraḥ', cat: 'Speaking', examples: [{ ar: 'شَرَحَ الأُسْتاذُ الدَّرْس.', en: 'The teacher explained the lesson.' }] },
 
   // ── Mind / thinking ───────────────────────────────────────
-  { en: 'to know', ar: 'عَرَفَ', present: 'يَعْرِف', translit: 'ʿarafa · yaʿrif', cat: 'Mind', examples: [{ ar: 'أَعْرِفُ الجَوابَ الصَّحيح.', en: 'I know the right answer.' }] },
+  { en: 'to know', ar: 'عَرَفَ', present: 'يَعْرِف', translit: 'ʿarafa · yaʿrif', cat: 'Mind', family: [{ ar: 'عَرَّفَ', form: 'II', en: 'to introduce; to define' }, { ar: 'تَعَرَّفَ', form: 'V', en: 'to get to know someone' }, { ar: 'اِعْتَرَفَ', form: 'VIII', en: 'to admit, to confess' }], examples: [{ ar: 'أَعْرِفُ الجَوابَ الصَّحيح.', en: 'I know the right answer.' }] },
   { en: 'to think', ar: 'فَكَّرَ', present: 'يُفَكِّر', translit: 'fakkara · yufakkir', cat: 'Mind', examples: [{ ar: 'أُفَكِّرُ في المُسْتَقْبَل.', en: 'I think about the future.' }] },
-  { en: 'to understand', ar: 'فَهِمَ', present: 'يَفْهَم', translit: 'fahima · yafham', cat: 'Mind', examples: [{ ar: 'هَلْ فَهِمْتَ الفِكْرة؟', en: 'Did you understand the idea?' }] },
-  { en: 'to remember', ar: 'تَذَكَّرَ', present: 'يَتَذَكَّر', translit: 'tadhakkara · yatadhakkar', cat: 'Mind', examples: [{ ar: 'أَتَذَكَّرُ ذلِكَ اليَوْمَ جَيِّدًا.', en: 'I remember that day well.' }] },
+  { en: 'to understand', ar: 'فَهِمَ', present: 'يَفْهَم', translit: 'fahima · yafham', cat: 'Mind', family: [{ ar: 'أَفْهَمَ', form: 'IV', en: 'to make someone understand' }, { ar: 'تَفاهَمَ', form: 'VI', en: 'to reach a mutual understanding' }], examples: [{ ar: 'هَلْ فَهِمْتَ الفِكْرة؟', en: 'Did you understand the idea?' }] },
+  { en: 'to remember', ar: 'تَذَكَّرَ', present: 'يَتَذَكَّر', translit: 'tadhakkara · yatadhakkar', cat: 'Mind', family: [{ ar: 'ذَكَرَ', form: 'I', en: 'to mention' }, { ar: 'ذَكَّرَ', form: 'II', en: 'to remind' }, { ar: 'اِسْتَذْكَرَ', form: 'X', en: 'to revise, to recall' }], examples: [{ ar: 'أَتَذَكَّرُ ذلِكَ اليَوْمَ جَيِّدًا.', en: 'I remember that day well.' }] },
   { en: 'to forget', ar: 'نَسِيَ', present: 'يَنْسى', translit: 'nasiya · yansā', cat: 'Mind', examples: [{ ar: 'نَسيتُ اسْمَه.', en: 'I forgot his name.' }] },
   { en: 'to learn', ar: 'تَعَلَّمَ', present: 'يَتَعَلَّم', translit: 'taʿallama · yataʿallam', cat: 'Mind', examples: [{ ar: 'أَتَعَلَّمُ العَرَبِيّةَ كُلَّ يَوْم.', en: 'I learn Arabic every day.' }] },
   { en: 'to study', ar: 'دَرَسَ', present: 'يَدْرُس', translit: 'darasa · yadrus', cat: 'Mind', examples: [{ ar: 'دَرَسْتُ لِلِامْتِحان.', en: 'I studied for the exam.' }] },
-  { en: 'to teach', ar: 'عَلَّمَ', present: 'يُعَلِّم', translit: 'ʿallama · yuʿallim', cat: 'Mind', examples: [{ ar: 'يُعَلِّمُنا الأُسْتاذُ الحِساب.', en: 'The teacher teaches us math.' }] },
+  { en: 'to teach', ar: 'عَلَّمَ', present: 'يُعَلِّم', translit: 'ʿallama · yuʿallim', cat: 'Mind', family: [{ ar: 'عَلِمَ', form: 'I', en: 'to know' }, { ar: 'أَعْلَمَ', form: 'IV', en: 'to inform' }, { ar: 'اِسْتَعْلَمَ', form: 'X', en: 'to enquire' }], examples: [{ ar: 'يُعَلِّمُنا الأُسْتاذُ الحِساب.', en: 'The teacher teaches us math.' }] },
   { en: 'to read', ar: 'قَرَأَ', present: 'يَقْرَأ', translit: 'qaraʾa · yaqraʾ', cat: 'Mind', examples: [{ ar: 'أَقْرَأُ كِتابًا كُلَّ أُسْبوع.', en: 'I read a book every week.' }] },
-  { en: 'to write', ar: 'كَتَبَ', present: 'يَكْتُب', translit: 'kataba · yaktub', cat: 'Mind', examples: [{ ar: 'أَكْتُبُ رِسالةً لِصَديقي.', en: 'I write a letter to my friend.' }] },
+  { en: 'to write', ar: 'كَتَبَ', present: 'يَكْتُب', translit: 'kataba · yaktub', cat: 'Mind', family: [{ ar: 'كاتَبَ', form: 'III', en: 'to correspond with' }, { ar: 'اِكْتَتَبَ', form: 'VIII', en: 'to subscribe, to enrol' }], examples: [{ ar: 'أَكْتُبُ رِسالةً لِصَديقي.', en: 'I write a letter to my friend.' }] },
   { en: 'to believe', ar: 'صَدَّقَ', present: 'يُصَدِّق', translit: 'ṣaddaqa · yuṣaddiq', cat: 'Mind', examples: [{ ar: 'لا أُصَدِّقُ هذا الخَبَر.', en: "I don't believe this news." }] },
 
   // ── Perception ────────────────────────────────────────────
   { en: 'to see', ar: 'رَأى', present: 'يَرى', translit: 'raʾā · yarā', cat: 'Everyday', examples: [{ ar: 'رَأَيْتُ القَمَرَ لَيْلًا.', en: 'I saw the moon at night.' }] },
   { en: 'to hear', ar: 'سَمِعَ', present: 'يَسْمَع', translit: 'samiʿa · yasmaʿ', cat: 'Everyday', examples: [{ ar: 'سَمِعْتُ صَوْتًا غَريبًا.', en: 'I heard a strange sound.' }] },
-  { en: 'to look / to watch', ar: 'نَظَرَ', present: 'يَنْظُر', translit: 'naẓara · yanẓur', cat: 'Everyday', examples: [{ ar: 'نَظَرْتُ إِلى السَّماء.', en: 'I looked at the sky.' }] },
+  { en: 'to look / to watch', ar: 'نَظَرَ', present: 'يَنْظُر', translit: 'naẓara · yanẓur', cat: 'Everyday', family: [{ ar: 'اِنْتَظَرَ', form: 'VIII', en: 'to wait' }, { ar: 'ناظَرَ', form: 'III', en: 'to debate' }, { ar: 'أَنْظَرَ', form: 'IV', en: 'to grant a delay' }], examples: [{ ar: 'نَظَرْتُ إِلى السَّماء.', en: 'I looked at the sky.' }] },
   { en: 'to feel', ar: 'شَعَرَ', present: 'يَشْعُر', translit: 'shaʿara · yashʿur', cat: 'Feelings', examples: [{ ar: 'أَشْعُرُ بِالتَّعَبِ اليَوْم.', en: 'I feel tired today.' }] },
 
   // ── Feelings ──────────────────────────────────────────────
@@ -82,9 +98,9 @@ export const dailyVerbs: DailyVerb[] = [
   { en: 'to run', ar: 'رَكَضَ', present: 'يَرْكُض', translit: 'rakaḍa · yarkuḍ', cat: 'Movement', examples: [{ ar: 'رَكَضَ الوَلَدُ بِسُرْعة.', en: 'The boy ran quickly.' }] },
   { en: 'to sit', ar: 'جَلَسَ', present: 'يَجْلِس', translit: 'jalasa · yajlis', cat: 'Movement', examples: [{ ar: 'اِجْلِسْ هُنا مِنْ فَضْلِك.', en: 'Please sit here.' }] },
   { en: 'to stand', ar: 'وَقَفَ', present: 'يَقِف', translit: 'waqafa · yaqif', cat: 'Movement', examples: [{ ar: 'وَقَفَ الرَّجُلُ عِنْدَ الباب.', en: 'The man stood at the door.' }] },
-  { en: 'to enter', ar: 'دَخَلَ', present: 'يَدْخُل', translit: 'dakhala · yadkhul', cat: 'Movement', examples: [{ ar: 'دَخَلَ الغُرْفةَ بِهُدوء.', en: 'He entered the room quietly.' }] },
-  { en: 'to leave / to depart', ar: 'غادَرَ', present: 'يُغادِر', translit: 'ghādara · yughādir', cat: 'Movement', examples: [{ ar: 'غادَرْتُ البَيْتَ مُبَكِّرًا.', en: 'I left the house early.' }] },
-  { en: 'to return', ar: 'رَجَعَ', present: 'يَرْجِع', translit: 'rajaʿa · yarjiʿ', cat: 'Movement', examples: [{ ar: 'رَجَعْتُ مِنَ العَمَلِ مُتْعَبًا.', en: 'I returned from work tired.' }] },
+  { en: 'to enter', ar: 'دَخَلَ', present: 'يَدْخُل', translit: 'dakhala · yadkhul', cat: 'Movement', family: [{ ar: 'أَدْخَلَ', form: 'IV', en: 'to bring in, to insert' }, { ar: 'تَدَخَّلَ', form: 'V', en: 'to interfere, to intervene' }], examples: [{ ar: 'دَخَلَ الغُرْفةَ بِهُدوء.', en: 'He entered the room quietly.' }] },
+  { en: 'to leave / to depart', ar: 'غادَرَ', present: 'يُغادِر', translit: 'ghādara · yughādir', cat: 'Movement', family: [{ ar: 'خَرَجَ', form: 'I', en: 'to go out' }, { ar: 'أَخْرَجَ', form: 'IV', en: 'to take out; to direct (a film)' }, { ar: 'اِسْتَخْرَجَ', form: 'X', en: 'to extract' }], examples: [{ ar: 'غادَرْتُ البَيْتَ مُبَكِّرًا.', en: 'I left the house early.' }] },
+  { en: 'to return', ar: 'رَجَعَ', present: 'يَرْجِع', translit: 'rajaʿa · yarjiʿ', cat: 'Movement', family: [{ ar: 'أَرْجَعَ', form: 'IV', en: 'to give back' }, { ar: 'راجَعَ', form: 'III', en: 'to review, to revise' }], examples: [{ ar: 'رَجَعْتُ مِنَ العَمَلِ مُتْعَبًا.', en: 'I returned from work tired.' }] },
   { en: 'to arrive', ar: 'وَصَلَ', present: 'يَصِل', translit: 'waṣala · yaṣil', cat: 'Movement', examples: [{ ar: 'وَصَلَ القِطارُ في مَوْعِدِه.', en: 'The train arrived on time.' }] },
   { en: 'to travel', ar: 'سافَرَ', present: 'يُسافِر', translit: 'sāfara · yusāfir', cat: 'Movement', examples: [{ ar: 'سافَرْتُ إِلى مِصْرَ العامَ الماضي.', en: 'I traveled to Egypt last year.' }] },
   { en: 'to drive', ar: 'قادَ', present: 'يَقود', translit: 'qāda · yaqūd', cat: 'Movement', examples: [{ ar: 'أَقودُ السَّيّارةَ بِحَذَر.', en: 'I drive the car carefully.' }] },
@@ -95,9 +111,9 @@ export const dailyVerbs: DailyVerb[] = [
   // ── Action / doing ────────────────────────────────────────
   { en: 'to do / to make', ar: 'فَعَلَ', present: 'يَفْعَل', translit: 'faʿala · yafʿal', cat: 'Action', examples: [{ ar: 'ماذا تَفْعَلُ الآن؟', en: 'What are you doing now?' }] },
   { en: 'to make / to manufacture', ar: 'صَنَعَ', present: 'يَصْنَع', translit: 'ṣanaʿa · yaṣnaʿ', cat: 'Action', examples: [{ ar: 'صَنَعْتُ كَعْكةً لِلضُّيوف.', en: 'I made a cake for the guests.' }] },
-  { en: 'to work', ar: 'عَمِلَ', present: 'يَعْمَل', translit: 'ʿamila · yaʿmal', cat: 'Work & Money', examples: [{ ar: 'أَعْمَلُ في شَرِكةٍ كَبيرة.', en: 'I work at a big company.' }] },
-  { en: 'to use', ar: 'اِسْتَخْدَمَ', present: 'يَسْتَخْدِم', translit: 'istakhdama · yastakhdim', cat: 'Action', examples: [{ ar: 'أَسْتَخْدِمُ الهاتِفَ لِلعَمَل.', en: 'I use the phone for work.' }] },
-  { en: 'to open', ar: 'فَتَحَ', present: 'يَفْتَح', translit: 'fataḥa · yaftaḥ', cat: 'Action', examples: [{ ar: 'اِفْتَحِ البابَ رَجاءً.', en: 'Please open the door.' }] },
+  { en: 'to work', ar: 'عَمِلَ', present: 'يَعْمَل', translit: 'ʿamila · yaʿmal', cat: 'Work & Money', family: [{ ar: 'عامَلَ', form: 'III', en: 'to treat, to deal with' }, { ar: 'اِسْتَعْمَلَ', form: 'X', en: 'to use' }], examples: [{ ar: 'أَعْمَلُ في شَرِكةٍ كَبيرة.', en: 'I work at a big company.' }] },
+  { en: 'to use', ar: 'اِسْتَخْدَمَ', present: 'يَسْتَخْدِم', translit: 'istakhdama · yastakhdim', cat: 'Action', family: [{ ar: 'خَدَمَ', form: 'I', en: 'to serve' }, { ar: 'اِسْتَعْمَلَ', form: 'X', en: 'to use (equally common)' }], examples: [{ ar: 'أَسْتَخْدِمُ الهاتِفَ لِلعَمَل.', en: 'I use the phone for work.' }] },
+  { en: 'to open', ar: 'فَتَحَ', present: 'يَفْتَح', translit: 'fataḥa · yaftaḥ', cat: 'Action', family: [{ ar: 'اِفْتَتَحَ', form: 'VIII', en: 'to inaugurate, to open officially' }, { ar: 'اِنْفَتَحَ', form: 'VII', en: 'to be opened' }], examples: [{ ar: 'اِفْتَحِ البابَ رَجاءً.', en: 'Please open the door.' }] },
   { en: 'to close', ar: 'أَغْلَقَ', present: 'يُغْلِق', translit: 'aghlaqa · yughliq', cat: 'Action', examples: [{ ar: 'أَغْلَقْتُ النافِذةَ بِسَبَبِ البَرْد.', en: 'I closed the window because of the cold.' }] },
   { en: 'to give', ar: 'أَعْطى', present: 'يُعْطي', translit: 'aʿṭā · yuʿṭī', cat: 'Action', examples: [{ ar: 'أَعْطِني الكِتابَ مِنْ فَضْلِك.', en: 'Give me the book please.' }] },
   { en: 'to take', ar: 'أَخَذَ', present: 'يَأْخُذ', translit: 'akhadha · yaʾkhudh', cat: 'Action', examples: [{ ar: 'خُذْ هذا مَعَك.', en: 'Take this with you.' }] },
@@ -110,8 +126,8 @@ export const dailyVerbs: DailyVerb[] = [
   { en: 'to show', ar: 'أَرى', present: 'يُري', translit: 'arā · yurī', cat: 'Action', examples: [{ ar: 'أَراني الطَّريقَ إِلى المَحَطّة.', en: 'He showed me the way to the station.' }] },
   { en: 'to build', ar: 'بَنى', present: 'يَبْني', translit: 'banā · yabnī', cat: 'Action', examples: [{ ar: 'بَنَوْا بَيْتًا جَديدًا.', en: 'They built a new house.' }] },
   { en: 'to break', ar: 'كَسَرَ', present: 'يَكْسِر', translit: 'kasara · yaksir', cat: 'Action', examples: [{ ar: 'كَسَرْتُ الكوبَ بِالخَطَأ.', en: 'I broke the cup by accident.' }] },
-  { en: 'to fix / to repair', ar: 'أَصْلَحَ', present: 'يُصْلِح', translit: 'aṣlaḥa · yuṣliḥ', cat: 'Action', examples: [{ ar: 'أَصْلَحَ السَّيّارةَ بِنَفْسِه.', en: 'He fixed the car himself.' }] },
-  { en: 'to cut', ar: 'قَطَعَ', present: 'يَقْطَع', translit: 'qaṭaʿa · yaqṭaʿ', cat: 'Action', examples: [{ ar: 'قَطَعْتُ الوَرَقةَ إِلى نِصْفَيْن.', en: 'I cut the paper in half.' }] },
+  { en: 'to fix / to repair', ar: 'أَصْلَحَ', present: 'يُصْلِح', translit: 'aṣlaḥa · yuṣliḥ', cat: 'Action', family: [{ ar: 'صَلَحَ', form: 'I', en: 'to be sound, to be right' }, { ar: 'اِصْطَلَحَ', form: 'VIII', en: 'to agree on a convention' }], examples: [{ ar: 'أَصْلَحَ السَّيّارةَ بِنَفْسِه.', en: 'He fixed the car himself.' }] },
+  { en: 'to cut', ar: 'قَطَعَ', present: 'يَقْطَع', translit: 'qaṭaʿa · yaqṭaʿ', cat: 'Action', family: [{ ar: 'قَطَّعَ', form: 'II', en: 'to cut into pieces, to chop' }, { ar: 'قاطَعَ', form: 'III', en: 'to boycott; to interrupt' }, { ar: 'اِنْقَطَعَ', form: 'VII', en: 'to be cut off, to stop' }], examples: [{ ar: 'قَطَعْتُ الوَرَقةَ إِلى نِصْفَيْن.', en: 'I cut the paper in half.' }] },
   { en: 'to throw', ar: 'رَمى', present: 'يَرْمي', translit: 'ramā · yarmī', cat: 'Action', examples: [{ ar: 'رَمى الكُرةَ بَعيدًا.', en: 'He threw the ball far.' }] },
   { en: 'to catch / to hold', ar: 'أَمْسَكَ', present: 'يُمْسِك', translit: 'amsaka · yumsik', cat: 'Action', examples: [{ ar: 'أَمْسَكْتُ الكُرةَ بِيَدَيّ.', en: 'I caught the ball with my hands.' }] },
   { en: 'to pull', ar: 'سَحَبَ', present: 'يَسْحَب', translit: 'saḥaba · yasḥab', cat: 'Action', examples: [{ ar: 'سَحَبَ الحَبْلَ بِقُوّة.', en: 'He pulled the rope hard.' }] },
@@ -136,7 +152,7 @@ export const dailyVerbs: DailyVerb[] = [
   { en: 'to obey', ar: 'أَطاعَ', present: 'يُطيع', translit: 'aṭāʿa · yuṭīʿ', cat: 'People', examples: [{ ar: 'أَطاعَ والِدَيْهِ دائِمًا.', en: 'He always obeyed his parents.' }] },
 
   // ── Decisions / agreement ─────────────────────────────────
-  { en: 'to accept', ar: 'قَبِلَ', present: 'يَقْبَل', translit: 'qabila · yaqbal', cat: 'People', examples: [{ ar: 'قَبِلْتُ الدَّعْوةَ بِسُرور.', en: 'I accepted the invitation gladly.' }] },
+  { en: 'to accept', ar: 'قَبِلَ', present: 'يَقْبَل', translit: 'qabila · yaqbal', cat: 'People', family: [{ ar: 'قابَلَ', form: 'III', en: 'to meet, to face' }, { ar: 'اِسْتَقْبَلَ', form: 'X', en: 'to receive, to welcome' }], examples: [{ ar: 'قَبِلْتُ الدَّعْوةَ بِسُرور.', en: 'I accepted the invitation gladly.' }] },
   { en: 'to refuse', ar: 'رَفَضَ', present: 'يَرْفُض', translit: 'rafaḍa · yarfuḍ', cat: 'People', examples: [{ ar: 'رَفَضَ العَرْضَ بِأَدَب.', en: 'He politely refused the offer.' }] },
   { en: 'to approve (of)', ar: 'وافَقَ', present: 'يُوافِق', translit: 'wāfaqa · yuwāfiq', cat: 'People', examples: [{ ar: 'وافَقْتُ على الخُطّة.', en: 'I approved of the plan.' }] },
   { en: 'to agree', ar: 'اِتَّفَقَ', present: 'يَتَّفِق', translit: 'ittafaqa · yattafiq', cat: 'People', examples: [{ ar: 'اِتَّفَقْنا على المَوْعِد.', en: 'We agreed on the time.' }] },
@@ -148,7 +164,7 @@ export const dailyVerbs: DailyVerb[] = [
   // ── Process / states ──────────────────────────────────────
   { en: 'to begin / to start', ar: 'بَدَأَ', present: 'يَبْدَأ', translit: 'badaʾa · yabdaʾ', cat: 'Action', examples: [{ ar: 'بَدَأَ الدَّرْسُ في التاسِعة.', en: 'The lesson began at nine.' }] },
   { en: 'to finish', ar: 'أَنْهى', present: 'يُنْهي', translit: 'anhā · yunhī', cat: 'Action', examples: [{ ar: 'أَنْهَيْتُ عَمَلي مُبَكِّرًا.', en: 'I finished my work early.' }] },
-  { en: 'to stop', ar: 'تَوَقَّفَ', present: 'يَتَوَقَّف', translit: 'tawaqqafa · yatawaqqaf', cat: 'Action', examples: [{ ar: 'تَوَقَّفَتِ السَّيّارةُ فَجْأة.', en: 'The car stopped suddenly.' }] },
+  { en: 'to stop', ar: 'تَوَقَّفَ', present: 'يَتَوَقَّف', translit: 'tawaqqafa · yatawaqqaf', cat: 'Action', family: [{ ar: 'وَقَفَ', form: 'I', en: 'to stand; to stop' }, { ar: 'أَوْقَفَ', form: 'IV', en: 'to bring to a halt; to park' }], examples: [{ ar: 'تَوَقَّفَتِ السَّيّارةُ فَجْأة.', en: 'The car stopped suddenly.' }] },
   { en: 'to continue', ar: 'اِسْتَمَرَّ', present: 'يَسْتَمِرّ', translit: 'istamarra · yastamirr', cat: 'Action', examples: [{ ar: 'اِسْتَمَرَّ المَطَرُ طَوالَ اللَّيْل.', en: 'The rain continued all night.' }] },
   { en: 'to try', ar: 'حاوَلَ', present: 'يُحاوِل', translit: 'ḥāwala · yuḥāwil', cat: 'Action', examples: [{ ar: 'سَأُحاوِلُ مَرّةً أُخْرى.', en: 'I will try again.' }] },
   { en: 'to wait', ar: 'اِنْتَظَرَ', present: 'يَنْتَظِر', translit: 'intaẓara · yantaẓir', cat: 'Everyday', examples: [{ ar: 'اِنْتَظِرْني قَليلًا.', en: 'Wait for me a little.' }] },
@@ -172,7 +188,7 @@ export const dailyVerbs: DailyVerb[] = [
   { en: 'to pray', ar: 'صَلّى', present: 'يُصَلّي', translit: 'ṣallā · yuṣallī', cat: 'Faith', examples: [{ ar: 'أُصَلّي الفَجْرَ في المَسْجِد.', en: 'I pray Fajr at the mosque.' }] },
   { en: 'to fast', ar: 'صامَ', present: 'يَصوم', translit: 'ṣāma · yaṣūm', cat: 'Faith', examples: [{ ar: 'نَصومُ شَهْرَ رَمَضان.', en: 'We fast the month of Ramadan.' }] },
   { en: 'to worship', ar: 'عَبَدَ', present: 'يَعْبُد', translit: 'ʿabada · yaʿbud', cat: 'Faith', examples: [{ ar: 'نَعْبُدُ اللهَ وَحْدَه.', en: 'We worship God alone.' }] },
-  { en: 'to forgive', ar: 'غَفَرَ', present: 'يَغْفِر', translit: 'ghafara · yaghfir', cat: 'Faith', examples: [{ ar: 'نَرْجو أَنْ يَغْفِرَ اللهُ لَنا.', en: 'We hope that God forgives us.' }] },
+  { en: 'to forgive', ar: 'غَفَرَ', present: 'يَغْفِر', translit: 'ghafara · yaghfir', cat: 'Faith', family: [{ ar: 'اِسْتَغْفَرَ', form: 'X', en: 'to seek forgiveness (astaghfirullāh)' }], examples: [{ ar: 'نَرْجو أَنْ يَغْفِرَ اللهُ لَنا.', en: 'We hope that God forgives us.' }] },
   { en: 'to remember / to mention (God)', ar: 'ذَكَرَ', present: 'يَذْكُر', translit: 'dhakara · yadhkur', cat: 'Faith', examples: [{ ar: 'نَذْكُرُ اللهَ في كُلِّ وَقْت.', en: 'We remember God at all times.' }] },
 
   // ════════════════════════════════════════════════════════
@@ -239,7 +255,7 @@ export const dailyVerbs: DailyVerb[] = [
   { en: 'to tell the truth', ar: 'صَدَقَ', present: 'يَصْدُق', translit: 'ṣadaqa · yaṣduq', cat: 'Speaking', examples: [{ ar: 'اِصْدُقْ دائِمًا.', en: 'Always tell the truth.' }] },
 
   // ── Mind & study ──────────────────────────────────────────
-  { en: 'to memorize', ar: 'حَفِظَ', present: 'يَحْفَظ', translit: 'ḥafiẓa · yaḥfaẓ', cat: 'Mind', examples: [{ ar: 'حَفِظْتُ القَصيدة.', en: 'I memorized the poem.' }] },
+  { en: 'to memorize', ar: 'حَفِظَ', present: 'يَحْفَظ', translit: 'ḥafiẓa · yaḥfaẓ', cat: 'Mind', family: [{ ar: 'حافَظَ', form: 'III', en: 'to preserve, to keep up' }, { ar: 'اِحْتَفَظَ', form: 'VIII', en: 'to keep, to retain' }], examples: [{ ar: 'حَفِظْتُ القَصيدة.', en: 'I memorized the poem.' }] },
   { en: 'to review', ar: 'راجَعَ', present: 'يُراجِع', translit: 'rājaʿa · yurājiʿ', cat: 'Mind', examples: [{ ar: 'راجَعْتُ الدَّرْسَ قَبْلَ النَّوْم.', en: 'I reviewed the lesson before sleeping.' }] },
   { en: 'to translate', ar: 'تَرْجَمَ', present: 'يُتَرْجِم', translit: 'tarjama · yutarjim', cat: 'Mind', examples: [{ ar: 'تَرْجَمَ الكِتابَ إِلى العَرَبِيّة.', en: 'He translated the book into Arabic.' }] },
   { en: 'to solve', ar: 'حَلَّ', present: 'يَحُلّ', translit: 'ḥalla · yaḥull', cat: 'Mind', examples: [{ ar: 'حَلَلْتُ المَسْأَلة.', en: 'I solved the problem.' }] },
@@ -262,12 +278,12 @@ export const dailyVerbs: DailyVerb[] = [
 
   // ── Getting, giving, money ────────────────────────────────
   { en: 'to get / to obtain', ar: 'حَصَلَ', present: 'يَحْصُل', translit: 'ḥaṣala · yaḥṣul', cat: 'Everyday', examples: [{ ar: 'حَصَلْتُ على وَظيفةٍ جَديدة.', en: 'I got a new job.' }] },
-  { en: 'to gather / to collect', ar: 'جَمَعَ', present: 'يَجْمَع', translit: 'jamaʿa · yajmaʿ', cat: 'Action', examples: [{ ar: 'جَمَعْتُ الأَوْراقَ مِنَ الأَرْض.', en: 'I gathered the papers from the ground.' }] },
-  { en: 'to share', ar: 'شارَكَ', present: 'يُشارِك', translit: 'shāraka · yushārik', cat: 'People', examples: [{ ar: 'شارَكْتُهُ طَعامي.', en: 'I shared my food with him.' }] },
+  { en: 'to gather / to collect', ar: 'جَمَعَ', present: 'يَجْمَع', translit: 'jamaʿa · yajmaʿ', cat: 'Action', family: [{ ar: 'اِجْتَمَعَ', form: 'VIII', en: 'to meet, to assemble' }, { ar: 'أَجْمَعَ', form: 'IV', en: 'to agree unanimously' }], examples: [{ ar: 'جَمَعْتُ الأَوْراقَ مِنَ الأَرْض.', en: 'I gathered the papers from the ground.' }] },
+  { en: 'to share', ar: 'شارَكَ', present: 'يُشارِك', translit: 'shāraka · yushārik', cat: 'People', family: [{ ar: 'اِشْتَرَكَ', form: 'VIII', en: 'to participate, to subscribe' }, { ar: 'أَشْرَكَ', form: 'IV', en: 'to associate partners with God' }], examples: [{ ar: 'شارَكْتُهُ طَعامي.', en: 'I shared my food with him.' }] },
   { en: 'to distribute', ar: 'وَزَّعَ', present: 'يُوَزِّع', translit: 'wazzaʿa · yuwazziʿ', cat: 'Action', examples: [{ ar: 'وَزَّعَ الهَدايا على الأَطْفال.', en: 'He distributed the gifts to the children.' }] },
   { en: 'to lend', ar: 'أَقْرَضَ', present: 'يُقْرِض', translit: 'aqraḍa · yuqriḍ', cat: 'Work & Money', examples: [{ ar: 'أَقْرَضْتُهُ بَعْضَ المال.', en: 'I lent him some money.' }] },
   { en: 'to borrow', ar: 'اِسْتَعارَ', present: 'يَسْتَعير', translit: 'istaʿāra · yastaʿīr', cat: 'Work & Money', examples: [{ ar: 'اِسْتَعَرْتُ كِتابًا مِنَ المَكْتَبة.', en: 'I borrowed a book from the library.' }] },
-  { en: 'to earn / to gain', ar: 'كَسَبَ', present: 'يَكْسِب', translit: 'kasaba · yaksib', cat: 'Work & Money', examples: [{ ar: 'يَكْسِبُ مالًا مِنْ عَمَلِه.', en: 'He earns money from his work.' }] },
+  { en: 'to earn / to gain', ar: 'كَسَبَ', present: 'يَكْسِب', translit: 'kasaba · yaksib', cat: 'Work & Money', family: [{ ar: 'اِكْتَسَبَ', form: 'VIII', en: 'to acquire, to gain' }], examples: [{ ar: 'يَكْسِبُ مالًا مِنْ عَمَلِه.', en: 'He earns money from his work.' }] },
   { en: 'to spend (money)', ar: 'أَنْفَقَ', present: 'يُنْفِق', translit: 'anfaqa · yunfiq', cat: 'Work & Money', examples: [{ ar: 'أَنْفَقْتُ الكَثيرَ هذا الشَّهْر.', en: 'I spent a lot this month.' }] },
   { en: 'to save / to set aside', ar: 'وَفَّرَ', present: 'يُوَفِّر', translit: 'waffara · yuwaffir', cat: 'Work & Money', examples: [{ ar: 'أُوَفِّرُ جُزْءًا مِنْ راتِبي.', en: 'I save part of my salary.' }] },
   { en: 'to rent', ar: 'اِسْتَأْجَرَ', present: 'يَسْتَأْجِر', translit: 'istaʾjara · yastaʾjir', cat: 'Work & Money', examples: [{ ar: 'اِسْتَأْجَرْتُ شَقّةً صَغيرة.', en: 'I rented a small apartment.' }] },
@@ -279,7 +295,7 @@ export const dailyVerbs: DailyVerb[] = [
 
   // ── Going out & social ────────────────────────────────────
   { en: 'to hurry', ar: 'أَسْرَعَ', present: 'يُسْرِع', translit: 'asraʿa · yusriʿ', cat: 'Movement', examples: [{ ar: 'أَسْرِعْ، لَقَدْ تَأَخَّرْنا.', en: "Hurry, we're late." }] },
-  { en: 'to attend', ar: 'حَضَرَ', present: 'يَحْضُر', translit: 'ḥaḍara · yaḥḍur', cat: 'People', examples: [{ ar: 'حَضَرْتُ المُحاضَرة.', en: 'I attended the lecture.' }] },
+  { en: 'to attend', ar: 'حَضَرَ', present: 'يَحْضُر', translit: 'ḥaḍara · yaḥḍur', cat: 'People', family: [{ ar: 'حَضَّرَ', form: 'II', en: 'to prepare' }, { ar: 'أَحْضَرَ', form: 'IV', en: 'to bring' }], examples: [{ ar: 'حَضَرْتُ المُحاضَرة.', en: 'I attended the lecture.' }] },
   { en: 'to join', ar: 'اِنْضَمَّ', present: 'يَنْضَمّ', translit: 'inḍamma · yanḍamm', cat: 'People', examples: [{ ar: 'اِنْضَمَمْتُ إِلى الفَريق.', en: 'I joined the team.' }] },
   { en: 'to participate', ar: 'اِشْتَرَكَ', present: 'يَشْتَرِك', translit: 'ishtaraka · yashtarik', cat: 'People', examples: [{ ar: 'اِشْتَرَكْتُ في المُسابَقة.', en: 'I participated in the competition.' }] },
   { en: 'to celebrate', ar: 'اِحْتَفَلَ', present: 'يَحْتَفِل', translit: 'iḥtafala · yaḥtafil', cat: 'People', examples: [{ ar: 'اِحْتَفَلْنا بِعيدِ ميلادِه.', en: 'We celebrated his birthday.' }] },
@@ -290,7 +306,7 @@ export const dailyVerbs: DailyVerb[] = [
   { en: 'to move', ar: 'تَحَرَّكَ', present: 'يَتَحَرَّك', translit: 'taḥarraka · yataḥarrak', cat: 'Movement', examples: [{ ar: 'تَحَرَّكَ القِطارُ بِبُطْء.', en: 'The train moved slowly.' }] },
   { en: 'to turn around', ar: 'اِسْتَدارَ', present: 'يَسْتَدير', translit: 'istadāra · yastadīr', cat: 'Movement', examples: [{ ar: 'اِسْتَدارَ إِلى الخَلْف.', en: 'He turned around.' }] },
   { en: 'to climb', ar: 'تَسَلَّقَ', present: 'يَتَسَلَّق', translit: 'tasallaqa · yatasallaq', cat: 'Movement', examples: [{ ar: 'تَسَلَّقَ الجَبَل.', en: 'He climbed the mountain.' }] },
-  { en: 'to go down / to descend', ar: 'نَزَلَ', present: 'يَنْزِل', translit: 'nazala · yanzil', cat: 'Movement', examples: [{ ar: 'نَزَلْتُ مِنَ الحافِلة.', en: 'I got off the bus.' }] },
+  { en: 'to go down / to descend', ar: 'نَزَلَ', present: 'يَنْزِل', translit: 'nazala · yanzil', cat: 'Movement', family: [{ ar: 'أَنْزَلَ', form: 'IV', en: 'to send down' }, { ar: 'نَزَّلَ', form: 'II', en: 'to send down gradually' }, { ar: 'تَنازَلَ', form: 'VI', en: 'to concede, to give up a right' }], examples: [{ ar: 'نَزَلْتُ مِنَ الحافِلة.', en: 'I got off the bus.' }] },
   { en: 'to go up / to ascend', ar: 'صَعِدَ', present: 'يَصْعَد', translit: 'ṣaʿida · yaṣʿad', cat: 'Movement', examples: [{ ar: 'صَعِدْتُ إِلى الطابِقِ الأَعْلى.', en: 'I went up to the top floor.' }] },
   { en: 'to fall', ar: 'سَقَطَ', present: 'يَسْقُط', translit: 'saqaṭa · yasquṭ', cat: 'Movement', examples: [{ ar: 'سَقَطَ الكِتابُ مِنْ يَدي.', en: 'The book fell from my hand.' }] },
   { en: 'to ride', ar: 'رَكِبَ', present: 'يَرْكَب', translit: 'rakiba · yarkab', cat: 'Movement', examples: [{ ar: 'رَكِبْتُ الحافِلةَ إِلى المَدْرَسة.', en: 'I rode the bus to school.' }] },
@@ -337,4 +353,59 @@ export const dailyVerbs: DailyVerb[] = [
   { en: 'to appear / to show up', ar: 'ظَهَرَ', present: 'يَظْهَر', translit: 'ẓahara · yaẓhar', cat: 'Everyday', examples: [{ ar: 'ظَهَرَ القَمَرُ في السَّماء.', en: 'The moon appeared in the sky.' }] },
   { en: 'to disappear', ar: 'اِخْتَفى', present: 'يَخْتَفي', translit: 'ikhtafā · yakhtafī', cat: 'Everyday', examples: [{ ar: 'اِخْتَفى فَجْأةً.', en: 'He disappeared suddenly.' }] },
   { en: 'to lower / to reduce', ar: 'خَفَّضَ', present: 'يُخَفِّض', translit: 'khaffaḍa · yukhaffiḍ', cat: 'Work & Money', examples: [{ ar: 'خَفَّضوا الأَسْعار.', en: 'They lowered the prices.' }] },
+  // ── Grooming & body care (added: everyday actions the first pass missed) ──
+  { en: 'to shave', ar: 'حَلَقَ', present: 'يَحْلِق', translit: 'ḥalaqa · yaḥliq', cat: 'Body', family: [{ ar: 'حَلَّقَ', form: 'II', en: 'to fly, to circle (in the air)' }], examples: [{ ar: 'يَحْلِقُ لِحْيَتَهُ كُلَّ أُسْبوع.', en: 'He shaves his beard every week.' }] },
+  { en: 'to shower / to bathe', ar: 'اِسْتَحَمَّ', present: 'يَسْتَحِمّ', translit: 'istaḥamma · yastaḥimm', cat: 'Body', examples: [{ ar: 'أَسْتَحِمُّ قَبْلَ النَّوْم.', en: 'I shower before sleeping.' }] },
+  { en: 'to comb', ar: 'مَشَّطَ', present: 'يُمَشِّط', translit: 'mashshaṭa · yumashshiṭ', cat: 'Body', examples: [{ ar: 'مَشَّطَتْ شَعْرَها.', en: 'She combed her hair.' }] },
+  { en: 'to chew', ar: 'مَضَغَ', present: 'يَمْضُغ', translit: 'maḍagha · yamḍugh', cat: 'Body', examples: [{ ar: 'اِمْضُغْ طَعامَكَ جَيِّدًا.', en: 'Chew your food well.' }] },
+  { en: 'to swallow', ar: 'بَلَعَ', present: 'يَبْلَع', translit: 'balaʿa · yablaʿ', cat: 'Body', examples: [{ ar: 'بَلَعَ الدَّواءَ بِالماء.', en: 'He swallowed the medicine with water.' }] },
+  { en: 'to bite', ar: 'عَضَّ', present: 'يَعَضّ', translit: 'ʿaḍḍa · yaʿaḍḍ', cat: 'Body', examples: [{ ar: 'عَضَّ الكَلْبُ يَدَه.', en: 'The dog bit his hand.' }] },
+  { en: 'to cough', ar: 'سَعَلَ', present: 'يَسْعُل', translit: 'saʿala · yasʿul', cat: 'Body', examples: [{ ar: 'يَسْعُلُ كَثيرًا مُنْذُ أَمْس.', en: 'He has been coughing a lot since yesterday.' }] },
+  { en: 'to sneeze', ar: 'عَطَسَ', present: 'يَعْطِس', translit: 'ʿaṭasa · yaʿṭis', cat: 'Body', examples: [{ ar: 'إِذا عَطَسْتَ فَقُلِ الحَمْدُ لِلّه.', en: 'If you sneeze, say al-ḥamdu lillāh.' }] },
+  { en: 'to yawn', ar: 'تَثاءَبَ', present: 'يَتَثاءَب', translit: 'tathāʾaba · yatathāʾab', cat: 'Body', examples: [{ ar: 'تَثاءَبَ مِنَ التَّعَب.', en: 'He yawned from tiredness.' }] },
+
+  // ── Greeting & contact ────────────────────────────────────
+  { en: 'to kiss', ar: 'قَبَّلَ', present: 'يُقَبِّل', translit: 'qabbala · yuqabbil', cat: 'People', examples: [{ ar: 'قَبَّلَتْ جَبينَ اِبْنِها.', en: "She kissed her son's forehead." }] },
+  { en: 'to hug / to embrace', ar: 'عانَقَ', present: 'يُعانِق', translit: 'ʿānaqa · yuʿāniq', cat: 'People', examples: [{ ar: 'عانَقَ صَديقَهُ بَعْدَ غِياب.', en: 'He hugged his friend after a long absence.' }] },
+  { en: 'to shake hands', ar: 'صافَحَ', present: 'يُصافِح', translit: 'ṣāfaḥa · yuṣāfiḥ', cat: 'People', examples: [{ ar: 'صافَحَني بِحَرارة.', en: 'He shook my hand warmly.' }] },
+
+  // ── Worship ───────────────────────────────────────────────
+  { en: 'to prostrate (sujūd)', ar: 'سَجَدَ', present: 'يَسْجُد', translit: 'sajada · yasjud', cat: 'Faith', family: [{ ar: 'أَسْجَدَ', form: 'IV', en: 'to cause to prostrate' }], examples: [{ ar: 'سَجَدَ شُكْرًا لِلّه.', en: 'He prostrated in gratitude to God.' }] },
+  { en: 'to bow (rukūʿ)', ar: 'رَكَعَ', present: 'يَرْكَع', translit: 'rakaʿa · yarkaʿ', cat: 'Faith', examples: [{ ar: 'نَرْكَعُ ثُمَّ نَسْجُد.', en: 'We bow, then we prostrate.' }] },
+  { en: 'to perform wuḍūʾ', ar: 'تَوَضَّأَ', present: 'يَتَوَضَّأ', translit: 'tawaḍḍaʾa · yatawaḍḍaʾ', cat: 'Faith', examples: [{ ar: 'تَوَضَّأْتُ قَبْلَ الصَّلاة.', en: 'I performed wuḍūʾ before the prayer.' }] },
+  { en: 'to recite', ar: 'تَلا', present: 'يَتْلو', translit: 'talā · yatlū', cat: 'Faith', family: [{ ar: 'رَتَّلَ', form: 'II', en: 'to recite slowly and measuredly (tartīl)' }], examples: [{ ar: 'يَتْلو القُرْآنَ كُلَّ فَجْر.', en: 'He recites the Quran every dawn.' }] },
+  { en: 'to supplicate (duʿāʾ)', ar: 'دَعا', present: 'يَدْعو', translit: 'daʿā · yadʿū', cat: 'Faith', family: [{ ar: 'اِدَّعى', form: 'VIII', en: 'to claim, to allege' }, { ar: 'دَعَّى', form: 'II', en: 'to invite' }], examples: [{ ar: 'أَدْعو اللهَ أَنْ يَشْفِيَه.', en: 'I ask God to heal him.' }] },
+  { en: 'to seek forgiveness', ar: 'اِسْتَغْفَرَ', present: 'يَسْتَغْفِر', translit: 'istaghfara · yastaghfir', cat: 'Faith', family: [{ ar: 'غَفَرَ', form: 'I', en: 'to forgive' }], examples: [{ ar: 'أَسْتَغْفِرُ اللهَ العَظيم.', en: 'I seek forgiveness from God the Almighty.' }] },
+  { en: 'to glorify (God)', ar: 'سَبَّحَ', present: 'يُسَبِّح', translit: 'sabbaḥa · yusabbiḥ', cat: 'Faith', examples: [{ ar: 'سُبْحانَ اللهِ وَبِحَمْدِه.', en: 'Glory be to God, and praise be to Him.' }] },
+  { en: 'to be patient', ar: 'صَبَرَ', present: 'يَصْبِر', translit: 'ṣabara · yaṣbir', cat: 'Faith', family: [{ ar: 'صابَرَ', form: 'III', en: 'to endure patiently alongside' }, { ar: 'اِصْطَبَرَ', form: 'VIII', en: 'to persevere' }], examples: [{ ar: 'اِصْبِرْ، إِنَّ اللهَ مَعَ الصّابِرين.', en: 'Be patient — God is with the patient.' }] },
+
+  // ── Movement ──────────────────────────────────────────────
+  { en: 'to stand up / to rise', ar: 'قامَ', present: 'يَقوم', translit: 'qāma · yaqūm', cat: 'Movement', family: [{ ar: 'أَقامَ', form: 'IV', en: 'to establish; to reside' }, { ar: 'اِسْتَقامَ', form: 'X', en: 'to be upright, to go straight' }, { ar: 'قاوَمَ', form: 'III', en: 'to resist' }], examples: [{ ar: 'قامَ مِنْ مَكانِهِ بِسُرْعة.', en: 'He stood up from his place quickly.' }] },
+  { en: 'to lie down', ar: 'اِسْتَلْقى', present: 'يَسْتَلْقي', translit: 'istalqā · yastalqī', cat: 'Movement', examples: [{ ar: 'اِسْتَلْقى عَلى ظَهْرِه.', en: 'He lay down on his back.' }] },
+  { en: 'to pass by', ar: 'مَرَّ', present: 'يَمُرّ', translit: 'marra · yamurr', cat: 'Movement', family: [{ ar: 'اِسْتَمَرَّ', form: 'X', en: 'to continue, to carry on' }], examples: [{ ar: 'مَرَرْتُ بِالسّوقِ في طَريقي.', en: 'I passed by the market on my way.' }] },
+  { en: 'to cross', ar: 'عَبَرَ', present: 'يَعْبُر', translit: 'ʿabara · yaʿbur', cat: 'Movement', family: [{ ar: 'عَبَّرَ', form: 'II', en: 'to express' }, { ar: 'اِعْتَبَرَ', form: 'VIII', en: 'to consider; to take a lesson' }], examples: [{ ar: 'عَبَرْنا الشّارِعَ مَعًا.', en: 'We crossed the street together.' }] },
+  { en: 'to flee / to escape', ar: 'هَرَبَ', present: 'يَهْرُب', translit: 'haraba · yahrub', cat: 'Movement', examples: [{ ar: 'هَرَبَ القِطُّ مِنَ البَيْت.', en: 'The cat escaped from the house.' }] },
+
+  // ── Home & chores ─────────────────────────────────────────
+  { en: 'to take off (clothes)', ar: 'خَلَعَ', present: 'يَخْلَع', translit: 'khalaʿa · yakhlaʿ', cat: 'Home', examples: [{ ar: 'اِخْلَعْ حِذاءَكَ قَبْلَ الدُّخول.', en: 'Take off your shoes before entering.' }] },
+  { en: 'to fold', ar: 'طَوى', present: 'يَطْوي', translit: 'ṭawā · yaṭwī', cat: 'Home', examples: [{ ar: 'طَوَتِ المَلابِسَ النَّظيفة.', en: 'She folded the clean clothes.' }] },
+  { en: 'to iron', ar: 'كَوى', present: 'يَكْوي', translit: 'kawā · yakwī', cat: 'Home', examples: [{ ar: 'أَكْوي قَميصي كُلَّ صَباح.', en: 'I iron my shirt every morning.' }] },
+  { en: 'to sweep', ar: 'كَنَسَ', present: 'يَكْنُس', translit: 'kanasa · yaknus', cat: 'Home', examples: [{ ar: 'كَنَسْتُ الغُرْفَةَ بَعْدَ الأَكْل.', en: 'I swept the room after eating.' }] },
+  { en: 'to sew', ar: 'خاطَ', present: 'يَخيط', translit: 'khāṭa · yakhīṭ', cat: 'Home', examples: [{ ar: 'خاطَتْ ثَوْبَها بِنَفْسِها.', en: 'She sewed her dress herself.' }] },
+  { en: 'to lock', ar: 'أَقْفَلَ', present: 'يُقْفِل', translit: 'aqfala · yuqfil', cat: 'Home', examples: [{ ar: 'أَقْفِلِ البابَ مِنْ فَضْلِك.', en: 'Lock the door, please.' }] },
+  { en: 'to peel', ar: 'قَشَّرَ', present: 'يُقَشِّر', translit: 'qashshara · yuqashshir', cat: 'Food', examples: [{ ar: 'قَشَّرْتُ البُرْتُقالة.', en: 'I peeled the orange.' }] },
+  { en: 'to stir', ar: 'قَلَّبَ', present: 'يُقَلِّب', translit: 'qallaba · yuqallib', cat: 'Food', family: [{ ar: 'اِنْقَلَبَ', form: 'VII', en: 'to be overturned; to turn back' }, { ar: 'تَقَلَّبَ', form: 'V', en: 'to toss and turn; to fluctuate' }], examples: [{ ar: 'قَلِّبِ الطَّعامَ عَلى النّار.', en: 'Stir the food on the heat.' }] },
+
+  // ── Work & life ───────────────────────────────────────────
+  { en: 'to succeed', ar: 'نَجَحَ', present: 'يَنْجَح', translit: 'najaḥa · yanjaḥ', cat: 'Work & Money', family: [{ ar: 'أَنْجَحَ', form: 'IV', en: 'to make succeed' }], examples: [{ ar: 'نَجَحْتُ في الاِمْتِحان.', en: 'I passed the exam.' }] },
+  { en: 'to fail', ar: 'فَشِلَ', present: 'يَفْشَل', translit: 'fashila · yafshal', cat: 'Work & Money', examples: [{ ar: 'فَشِلَتِ المُحاوَلَةُ الأولى.', en: 'The first attempt failed.' }] },
+  { en: 'to sign', ar: 'وَقَّعَ', present: 'يُوَقِّع', translit: 'waqqaʿa · yuwaqqiʿ', cat: 'Work & Money', family: [{ ar: 'وَقَعَ', form: 'I', en: 'to fall; to occur' }, { ar: 'تَوَقَّعَ', form: 'V', en: 'to expect' }], examples: [{ ar: 'وَقَّعْتُ العَقْدَ أَمْس.', en: 'I signed the contract yesterday.' }] },
+  { en: 'to resign', ar: 'اِسْتَقالَ', present: 'يَسْتَقيل', translit: 'istaqāla · yastaqīl', cat: 'Work & Money', examples: [{ ar: 'اِسْتَقالَ مِنْ عَمَلِه.', en: 'He resigned from his job.' }] },
+  { en: 'to employ / to hire', ar: 'وَظَّفَ', present: 'يُوَظِّف', translit: 'waẓẓafa · yuwaẓẓif', cat: 'Work & Money', examples: [{ ar: 'وَظَّفَتِ الشَّرِكَةُ مُهَنْدِسًا جَديدًا.', en: 'The company hired a new engineer.' }] },
+
+  // ── Speaking ──────────────────────────────────────────────
+  { en: 'to shout', ar: 'صَرَخَ', present: 'يَصْرُخ', translit: 'ṣarakha · yaṣrukh', cat: 'Speaking', examples: [{ ar: 'صَرَخَ الطِّفْلُ مِنَ الخَوْف.', en: 'The child screamed from fear.' }] },
+  { en: 'to whisper', ar: 'هَمَسَ', present: 'يَهْمِس', translit: 'hamasa · yahmis', cat: 'Speaking', examples: [{ ar: 'هَمَسَ في أُذُني.', en: 'He whispered in my ear.' }] },
+  { en: 'to interrupt', ar: 'قاطَعَ', present: 'يُقاطِع', translit: 'qāṭaʿa · yuqāṭiʿ', cat: 'Speaking', family: [{ ar: 'قَطَعَ', form: 'I', en: 'to cut' }, { ar: 'اِنْقَطَعَ', form: 'VII', en: 'to be cut off' }], examples: [{ ar: 'لا تُقاطِعْني مِنْ فَضْلِك.', en: "Don't interrupt me, please." }] },
+  { en: 'to swear / to take an oath', ar: 'أَقْسَمَ', present: 'يُقْسِم', translit: 'aqsama · yuqsim', cat: 'Speaking', family: [{ ar: 'قَسَمَ', form: 'I', en: 'to divide, to split' }, { ar: 'قَسَّمَ', form: 'II', en: 'to divide up, to distribute' }], examples: [{ ar: 'أُقْسِمُ بِاللهِ إِنّي صادِق.', en: 'I swear by God that I am telling the truth.' }] },
 ];
