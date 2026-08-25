@@ -634,3 +634,22 @@ export const chatMessages = pgTable('chat_messages', {
   index('chat_messages_room_created_idx').on(table.room, table.createdAt),
   index('chat_messages_user_created_idx').on(table.userId, table.createdAt),
 ]);
+
+// ── Daily Verbs progress ─────────────────────────────────────
+/**
+ * Which of the /verbs entries a learner has ticked as "I know this".
+ *
+ * A row existing IS the fact — un-ticking deletes it rather than flipping a
+ * flag, so there is no way for a boolean and a timestamp to disagree.
+ *
+ * `verbId` is the frozen slug from src/data/dailyVerbs.ts, not a foreign key:
+ * the verb list is static application data, not a table. The API validates
+ * every id against that list before writing.
+ */
+export const userVerbProgress = pgTable('user_verb_progress', {
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  verbId: text('verb_id').notNull(),
+  rememberedAt: timestamp('remembered_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => [
+  primaryKey({ columns: [table.userId, table.verbId] }),
+]);

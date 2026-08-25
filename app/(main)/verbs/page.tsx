@@ -35,6 +35,10 @@ const FAQ: FaqItem[] = [
     a: 'Roughly 250–500 high-frequency verbs cover the vast majority of everyday conversation. Focus on the common ones first — the present tense (يفعل) is the form you use to say “I do it”.',
   },
   {
+    q: 'Can I track which Arabic verbs I have already learned?',
+    a: 'Yes. Sign in (free) and every verb gets a tick box — mark one once you can recall it without looking, and it moves from “Still learning” to “Remembered”. A progress bar shows how much of the list you have covered, and your ticks are saved to your account, so you pick up on any device where you left off.',
+  },
+  {
     q: 'Why do some verbs list other forms of the same root?',
     a: 'Arabic builds whole families of verbs from one three-letter root by putting it through different patterns (awzān). قَطَعَ is “to cut”; the same root gives قَطَّعَ (Form II, “to chop up”), قاطَعَ (Form III, “to boycott, to interrupt”) and اِنْقَطَعَ (Form VII, “to be cut off”). Where a root has other measures you will actually hear, they are listed under “same root, other forms” — so learning one verb gets you most of the way to three or four more.',
   },
