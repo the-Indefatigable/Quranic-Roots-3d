@@ -49,6 +49,21 @@ const TABS: { id: Tab; label: string; short: string }[] = [
 
 const EMPTY: ReadonlySet<string> = new Set();
 
+const NETWORK_MESSAGE = 'Could not reach the server — check your connection and try again.';
+
+/**
+ * The message to show for a failed response.
+ *
+ * The server's own text is used when there is one, because the useful cases are
+ * specific: a 503 saying the progress table is missing should not be reported
+ * to the reader as a connection problem they can do something about.
+ */
+async function failureMessage(res: Response, fallback: string): Promise<string> {
+  const body = await res.json().catch(() => null);
+  const message = (body as { error?: unknown } | null)?.error;
+  return typeof message === 'string' && message ? message : `${fallback} (error ${res.status})`;
+}
+
 export function DailyVerbsClient() {
   const { user, isLoading: authLoading } = useAuthStore();
   const userId = user?.id ?? null;
@@ -57,6 +72,7 @@ export function DailyVerbsClient() {
   const [cat, setCat] = useState('All');
   const [tab, setTab] = useState<Tab>('all');
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   // Progress is stored together with the account it belongs to. Reading it back
   // through an identity check means signing out shows an empty list on the very
@@ -90,16 +106,23 @@ export function DailyVerbsClient() {
     let cancelled = false;
     (async () => {
       let ids: ReadonlySet<string> = EMPTY;
+      let failure: string | null = null;
       try {
         const res = await fetch('/api/verbs/progress');
         if (res.ok) {
           const data: { remembered: string[] } = await res.json();
           ids = new Set(data.remembered);
+        } else {
+          failure = await failureMessage(res, 'Could not load your progress');
         }
       } catch {
-        // Non-fatal: the list still works, nothing appears ticked.
+        failure = NETWORK_MESSAGE;
       }
-      if (!cancelled) setProgress({ userId, ids });
+      if (cancelled) return;
+      // Say so rather than rendering an empty bar: "0 of 298" to someone who
+      // has ticked forty verbs reads as their progress having been lost.
+      setLoadError(failure);
+      setProgress({ userId, ids });
     })();
     return () => { cancelled = true; };
   }, [userId]);
@@ -138,16 +161,18 @@ export function DailyVerbsClient() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ verbId, remembered: next }),
       });
-      if (!res.ok) throw new Error(String(res.status));
+      if (!res.ok) throw new Error(await failureMessage(res, 'Could not save that'));
       // The server returns the full set, so a second tab's changes land here
       // too instead of being silently overwritten.
       const data: { remembered: string[] } = await res.json();
       setProgress({ userId, ids: new Set(data.remembered) });
-    } catch {
+    } catch (err) {
       // Roll the optimistic change back rather than leaving a tick that was
       // never saved — that would be worse than not ticking at all.
       apply(!next);
-      setSaveError('Could not save that — check your connection and try again.');
+      // A thrown Error carries the server's explanation; anything else means
+      // fetch itself failed, which really is a connection problem.
+      setSaveError(err instanceof Error && err.message ? err.message : NETWORK_MESSAGE);
     } finally {
       inFlight.current.delete(verbId);
     }
@@ -231,8 +256,10 @@ export function DailyVerbsClient() {
         </div>
       )}
 
-      {saveError && (
-        <p className="mb-3 text-xs px-1" role="status" style={{ color: '#E5766A' }}>{saveError}</p>
+      {(saveError || loadError) && (
+        <p className="mb-3 text-xs px-1" role="status" style={{ color: '#E5766A' }}>
+          {saveError ?? loadError}
+        </p>
       )}
 
       {/* Search */}

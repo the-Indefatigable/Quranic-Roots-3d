@@ -33,6 +33,38 @@ const Body = z.object({
 const LIMIT = 120;
 const WINDOW_MS = 60_000;
 
+/**
+ * Postgres 42P01 = undefined_table: db/015_daily_verbs_progress.sql (or the
+ * generated drizzle/0001) has not been applied to this database yet.
+ *
+ * Worth singling out, because the generic 500 it would otherwise produce
+ * surfaces in the UI as "check your connection" — which sends whoever hits it
+ * looking in exactly the wrong place.
+ *
+ * The cause chain has to be walked: drizzle-orm wraps driver errors in a
+ * DrizzleQueryError carrying no `code` of its own, with the PostgresError that
+ * actually has it hanging off `.cause`. Checking only the top-level error looks
+ * correct and silently never matches.
+ */
+function isMissingTable(error: unknown): boolean {
+  for (let e: unknown = error, depth = 0; e && depth < 5; depth++) {
+    if (typeof e !== 'object') return false;
+    if ((e as { code?: string }).code === '42P01') return true;
+    e = (e as { cause?: unknown }).cause;
+  }
+  return false;
+}
+
+const MISSING_TABLE_MESSAGE =
+  'Verb progress is not set up on this server yet — the user_verb_progress table is missing.';
+
+function missingTableResponse() {
+  console.error(
+    '[verbs/progress] user_verb_progress does not exist. Apply db/015_daily_verbs_progress.sql.',
+  );
+  return NextResponse.json({ error: MISSING_TABLE_MESSAGE }, { status: 503 });
+}
+
 async function readSet(userId: string): Promise<string[]> {
   const rows = await dbQuery(() =>
     db
@@ -53,6 +85,7 @@ export async function GET() {
 
     return NextResponse.json({ remembered: await readSet(userId) });
   } catch (error) {
+    if (isMissingTable(error)) return missingTableResponse();
     console.error('[verbs/progress] GET error:', error);
     return NextResponse.json({ error: 'Failed to load progress' }, { status: 500 });
   }
@@ -91,6 +124,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ remembered: await readSet(userId) });
   } catch (error) {
+    if (isMissingTable(error)) return missingTableResponse();
     console.error('[verbs/progress] POST error:', error);
     return NextResponse.json({ error: 'Failed to save progress' }, { status: 500 });
   }
