@@ -3,6 +3,7 @@ import { getStripe } from '@/lib/stripe';
 import { db } from '@/db';
 import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
+import { PATH_ORDER_PREFIX } from '@/lib/salahPath';
 
 // Raw body is required for signature verification, so keep this fully dynamic.
 export const dynamic = 'force-dynamic';
@@ -57,12 +58,17 @@ export async function POST(request: NextRequest) {
     }
 
     try {
+      // A salah-path purchase is recorded with a prefix so it unlocks the paid days; a later
+      // donation must not overwrite it.
+      const isPath = s.metadata?.kind === 'salah_path';
+      const [current] = await db.select({ order: users.supporterOrderId }).from(users).where(eq(users.id, userId)).limit(1);
+      const keepPath = !isPath && current?.order?.startsWith(PATH_ORDER_PREFIX);
       await db
         .update(users)
         .set({
           isSupporter: true,
           supporterSince: new Date(),
-          supporterOrderId: s.id, // unique index makes re-delivery idempotent
+          ...(keepPath ? {} : { supporterOrderId: isPath ? `${PATH_ORDER_PREFIX}${s.id}` : s.id }), // unique index makes re-delivery idempotent
           updatedAt: new Date(),
         })
         .where(eq(users.id, userId));

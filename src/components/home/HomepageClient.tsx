@@ -310,26 +310,26 @@ export function HomepageClient() {
               935 words across the Quran.
             </p>
             <p className="text-sm leading-relaxed mb-8 max-w-xl mx-auto lg:mx-0" style={{ color: '#8A8783' }}>
-              The 250 most common roots make up four in five of the Quran&rsquo;s root words. QuRoots teaches them in order,
-              with the Quran open beside you.
+              Start with your prayer: Al-Fatiha and the short surahs you recite use just 85 roots.
+              Learn two or three a day, and in 30 days you understand every word. The first week is free.
             </p>
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 mb-6">
               <Link
-                href="/quiz"
+                href="/salah"
                 className="flex items-center gap-2 px-6 py-3.5 rounded-2xl text-sm font-bold transition-all duration-200 hover:scale-105 active:scale-95"
                 style={{ background: 'linear-gradient(135deg, #D4A246, #C89535)', color: '#0E0D0C', boxShadow: '0 4px 24px rgba(212,162,70,0.3)' }}
               >
-                Try five roots, no sign-up
+                Understand your salah in 30 days
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                 </svg>
               </Link>
               <Link
-                href="/quran"
+                href="/quiz"
                 className="flex items-center gap-2 px-6 py-3.5 rounded-2xl text-sm font-semibold transition-all duration-200 hover:scale-105 active:scale-95"
                 style={{ background: 'rgba(255,255,255,0.04)', color: '#EDEDEC', border: '1px solid rgba(255,255,255,0.12)' }}
               >
-                Open the Quran
+                Try five roots
               </Link>
             </div>
             <p className="text-xs" style={{ color: '#6E6B66' }}>

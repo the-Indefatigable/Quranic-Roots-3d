@@ -19,6 +19,7 @@ export type NavEntry =
 export const navItems: NavEntry[] = [
   { type: 'section', label: 'Practice' },
   { href: '/dashboard',   label: 'Home',         icon: HomeIcon,   requiresAuth: true },
+  { href: '/salah',       label: 'Your Salah',   icon: BookIcon, badge: 'New' },
   { href: '/learn/path',  label: 'Learn Arabic', icon: LearnIcon },
   { href: '/verbs',       label: 'Daily Verbs',  icon: VerbsIcon },
   { href: '/words',       label: 'Everyday Words', icon: WordsIcon },
