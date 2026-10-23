@@ -1,0 +1,126 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>QuRoots reel: ر ح م</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500&display=swap">
+<!--
+  A 1080x1920 reel driven by window.render(t), t in seconds. scripts/reels/render.mjs steps t
+  frame by frame in headless Chrome and ffmpeg joins the frames with the recitation.
+  Every figure is from the QuRoots database: root ر ح م, 333 words; أَرْحَام "wombs" at 4:1.
+-->
+<style>
+  :root { --gold: #D4A246; --ink: #F0E8D8; --quiet: #9A958C; }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: #0E0D0C; }
+  body { position: relative; font-family: Inter, sans-serif; color: var(--ink); }
+  .glow { position: absolute; inset: 0; background: radial-gradient(ellipse 70% 45% at 50% 46%, rgba(212,162,70,.13), transparent 70%); }
+  .grain { position: absolute; inset: 0; opacity: .05; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  .layer { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 90px; }
+  .ar { font-family: Amiri, serif; direction: rtl; }
+  .cap { font-family: 'Cormorant Garamond', serif; font-size: 66px; line-height: 1.18; color: var(--ink); max-width: 880px; }
+  .cap em { color: var(--gold); font-style: italic; }
+  .small { font-size: 34px; color: var(--quiet); font-family: Inter, sans-serif; letter-spacing: .01em; }
+  #basmala { font-size: 120px; line-height: 1.5; }
+  #basmala span { display: inline-block; margin: 0 14px; transition: none; }
+  .letters { font-size: 340px; line-height: 1; color: var(--gold); text-shadow: 0 0 80px rgba(212,162,70,.45); }
+  .meaning { font-family: 'Cormorant Garamond', serif; font-size: 72px; margin-top: 110px; letter-spacing: .02em; }
+  .chip { position: absolute; width: 330px; padding: 26px 18px; border-radius: 28px; text-align: center; background: rgba(212,162,70,.07); border: 1.5px solid rgba(212,162,70,.32); transform: translate(-50%, -50%); }
+  .chip .w { font-family: Amiri, serif; font-size: 84px; line-height: 1.2; direction: rtl; }
+  .chip .e { font-family: 'Cormorant Garamond', serif; font-size: 40px; color: var(--gold); margin-top: 6px; }
+  .chip .r { font-size: 24px; color: var(--quiet); margin-top: 4px; }
+  svg.lines { position: absolute; inset: 0; }
+  .big { font-family: 'Cormorant Garamond', serif; font-size: 300px; line-height: .9; color: var(--gold); }
+  .logo { font-family: 'Cormorant Garamond', serif; font-size: 96px; letter-spacing: .01em; }
+  .logo b { color: var(--gold); font-weight: 500; }
+  .url { font-family: Inter, sans-serif; font-size: 44px; color: var(--gold); margin-top: 26px; letter-spacing: .02em; }
+  .bar { position: absolute; left: 90px; right: 90px; bottom: 120px; height: 4px; background: rgba(255,255,255,.08); border-radius: 4px; }
+  .bar i { display: block; height: 100%; background: var(--gold); border-radius: 4px; }
+</style>
+<div class="glow"></div>
+<div class="layer" id="s1">
+  <p class="ar" id="basmala"><span>بِسْمِ</span><span>ٱللَّهِ</span><span id="w3">ٱلرَّحْمَـٰنِ</span><span id="w4">ٱلرَّحِيمِ</span></p>
+  <p class="cap" id="c1" style="margin-top:70px">You say this at least <em>17 times</em> a day.</p>
+  <p class="cap" id="c2" style="margin-top:-80px">Two of these words grow from <em>the same three letters.</em></p>
+</div>
+<div class="layer" id="s3">
+  <p class="ar letters" id="root">ر ح م</p>
+  <p class="meaning" id="mean">to have mercy</p>
+</div>
+<svg class="lines" id="lines" viewBox="0 0 1080 1920"></svg>
+<div id="chips"></div>
+<div class="layer" id="s4cap" style="justify-content:flex-end; padding-bottom:250px">
+  <p class="cap" id="c4">Even the word for <em>womb</em> comes from the root of mercy.</p>
+</div>
+<div class="layer" id="s5">
+  <p class="big" id="n333">333</p>
+  <p class="cap" style="margin-top:20px">words in the Quran grow from this one root.</p>
+</div>
+<div class="layer" id="s6">
+  <p class="logo">Qu<b>Roots</b></p>
+  <p class="cap" style="margin-top:50px">Understand every word of your salah <em>in 30 days.</em></p>
+  <p class="small" style="margin-top:28px">First week free · Al-Fatiha, word by word</p>
+  <p class="url">quroots.com/salah</p>
+</div>
+<div class="bar"><i id="prog"></i></div>
+<div class="grain"></div>
+<script>
+const DUR = 18;
+const C = [540, 900];                      // bloom centre (the shrunken root sits here)
+const CHIPS = [                            // fixed corners around the root
+  { w: 'رَحْمَة', e: 'mercy', r: '116 times in the Quran', x: 270, y: 520 },
+  { w: 'ٱلرَّحْمَـٰن', e: 'the Most Gracious', r: 'Al-Fatiha 1:1', x: 810, y: 520 },
+  { w: 'ٱلرَّحِيم', e: 'the Most Merciful', r: 'Al-Fatiha 1:1', x: 270, y: 1290 },
+  { w: 'أَرْحَام', e: 'wombs', r: 'An-Nisa 4:1', x: 810, y: 1290 },
+];
+const $ = (id) => document.getElementById(id);
+const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+const ease = (t) => { t = clamp(t); return 1 - Math.pow(1 - t, 3); };
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const fade = (t, a, b, inD = .5, outD = .5) => Math.min(ease(seg(t, a, a + inD)), 1 - ease(seg(t, b - outD, b)));
+const set = (el, o, y = 0, s = 1) => { el.style.opacity = o; el.style.transform = `translateY(${y}px) scale(${s})`; };
+
+const chipEls = CHIPS.map((c) => {
+  const d = document.createElement('div'); d.className = 'chip';
+  d.innerHTML = `<div class="w">${c.w}</div><div class="e">${c.e}</div><div class="r">${c.r}</div>`;
+  $('chips').appendChild(d); return d;
+});
+const lineEls = CHIPS.map(() => { const l = document.createElementNS('http://www.w3.org/2000/svg', 'line'); l.setAttribute('stroke', '#D4A246'); l.setAttribute('stroke-width', '2.5'); l.setAttribute('stroke-linecap', 'round'); $('lines').appendChild(l); return l; });
+
+window.render = (t) => {
+  // 1. the basmala, then the two words light up
+  const s1 = fade(t, 0, 5.6, .8, .6);
+  set($('s1'), 1);
+  $('basmala').style.opacity = s1;
+  $('basmala').style.transform = `translateY(${(1 - ease(seg(t, 0, 1.2))) * 40 + (seg(t, 3, 5.6)) * -60}px)`;
+  const hl = ease(seg(t, 2.9, 3.6));
+  [...$('basmala').children].forEach((sp, i) => { const on = i >= 2; sp.style.color = on ? `rgb(${240 - 28 * hl},${232 - 70 * hl},${216 - 146 * hl})` : `rgba(240,232,216,${1 - .7 * hl})`; });
+  set($('c1'), fade(t, .9, 3.0, .5, .4), (1 - ease(seg(t, .9, 1.5))) * 20);
+  set($('c2'), fade(t, 3.1, 5.6, .5, .5), (1 - ease(seg(t, 3.1, 3.7))) * 20);
+  // 2. the root
+  const r = fade(t, 5.6, 13.4, .7, .6), rUp = ease(seg(t, 8.4, 9.4));
+  set($('root'), r, (1 - ease(seg(t, 5.6, 6.5))) * 60 - rUp * 40, 1 - rUp * .5);
+  set($('mean'), fade(t, 6.6, 13.4, .6, .6), -rUp * 140, 1 - rUp * .25);
+  // 3. the bloom
+  CHIPS.forEach((c, i) => {
+    const k = ease(seg(t, 9.1 + i * .45, 9.9 + i * .45)) * (1 - ease(seg(t, 13.0, 13.5)));
+    const x = C[0] + (c.x - C[0]) * (.6 + .4 * k), y = C[1] + (c.y - C[1]) * (.6 + .4 * k);
+    chipEls[i].style.left = x + 'px'; chipEls[i].style.top = y + 'px';
+    chipEls[i].style.opacity = k; chipEls[i].style.transform = `translate(-50%,-50%) scale(${.7 + .3 * k})`;
+    // ink line from just outside the root toward the chip
+    const dx = c.x - C[0], dy = c.y - C[1], len = Math.hypot(dx, dy), ux = dx / len, uy = dy / len;
+    const r0 = dy > 0 ? 250 : 170;      // below the root, start past its meaning
+    const L = lineEls[i]; L.setAttribute('x1', C[0] + ux * r0); L.setAttribute('y1', C[1] + uy * r0);
+    L.setAttribute('x2', C[0] + ux * (r0 + (len - r0 - 190) * k)); L.setAttribute('y2', C[1] + uy * (r0 + (len - r0 - 190) * k)); L.setAttribute('opacity', k * .5);
+  });
+  const womb = ease(seg(t, 10.6, 11.3)) * (1 - ease(seg(t, 13.0, 13.5)));
+  chipEls[3].style.borderColor = `rgba(212,162,70,${.32 + .6 * womb})`; chipEls[3].style.boxShadow = `0 0 ${60 * womb}px rgba(212,162,70,${.35 * womb})`;
+  set($('s4cap'), fade(t, 10.8, 13.4, .5, .5), (1 - ease(seg(t, 10.8, 11.4))) * 20);
+  // 4. the count
+  const n = fade(t, 13.5, 15.7, .5, .5);
+  set($('s5'), n, (1 - ease(seg(t, 13.5, 14.1))) * 30);
+  $('n333').textContent = Math.round(333 * ease(seg(t, 13.5, 14.6)));
+  // 5. the call
+  set($('s6'), ease(seg(t, 15.8, 16.5)), (1 - ease(seg(t, 15.8, 16.5))) * 30);
+  $('prog').style.width = (clamp(t / DUR) * 100) + '%';
+};
+render(Number(new URLSearchParams(location.search).get('t') || 0));
+</script>
