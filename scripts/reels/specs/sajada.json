@@ -1,0 +1,229 @@
+{
+ "tag": "QURANIC ROOTS · س ج د",
+ "hideCaptions": [
+  "hook"
+ ],
+ "segments": [
+  {
+   "id": "hook",
+   "say": "What does a mosque have to do with your forehead?",
+   "gap": 0.4
+  },
+  {
+   "id": "letters",
+   "say": "Seen. Jeem. Dal.",
+   "gap": 0.25
+  },
+  {
+   "id": "meaning",
+   "say": "The root of prostration.",
+   "gap": 0.3
+  },
+  {
+   "id": "family",
+   "say": "Sujood is putting your forehead on the ground. And a masjid is the place of sujood.",
+   "gap": 0.35
+  },
+  {
+   "id": "count",
+   "say": "Ninety two words in the Quran grow from this root.",
+   "gap": 0.3
+  },
+  {
+   "id": "cta",
+   "say": "Understand every word of your salah in thirty days. Link in bio.",
+   "gap": 0.8
+  }
+ ],
+ "captions": {
+  "merge": [
+   {
+    "seg": "count",
+    "from": "Ninety",
+    "to": "two",
+    "as": "92"
+   }
+  ],
+  "map": {
+   "thirty": "30"
+  }
+ },
+ "scenes": [
+  {
+   "type": "title",
+   "from": 0,
+   "to": {
+    "seg": "letters",
+    "edge": "start",
+    "offset": -0.1
+   },
+   "text": "What does a <em>masjid</em> have to do with your forehead?"
+  },
+  {
+   "type": "letters",
+   "from": {
+    "seg": "letters",
+    "edge": "start",
+    "offset": -0.1
+   },
+   "to": {
+    "seg": "count",
+    "edge": "start",
+    "offset": -0.1
+   },
+   "letters": [
+    "س",
+    "ج",
+    "د"
+   ],
+   "at": [
+    {
+     "seg": "letters",
+     "word": "Seen"
+    },
+    {
+     "seg": "letters",
+     "word": "Jeem"
+    },
+    {
+     "seg": "letters",
+     "word": "Dal"
+    }
+   ],
+   "meaning": "to prostrate",
+   "meaningAt": {
+    "seg": "meaning",
+    "word": "prostration"
+   },
+   "shrinkAt": {
+    "seg": "family",
+    "edge": "start",
+    "offset": -0.2
+   }
+  },
+  {
+   "type": "chips",
+   "from": {
+    "seg": "family",
+    "edge": "start",
+    "offset": -0.1
+   },
+   "to": {
+    "seg": "count",
+    "edge": "start",
+    "offset": -0.1
+   },
+   "items": [
+    {
+     "ar": "سُجُود",
+     "en": "prostration",
+     "ref": "sujood",
+     "at": {
+      "seg": "family",
+      "word": "Sujood"
+     }
+    },
+    {
+     "ar": "مَسْجِد",
+     "en": "place of sujood",
+     "ref": "masjid",
+     "hero": true,
+     "at": {
+      "seg": "family",
+      "word": "masjid"
+     }
+    }
+   ]
+  },
+  {
+   "type": "count",
+   "n": 92,
+   "sub": "words in the Quran grow from <span style=\"font-family:Amiri;color:#D4A246\">س ج د</span>",
+   "from": {
+    "seg": "count",
+    "edge": "start"
+   },
+   "to": {
+    "seg": "cta",
+    "edge": "start",
+    "offset": -0.1
+   }
+  },
+  {
+   "type": "cta",
+   "from": {
+    "seg": "cta",
+    "edge": "start"
+   },
+   "line": "Understand every word of your <em>salah</em> in 30 days",
+   "free": "The first week is free"
+  }
+ ],
+ "sfx": [
+  {
+   "n": "ting",
+   "seg": "hook",
+   "word": "mosque"
+  },
+  {
+   "n": "ting_hi",
+   "seg": "hook",
+   "word": "forehead"
+  },
+  {
+   "n": "whoosh",
+   "seg": "letters",
+   "edge": "start",
+   "offset": -0.4
+  },
+  {
+   "n": "tock",
+   "seg": "letters",
+   "word": "Seen"
+  },
+  {
+   "n": "tock",
+   "seg": "letters",
+   "word": "Jeem"
+  },
+  {
+   "n": "tock",
+   "seg": "letters",
+   "word": "Dal"
+  },
+  {
+   "n": "sub",
+   "seg": "meaning",
+   "word": "prostration"
+  },
+  {
+   "n": "ting",
+   "seg": "family",
+   "word": "Sujood"
+  },
+  {
+   "n": "chime",
+   "seg": "family",
+   "word": "masjid"
+  },
+  {
+   "n": "whoosh_down",
+   "seg": "count",
+   "edge": "start",
+   "offset": -0.35
+  },
+  {
+   "n": "tick",
+   "seg": "count",
+   "edge": "start",
+   "count": 16,
+   "every": 0.07
+  },
+  {
+   "n": "chime",
+   "seg": "cta",
+   "edge": "start",
+   "offset": -0.1
+  }
+ ]
+}

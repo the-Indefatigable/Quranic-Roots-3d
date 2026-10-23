@@ -1,0 +1,160 @@
+{
+ "tag": "3-SECOND ROOT QUIZ",
+ "segments": [
+  {
+   "id": "hook",
+   "say": "Three seconds. What does this root mean?",
+   "gap": 3.4
+  },
+  {
+   "id": "reveal",
+   "say": "Mercy. Ra, Ha, Meem is the root of mercy.",
+   "gap": 0.35
+  },
+  {
+   "id": "family",
+   "say": "It gives us Ar-Rahman and Ar-Raheem, which you say before almost every surah. It even gives the word for womb.",
+   "gap": 0.35
+  },
+  {
+   "id": "cta",
+   "say": "Got it right? Learn one root a day for thirty days. Link in bio.",
+   "gap": 0.8
+  }
+ ],
+ "captions": {
+  "merge": [],
+  "map": {
+   "three": "3",
+   "thirty": "30"
+  }
+ },
+ "scenes": [
+  {
+   "type": "quiz",
+   "from": 0,
+   "to": {
+    "seg": "family",
+    "edge": "start",
+    "offset": -0.1
+   },
+   "letters": "ر ح م",
+   "options": [
+    "to have mercy",
+    "to know",
+    "to write",
+    "to guide"
+   ],
+   "answer": 0,
+   "timerFrom": {
+    "seg": "hook",
+    "edge": "end",
+    "offset": 0.15
+   },
+   "reveal": {
+    "seg": "reveal",
+    "edge": "start",
+    "offset": -0.1
+   }
+  },
+  {
+   "type": "chips",
+   "from": {
+    "seg": "family",
+    "edge": "start",
+    "offset": -0.1
+   },
+   "to": {
+    "seg": "cta",
+    "edge": "start",
+    "offset": -0.1
+   },
+   "items": [
+    {
+     "ar": "ٱلرَّحْمَٰن",
+     "en": "the Most Gracious",
+     "ref": "1:1",
+     "at": {
+      "seg": "family",
+      "word": "Rahman"
+     }
+    },
+    {
+     "ar": "ٱلرَّحِيم",
+     "en": "the Most Merciful",
+     "ref": "1:1",
+     "at": {
+      "seg": "family",
+      "word": "Raheem"
+     }
+    },
+    {
+     "ar": "أَرْحَام",
+     "en": "wombs",
+     "ref": "4:1",
+     "hero": true,
+     "at": {
+      "seg": "family",
+      "word": "womb"
+     }
+    }
+   ]
+  },
+  {
+   "type": "cta",
+   "from": {
+    "seg": "cta",
+    "edge": "start"
+   },
+   "line": "One root a day. <em>30 days</em>. Every word of your salah.",
+   "free": "The first week is free"
+  }
+ ],
+ "sfx": [
+  {
+   "n": "ting_hi",
+   "seg": "hook",
+   "edge": "start"
+  },
+  {
+   "n": "clock",
+   "seg": "hook",
+   "edge": "end",
+   "offset": 0.15,
+   "count": 3,
+   "every": 1
+  },
+  {
+   "n": "buzz",
+   "seg": "hook",
+   "edge": "end",
+   "offset": 3.15
+  },
+  {
+   "n": "chime",
+   "seg": "reveal",
+   "word": "Mercy"
+  },
+  {
+   "n": "ting",
+   "seg": "family",
+   "word": "Rahman"
+  },
+  {
+   "n": "ting",
+   "seg": "family",
+   "word": "Raheem"
+  },
+  {
+   "n": "chime",
+   "seg": "family",
+   "word": "womb"
+  },
+  {
+   "n": "chime",
+   "seg": "cta",
+   "edge": "start",
+   "offset": -0.1
+  }
+ ]
+}

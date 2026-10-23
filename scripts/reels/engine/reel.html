@@ -1,0 +1,210 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>QuRoots reel</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@500;700;800&display=swap">
+<!--
+  Draws any reel from a spec (window.setReel(spec, cues)); window.render(t) draws the frame at t seconds.
+  Scenes start and end at anchors into the narration: {seg, word, nth, edge, offset}.
+  Scene types: ayah, letters, chips, count, quiz, title, cta. Captions come from the narration.
+-->
+<style>
+  :root { --gold: #D4A246; --ink: #F3ECDD; --quiet: #9A958C; }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: #0C0B0A; }
+  body { position: relative; font-family: Inter, sans-serif; color: var(--ink); }
+  #stage { position: absolute; inset: 0; transform-origin: 50% 42%; }
+  .glow { position: absolute; inset: 0; background: radial-gradient(ellipse 75% 42% at 50% 40%, rgba(212,162,70,.16), transparent 70%); }
+  .grain { position: absolute; inset: 0; opacity: .055; pointer-events: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  .flash { position: absolute; inset: 0; background: #F3E2B8; opacity: 0; pointer-events: none; mix-blend-mode: screen; }
+  .scene { position: absolute; left: 0; right: 0; text-align: center; opacity: 0; }
+  .ayah { font-family: Amiri, serif; direction: rtl; padding: 0 50px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 22px; }
+  .ayah .wd { display: inline-flex; flex-direction: column; align-items: center; }
+  .ayah .ar { font-size: 112px; line-height: 1.45; }
+  .ayah .en { font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 38px; color: var(--gold); direction: ltr; max-width: 300px; line-height: 1.1; margin-top: -6px; }
+  .ayah.stack { flex-direction: column; align-items: center; gap: 18px; }
+  .ayah.stack .wd { flex-direction: row; justify-content: space-between; align-items: center; width: 940px; padding: 6px 34px; border-radius: 28px; background: rgba(255,255,255,.03); }
+  .ayah.stack .ar { font-size: 104px; }
+  .ayah.stack .en { font-size: 58px; max-width: none; margin: 0; text-align: left; }
+  .trans { font-family: 'Cormorant Garamond', serif; font-size: 46px; color: var(--quiet); font-style: italic; padding: 0 70px; }
+  .letters { font-family: Amiri, serif; font-size: 320px; line-height: 1.4; direction: rtl; color: var(--gold); text-shadow: 0 0 90px rgba(212,162,70,.5); }
+  .letters span { display: inline-block; margin: 0 26px; }
+  .meaning { font-family: 'Cormorant Garamond', serif; font-size: 84px; font-weight: 600; }
+  .chip { position: absolute; width: 380px; padding: 26px 18px; border-radius: 30px; text-align: center; background: rgba(212,162,70,.08); border: 2px solid rgba(212,162,70,.35); transform: translate(-50%, -50%); opacity: 0; }
+  .chip .w { font-family: Amiri, serif; font-size: 90px; line-height: 1.2; direction: rtl; }
+  .chip .e { font-family: 'Cormorant Garamond', serif; font-size: 46px; font-weight: 600; color: var(--gold); margin-top: 6px; }
+  .chip .r { font-size: 24px; color: var(--quiet); margin-top: 6px; font-weight: 500; }
+  .count .n { font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 330px; line-height: .9; color: var(--gold); text-shadow: 0 0 70px rgba(212,162,70,.35); }
+  .count .sub span { white-space: nowrap; }
+  .count .sub, .title .sub { font-family: 'Cormorant Garamond', serif; font-size: 62px; padding: 0 100px; margin-top: 20px; }
+  .title .big { font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 104px; line-height: 1.05; padding: 0 80px; }
+  .title .big em { color: var(--gold); }
+  .quiz .opts { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; padding: 0 70px; margin-top: 60px; }
+  .quiz .opt { font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 50px; padding: 30px 20px; border-radius: 26px; border: 2px solid rgba(243,236,221,.18); background: rgba(255,255,255,.04); }
+  .quiz .opt.right { border-color: #34D399; background: rgba(52,211,153,.14); color: #D1FAE5; }
+  .quiz .opt.wrong { opacity: .32; }
+  .quiz .timer { position: relative; width: 150px; height: 150px; margin: 0 auto; }
+  .quiz .timer svg { position: absolute; inset: 0; transform: rotate(-90deg); }
+  .quiz .timer b { position: absolute; inset: 0; display: grid; place-items: center; font-size: 72px; font-weight: 800; }
+  .cta .logo { font-family: 'Cormorant Garamond', serif; font-size: 110px; font-weight: 600; }
+  .cta .logo b { color: var(--gold); font-weight: 600; }
+  .cta .line { font-family: 'Cormorant Garamond', serif; font-size: 70px; line-height: 1.15; margin-top: 50px; padding: 0 90px; }
+  .cta .line em { color: var(--gold); }
+  .cta .free { font-size: 34px; color: var(--quiet); margin-top: 34px; font-weight: 500; }
+  .cta .url { display: inline-block; font-size: 46px; font-weight: 700; color: #0C0B0A; background: var(--gold); padding: 18px 36px; border-radius: 999px; margin-top: 42px; }
+  #cap { position: absolute; left: 0; right: 0; top: 1360px; text-align: center; padding: 0 80px; font-weight: 800; font-size: 66px; line-height: 1.18; text-shadow: 0 4px 24px rgba(0,0,0,.8); }
+  #cap span { display: inline-block; margin: 0 .16em; }
+  #cap span.on { color: var(--gold); }
+  .bar { position: absolute; left: 90px; right: 90px; bottom: 110px; height: 5px; background: rgba(255,255,255,.08); border-radius: 5px; }
+  .bar i { display: block; height: 100%; background: var(--gold); border-radius: 5px; }
+  .tag { position: absolute; top: 120px; left: 0; right: 0; text-align: center; font-size: 30px; letter-spacing: .08em; color: var(--quiet); font-weight: 500; }
+</style>
+<div class="glow"></div>
+<div id="stage"></div>
+<p class="tag" id="tag"></p>
+<p id="cap"></p>
+<div class="flash" id="flash"></div>
+<div class="bar"><i id="prog"></i></div>
+<div class="grain"></div>
+<script>
+const $ = (id) => document.getElementById(id);
+const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+const ease = (t) => { t = clamp(t); return 1 - Math.pow(1 - t, 3); };
+const back = (t) => { t = clamp(t); const c = 1.9; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); };
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const el = (tag, cls, html, parent) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; (parent || $('stage')).appendChild(e); return e; };
+let SPEC, CUES, SEG, scenes = [];
+
+function at(a) {
+  if (a == null) return Infinity;
+  if (typeof a === 'number') return a;
+  const s = SEG[a.seg];
+  if (!s) throw new Error('no segment ' + a.seg);
+  if (a.word) {
+    const hits = s.words.filter((w) => w.w.toLowerCase().replace(/[.,!?]/g, '').includes(a.word.toLowerCase()));
+    if (!hits.length) throw new Error(`no word "${a.word}" in ${a.seg}`);
+    return hits[a.nth || 0].s + (a.offset || 0);
+  }
+  return s[a.edge || 'start'] + (a.offset || 0);
+}
+const life = (t, sc) => Math.min(ease(seg(t, sc.t0 - 0.05, sc.t0 + 0.35)), 1 - ease(seg(t, sc.t1 - 0.3, sc.t1)));
+
+// ---------------------------------------------------------------- scene builders
+const BUILD = {
+  ayah(sc) {
+    const box = el('div', 'scene'); box.style.top = (sc.y ?? 520) + 'px';
+    const row = el('div', sc.stack ? 'ayah stack' : 'ayah', null, box);
+    sc.wordEls = sc.words.map((w) => { const d = el('span', 'wd', `<span class="ar">${w.ar}</span>${w.en ? `<span class="en">${w.en}</span>` : ''}`, row); return d; });
+    if (sc.trans) { sc.transEl = el('p', 'trans', sc.trans, box); sc.transEl.style.marginTop = '30px'; }
+    sc.root = box;
+    if (sc.recite) { const s = SEG[sc.recite], L = sc.words.map((w) => w.ar.length), tot = L.reduce((a, b) => a + b, 0); let acc = s.start; sc.spans = L.map((l) => { const a = acc; acc += (s.end - s.start) * l / tot; return [a, acc]; }); }
+    sc.goldT = sc.gold ? at(sc.gold.at) : Infinity;
+    sc.glossT = (sc.gloss || []).map((g) => ({ i: g.i, t: at(g.at) }));
+  },
+  letters(sc) {
+    const box = el('div', 'scene'); box.style.top = (sc.y ?? 470) + 'px';
+    const row = el('p', 'letters', null, box); sc.spansEl = sc.letters.map((l) => el('span', '', l, row));
+    sc.meaningEl = el('p', 'meaning', sc.meaning || '', box); sc.meaningEl.style.marginTop = '40px';
+    sc.root = box; sc.ts = sc.at.map(at); sc.mT = at(sc.meaningAt); sc.shrinkT = at(sc.shrinkAt);
+  },
+  chips(sc) {
+    sc.root = el('div', 'scene'); sc.root.style.inset = '0';
+    const n = sc.items.length;
+    const pos = n === 2 ? [[280, 1120], [800, 1120]] : n === 3 ? [[270, 520], [810, 520], [540, 1150]] : [[280, 470], [800, 470], [280, 1120], [800, 1120]];
+    sc.items.forEach((it, i) => { it.el = el('div', 'chip', `<div class="w">${it.ar}</div><div class="e">${it.en}</div>${it.ref ? `<div class="r">${it.ref}</div>` : ''}`, sc.root); it.x = it.x ?? pos[i][0]; it.y = it.y ?? pos[i][1]; it.t = at(it.at); });
+  },
+  count(sc) { sc.root = el('div', 'scene count', `<p class="n">0</p><p class="sub">${sc.sub}</p>`); sc.root.style.top = (sc.y ?? 520) + 'px'; },
+  title(sc) { sc.root = el('div', 'scene title', `<p class="big">${sc.text}</p>${sc.sub ? `<p class="sub">${sc.sub}</p>` : ''}`); sc.root.style.top = (sc.y ?? 600) + 'px'; },
+  quiz(sc) {
+    sc.root = el('div', 'scene quiz');
+    sc.root.style.top = (sc.y ?? 300) + 'px';
+    sc.root.innerHTML = `<div class="timer"><svg viewBox="0 0 150 150"><circle cx="75" cy="75" r="66" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="9"/><circle class="arc" cx="75" cy="75" r="66" fill="none" stroke="#D4A246" stroke-width="9" stroke-linecap="round" stroke-dasharray="414.7" stroke-dashoffset="0"/></svg><b>3</b></div>
+      <p class="letters" style="font-size:250px;margin-top:40px">${sc.letters.split(' ').map((l) => `<span>${l}</span>`).join('')}</p><div class="opts">${sc.options.map((o) => `<div class="opt">${o}</div>`).join('')}</div>`;
+    sc.timerT = at(sc.timerFrom); sc.revealT = at(sc.reveal);
+  },
+  cta(sc) { sc.root = el('div', 'scene cta', `<p class="logo">Qu<b>Roots</b></p><p class="line">${sc.line}</p><p class="free">${sc.free || ''}</p><p class="url">${sc.url || 'quroots.com/salah'}</p>`); sc.root.style.top = '480px'; },
+};
+
+// ---------------------------------------------------------------- scene renderers
+const DRAW = {
+  ayah(sc, t, o) {
+    sc.root.style.opacity = o; sc.root.style.transform = `translateY(${(1 - o) * 30}px)`;
+    const g = ease(seg(t, sc.goldT, sc.goldT + 0.35));
+    sc.wordEls.forEach((d, i) => {
+      const ar = d.firstChild, en = d.querySelector('.en');
+      const reciting = sc.spans && t >= sc.spans[i][0] && t < sc.spans[i][1];
+      const isGold = sc.gold && sc.gold.idx.includes(i) ? g : 0;
+      const gl = sc.glossT.find((x) => x.i === i), lit = gl ? ease(seg(t, gl.t - 0.05, gl.t + 0.25)) : (sc.showGloss ? 1 : 0);
+      const dim = sc.gold && !sc.gold.idx.includes(i) ? 0.7 * g : 0;
+      ar.style.color = isGold || (gl && t >= gl.t && t < gl.t + 1.2) ? '#E8BF62' : `rgba(243,236,221,${1 - dim})`;
+      ar.style.textShadow = reciting || (gl && t >= gl.t && t < gl.t + 1.2) ? '0 0 44px rgba(212,162,70,.8)' : isGold ? `0 0 ${40 * isGold}px rgba(212,162,70,.5)` : 'none';
+      d.style.transform = `scale(${reciting ? 1.06 : 1 + 0.06 * isGold})`;
+      if (en) { en.style.opacity = lit; en.style.transform = `translateY(${(1 - lit) * 14}px)`; }
+    });
+    if (sc.transEl) sc.transEl.style.opacity = sc.transFrom ? ease(seg(t, at(sc.transFrom), at(sc.transFrom) + 0.5)) : 1;
+  },
+  letters(sc, t, o) {
+    sc.root.style.opacity = o;
+    sc.spansEl.forEach((s, i) => { const k = back(seg(t, sc.ts[i] - 0.03, sc.ts[i] + 0.22)); s.style.opacity = clamp(seg(t, sc.ts[i] - 0.03, sc.ts[i] + 0.05)); s.style.transform = `scale(${1.9 - 0.9 * k})`; });
+    const sh = ease(seg(t, sc.shrinkT - 0.1, sc.shrinkT + 0.45));
+    sc.root.style.transform = `translateY(${sh * (sc.shrinkY ?? 150)}px) scale(${1 - sh * 0.55})`;
+    const m = ease(seg(t, sc.mT, sc.mT + 0.5)); sc.meaningEl.style.opacity = m; sc.meaningEl.style.transform = `translateY(${(1 - m) * 20 + sh * 70}px)`;
+  },
+  chips(sc, t, o) {
+    sc.root.style.opacity = o;
+    sc.items.forEach((it, i) => {
+      const k = back(seg(t, it.t - 0.03, it.t + 0.3)), m = ease(seg(t, it.t, it.t + 0.3));
+      const x = 540 + (it.x - 540) * (0.55 + 0.45 * m), y = 860 + (it.y - 860) * (0.55 + 0.45 * m);
+      it.el.style.left = x + 'px'; it.el.style.top = y + 'px'; it.el.style.opacity = clamp(seg(t, it.t - 0.03, it.t + 0.1));
+      it.el.style.transform = `translate(-50%,-50%) scale(${0.5 + 0.5 * k})`;
+      if (it.hero) { const h = ease(seg(t, it.t, it.t + 0.4)); it.el.style.borderColor = `rgba(212,162,70,${.35 + .6 * h})`; it.el.style.boxShadow = `0 0 ${80 * h}px rgba(212,162,70,${.45 * h})`; }
+    });
+  },
+  count(sc, t, o) { sc.root.style.opacity = o; sc.root.style.transform = `translateY(${(1 - o) * 40}px)`; sc.root.querySelector('.n').textContent = Math.round(sc.n * ease(seg(t, sc.t0, sc.t0 + 1.15))).toLocaleString('en-US'); },
+  title(sc, t, o) { sc.root.style.opacity = o; sc.root.style.transform = `translateY(${(1 - o) * 30}px)`; },
+  quiz(sc, t, o) {
+    sc.root.style.opacity = o;
+    const secs = sc.seconds || 3, left = clamp(1 - (t - sc.timerT) / secs);
+    sc.root.querySelector('.arc').setAttribute('stroke-dashoffset', 414.7 * (1 - left));
+    sc.root.querySelector('b').textContent = t < sc.timerT ? secs : Math.max(0, Math.ceil(secs - (t - sc.timerT)));
+    const shown = t >= sc.revealT;
+    [...sc.root.querySelectorAll('.opt')].forEach((d, i) => { d.className = 'opt' + (shown ? (i === sc.answer ? ' right' : ' wrong') : ''); });
+  },
+  cta(sc, t, o) { sc.root.style.opacity = o; sc.root.style.transform = `translateY(${(1 - o) * 40}px)`; },
+};
+
+// ---------------------------------------------------------------- captions
+function captionWords(s) {
+  let ws = s.words.map((w) => ({ ...w, w: w.w.replace(/[.,!?]/g, '') }));
+  for (const m of (SPEC.captions?.merge || []).filter((m) => m.seg === s.id)) {
+    const a = ws.findIndex((w) => w.w.toLowerCase() === m.from.toLowerCase()), b = ws.findIndex((w, i) => i > a && w.w.toLowerCase() === m.to.toLowerCase());
+    if (a >= 0 && b >= 0) ws = [...ws.slice(0, a), { w: m.as, s: ws[a].s, e: ws[b].e }, ...ws.slice(b + 1)];
+  }
+  const map = SPEC.captions?.map || {};
+  return ws.map((w) => ({ ...w, w: map[w.w.toLowerCase()] ?? w.w }));
+}
+function captions(t) {
+  const cur = CUES.segments.find((s) => s.caps && t >= s.start - 0.05 && t <= s.end + 0.25), cap = $('cap');
+  if (!cur || SPEC.hideCaptions?.includes(cur.id)) { cap.innerHTML = ''; return; }
+  const ws = cur.caps, f = ws.findIndex((w) => t < w.e + 0.02), i = f === -1 ? ws.length - 1 : f, c0 = Math.floor(i / 4) * 4;
+  cap.innerHTML = ws.slice(c0, c0 + 4).map((w) => { const k = ease(seg(t, w.s - 0.05, w.s + 0.1)), on = t >= w.s - 0.02 && t < w.e + 0.08; return `<span class="${on ? 'on' : ''}" style="opacity:${0.25 + 0.75 * k};transform:translateY(${(1 - k) * 14}px) scale(${on ? 1.08 : 1})">${w.w}</span>`; }).join('');
+}
+
+window.setReel = (spec, cues) => {
+  SPEC = spec; CUES = cues; SEG = Object.fromEntries(cues.segments.map((s) => [s.id, s]));
+  cues.segments.forEach((s) => { if (s.words.length) s.caps = captionWords(s); });
+  $('tag').textContent = spec.tag || '';
+  scenes = spec.scenes.map((sc) => { sc = { ...sc }; BUILD[sc.type](sc); sc.t0 = at(sc.from); sc.t1 = sc.to ? at(sc.to) : cues.duration + 1; return sc; });
+};
+
+window.render = (t) => {
+  if (!CUES) return;
+  const starts = scenes.map((s) => s.t0).filter((s) => s <= t);
+  $('stage').style.transform = `scale(${1 + Math.min(t - Math.max(0, ...starts), 4) * 0.008})`;
+  scenes.forEach((sc) => { const o = life(t, sc); sc.root.style.visibility = o > 0.001 ? 'visible' : 'hidden'; if (o > 0.001) DRAW[sc.type](sc, t, o); });
+  const flashes = CUES.sfx.filter((s) => s.n.startsWith('whoosh')).map((s) => s.t + 0.4);
+  $('flash').style.opacity = Math.max(0, ...flashes.map((f) => 0.32 * (1 - clamp(Math.abs(t - f) / 0.18))));
+  $('tag').style.opacity = Math.min(ease(seg(t, 0.2, 0.8)), 1 - ease(seg(t, CUES.duration - 4, CUES.duration - 3.5)));
+  captions(t);
+  $('prog').style.width = (clamp(t / CUES.duration) * 100) + '%';
+};
+</script>

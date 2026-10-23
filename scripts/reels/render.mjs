@@ -4,13 +4,14 @@
  *
  * Run: node scripts/reels/render.mjs scripts/reels/rahma.html out/rahma.mp4 [seconds] [audio-url-or-file] [cues.json]
  * With cues.json the page gets window.setCues(cues) and the audio is used as a finished soundtrack.
+ * Engine reels add a spec: render.mjs engine/reel.html out.mp4 <secs> soundtrack.wav cues.json specs/x.json
  * Needs Google Chrome and ffmpeg.
  */
 import fs from 'fs';
 import path from 'path';
 import { spawn, execFileSync } from 'child_process';
 
-const [page, out, secs = '18', audio = 'https://everyayah.com/data/Alafasy_128kbps/001001.mp3', cues] = process.argv.slice(2);
+const [page, out, secs = '18', audio = 'https://everyayah.com/data/Alafasy_128kbps/001001.mp3', cues, spec] = process.argv.slice(2);
 const FPS = 30, DUR = Number(secs), W = 1080, H = 1920;
 const tmp = fs.mkdtempSync(path.join(process.env.TMPDIR || '/tmp', 'reel-'));
 const CH = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
@@ -24,7 +25,10 @@ await send('Page.enable');
 await send('Emulation.setDeviceMetricsOverride', { width: W, height: H, deviceScaleFactor: 1, mobile: false });
 await send('Page.navigate', { url: 'file://' + path.resolve(page) }); await sleep(2500);
 await send('Runtime.evaluate', { expression: 'document.fonts.ready', awaitPromise: true });
-if (cues) await send('Runtime.evaluate', { expression: `setCues(${fs.readFileSync(cues, 'utf8')})` });
+if (spec) {
+  const r = await send('Runtime.evaluate', { expression: `setReel(${fs.readFileSync(spec, 'utf8')}, ${fs.readFileSync(cues, 'utf8')})` });
+  if (r.result.exceptionDetails) throw new Error(r.result.exceptionDetails.exception?.description);
+} else if (cues) await send('Runtime.evaluate', { expression: `setCues(${fs.readFileSync(cues, 'utf8')})` });
 const frames = Math.round(DUR * FPS);
 for (let f = 0; f < frames; f++) {
   await send('Runtime.evaluate', { expression: `render(${(f / FPS).toFixed(4)})` });

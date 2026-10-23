@@ -1,0 +1,294 @@
+{
+ "tag": "QURANIC ROOTS · ح م د",
+ "segments": [
+  {
+   "id": "hook",
+   "say": "You begin every prayer by praising Allah.",
+   "gap": 0.35
+  },
+  {
+   "id": "recite",
+   "recite": [
+    "https://everyayah.com/data/Alafasy_128kbps/001002.mp3"
+   ],
+   "gap": 0.4
+  },
+  {
+   "id": "two",
+   "say": "The first word grows from three letters.",
+   "gap": 0.2
+  },
+  {
+   "id": "letters",
+   "say": "Ha. Meem. Dal.",
+   "gap": 0.25
+  },
+  {
+   "id": "meaning",
+   "say": "The root of praise.",
+   "gap": 0.3
+  },
+  {
+   "id": "family",
+   "say": "From it comes praise itself. Muhammad. Ahmad. And al-Hamid, the Praiseworthy.",
+   "gap": 0.35
+  },
+  {
+   "id": "count",
+   "say": "Sixty seven words in the Quran grow from this one root.",
+   "gap": 0.3
+  },
+  {
+   "id": "cta",
+   "say": "Understand every word of your salah in thirty days. Link in bio.",
+   "gap": 0.8
+  }
+ ],
+ "captions": {
+  "merge": [
+   {
+    "seg": "count",
+    "from": "Sixty",
+    "to": "seven",
+    "as": "67"
+   }
+  ],
+  "map": {
+   "thirty": "30"
+  }
+ },
+ "scenes": [
+  {
+   "type": "ayah",
+   "from": 0,
+   "to": {
+    "seg": "letters",
+    "edge": "start",
+    "offset": -0.15
+   },
+   "recite": "recite",
+   "words": [
+    {
+     "ar": "ٱلْحَمْدُ"
+    },
+    {
+     "ar": "لِلَّهِ"
+    },
+    {
+     "ar": "رَبِّ"
+    },
+    {
+     "ar": "ٱلْعَٰلَمِينَ"
+    }
+   ],
+   "trans": "All praise is for Allah, Lord of the worlds",
+   "transFrom": {
+    "seg": "recite",
+    "edge": "end"
+   },
+   "gold": {
+    "idx": [
+     0
+    ],
+    "at": {
+     "seg": "two",
+     "word": "first"
+    }
+   }
+  },
+  {
+   "type": "letters",
+   "from": {
+    "seg": "letters",
+    "edge": "start",
+    "offset": -0.1
+   },
+   "to": {
+    "seg": "count",
+    "edge": "start",
+    "offset": -0.1
+   },
+   "letters": [
+    "ح",
+    "م",
+    "د"
+   ],
+   "at": [
+    {
+     "seg": "letters",
+     "word": "Ha"
+    },
+    {
+     "seg": "letters",
+     "word": "Meem"
+    },
+    {
+     "seg": "letters",
+     "word": "Dal"
+    }
+   ],
+   "meaning": "to praise",
+   "meaningAt": {
+    "seg": "meaning",
+    "word": "praise"
+   },
+   "shrinkAt": {
+    "seg": "family",
+    "edge": "start",
+    "offset": -0.2
+   }
+  },
+  {
+   "type": "chips",
+   "from": {
+    "seg": "family",
+    "edge": "start",
+    "offset": -0.1
+   },
+   "to": {
+    "seg": "count",
+    "edge": "start",
+    "offset": -0.1
+   },
+   "items": [
+    {
+     "ar": "ٱلْحَمْد",
+     "en": "praise",
+     "ref": "1:2",
+     "at": {
+      "seg": "family",
+      "word": "praise"
+     }
+    },
+    {
+     "ar": "مُحَمَّد",
+     "en": "Muhammad ﷺ",
+     "ref": "48:29",
+     "at": {
+      "seg": "family",
+      "word": "Muhammad"
+     }
+    },
+    {
+     "ar": "أَحْمَد",
+     "en": "Ahmad",
+     "ref": "61:6",
+     "at": {
+      "seg": "family",
+      "word": "Ahmad"
+     }
+    },
+    {
+     "ar": "ٱلْحَمِيد",
+     "en": "the Praiseworthy",
+     "ref": "31:26",
+     "hero": true,
+     "at": {
+      "seg": "family",
+      "word": "Hamid"
+     }
+    }
+   ]
+  },
+  {
+   "type": "count",
+   "n": 67,
+   "sub": "words in the Quran grow from <span style=\"font-family:Amiri;color:#D4A246\">ح م د</span>",
+   "from": {
+    "seg": "count",
+    "edge": "start"
+   },
+   "to": {
+    "seg": "cta",
+    "edge": "start",
+    "offset": -0.1
+   }
+  },
+  {
+   "type": "cta",
+   "from": {
+    "seg": "cta",
+    "edge": "start"
+   },
+   "line": "Understand every word of your <em>salah</em> in 30 days",
+   "free": "The first week is free"
+  }
+ ],
+ "sfx": [
+  {
+   "n": "whoosh",
+   "seg": "recite",
+   "edge": "start",
+   "offset": -0.45
+  },
+  {
+   "n": "ting",
+   "seg": "two",
+   "word": "first"
+  },
+  {
+   "n": "ting_hi",
+   "seg": "two",
+   "word": "three"
+  },
+  {
+   "n": "tock",
+   "seg": "letters",
+   "word": "Ha"
+  },
+  {
+   "n": "tock",
+   "seg": "letters",
+   "word": "Meem"
+  },
+  {
+   "n": "tock",
+   "seg": "letters",
+   "word": "Dal"
+  },
+  {
+   "n": "sub",
+   "seg": "meaning",
+   "word": "praise"
+  },
+  {
+   "n": "ting",
+   "seg": "family",
+   "word": "praise"
+  },
+  {
+   "n": "ting",
+   "seg": "family",
+   "word": "Muhammad"
+  },
+  {
+   "n": "ting",
+   "seg": "family",
+   "word": "Ahmad"
+  },
+  {
+   "n": "chime",
+   "seg": "family",
+   "word": "Hamid"
+  },
+  {
+   "n": "whoosh_down",
+   "seg": "count",
+   "edge": "start",
+   "offset": -0.35
+  },
+  {
+   "n": "tick",
+   "seg": "count",
+   "edge": "start",
+   "count": 16,
+   "every": 0.07
+  },
+  {
+   "n": "chime",
+   "seg": "cta",
+   "edge": "start",
+   "offset": -0.1
+  }
+ ]
+}

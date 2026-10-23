@@ -1,0 +1,98 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>QuRoots brand</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@500;700;800&display=swap">
+<!--
+  Channel art and carousel slides. Pick one with the hash and screenshot at its size:
+    #profile 1080x1080 · #banner 2560x1440 · #header 1500x500 · #cover-<reel> 1080x1920 · #slide-1..6 1080x1350
+  Run scripts/reels/brand.sh to make all of them.
+-->
+<style>
+  :root { --gold: #D4A246; --ink: #F3ECDD; --quiet: #9A958C; --bg: #0C0B0A; }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { overflow: hidden; background: var(--bg); color: var(--ink); font-family: Inter, sans-serif; }
+  .art { position: relative; overflow: hidden; background: radial-gradient(ellipse 70% 60% at 50% 42%, rgba(212,162,70,.17), transparent 70%), var(--bg); }
+  .art::after { content: ''; position: absolute; inset: 0; opacity: .05; pointer-events: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  .c { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  .mark { filter: drop-shadow(0 0 40px rgba(212,162,70,.45)); }
+  .word { font-family: 'Cormorant Garamond', serif; font-weight: 600; letter-spacing: -.01em; }
+  .word b { color: var(--gold); font-weight: 600; }
+  .ar { font-family: Amiri, serif; direction: rtl; }
+  .gold { color: var(--gold); }
+  em { color: var(--gold); font-style: normal; }
+  .ghost { position: absolute; font-family: Amiri, serif; color: rgba(212,162,70,.07); line-height: 1; }
+  .pill { display: inline-block; font-weight: 700; color: var(--bg); background: var(--gold); border-radius: 999px; }
+  .kicker { letter-spacing: .14em; color: var(--quiet); font-weight: 500; text-transform: uppercase; }
+  .rule { width: 90px; height: 3px; background: var(--gold); border-radius: 3px; }
+</style>
+<body>
+<div id="root"></div>
+<script>
+const MARK = (size) => `<svg class="mark" width="${size}" height="${size}" viewBox="18 14 84 92" fill="none"><defs><linearGradient id="g" x1="60" y1="18" x2="60" y2="104" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#E7C877"/><stop offset=".55" stop-color="#D4A246"/><stop offset="1" stop-color="#B4822E"/></linearGradient></defs>
+  <path d="M60 20 L74 36 L60 52 L46 36 Z" fill="url(#g)"/><g stroke="url(#g)" stroke-width="6" stroke-linecap="round"><path d="M60 50 L60 100"/><path d="M60 56 C 55 72 46 78 30 96"/><path d="M60 56 C 65 72 74 78 90 96"/><path d="M45 76 C 42 82 40 86 36 92" stroke-width="4.5"/><path d="M75 76 C 78 82 80 86 84 92" stroke-width="4.5"/></g></svg>`;
+const ghosts = (list) => list.map(([t, x, y, s]) => `<span class="ghost" style="left:${x}px;top:${y}px;font-size:${s}px">${t}</span>`).join('');
+
+// One slide of the "3 roots in Al-Fatiha" carousel.
+const rootSlide = (n, letters, meaning, word, gloss, ref, count) => ({ w: 1080, h: 1350, html: `
+  <div class="c" style="padding:0 90px">
+    <p class="kicker" style="font-size:28px">Root ${n} of 3</p>
+    <p class="ar gold" style="font-size:220px;line-height:1.5;margin-top:0;text-shadow:0 0 80px rgba(212,162,70,.4)">${letters}</p>
+    <p class="word" style="font-size:78px;margin-top:6px">${meaning}</p>
+    <div class="rule" style="margin:40px 0 40px"></div>
+    <p class="ar" style="font-size:104px;line-height:1.6">${word}</p>
+    <p class="word gold" style="font-size:52px;margin-top:4px">${gloss}</p>
+    <p style="font-size:26px;color:var(--quiet);margin-top:14px">Al-Fātiḥa ${ref}</p>
+    <p class="word" style="font-size:44px;margin-top:56px;color:var(--quiet)"><span style="color:var(--ink)">${count}</span> words in the Quran grow from this root</p>
+  </div>` });
+
+const cover = (letters, top, bottom) => ({ w: 1080, h: 1920, html: `
+  <div class="c">
+    <p class="ar gold" style="font-size:300px;line-height:1.5;text-shadow:0 0 90px rgba(212,162,70,.45)">${letters}</p>
+    <p class="word" style="font-size:96px;line-height:1.05;margin-top:40px;padding:0 90px">${top}</p>
+    <p class="kicker" style="font-size:30px;margin-top:44px">${bottom}</p>
+  </div>` });
+
+const ART = {
+  profile: { w: 1080, h: 1080, html: `<div class="c">${MARK(560)}</div>` },
+  banner: { w: 2560, h: 1440, html: `
+    ${ghosts([['ر ح م', 120, 150, 240], ['ع ل م', 140, 1010, 220], ['ح م د', 2030, 140, 240], ['س ج د', 2050, 990, 240], ['ك ت ب', 130, 610, 170], ['ذ ك ر', 2140, 600, 170]])}
+    <div class="c"><div style="display:flex;align-items:center;gap:40px">${MARK(190)}<div style="text-align:left">
+      <p class="word" style="font-size:132px;line-height:1">Qu<b>Roots</b></p>
+      <p class="word" style="font-size:52px;color:var(--quiet);margin-top:10px">Understand the Quran, <em>one root at a time</em></p></div></div>
+      <p class="kicker" style="font-size:26px;margin-top:40px">New reels every week · quroots.com</p></div>` },
+  header: { w: 1500, h: 500, html: `
+    ${ghosts([['ر ح م', 40, 70, 150], ['ح م د', 1180, 60, 150], ['س ج د', 1210, 300, 120], ['ع ل م', 60, 320, 110]])}
+    <div class="c"><p class="word" style="font-size:88px;line-height:1">Qu<b>Roots</b></p>
+      <p class="word" style="font-size:40px;color:var(--quiet);margin-top:14px">Understand the Quran, <em>one root at a time</em></p></div>` },
+  'cover-hamd': cover('ح م د', 'The root inside <em>Alhamdulillah</em>', 'and a name you love'),
+  'cover-rahma-quiz': cover('ر ح م', 'Guess this root in <em>3 seconds</em>', '3-second root quiz'),
+  'cover-sajada': cover('س ج د', 'Masjid &amp; <em>sujood</em>', 'one root, one surprise'),
+  'cover-fatiha-1': cover('بِسْمِ', 'What you\'re <em>actually</em> saying', 'Al-Fātiḥa · word by word'),
+  'slide-1': { w: 1080, h: 1350, html: `
+    ${ghosts([['ح م د', 60, 120, 200], ['ر ح م', 600, 980, 200], ['ع ل م', 640, 140, 160]])}
+    <div class="c" style="padding:0 90px"><p class="kicker" style="font-size:28px">You say these 17 times a day</p>
+      <p class="word" style="font-size:118px;line-height:1.02;margin-top:40px"><em>3 roots</em> hiding in Al-Fātiḥa</p>
+      <p class="word" style="font-size:46px;color:var(--quiet);margin-top:46px">Learn them and every prayer starts to make sense</p>
+      <p style="font-size:30px;color:var(--quiet);margin-top:90px;font-weight:500">Swipe →</p></div>` },
+  'slide-2': rootSlide(1, 'ح م د', 'to praise', 'ٱلْحَمْدُ', 'All praise', '1:2', 67),
+  'slide-3': rootSlide(2, 'ع ل م', 'to know', 'ٱلْعَٰلَمِينَ', 'the worlds', '1:2', 935),
+  'slide-4': rootSlide(3, 'ر ح م', 'to have mercy', 'ٱلرَّحْمَٰنِ ٱلرَّحِيمِ', 'the Most Gracious, the Most Merciful', '1:3', 333),
+  'slide-5': { w: 1080, h: 1350, html: `
+    <div class="c" style="padding:0 80px"><p class="kicker" style="font-size:28px">Now read it again</p>
+      <p class="ar" style="font-size:96px;line-height:1.7;margin-top:40px"><span class="gold">ٱلْحَمْدُ</span> لِلَّهِ رَبِّ <span class="gold">ٱلْعَٰلَمِينَ</span><br><span class="gold">ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</span></p>
+      <p class="word" style="font-size:52px;line-height:1.3;margin-top:40px"><em>All praise</em> is for Allah, Lord of <em>the worlds</em>, <em>the Most Gracious, the Most Merciful</em></p>
+      <p class="word" style="font-size:42px;color:var(--quiet);margin-top:50px">Three roots, and these two ayat open up.</p></div>` },
+  'slide-6': { w: 1080, h: 1350, html: `
+    <div class="c" style="padding:0 90px">${MARK(150)}
+      <p class="word" style="font-size:96px;line-height:1.05;margin-top:50px">Understand every word of your <em>salah</em> in 30 days</p>
+      <p class="word" style="font-size:44px;color:var(--quiet);margin-top:36px">One root a day · the first week is free</p>
+      <p class="pill" style="font-size:44px;padding:20px 40px;margin-top:60px">quroots.com/salah</p>
+      <p style="font-size:28px;color:var(--quiet);margin-top:40px;font-weight:500">Save this for your next prayer</p></div>` },
+};
+
+const a = ART[location.hash.slice(1)] || ART.profile;
+document.documentElement.style.width = document.body.style.width = a.w + 'px';
+document.documentElement.style.height = document.body.style.height = a.h + 'px';
+const $root = document.getElementById('root');
+$root.className = 'art'; $root.style.width = a.w + 'px'; $root.style.height = a.h + 'px'; $root.innerHTML = a.html;
+</script>

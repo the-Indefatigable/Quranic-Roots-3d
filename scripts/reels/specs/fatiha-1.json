@@ -1,0 +1,259 @@
+{
+ "tag": "AL-FĀTIḤA · WORD BY WORD",
+ "hideCaptions": [
+  "g1",
+  "g2"
+ ],
+ "segments": [
+  {
+   "id": "hook",
+   "say": "Here's what you are actually saying, word by word.",
+   "gap": 0.4
+  },
+  {
+   "id": "r1",
+   "recite": [
+    "https://everyayah.com/data/Alafasy_128kbps/001001.mp3"
+   ],
+   "gap": 0.35
+  },
+  {
+   "id": "g1",
+   "say": "In the name. Of Allah. The Most Gracious. The Most Merciful.",
+   "gap": 0.6
+  },
+  {
+   "id": "r2",
+   "recite": [
+    "https://everyayah.com/data/Alafasy_128kbps/001002.mp3"
+   ],
+   "gap": 0.35
+  },
+  {
+   "id": "g2",
+   "say": "All praise. Is for Allah. Lord. Of the worlds.",
+   "gap": 0.4
+  },
+  {
+   "id": "cta",
+   "say": "Every word of your salah, in thirty days. Link in bio.",
+   "gap": 0.8
+  }
+ ],
+ "captions": {
+  "merge": [],
+  "map": {
+   "thirty": "30"
+  }
+ },
+ "scenes": [
+  {
+   "type": "title",
+   "from": 0,
+   "to": {
+    "seg": "r1",
+    "edge": "start",
+    "offset": -0.15
+   },
+   "y": 640,
+   "text": "What you're <em>actually</em> saying"
+  },
+  {
+   "type": "ayah",
+   "from": {
+    "seg": "r1",
+    "edge": "start",
+    "offset": -0.15
+   },
+   "to": {
+    "seg": "r2",
+    "edge": "start",
+    "offset": -0.2
+   },
+   "recite": "r1",
+   "y": 380,
+   "words": [
+    {
+     "ar": "بِسْمِ",
+     "en": "In the name"
+    },
+    {
+     "ar": "ٱللَّهِ",
+     "en": "of Allah"
+    },
+    {
+     "ar": "ٱلرَّحْمَٰنِ",
+     "en": "the Most Gracious"
+    },
+    {
+     "ar": "ٱلرَّحِيمِ",
+     "en": "the Most Merciful"
+    }
+   ],
+   "gloss": [
+    {
+     "i": 0,
+     "at": {
+      "seg": "g1",
+      "word": "name"
+     }
+    },
+    {
+     "i": 1,
+     "at": {
+      "seg": "g1",
+      "word": "Allah"
+     }
+    },
+    {
+     "i": 2,
+     "at": {
+      "seg": "g1",
+      "word": "Gracious"
+     }
+    },
+    {
+     "i": 3,
+     "at": {
+      "seg": "g1",
+      "word": "Merciful"
+     }
+    }
+   ],
+   "stack": true
+  },
+  {
+   "type": "ayah",
+   "from": {
+    "seg": "r2",
+    "edge": "start",
+    "offset": -0.2
+   },
+   "to": {
+    "seg": "cta",
+    "edge": "start",
+    "offset": -0.1
+   },
+   "recite": "r2",
+   "y": 380,
+   "words": [
+    {
+     "ar": "ٱلْحَمْدُ",
+     "en": "All praise"
+    },
+    {
+     "ar": "لِلَّهِ",
+     "en": "is for Allah"
+    },
+    {
+     "ar": "رَبِّ",
+     "en": "Lord"
+    },
+    {
+     "ar": "ٱلْعَٰلَمِينَ",
+     "en": "of the worlds"
+    }
+   ],
+   "gloss": [
+    {
+     "i": 0,
+     "at": {
+      "seg": "g2",
+      "word": "praise"
+     }
+    },
+    {
+     "i": 1,
+     "at": {
+      "seg": "g2",
+      "word": "Allah"
+     }
+    },
+    {
+     "i": 2,
+     "at": {
+      "seg": "g2",
+      "word": "Lord"
+     }
+    },
+    {
+     "i": 3,
+     "at": {
+      "seg": "g2",
+      "word": "worlds"
+     }
+    }
+   ],
+   "stack": true
+  },
+  {
+   "type": "cta",
+   "from": {
+    "seg": "cta",
+    "edge": "start"
+   },
+   "line": "Every word of your <em>salah</em>, in 30 days",
+   "free": "The first week is free"
+  }
+ ],
+ "sfx": [
+  {
+   "n": "whoosh",
+   "seg": "r1",
+   "edge": "start",
+   "offset": -0.45
+  },
+  {
+   "n": "tock",
+   "seg": "g1",
+   "word": "name"
+  },
+  {
+   "n": "tock",
+   "seg": "g1",
+   "word": "Allah"
+  },
+  {
+   "n": "tock",
+   "seg": "g1",
+   "word": "Gracious"
+  },
+  {
+   "n": "ting",
+   "seg": "g1",
+   "word": "Merciful"
+  },
+  {
+   "n": "whoosh",
+   "seg": "r2",
+   "edge": "start",
+   "offset": -0.45
+  },
+  {
+   "n": "tock",
+   "seg": "g2",
+   "word": "praise"
+  },
+  {
+   "n": "tock",
+   "seg": "g2",
+   "word": "Allah"
+  },
+  {
+   "n": "tock",
+   "seg": "g2",
+   "word": "Lord"
+  },
+  {
+   "n": "ting",
+   "seg": "g2",
+   "word": "worlds"
+  },
+  {
+   "n": "chime",
+   "seg": "cta",
+   "edge": "start",
+   "offset": -0.1
+  }
+ ]
+}
