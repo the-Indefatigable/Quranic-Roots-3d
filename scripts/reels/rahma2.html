@@ -1,0 +1,172 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>QuRoots reel: ر ح م (narrated)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@500;700;800&display=swap">
+<!--
+  Narrated version. window.setCues(cues) receives the timings written by rahma_audio.py
+  (every spoken word, scene starts, sound-effect times); window.render(t) draws frame t.
+  Figures from the QuRoots database: root ر ح م, 333 words; rahma 116; arham at 4:1.
+-->
+<style>
+  :root { --gold: #D4A246; --ink: #F3ECDD; --quiet: #9A958C; }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: #0C0B0A; }
+  body { position: relative; font-family: Inter, sans-serif; color: var(--ink); }
+  #stage { position: absolute; inset: 0; transform-origin: 50% 45%; }
+  .glow { position: absolute; inset: 0; background: radial-gradient(ellipse 75% 42% at 50% 42%, rgba(212,162,70,.16), transparent 70%); }
+  .grain { position: absolute; inset: 0; opacity: .055; pointer-events: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  .flash { position: absolute; inset: 0; background: #F3E2B8; opacity: 0; pointer-events: none; mix-blend-mode: screen; }
+  .abs { position: absolute; left: 0; right: 0; text-align: center; }
+  #basmala { top: 560px; font-family: Amiri, serif; font-size: 118px; line-height: 1.5; direction: rtl; padding: 0 60px; }
+  #basmala span { display: inline-block; margin: 0 12px; }
+  #trans { top: 820px; font-family: 'Cormorant Garamond', serif; font-size: 46px; color: var(--quiet); font-style: italic; }
+  #letters { top: 470px; font-family: Amiri, serif; font-size: 330px; line-height: 1; direction: rtl; color: var(--gold); text-shadow: 0 0 90px rgba(212,162,70,.5); }
+  #letters span { display: inline-block; margin: 0 26px; }
+  #meaning { top: 860px; font-family: 'Cormorant Garamond', serif; font-size: 84px; font-weight: 600; }
+  .chip { position: absolute; width: 360px; padding: 26px 18px; border-radius: 30px; text-align: center; background: rgba(212,162,70,.08); border: 2px solid rgba(212,162,70,.35); transform: translate(-50%, -50%); }
+  .chip .w { font-family: Amiri, serif; font-size: 88px; line-height: 1.2; direction: rtl; }
+  .chip .e { font-family: 'Cormorant Garamond', serif; font-size: 44px; font-weight: 600; color: var(--gold); margin-top: 6px; }
+  .chip .r { font-size: 24px; color: var(--quiet); margin-top: 6px; font-weight: 500; }
+  #count { top: 520px; font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 340px; line-height: .9; color: var(--gold); text-shadow: 0 0 70px rgba(212,162,70,.35); }
+  #countsub { top: 860px; font-family: 'Cormorant Garamond', serif; font-size: 62px; padding: 0 100px; }
+  #end { top: 520px; padding: 0 90px; }
+  #end .logo { font-family: 'Cormorant Garamond', serif; font-size: 110px; font-weight: 600; }
+  #end .logo b { color: var(--gold); font-weight: 600; }
+  #end .line { font-family: 'Cormorant Garamond', serif; font-size: 70px; line-height: 1.15; margin-top: 50px; }
+  #end .line em { color: var(--gold); }
+  #end .free { font-size: 34px; color: var(--quiet); margin-top: 34px; font-weight: 500; }
+  #end .url { display: inline-block; font-size: 46px; font-weight: 700; color: #0C0B0A; background: var(--gold); padding: 18px 36px; border-radius: 999px; margin-top: 42px; }
+  /* kinetic captions */
+  #cap { top: 1330px; padding: 0 80px; font-weight: 800; font-size: 66px; line-height: 1.18; letter-spacing: -.01em; text-shadow: 0 4px 24px rgba(0,0,0,.8); }
+  #cap span { display: inline-block; margin: 0 .16em; transition: none; }
+  #cap span.on { color: var(--gold); }
+  .bar { position: absolute; left: 90px; right: 90px; bottom: 110px; height: 5px; background: rgba(255,255,255,.08); border-radius: 5px; }
+  .bar i { display: block; height: 100%; background: var(--gold); border-radius: 5px; }
+</style>
+<div class="glow"></div>
+<div id="stage">
+  <p class="abs" id="basmala"><span>بِسْمِ</span><span>ٱللَّهِ</span><span>ٱلرَّحْمَـٰنِ</span><span>ٱلرَّحِيمِ</span></p>
+  <p class="abs" id="trans">In the name of Allah, the Most Gracious, the Most Merciful</p>
+  <p class="abs" id="letters"><span>ر</span><span>ح</span><span>م</span></p>
+  <p class="abs" id="meaning">to have mercy</p>
+  <div id="chips"></div>
+  <p class="abs" id="count">0</p>
+  <p class="abs" id="countsub">words in the Quran grow from this one root</p>
+  <div class="abs" id="end"><p class="logo">Qu<b>Roots</b></p><p class="line">Understand every word of your salah <em>in 30 days.</em></p><p class="free">The first week is free</p><p class="url">quroots.com/salah</p></div>
+</div>
+<p class="abs" id="cap"></p>
+<div class="flash" id="flash"></div>
+<div class="bar"><i id="prog"></i></div>
+<div class="grain"></div>
+<script>
+const $ = (id) => document.getElementById(id);
+const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+const ease = (t) => { t = clamp(t); return 1 - Math.pow(1 - t, 3); };
+const back = (t) => { t = clamp(t); const c = 1.9; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); };
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const show = (el, o, y = 0, s = 1) => { el.style.opacity = o; el.style.transform = `translateY(${y}px) scale(${s})`; };
+let CUES = null, S = {}, CHIPS = [], chipEls = [];
+
+// caption text: spoken numbers shown as figures
+function figures(seg) {
+  const ws = seg.words.map((w) => ({ ...w, w: w.w.replace(/[.,]/g, '') }));
+  if (seg.id === 'count') {                       // "Three hundred and thirty three" -> 333
+    const end = ws.findIndex((w, i) => i > 0 && /^three$/i.test(w.w));
+    return [{ ...ws[0], w: '333', e: ws[end].e }, ...ws.slice(end + 1)];
+  }
+  return ws.map((w) => ({ ...w, w: ({ seventeen: '17', thirty: '30' })[w.w.toLowerCase()] || w.w }));
+}
+
+window.setCues = (c) => {
+  c.segments.forEach((s) => { if (s.words.length) s.caps = figures(s); });
+  CUES = c; S = Object.fromEntries(c.segments.map((s) => [s.id, s]));
+  const fam = S.family.words, at = (needle) => fam.find((w) => w.w.toLowerCase().includes(needle)).s;
+  CHIPS = [
+    { w: 'رَحْمَة', e: 'mercy', r: '116 times in the Quran', x: 280, y: 470, t: at('mercy') },
+    { w: 'ٱلرَّحْمَـٰن', e: 'the Most Gracious', r: 'Al-Fatiha 1:1', x: 800, y: 470, t: at('gracious') },
+    { w: 'ٱلرَّحِيم', e: 'the Most Merciful', r: 'Al-Fatiha 1:1', x: 280, y: 1120, t: at('merciful') },
+    { w: 'أَرْحَام', e: 'wombs', r: 'An-Nisa 4:1', x: 800, y: 1120, t: at('womb') },
+  ];
+  chipEls = CHIPS.map((c) => { const d = document.createElement('div'); d.className = 'chip'; d.innerHTML = `<div class="w">${c.w}</div><div class="e">${c.e}</div><div class="r">${c.r}</div>`; $('chips').appendChild(d); return d; });
+};
+
+// captions: the current narration line, words appearing as they are spoken; the word being said is gold
+function captions(t) {
+  const cur = CUES.segments.find((s) => s.words.length && t >= s.start - 0.05 && t <= s.end + 0.25);
+  const cap = $('cap');
+  if (!cur) { cap.innerHTML = ''; return; }
+  // show at most ~6 words: the chunk containing the current word
+  const ws = cur.caps, found = ws.findIndex((w) => t < w.e + 0.02), i = found === -1 ? ws.length - 1 : found;
+  const chunkStart = Math.floor(i / 4) * 4, chunk = ws.slice(chunkStart, chunkStart + 4);
+  cap.innerHTML = chunk.map((w) => {
+    const k = ease(seg(t, w.s - 0.05, w.s + 0.1)), on = t >= w.s - 0.02 && t < w.e + 0.08;
+    return `<span class="${on ? 'on' : ''}" style="opacity:${0.25 + 0.75 * k};transform:translateY(${(1 - k) * 14}px) scale(${on ? 1.08 : 1})">${w.w}</span>`;
+  }).join('');
+}
+
+window.render = (t) => {
+  if (!CUES) return;
+  const R = S.recite, two = S.two, L = S.letters, M = S.meaning, F = S.family, C = S.count, E = S.cta;
+  // gentle push-in that resets on every scene change, so the frame never sits still
+  const scenes = [0, R.start, two.start, L.start, F.start, C.start, E.start];
+  const sc = scenes.filter((s) => s <= t).pop();
+  $('stage').style.transform = `scale(${1 + Math.min(t - sc, 4) * 0.008})`;
+
+  // 1. basmala (hook, recitation, "two of these words")
+  const b = Math.min(ease(seg(t, 0.1, 0.6)), 1 - ease(seg(t, L.start - 0.25, L.start)));
+  show($('basmala'), b, (1 - ease(seg(t, 0.1, 0.6))) * 30);
+  const spans = [...$('basmala').children], weights = [0.17, 0.2, 0.33, 0.3];
+  let acc = R.start;
+  spans.forEach((sp, i) => {
+    const s0 = acc; acc += (R.end - R.start) * weights[i];
+    const reciting = t >= s0 && t < acc && t < R.end;                      // the word being recited glows
+    const hl = ease(seg(t, two.words[0].s, two.words[0].s + 0.3));       // "Two..." picks out the two words
+    const gold = i >= 2 ? hl : 0;
+    sp.style.color = gold ? `rgba(${243 - 31 * gold},${236 - 74 * gold},${221 - 151 * gold},1)` : `rgba(243,236,221,${1 - 0.72 * hl})`;
+    sp.style.textShadow = reciting ? '0 0 40px rgba(212,162,70,.75)' : gold ? `0 0 ${40 * gold}px rgba(212,162,70,.5)` : 'none';
+    sp.style.transform = `scale(${reciting ? 1.06 : 1 + 0.06 * gold})`;
+  });
+  show($('trans'), Math.min(ease(seg(t, R.start + 0.3, R.start + 0.9)), 1 - ease(seg(t, two.start - 0.2, two.start + 0.2))));
+
+  // 2. letters slam in on "Ra", "Ha", "Meem"
+  const lw = L.words.filter((w) => /ra|ha|meem/i.test(w.w));
+  [...$('letters').children].forEach((sp, i) => {
+    const s0 = lw[i] ? lw[i].s : L.start + i * 0.35, k = back(seg(t, s0 - 0.03, s0 + 0.22));
+    sp.style.opacity = clamp(seg(t, s0 - 0.03, s0 + 0.05)) * (1 - ease(seg(t, F.start + 0.1, F.start + 0.5)) * 0.25);
+    sp.style.transform = `scale(${(1.9 - 0.9 * k)})`;
+  });
+  const famShrink = ease(seg(t, F.start - 0.1, F.start + 0.5));
+  const lettersOn = t >= L.start - 0.1 && t < C.start - 0.3 ? 1 : 0;
+  $('letters').style.opacity = lettersOn * (1 - ease(seg(t, C.start - 0.6, C.start - 0.3)));
+  $('letters').style.transform = `translateY(${famShrink * 150}px) scale(${1 - famShrink * 0.55})`;
+  show($('meaning'), Math.min(ease(seg(t, M.words[2] ? M.words[2].s : M.start, M.start + 0.6)), 1 - ease(seg(t, C.start - 0.6, C.start - 0.3))), famShrink * 70, 1 - famShrink * 0.35);
+
+  // 3. the family pops in, one word per "ting"
+  CHIPS.forEach((c, i) => {
+    const k = back(seg(t, c.t - 0.03, c.t + 0.3)), out = ease(seg(t, C.start - 0.6, C.start - 0.3));
+    const cx = 540, cy = 860, x = cx + (c.x - cx) * (0.55 + 0.45 * ease(seg(t, c.t, c.t + 0.3))), y = cy + (c.y - cy) * (0.55 + 0.45 * ease(seg(t, c.t, c.t + 0.3)));
+    const el = chipEls[i]; el.style.left = x + 'px'; el.style.top = y + 'px';
+    el.style.opacity = clamp(seg(t, c.t - 0.03, c.t + 0.1)) * (1 - out);
+    el.style.transform = `translate(-50%,-50%) scale(${0.5 + 0.5 * k})`;
+  });
+  const womb = ease(seg(t, CHIPS[3].t, CHIPS[3].t + 0.4)) * (1 - ease(seg(t, C.start - 0.6, C.start - 0.3)));
+  chipEls[3].style.borderColor = `rgba(212,162,70,${.35 + .6 * womb})`; chipEls[3].style.boxShadow = `0 0 ${80 * womb}px rgba(212,162,70,${.45 * womb})`;
+
+  // 4. the count runs up with the ticks
+  const cIn = Math.min(ease(seg(t, C.start - 0.2, C.start + 0.25)), 1 - ease(seg(t, E.start - 0.35, E.start)));
+  show($('count'), cIn, (1 - cIn) * 40);
+  $('count').textContent = Math.round(333 * ease(seg(t, C.start, C.start + 1.15)));
+  show($('countsub'), Math.min(ease(seg(t, C.start + 0.5, C.start + 1)), 1 - ease(seg(t, E.start - 0.35, E.start))));
+
+  // 5. the call to action
+  const e = ease(seg(t, E.start - 0.1, E.start + 0.45));
+  show($('end'), e, (1 - e) * 40);
+
+  // white flash on the two whooshes
+  const flashes = CUES.sfx.filter((s) => s.n.startsWith('whoosh')).map((s) => s.t + (s.n === 'whoosh' ? 0.45 : 0.35));
+  $('flash').style.opacity = Math.max(0, ...flashes.map((f) => 0.35 * (1 - clamp(Math.abs(t - f) / 0.18))));
+
+  captions(t);
+  $('prog').style.width = (clamp(t / CUES.duration) * 100) + '%';
+};
+</script>
