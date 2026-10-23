@@ -40,7 +40,7 @@ const R  = 250;          // distance from center to derivative anchors
 // Start derivatives at 12 o'clock (-90°) and walk clockwise
 const ANGLE_OFFSET = -Math.PI / 2;
 
-export function RootBloom() {
+export function RootBloom({ caption }: { caption?: string } = {}) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: '-15% 0px -15% 0px' });
   const prefersReduced = useReducedMotion();
@@ -185,6 +185,9 @@ export function RootBloom() {
         >
           {ROOT.meaning}
         </span>
+        {caption && (
+          <span className="mt-1 text-[11px]" style={{ color: '#A09F9B' }}>{caption}</span>
+        )}
       </motion.div>
 
       {/* Derivative chips — positioned absolutely around the ring */}
