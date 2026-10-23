@@ -176,7 +176,9 @@ function QiratOrnament() {
 }
 
 // ── Feature cards data ────────────────────────────────────────────────
-const FEATURES = [
+const QIRAT_UNLOCKED = process.env.NEXT_PUBLIC_UNLOCK_QIRAT === 'true';
+
+const ALL_FEATURES = [
   {
     color: '#D4A246',
     href: '/quran',
@@ -217,6 +219,7 @@ const FEATURES = [
     Ornament: QiratOrnament,
   },
 ];
+const FEATURES = ALL_FEATURES.filter((f) => QIRAT_UNLOCKED || f.href !== '/learn/qirat');
 
 // ─────────────────────────────────────────────────────────────────────
 export function HomepageClient() {
@@ -283,7 +286,7 @@ export function HomepageClient() {
             { href: '/quran',       label: 'Quran'  },
             { href: '/roots',       label: 'Roots'  },
             { href: '/learn/path',  label: 'Learn'  },
-            { href: '/learn/qirat', label: 'Qirat'  },
+            ...(QIRAT_UNLOCKED ? [{ href: '/learn/qirat', label: 'Qirat' }] : []),
             { href: '/blog',        label: 'Blog'   },
             { href: '/support',     label: 'Support' },
           ].map((l) => (
@@ -462,7 +465,7 @@ export function HomepageClient() {
           <div className="flex flex-wrap items-center justify-center gap-2 mb-14">
             {[
               { label: 'Word-by-Word', d: 'M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25' },
-              { label: 'Qirat Training', d: 'M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 0 1-1.632 2.163l-1.32.377a1.803 1.803 0 1 1-.99-3.467l2.31-.66a2.25 2.25 0 0 0 1.632-2.163Zm0 0V4.103A2.25 2.25 0 0 0 17.77 2.03l-4.046 1.157A2.25 2.25 0 0 0 12.12 5.35v6.2a2.25 2.25 0 0 1-1.632 2.163l-1.32.377a1.803 1.803 0 1 1-.99-3.467l2.31-.66A2.25 2.25 0 0 0 12.12 7.8' },
+              ...(QIRAT_UNLOCKED ? [{ label: 'Qirat Training', d: 'M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 0 1-1.632 2.163l-1.32.377a1.803 1.803 0 1 1-.99-3.467l2.31-.66a2.25 2.25 0 0 0 1.632-2.163Zm0 0V4.103A2.25 2.25 0 0 0 17.77 2.03l-4.046 1.157A2.25 2.25 0 0 0 12.12 5.35v6.2a2.25 2.25 0 0 1-1.632 2.163l-1.32.377a1.803 1.803 0 1 1-.99-3.467l2.31-.66A2.25 2.25 0 0 0 12.12 7.8' }] : []),
               { label: 'Root Analysis', d: 'm3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z' },
               { label: 'Grammar Lessons', d: 'M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342' },
             ].map((b) => (
@@ -909,7 +912,7 @@ export function HomepageClient() {
             { href: '/quran',       label: 'Quran'   },
             { href: '/roots',       label: 'Roots'   },
             { href: '/learn/path',  label: 'Learn'   },
-            { href: '/learn/qirat', label: 'Qirat'   },
+            ...(QIRAT_UNLOCKED ? [{ href: '/learn/qirat', label: 'Qirat' }] : []),
             { href: '/search',      label: 'Search'  },
             { href: '/blog',        label: 'Blog'    },
             { href: '/support',     label: 'Support' },

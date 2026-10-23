@@ -4,7 +4,8 @@ import { roots, forms, tenses } from '../../../src/db/schema';
 import { asc } from 'drizzle-orm';
 import { cacheGet, cacheSet } from '../../../src/db/cache';
 
-export const revalidate = 86400;
+export const dynamic = 'force-dynamic';
+import { auth } from '@/lib/auth';
 
 const BAB_COLORS: Record<string, string> = {
   I: '#4a9eff', II: '#f97316', III: '#a855f7', IV: '#22c55e', V: '#ec4899',
@@ -18,7 +19,13 @@ const TENSE_COLORS: Record<string, string> = {
 
 const CACHE_KEY = 'api:roots:index';
 
+// The whole curated dataset in one response. Nothing in the app calls it, so it is
+// admin-only: a public copy of this endpoint was the easiest thing on the site to scrape.
 export async function GET() {
+  const session = await auth();
+  if (!session?.user?.id || session.user.role !== 'admin') {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  }
   // Return cached if available (5 min TTL)
   const cached = cacheGet<{ roots: unknown[] }>(CACHE_KEY);
   if (cached) {
@@ -97,7 +104,7 @@ export async function GET() {
     const payload = { roots: result };
     cacheSet(CACHE_KEY, payload);
     return NextResponse.json(payload, {
-      headers: { 'Cache-Control': 'public, s-maxage=86400, stale-while-revalidate=604800' },
+      headers: { 'Cache-Control': 'private, no-store' },
     });
   } catch (err) {
     console.error('[/api/roots] DB error:', err);
