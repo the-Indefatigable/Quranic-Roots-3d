@@ -60,7 +60,7 @@ export default function LearnHubPage() {
 
       {/* Courses */}
       <div className="space-y-3 mb-12">
-        {COURSES.map((course) => (
+        {COURSES.filter((c) => !c.locked).map((course) => (
           <Link
             key={course.href}
             href={course.href}
@@ -133,17 +133,6 @@ export default function LearnHubPage() {
           In-depth articles on grammar (i&rsquo;rab, verb forms, plurals), daily fusha vocabulary, and beginner-friendly Islamic books.
         </p>
       </Link>
-
-      <div className="mt-12 text-center">
-        <div className="flex items-center justify-center gap-3 mb-3">
-          <span className="h-px w-14 bg-gradient-to-r from-transparent to-[#D4A246]/20" />
-          <div className="w-1.5 h-1.5 rotate-45" style={{ background: '#D4A246', opacity: 0.3 }} />
-          <span className="h-px w-14 bg-gradient-to-l from-transparent to-[#D4A246]/20" />
-        </div>
-        <p className="text-[#2D2C2A] text-[11px] tracking-wider">
-          More courses are being crafted with care
-        </p>
-      </div>
     </div>
   );
 }

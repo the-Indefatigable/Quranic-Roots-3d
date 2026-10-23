@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAppStore } from '@/store/useAppStore';
 import { RootBloom } from './RootBloom';
 import { CommunityStrip } from './CommunityStrip';
@@ -34,25 +34,6 @@ function useScrollReveal() {
 }
 
 // ── Animated counter ────────────────────────────────────────────────
-function useCounter(end: number, duration = 2000) {
-  const [count, setCount] = useState(0);
-  const [started, setStarted] = useState(false);
-  useEffect(() => {
-    if (!started) return;
-    let startTime: number;
-    let frame: number;
-    const step = (timestamp: number) => {
-      if (!startTime) startTime = timestamp;
-      const progress = Math.min((timestamp - startTime) / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setCount(Math.floor(eased * end));
-      if (progress < 1) frame = requestAnimationFrame(step);
-    };
-    frame = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(frame);
-  }, [started, end, duration]);
-  return { count, start: () => setStarted(true) };
-}
 
 // ── Interactive Demo Data ────────────────────────────────────────────
 const DEMO_AYAH = {
@@ -100,10 +81,6 @@ const SAMPLE_ROOTS = [
 ];
 
 // ── Latin → Arabic-Indic digit conversion ────────────────────────────
-const ARABIC_INDIC = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
-function toArabicIndic(value: string): string {
-  return value.replace(/[0-9]/g, (d) => ARABIC_INDIC[parseInt(d, 10)]);
-}
 
 // ── Per-feature ornaments — each card gets its own visual personality ──
 function QuranOrnament() {
@@ -177,7 +154,9 @@ function QiratOrnament() {
 }
 
 // ── Feature cards data ────────────────────────────────────────────────
-const FEATURES = [
+const QIRAT_UNLOCKED = process.env.NEXT_PUBLIC_UNLOCK_QIRAT === 'true';
+
+const ALL_FEATURES = [
   {
     color: '#D4A246',
     href: '/quran',
@@ -218,6 +197,7 @@ const FEATURES = [
     Ornament: QiratOrnament,
   },
 ];
+const FEATURES = ALL_FEATURES.filter((f) => QIRAT_UNLOCKED || f.href !== '/learn/qirat');
 
 // ─────────────────────────────────────────────────────────────────────
 export function HomepageClient() {
@@ -226,28 +206,6 @@ export function HomepageClient() {
   useEffect(() => setIsMounted(true), []);
 
   useScrollReveal();
-
-  const roots = useCounter(TOTAL_ROOTS, 1800);
-  const ayahs = useCounter(TOTAL_AYAHS, 2200);
-  const words = useCounter(TOTAL_WORD_TOKENS, 2400);
-
-  const statsRef = useRef<HTMLElement>(null);
-  useEffect(() => {
-    const el = statsRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          roots.start(); ayahs.start(); words.start();
-          observer.disconnect();
-        }
-      },
-      { rootMargin: '-80px', threshold: 0 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const [verse] = useState(() => {
     // UTC-based day index so the server render and client hydration agree
@@ -284,7 +242,7 @@ export function HomepageClient() {
             { href: '/quran',       label: 'Quran'  },
             { href: '/roots',       label: 'Roots'  },
             { href: '/learn/path',  label: 'Learn'  },
-            { href: '/learn/qirat', label: 'Qirat'  },
+            ...(QIRAT_UNLOCKED ? [{ href: '/learn/qirat', label: 'Qirat' }] : []),
             { href: '/blog',        label: 'Blog'   },
             { href: '/support',     label: 'Support' },
           ].map((l) => (
@@ -328,231 +286,60 @@ export function HomepageClient() {
       </nav>
 
       {/* ══════════════════════════════════════════════════════
-          HERO
+          HERO — the root is the product: three letters, a family of words
       ══════════════════════════════════════════════════════ */}
-      <section
-        className="relative flex flex-col items-center justify-center min-h-screen text-center px-5 pt-14 pb-24 overflow-hidden"
-      >
-        {/* Radial center glow */}
+      <section className="relative overflow-hidden px-5 pt-24 pb-16 sm:pt-28 lg:pb-24">
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0"
-          style={{
-            background: 'radial-gradient(ellipse 60% 55% at 50% 48%, rgba(212,162,70,0.07) 0%, transparent 70%)',
-          }}
+          style={{ background: 'radial-gradient(ellipse 55% 60% at 72% 50%, rgba(212,162,70,0.08) 0%, transparent 70%)' }}
         />
-
-        {/* Side ambient glows */}
-        <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div style={{ position: 'absolute', top: '10%', left: '-5%', width: 420, height: 420, borderRadius: '50%', background: 'radial-gradient(circle, rgba(13,148,136,0.06) 0%, transparent 70%)' }} />
-          <div style={{ position: 'absolute', bottom: '5%', right: '-8%', width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle, rgba(124,58,237,0.05) 0%, transparent 70%)' }} />
-        </div>
-
-        {/* اقْرَأْ watermark — bleeds off the right edge, asymmetric */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 select-none font-arabic overflow-hidden"
-        >
-          <div
-            className="absolute"
-            style={{
-              top: '50%',
-              right: '-12vw',
-              transform: 'translateY(-50%)',
-              fontSize: 'clamp(22rem, 52vw, 68rem)',
-              lineHeight: 0.85,
-              color: 'rgba(212,162,70,0.085)',
-              letterSpacing: '-0.04em',
-              textShadow: '0 0 80px rgba(212,162,70,0.15)',
-            }}
-            dir="rtl"
-          >
-            اقْرَأْ
-          </div>
-        </div>
-
-        {/* Hero content */}
-        <div className="relative z-10 max-w-2xl mx-auto page-enter">
-          {/* Label */}
-          <div className="flex items-center justify-center gap-3 mb-6">
-            <span style={{ height: 1, width: 32, background: 'rgba(212,162,70,0.4)' }} />
-            <span
-              className="text-[10px] font-bold tracking-[0.3em] uppercase"
-              style={{ color: '#D4A246' }}
+        <div className="relative z-10 max-w-6xl mx-auto grid lg:grid-cols-[1fr_1.05fr] items-center gap-10 lg:gap-6">
+          <div className="text-center lg:text-left page-enter">
+            <h1
+              className="font-heading leading-[1.06] mb-6"
+              style={{ fontSize: 'clamp(2.4rem, 5.2vw, 4.1rem)', color: '#F0E8D8' }}
             >
-              Quranic Arabic Learning
-            </span>
-            <span style={{ height: 1, width: 32, background: 'rgba(212,162,70,0.4)' }} />
-          </div>
-
-          {/* Main headline — Arabic-first, mixed-script */}
-          <h1
-            className="font-heading mb-5 leading-[1.05] flex flex-col items-center gap-1"
-            style={{ fontSize: 'clamp(2.4rem, 6vw, 4rem)', color: '#F0E8D8' }}
-          >
-            <span className="block">Understand the Quran,</span>
-            <span className="block flex items-baseline justify-center gap-3 flex-wrap">
-              <span
-                className="font-arabic"
-                style={{
-                  color: '#D4A246',
-                  fontSize: 'clamp(2.8rem, 7vw, 4.6rem)',
-                  textShadow: '0 0 36px rgba(212,162,70,0.45)',
-                  letterSpacing: '0.02em',
-                  lineHeight: 1,
-                }}
-                dir="rtl"
+              Three letters.<br />
+              <span style={{ color: '#D4A246' }}>A whole family of Quranic words.</span>
+            </h1>
+            <p className="text-base sm:text-lg leading-relaxed mb-4 max-w-xl mx-auto lg:mx-0" style={{ color: '#B5B2AC' }}>
+              Every Arabic word grows from a root. Learn the root{' '}
+              <span className="font-arabic text-xl" style={{ color: '#D4A246' }} dir="rtl">ع ل م</span>{' '}
+              and you can recognise <em>knowledge</em>, <em>scholar</em>, <em>teacher</em> and <em>All-Knowing</em>:
+              935 words across the Quran.
+            </p>
+            <p className="text-sm leading-relaxed mb-8 max-w-xl mx-auto lg:mx-0" style={{ color: '#8A8783' }}>
+              The 250 most common roots make up four in five of the Quran&rsquo;s root words. QuRoots teaches them in order,
+              with the Quran open beside you.
+            </p>
+            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 mb-6">
+              <Link
+                href="/quiz"
+                className="flex items-center gap-2 px-6 py-3.5 rounded-2xl text-sm font-bold transition-all duration-200 hover:scale-105 active:scale-95"
+                style={{ background: 'linear-gradient(135deg, #D4A246, #C89535)', color: '#0E0D0C', boxShadow: '0 4px 24px rgba(212,162,70,0.3)' }}
               >
-                كَلِمَة
-              </span>
-              <span style={{ color: '#D4A246', fontStyle: 'italic' }}>by</span>
-              <span
-                className="font-arabic"
-                style={{
-                  color: '#D4A246',
-                  fontSize: 'clamp(2.8rem, 7vw, 4.6rem)',
-                  textShadow: '0 0 36px rgba(212,162,70,0.45)',
-                  letterSpacing: '0.02em',
-                  lineHeight: 1,
-                }}
-                dir="rtl"
-              >
-                كَلِمَة
-              </span>
-            </span>
-          </h1>
-
-          <p
-            className="text-base sm:text-lg leading-relaxed mb-8 max-w-xl mx-auto"
-            style={{ color: '#A09F9B' }}
-          >
-            Learn Arabic roots, read with translation, master recitation.
-            Built for every Muslim.
-          </p>
-
-          {/* CTAs */}
-          <div className="flex flex-wrap items-center justify-center gap-3 mb-12">
-            <Link
-              href="/quran"
-              className="flex items-center gap-2 px-6 py-3.5 rounded-2xl text-sm font-bold transition-all duration-200 hover:scale-105 active:scale-95"
-              style={{
-                background: 'linear-gradient(135deg, #D4A246, #C89535)',
-                color: '#0E0D0C',
-                boxShadow: '0 4px 24px rgba(212,162,70,0.35)',
-              }}
-            >
-              Open the Quran
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-              </svg>
-            </Link>
-            <Link
-              href="/roots"
-              className="flex items-center gap-2 px-6 py-3.5 rounded-2xl text-sm font-semibold transition-all duration-200 hover:scale-105 active:scale-95"
-              style={{
-                background: 'rgba(255,255,255,0.04)',
-                color: '#EDEDEC',
-                border: '1px solid rgba(255,255,255,0.12)',
-              }}
-            >
-              Explore Roots
-            </Link>
-          </div>
-
-          {/* Feature badges */}
-          <div className="flex flex-wrap items-center justify-center gap-2 mb-14">
-            {[
-              { label: 'Word-by-Word', d: 'M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25' },
-              { label: 'Qirat Training', d: 'M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 0 1-1.632 2.163l-1.32.377a1.803 1.803 0 1 1-.99-3.467l2.31-.66a2.25 2.25 0 0 0 1.632-2.163Zm0 0V4.103A2.25 2.25 0 0 0 17.77 2.03l-4.046 1.157A2.25 2.25 0 0 0 12.12 5.35v6.2a2.25 2.25 0 0 1-1.632 2.163l-1.32.377a1.803 1.803 0 1 1-.99-3.467l2.31-.66A2.25 2.25 0 0 0 12.12 7.8' },
-              { label: 'Root Analysis', d: 'm3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z' },
-              { label: 'Grammar Lessons', d: 'M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342' },
-            ].map((b) => (
-              <span
-                key={b.label}
-                className="flex items-center gap-1.5 text-xs font-medium px-3.5 py-1.5 rounded-full"
-                style={{
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid rgba(255,255,255,0.09)',
-                  color: '#A09F9B',
-                }}
-              >
-                <svg className="w-3.5 h-3.5" style={{ color: '#D4A246' }} fill="none" viewBox="0 0 24 24" strokeWidth={1.6} stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" d={b.d} />
+                Try five roots, no sign-up
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                 </svg>
-                {b.label}
-              </span>
-            ))}
+              </Link>
+              <Link
+                href="/quran"
+                className="flex items-center gap-2 px-6 py-3.5 rounded-2xl text-sm font-semibold transition-all duration-200 hover:scale-105 active:scale-95"
+                style={{ background: 'rgba(255,255,255,0.04)', color: '#EDEDEC', border: '1px solid rgba(255,255,255,0.12)' }}
+              >
+                Open the Quran
+              </Link>
+            </div>
+            <p className="text-xs" style={{ color: '#6E6B66' }}>
+              Free, with no ads.{' '}
+              <Link href="/support" className="underline underline-offset-4 hover:text-[#D4A246] transition-colors">Support QuRoots</Link>
+            </p>
           </div>
-
-          {/* Support pill — visible on mobile and desktop */}
-          <div className="flex justify-center mb-4">
-            <Link
-              href="/support"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-full transition-all duration-200 hover:-translate-y-0.5"
-              style={{ background: 'rgba(212,162,70,0.1)', border: '1px solid rgba(212,162,70,0.3)', color: '#D4A246' }}
-            >
-              <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
-              </svg>
-              QuRoots is free — support it
-            </Link>
+          <div className="relative">
+            <RootBloom caption="935 times in the Quran" />
           </div>
-        </div>
-
-        {/* Stats bar */}
-        <section
-          ref={statsRef}
-          className="relative z-10 w-full max-w-xl mx-auto"
-        >
-          <div
-            className="grid grid-cols-3 divide-x rounded-2xl overflow-hidden"
-            style={{
-              background: 'rgba(255,255,255,0.03)',
-              border: '1px solid rgba(212,162,70,0.12)',
-            }}
-          >
-            {[
-              { value: roots.count.toLocaleString(),  label: 'Arabic Roots',   suffix: '+' },
-              { value: ayahs.count.toLocaleString(),  label: 'Quranic Ayahs',  suffix: ''  },
-              { value: words.count.toLocaleString(),  label: 'Unique Words',   suffix: '+'  },
-            ].map((s) => (
-              <div key={s.label} className="flex flex-col items-center py-5 px-2" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-                <span
-                  className="text-2xl font-bold tabular-nums leading-none mb-0.5"
-                  style={{ color: '#D4A246', fontVariantNumeric: 'tabular-nums' }}
-                >
-                  {s.value}{s.suffix}
-                </span>
-                {/*
-                  Deliberately NOT font-arabic. That maps to UthmanicHafs, a
-                  Quran-text face with no Arabic-Indic digit glyphs (U+0660-0669),
-                  so these numerals rendered as tofu boxes. The UI font stack
-                  covers them on every mainstream platform.
-                */}
-                <span
-                  className="text-[11px] leading-none mb-1.5"
-                  style={{ color: '#D4A246', opacity: 0.55, letterSpacing: '0.04em' }}
-                  dir="rtl"
-                  lang="ar"
-                >
-                  {toArabicIndic(s.value)}{s.suffix}
-                </span>
-                <span className="text-[10px] uppercase tracking-widest" style={{ color: '#57534E' }}>
-                  {s.label}
-                </span>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Scroll cue */}
-        <div
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 animate-scroll-bounce"
-          style={{ color: '#3D3C3A' }}
-        >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-          </svg>
         </div>
       </section>
 
@@ -794,22 +581,6 @@ export function HomepageClient() {
           ))}
         </div>
 
-        {/* ── Signature moment: Root Bloom ── */}
-        <div className="mt-10">
-          <p
-            className="text-center text-[10px] uppercase tracking-[0.3em] font-bold mb-2"
-            style={{ color: '#D4A246', opacity: 0.7 }}
-          >
-            From one root, an entire vocabulary
-          </p>
-          <p
-            className="text-center text-xs mb-2"
-            style={{ color: '#A09F9B' }}
-          >
-            Watch the root <span className="font-arabic" style={{ color: '#D4A246' }}>{ROOT_TREE.root}</span> bloom into {ROOT_TREE.derivatives.length} Quranic words
-          </p>
-          <RootBloom />
-        </div>
       </section>
 
       {/* ══════════════════════════════════════════════════════
@@ -917,7 +688,7 @@ export function HomepageClient() {
             { href: '/quran',       label: 'Quran'   },
             { href: '/roots',       label: 'Roots'   },
             { href: '/learn/path',  label: 'Learn'   },
-            { href: '/learn/qirat', label: 'Qirat'   },
+            ...(QIRAT_UNLOCKED ? [{ href: '/learn/qirat', label: 'Qirat' }] : []),
             { href: '/search',      label: 'Search'  },
             { href: '/blog',        label: 'Blog'    },
             { href: '/support',     label: 'Support' },

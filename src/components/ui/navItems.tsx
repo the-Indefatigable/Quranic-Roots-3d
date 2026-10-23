@@ -22,7 +22,7 @@ export const navItems: NavEntry[] = [
   { href: '/learn/path',  label: 'Learn Arabic', icon: LearnIcon },
   { href: '/verbs',       label: 'Daily Verbs',  icon: VerbsIcon },
   { href: '/words',       label: 'Everyday Words', icon: WordsIcon },
-  { href: '/learn/qirat', label: 'Learn Qirat',  icon: QiratIcon, badge: !QIRAT_UNLOCKED ? 'Soon' : undefined },
+  ...(QIRAT_UNLOCKED ? [{ href: '/learn/qirat', label: 'Learn Qirat', icon: QiratIcon, badge: 'New' } as NavEntry] : []),
   { type: 'section', label: 'Read' },
   { href: '/quran',       label: 'Quran',        icon: BookIcon },
   { href: '/roots',       label: 'Roots',        icon: RootIcon },
