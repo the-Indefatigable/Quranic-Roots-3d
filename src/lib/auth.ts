@@ -25,15 +25,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   callbacks: {
     async session({ session, user }) {
-      // Attach custom fields from users table
-      if (session.user) {
-        session.user.id = user.id;
-        session.user.role = (user as any).role || 'student';
-        session.user.streakDays = (user as any).streakDays || 0;
-        session.user.lastActive = (user as any).lastActive || null;
-        session.user.preferredLang = (user as any).preferredLang || 'en';
-      }
-      return session;
+      // The adapter puts the whole users row on session.user, and the session is sent to the
+      // browser, so build it from an allow-list (never the password hash or unsubscribe token).
+      return {
+        expires: session.expires,
+        user: {
+          id: user.id,
+          name: user.name ?? null,
+          email: user.email,
+          image: user.image ?? null,
+          role: (user as any).role || 'student',
+          streakDays: (user as any).streakDays || 0,
+          lastActive: (user as any).lastActive || null,
+          preferredLang: (user as any).preferredLang || 'en',
+        },
+      } as typeof session;
     },
   },
   pages: {
