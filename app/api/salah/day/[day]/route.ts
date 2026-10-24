@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { pack } from '@/lib/wire';
 import { auth } from '@/lib/auth';
 import { PATH, hasPathAccess, linesFor, linesOf } from '@/lib/salahPath';
 
@@ -18,5 +19,5 @@ export async function GET(_req: Request, { params }: { params: Promise<{ day: st
   const lines = n === 7 ? linesOf(1) : n === 30 ? PATH.lines : linesFor(n);
   // quiz distractors: meanings of roots learned on earlier days
   const earlier = PATH.days.filter((d) => d.day < n).flatMap((d) => d.roots.map((r) => r.meaning)).filter(Boolean);
-  return NextResponse.json({ day, lines, earlierMeanings: earlier.slice(-24) }, { headers: { 'Cache-Control': 'private, no-store' } });
+  return NextResponse.json(pack({ day, lines, earlierMeanings: earlier.slice(-24) }), { headers: { 'Cache-Control': 'private, no-store' } });
 }

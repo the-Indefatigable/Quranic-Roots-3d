@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import DOMPurify from 'isomorphic-dompurify';
+import { unpack } from '@/lib/wire';
 
 interface TafsirEntry {
   ayahNumber: number;
@@ -37,7 +38,7 @@ export function TafsirPanel({ surahNumber, ayahNumber, ayahs, onClose }: Props) 
       try {
         const res = await fetch(`/api/tafsir/${surahNumber}`);
         if (!res.ok) throw new Error('Failed');
-        const data = await res.json();
+        const data = await unpack(res);
         // Ensure entries are sorted by ayah ASC for range calculation
         const entries = (data.entries || []).sort((a: TafsirEntry, b: TafsirEntry) => a.ayahNumber - b.ayahNumber);
         cached = {

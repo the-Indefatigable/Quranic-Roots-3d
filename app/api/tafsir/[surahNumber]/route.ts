@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { pack } from '@/lib/wire';
 import { db } from '@/db';
 import { tafsirEntries, tafsirs } from '@/db/schema';
 import { eq, and, asc } from 'drizzle-orm';
@@ -41,11 +42,11 @@ export async function GET(
         .limit(1);
 
       return NextResponse.json(
-        {
+        pack({
           entry: entry || null,
           tafsirName: tafsir.name,
           authorName: tafsir.authorName,
-        },
+        }),
         { headers: { 'Cache-Control': 'public, s-maxage=86400, stale-while-revalidate=604800' } }
       );
     }
@@ -63,11 +64,11 @@ export async function GET(
       .orderBy(asc(tafsirEntries.ayahNumber));
 
     return NextResponse.json(
-      {
+      pack({
         entries,
         tafsirName: tafsir.name,
         authorName: tafsir.authorName,
-      },
+      }),
       { headers: { 'Cache-Control': 'public, s-maxage=86400, stale-while-revalidate=604800' } }
     );
   } catch (err) {

@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useSalahProgress, startPathCheckout } from './useSalahProgress';
+import { unpack } from '@/lib/wire';
 
 const GOLD = '#D4A246';
 
@@ -33,7 +34,7 @@ export function SalahLesson({ day }: { day: number }) {
 
   useEffect(() => {
     fetch(`/api/salah/day/${day}`).then(async (r) => {
-      const d = await r.json().catch(() => ({}));
+      const d = await unpack(r).catch(() => ({}));
       if (r.status === 402) setLocked(d.title || '');
       else if (!r.ok) setError(d.error || 'Could not load this day.');
       else { setData(d); setStep(d.day.roots.length ? { kind: 'root', i: 0 } : { kind: 'lines' }); }

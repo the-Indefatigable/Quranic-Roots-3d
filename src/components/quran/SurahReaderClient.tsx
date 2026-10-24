@@ -8,6 +8,7 @@ import { WordPopover, type WordData } from './WordPopover';
 import { TafsirPanel } from './TafsirPanel';
 import { AyahLessonModal } from './AyahLessonModal';
 import type { PlayMode, LoopMode } from './AudioPlayer';
+import { unpack } from '@/lib/wire';
 
 // Lazy-load the 1.3k LOC audio player + its DSP deps. Keeps it out of the
 // initial reader bundle; mounts on first render of the player surface.
@@ -126,7 +127,7 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, surahArabicNa
     try {
       const res = await fetch(`/api/quran/${nextNum}`);
       if (!res.ok) throw new Error('fetch failed');
-      const data = await res.json();
+      const data = await unpack(res);
       const nextBlock: SurahBlock = {
         surahNumber: data.surah.number,
         surahName: data.surah.englishName,

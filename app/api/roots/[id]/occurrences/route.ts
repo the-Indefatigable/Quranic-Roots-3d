@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { pack } from '@/lib/wire';
 import { db, dbQuery } from '@/db';
 import { quranWords, surahs, translationEntries } from '@/db/schema';
 import { eq, asc, sql, inArray } from 'drizzle-orm';
@@ -99,7 +100,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
       };
     });
 
-    return NextResponse.json({ occurrences }, {
+    return NextResponse.json(pack({ occurrences }), {
       headers: { 'Cache-Control': 'public, s-maxage=86400, stale-while-revalidate=604800' },
     });
   } catch (err) {

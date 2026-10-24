@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { pack } from '@/lib/wire';
 import { db, dbQuery } from '@/db';
 import { ayahs, translationEntries, translations, surahs } from '@/db/schema';
 import { eq, and, ilike, sql } from 'drizzle-orm';
@@ -114,7 +115,7 @@ export async function GET(request: NextRequest) {
           .limit(20)
       );
 
-      return NextResponse.json({ results: rows });
+      return NextResponse.json(pack({ results: rows }));
     }
 
     // English: search translation_entries (now fully populated)
@@ -148,7 +149,7 @@ export async function GET(request: NextRequest) {
         .limit(20)
     );
 
-    return NextResponse.json({ results: rows });
+    return NextResponse.json(pack({ results: rows }));
   } catch (error) {
     console.error('[search] Error:', error);
     return NextResponse.json({ error: 'Search failed' }, { status: 500 });

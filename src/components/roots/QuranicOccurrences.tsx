@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/Badge';
+import { unpack } from '@/lib/wire';
 
 interface Occurrence {
   surahNumber: number;
@@ -31,7 +32,7 @@ export function QuranicOccurrences({ occurrences: initial, totalAyahs, rootArabi
       const res = await fetch(
         `/api/roots/${encodeURIComponent(rootArabic)}/occurrences?offset=${items.length}&limit=10`
       );
-      const data = await res.json();
+      const data = await unpack(res);
       if (data.occurrences?.length) {
         setItems((prev) => [...prev, ...data.occurrences]);
       }

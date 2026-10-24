@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { unpack } from '@/lib/wire';
 
 interface SearchResult {
   surahNumber: number;
@@ -47,7 +48,7 @@ export default function SearchPage() {
       setLoading(true);
       try {
         const res = await fetch(`/api/search?q=${encodeURIComponent(trimmed)}`);
-        const data = await res.json();
+        const data = await unpack(res);
         setResults(data.results ?? []);
         setSearched(true);
       } catch {

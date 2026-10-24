@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { pack } from '@/lib/wire';
 import { db, dbQuery } from '@/db';
 import { surahs, ayahs, translationEntries, translations, quranWords } from '@/db/schema';
 import { eq, and, asc } from 'drizzle-orm';
@@ -96,7 +97,7 @@ export async function GET(
   }));
 
   return NextResponse.json(
-    { surah: surahRows[0], ayahs: ayahData },
+    pack({ surah: surahRows[0], ayahs: ayahData }),
     {
       headers: {
         'Cache-Control': 'public, s-maxage=86400, stale-while-revalidate=604800',
