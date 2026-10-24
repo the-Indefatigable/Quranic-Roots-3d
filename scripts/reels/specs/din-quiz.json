@@ -1,0 +1,28 @@
+{
+ "tag": "3-SECOND ROOT QUIZ",
+ "segments": [
+  {"id": "hook", "say": "Three seconds. What does this root mean?", "gap": 3.4},
+  {"id": "reveal", "say": "To judge, and to owe. Dal, Ya, Noon.", "gap": 0.35},
+  {"id": "family", "say": "It gives Judgment, as in the Day of Judgment. Religion, as in to you your religion. And even a debt.", "gap": 0.35},
+  {"id": "cta", "say": "Got it right? Learn one root a day for thirty days. Link in bio.", "gap": 0.8}
+ ],
+ "captions": {"map": {"three": "3", "thirty": "30"}},
+ "scenes": [
+  {"type": "quiz", "from": 0, "to": {"seg": "family", "edge": "start", "offset": -0.1}, "letters": "د ي ن",
+   "options": ["to judge, to owe", "to pray", "to write", "to travel"], "answer": 0,
+   "timerFrom": {"seg": "hook", "edge": "end", "offset": 0.15}, "reveal": {"seg": "reveal", "edge": "start", "offset": -0.1}},
+  {"type": "chips", "from": {"seg": "family", "edge": "start", "offset": -0.1}, "to": {"seg": "cta", "edge": "start", "offset": -0.1}, "items": [
+   {"ar": "ٱلدِّينِ", "en": "Judgment", "ref": "1:4", "at": {"seg": "family", "word": "Judgment"}},
+   {"ar": "دِينُكُمْ", "en": "your religion", "ref": "109:6", "at": {"seg": "family", "word": "Religion"}},
+   {"ar": "تَدَايَنتُم", "en": "you take a debt", "ref": "2:282", "hero": true, "at": {"seg": "family", "word": "debt"}}]},
+  {"type": "cta", "from": {"seg": "cta", "edge": "start"}, "line": "One root a day. <em>30 days</em>. Every word of your salah.", "free": "The first week is free"}
+ ],
+ "sfx": [
+  {"n": "ting_hi", "seg": "hook", "edge": "start"},
+  {"n": "clock", "seg": "hook", "edge": "end", "offset": 0.15, "count": 3, "every": 1},
+  {"n": "buzz", "seg": "hook", "edge": "end", "offset": 3.15},
+  {"n": "chime", "seg": "reveal", "word": "judge"},
+  {"n": "ting", "seg": "family", "word": "Judgment"}, {"n": "ting", "seg": "family", "word": "Religion"}, {"n": "chime", "seg": "family", "word": "debt"},
+  {"n": "chime", "seg": "cta", "edge": "start", "offset": -0.1}
+ ]
+}

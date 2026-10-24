@@ -1,0 +1,234 @@
+{
+ "tag": "QURANIC ROOTS · ع ب د",
+ "hideCaptions": [
+  "hook"
+ ],
+ "segments": [
+  {
+   "id": "hook",
+   "say": "What does the name Abdullah have to do with your salah?",
+   "gap": 0.4
+  },
+  {
+   "id": "letters",
+   "say": "Ayn. Ba. Dal.",
+   "gap": 0.25
+  },
+  {
+   "id": "meaning",
+   "say": "The root of worship, and of serving.",
+   "gap": 0.3
+  },
+  {
+   "id": "family",
+   "say": "In every prayer you say, we worship. Abdullah is the servant of Allah. And in the Ramadan verses, Allah calls us: My servants.",
+   "gap": 0.35
+  },
+  {
+   "id": "close",
+   "say": "Every Abd in a name is a promise you make in salah.",
+   "gap": 0.35
+  },
+  {
+   "id": "cta",
+   "say": "Understand every word of your salah in thirty days. Link in bio.",
+   "gap": 0.8
+  }
+ ],
+ "captions": {
+  "map": {
+   "thirty": "30"
+  }
+ },
+ "scenes": [
+  {
+   "type": "title",
+   "from": 0,
+   "to": {
+    "seg": "letters",
+    "edge": "start",
+    "offset": -0.1
+   },
+   "text": "What does <em>Abdullah</em> have to do with your salah?"
+  },
+  {
+   "type": "letters",
+   "from": {
+    "seg": "letters",
+    "edge": "start",
+    "offset": -0.1
+   },
+   "to": {
+    "seg": "close",
+    "edge": "start",
+    "offset": -0.1
+   },
+   "letters": [
+    "ع",
+    "ب",
+    "د"
+   ],
+   "at": [
+    {
+     "seg": "letters",
+     "word": "Ayn"
+    },
+    {
+     "seg": "letters",
+     "word": "Ba"
+    },
+    {
+     "seg": "letters",
+     "word": "Dal"
+    }
+   ],
+   "meaning": "to worship, to serve",
+   "meaningAt": {
+    "seg": "meaning",
+    "word": "worship"
+   },
+   "shrinkAt": {
+    "seg": "family",
+    "edge": "start",
+    "offset": -0.2
+   },
+   "shrinkY": 40
+  },
+  {
+   "type": "chips",
+   "from": {
+    "seg": "family",
+    "edge": "start",
+    "offset": -0.1
+   },
+   "to": {
+    "seg": "close",
+    "edge": "start",
+    "offset": -0.1
+   },
+   "items": [
+    {
+     "ar": "نَعْبُدُ",
+     "en": "we worship",
+     "ref": "1:5",
+     "at": {
+      "seg": "family",
+      "word": "worship"
+     },
+     "x": 280,
+     "y": 440
+    },
+    {
+     "ar": "عَبْدُ ٱللَّهِ",
+     "en": "servant of Allah",
+     "ref": "72:19",
+     "at": {
+      "seg": "family",
+      "word": "Abdullah"
+     },
+     "x": 800,
+     "y": 440
+    },
+    {
+     "ar": "عِبَادِى",
+     "en": "My servants",
+     "ref": "2:186",
+     "hero": true,
+     "at": {
+      "seg": "family",
+      "word": "servants"
+     },
+     "x": 540,
+     "y": 1190
+    }
+   ]
+  },
+  {
+   "type": "title",
+   "from": {
+    "seg": "close",
+    "edge": "start"
+   },
+   "to": {
+    "seg": "cta",
+    "edge": "start",
+    "offset": -0.1
+   },
+   "text": "Every <em>ʿAbd</em> in a name is a promise you make in salah"
+  },
+  {
+   "type": "cta",
+   "from": {
+    "seg": "cta",
+    "edge": "start"
+   },
+   "line": "Understand every word of your <em>salah</em> in 30 days",
+   "free": "The first week is free"
+  }
+ ],
+ "sfx": [
+  {
+   "n": "ting",
+   "seg": "hook",
+   "word": "Abdullah"
+  },
+  {
+   "n": "ting_hi",
+   "seg": "hook",
+   "word": "salah"
+  },
+  {
+   "n": "whoosh",
+   "seg": "letters",
+   "edge": "start",
+   "offset": -0.4
+  },
+  {
+   "n": "tock",
+   "seg": "letters",
+   "word": "Ayn"
+  },
+  {
+   "n": "tock",
+   "seg": "letters",
+   "word": "Ba"
+  },
+  {
+   "n": "tock",
+   "seg": "letters",
+   "word": "Dal"
+  },
+  {
+   "n": "sub",
+   "seg": "meaning",
+   "word": "worship"
+  },
+  {
+   "n": "ting",
+   "seg": "family",
+   "word": "worship"
+  },
+  {
+   "n": "ting",
+   "seg": "family",
+   "word": "Abdullah"
+  },
+  {
+   "n": "chime",
+   "seg": "family",
+   "word": "servants"
+  },
+  {
+   "n": "whoosh_down",
+   "seg": "close",
+   "edge": "start",
+   "offset": -0.35
+  },
+  {
+   "n": "chime",
+   "seg": "cta",
+   "edge": "start",
+   "offset": -0.1
+  }
+ ]
+}

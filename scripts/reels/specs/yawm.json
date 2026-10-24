@@ -1,0 +1,264 @@
+{
+ "tag": "QURANIC ROOTS · ي و م",
+ "segments": [
+  {
+   "id": "hook",
+   "say": "In every prayer, you mention one day.",
+   "gap": 0.35
+  },
+  {
+   "id": "recite",
+   "recite": [
+    "https://everyayah.com/data/Alafasy_128kbps/001004.mp3"
+   ],
+   "gap": 0.4
+  },
+  {
+   "id": "two",
+   "say": "Master of the Day of Judgment. That day grows from three letters.",
+   "gap": 0.2
+  },
+  {
+   "id": "letters",
+   "say": "Ya. Waw. Meem.",
+   "gap": 0.25
+  },
+  {
+   "id": "meaning",
+   "say": "The root of day.",
+   "gap": 0.3
+  },
+  {
+   "id": "family",
+   "say": "From it comes day. Today. And days, as in the fasting verse: a few counted days.",
+   "gap": 0.35
+  },
+  {
+   "id": "ramadan",
+   "say": "Ramadan is that: a few counted days. And it is close.",
+   "gap": 0.35
+  },
+  {
+   "id": "cta",
+   "say": "Understand every word of your salah before it arrives. Link in bio.",
+   "gap": 0.8
+  }
+ ],
+ "captions": {
+  "map": {
+   "thirty": "30"
+  }
+ },
+ "scenes": [
+  {
+   "type": "ayah",
+   "from": 0,
+   "to": {
+    "seg": "letters",
+    "edge": "start",
+    "offset": -0.15
+   },
+   "recite": "recite",
+   "words": [
+    {
+     "ar": "مَـٰلِكِ"
+    },
+    {
+     "ar": "يَوْمِ"
+    },
+    {
+     "ar": "ٱلدِّينِ"
+    }
+   ],
+   "trans": "Master of the Day of Judgment",
+   "transFrom": {
+    "seg": "recite",
+    "edge": "end"
+   },
+   "gold": {
+    "idx": [
+     1
+    ],
+    "at": {
+     "seg": "two",
+     "word": "That"
+    }
+   }
+  },
+  {
+   "type": "letters",
+   "from": {
+    "seg": "letters",
+    "edge": "start",
+    "offset": -0.1
+   },
+   "to": {
+    "seg": "ramadan",
+    "edge": "start",
+    "offset": -0.1
+   },
+   "letters": [
+    "ي",
+    "و",
+    "م"
+   ],
+   "at": [
+    {
+     "seg": "letters",
+     "word": "Ya"
+    },
+    {
+     "seg": "letters",
+     "word": "Waw"
+    },
+    {
+     "seg": "letters",
+     "word": "Meem"
+    }
+   ],
+   "meaning": "day",
+   "meaningAt": {
+    "seg": "meaning",
+    "word": "day"
+   },
+   "shrinkAt": {
+    "seg": "family",
+    "edge": "start",
+    "offset": -0.2
+   },
+   "shrinkY": 40
+  },
+  {
+   "type": "chips",
+   "from": {
+    "seg": "family",
+    "edge": "start",
+    "offset": -0.1
+   },
+   "to": {
+    "seg": "ramadan",
+    "edge": "start",
+    "offset": -0.1
+   },
+   "items": [
+    {
+     "ar": "يَوْم",
+     "en": "day",
+     "ref": "1:4",
+     "at": {
+      "seg": "family",
+      "word": "day"
+     },
+     "x": 280,
+     "y": 440
+    },
+    {
+     "ar": "ٱلْيَوْمَ",
+     "en": "today",
+     "ref": "5:3",
+     "at": {
+      "seg": "family",
+      "word": "Today"
+     },
+     "x": 800,
+     "y": 440
+    },
+    {
+     "ar": "أَيَّامًا",
+     "en": "days",
+     "ref": "2:184",
+     "hero": true,
+     "at": {
+      "seg": "family",
+      "word": "days"
+     },
+     "x": 540,
+     "y": 1190
+    }
+   ]
+  },
+  {
+   "type": "title",
+   "from": {
+    "seg": "ramadan",
+    "edge": "start"
+   },
+   "to": {
+    "seg": "cta",
+    "edge": "start",
+    "offset": -0.1
+   },
+   "text": "<span class=\"ar\" style=\"font-family:Amiri\">أَيَّامًا مَّعْدُودَٰتٍ</span><br><em>a few counted days</em>",
+   "sub": "Al-Baqarah 2:184 · the fasting verse"
+  },
+  {
+   "type": "cta",
+   "from": {
+    "seg": "cta",
+    "edge": "start"
+   },
+   "line": "Understand every word of your <em>salah</em> before Ramadan",
+   "free": "30 days · the first week is free"
+  }
+ ],
+ "sfx": [
+  {
+   "n": "whoosh",
+   "seg": "recite",
+   "edge": "start",
+   "offset": -0.45
+  },
+  {
+   "n": "ting",
+   "seg": "two",
+   "word": "That"
+  },
+  {
+   "n": "tock",
+   "seg": "letters",
+   "word": "Ya"
+  },
+  {
+   "n": "tock",
+   "seg": "letters",
+   "word": "Waw"
+  },
+  {
+   "n": "tock",
+   "seg": "letters",
+   "word": "Meem"
+  },
+  {
+   "n": "sub",
+   "seg": "meaning",
+   "word": "day"
+  },
+  {
+   "n": "ting",
+   "seg": "family",
+   "word": "day"
+  },
+  {
+   "n": "ting",
+   "seg": "family",
+   "word": "Today"
+  },
+  {
+   "n": "chime",
+   "seg": "family",
+   "word": "days"
+  },
+  {
+   "n": "whoosh_down",
+   "seg": "ramadan",
+   "edge": "start",
+   "offset": -0.35
+  },
+  {
+   "n": "chime",
+   "seg": "cta",
+   "edge": "start",
+   "offset": -0.1
+  }
+ ]
+}

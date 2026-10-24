@@ -1,0 +1,37 @@
+{
+ "tag": "AL-FĀTIḤA · WORD BY WORD · PART 2",
+ "hideCaptions": ["g3", "g4", "g5"],
+ "segments": [
+  {"id": "hook", "say": "Part two. What you are actually saying, word by word.", "gap": 0.4},
+  {"id": "r3", "recite": ["https://everyayah.com/data/Alafasy_128kbps/001003.mp3"], "gap": 0.35},
+  {"id": "g3", "say": "The Most Gracious. The Most Merciful.", "gap": 0.5},
+  {"id": "r4", "recite": ["https://everyayah.com/data/Alafasy_128kbps/001004.mp3"], "gap": 0.35},
+  {"id": "g4", "say": "Master. Of the Day. Of Judgment.", "gap": 0.5},
+  {"id": "r5", "recite": ["https://everyayah.com/data/Alafasy_128kbps/001005.mp3"], "gap": 0.35},
+  {"id": "g5", "say": "You alone. We worship. And You alone. We ask for help.", "gap": 0.4},
+  {"id": "cta", "say": "Every word of your salah, in thirty days. Link in bio.", "gap": 0.8}
+ ],
+ "captions": {"map": {"thirty": "30"}},
+ "scenes": [
+  {"type": "title", "from": 0, "to": {"seg": "r3", "edge": "start", "offset": -0.15}, "y": 640, "text": "What you're <em>actually</em> saying", "sub": "Part 2"},
+  {"type": "ayah", "stack": true, "y": 480, "from": {"seg": "r3", "edge": "start", "offset": -0.15}, "to": {"seg": "r4", "edge": "start", "offset": -0.2}, "recite": "r3",
+   "words": [{"ar": "ٱلرَّحْمَـٰنِ", "en": "the Most Gracious"}, {"ar": "ٱلرَّحِيمِ", "en": "the Most Merciful"}],
+   "gloss": [{"i": 0, "at": {"seg": "g3", "word": "Gracious"}}, {"i": 1, "at": {"seg": "g3", "word": "Merciful"}}]},
+  {"type": "ayah", "stack": true, "y": 420, "from": {"seg": "r4", "edge": "start", "offset": -0.2}, "to": {"seg": "r5", "edge": "start", "offset": -0.2}, "recite": "r4",
+   "words": [{"ar": "مَـٰلِكِ", "en": "Master"}, {"ar": "يَوْمِ", "en": "of the Day"}, {"ar": "ٱلدِّينِ", "en": "of Judgment"}],
+   "gloss": [{"i": 0, "at": {"seg": "g4", "word": "Master"}}, {"i": 1, "at": {"seg": "g4", "word": "Day"}}, {"i": 2, "at": {"seg": "g4", "word": "Judgment"}}]},
+  {"type": "ayah", "stack": true, "y": 380, "from": {"seg": "r5", "edge": "start", "offset": -0.2}, "to": {"seg": "cta", "edge": "start", "offset": -0.1}, "recite": "r5",
+   "words": [{"ar": "إِيَّاكَ", "en": "You alone"}, {"ar": "نَعْبُدُ", "en": "we worship"}, {"ar": "وَإِيَّاكَ", "en": "and You alone"}, {"ar": "نَسْتَعِينُ", "en": "we ask for help"}],
+   "gloss": [{"i": 0, "at": {"seg": "g5", "word": "You"}}, {"i": 1, "at": {"seg": "g5", "word": "worship"}}, {"i": 2, "at": {"seg": "g5", "word": "You", "nth": 1}}, {"i": 3, "at": {"seg": "g5", "word": "help"}}]},
+  {"type": "cta", "from": {"seg": "cta", "edge": "start"}, "line": "Every word of your <em>salah</em>, in 30 days", "free": "The first week is free"}
+ ],
+ "sfx": [
+  {"n": "whoosh", "seg": "r3", "edge": "start", "offset": -0.45},
+  {"n": "tock", "seg": "g3", "word": "Gracious"}, {"n": "ting", "seg": "g3", "word": "Merciful"},
+  {"n": "whoosh", "seg": "r4", "edge": "start", "offset": -0.45},
+  {"n": "tock", "seg": "g4", "word": "Master"}, {"n": "tock", "seg": "g4", "word": "Day"}, {"n": "ting", "seg": "g4", "word": "Judgment"},
+  {"n": "whoosh", "seg": "r5", "edge": "start", "offset": -0.45},
+  {"n": "tock", "seg": "g5", "word": "You"}, {"n": "tock", "seg": "g5", "word": "worship"}, {"n": "tock", "seg": "g5", "word": "You", "nth": 1}, {"n": "ting", "seg": "g5", "word": "help"},
+  {"n": "chime", "seg": "cta", "edge": "start", "offset": -0.1}
+ ]
+}
