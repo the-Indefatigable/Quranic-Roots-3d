@@ -30,6 +30,8 @@
 <script>
 const MARK = (size) => `<svg class="mark" width="${size}" height="${size}" viewBox="18 14 84 92" fill="none"><defs><linearGradient id="g" x1="60" y1="18" x2="60" y2="104" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#E7C877"/><stop offset=".55" stop-color="#D4A246"/><stop offset="1" stop-color="#B4822E"/></linearGradient></defs>
   <path d="M60 20 L74 36 L60 52 L46 36 Z" fill="url(#g)"/><g stroke="url(#g)" stroke-width="6" stroke-linecap="round"><path d="M60 50 L60 100"/><path d="M60 56 C 55 72 46 78 30 96"/><path d="M60 56 C 65 72 74 78 90 96"/><path d="M45 76 C 42 82 40 86 36 92" stroke-width="4.5"/><path d="M75 76 C 78 82 80 86 84 92" stroke-width="4.5"/></g></svg>`;
+// Bold single-colour mark for tiny sizes (profile picture, watermark).
+const SOLID = (size, color) => `<svg width="${size}" height="${size}" viewBox="20 12 80 92" fill="none"><path d="M60 16 L77 35 L60 54 L43 35 Z" fill="${color}"/><g stroke="${color}" stroke-width="10" stroke-linecap="round"><path d="M60 50 L60 100"/><path d="M60 58 C 55 72 44 80 28 97"/><path d="M60 58 C 65 72 76 80 92 97"/></g></svg>`;
 const ghosts = (list) => list.map(([t, x, y, s]) => `<span class="ghost" style="left:${x}px;top:${y}px;font-size:${s}px">${t}</span>`).join('');
 
 // One slide of the "3 roots in Al-Fatiha" carousel.
@@ -53,7 +55,8 @@ const cover = (letters, top, bottom) => ({ w: 1080, h: 1920, html: `
   </div>` });
 
 const ART = {
-  profile: { w: 1080, h: 1080, html: `<div class="c">${MARK(560)}</div>` },
+  profile: { w: 1080, h: 1080, html: `<div class="c" style="background:radial-gradient(circle at 50% 35%, #EDD08A, #D4A246 55%, #A9772A)">${SOLID(640, '#14110C')}</div>` },
+  watermark: { w: 600, h: 600, bare: true, html: `<div class="c">${SOLID(580, '#FFFFFF')}</div>` },
   banner: { w: 2560, h: 1440, html: `
     ${ghosts([['ر ح م', 120, 150, 240], ['ع ل م', 140, 1010, 220], ['ح م د', 2030, 140, 240], ['س ج د', 2050, 990, 240]])}
     <div class="c"><div style="display:flex;align-items:center;gap:56px">${MARK(300)}<div style="text-align:left">
@@ -120,5 +123,5 @@ const a = ART[location.hash.slice(1)] || ART.profile;
 document.documentElement.style.width = document.body.style.width = a.w + 'px';
 document.documentElement.style.height = document.body.style.height = a.h + 'px';
 const $root = document.getElementById('root');
-$root.className = 'art'; $root.style.width = a.w + 'px'; $root.style.height = a.h + 'px'; $root.innerHTML = a.html;
+$root.className = a.bare ? '' : 'art'; if (a.bare) document.documentElement.style.background = document.body.style.background = 'transparent'; $root.style.width = a.w + 'px'; $root.style.height = a.h + 'px'; $root.innerHTML = a.html;
 </script>
