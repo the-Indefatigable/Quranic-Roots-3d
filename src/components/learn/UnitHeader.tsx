@@ -48,17 +48,17 @@ export function UnitHeader({ unit, unitIndex }: UnitHeaderProps) {
         <div className="flex-1 pr-3 min-w-0">
           <div className="flex items-center gap-2 mb-1.5">
             <span
-              className="text-[10px] font-bold uppercase tracking-[0.18em] px-2 py-0.5 rounded-full"
+              className="text-[11px] font-bold uppercase tracking-[0.18em] px-2 py-0.5 rounded-full"
               style={{ background: `${color}18`, color }}
             >
               Unit {toEastern(unitIndex + 1)}
             </span>
-            <span className="text-[#3D3C3A] text-[10px]">
+            <span className="text-[#3D3C3A] text-[11px]">
               {totalLessons} lessons
             </span>
             {crown > 0 && (
               <span
-                className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                className="text-[11px] font-bold px-2 py-0.5 rounded-full"
                 style={{
                   backgroundColor: CROWN_COLORS[crown] + '20',
                   color: CROWN_COLORS[crown],
@@ -72,7 +72,7 @@ export function UnitHeader({ unit, unitIndex }: UnitHeaderProps) {
             {isLocked ? '🔒 ' : ''}{unit.title}
           </h2>
           {unit.description && !isLocked && (
-            <p className="text-[#57534E] text-[11px] leading-relaxed line-clamp-2">
+            <p className="text-[#57534E] text-[12px] leading-relaxed line-clamp-2">
               {unit.description}
             </p>
           )}
@@ -86,7 +86,7 @@ export function UnitHeader({ unit, unitIndex }: UnitHeaderProps) {
                   style={{ width: `${progressPercent}%`, backgroundColor: color }}
                 />
               </div>
-              <p className="text-[10px] text-[#3D3C3A] mt-1">
+              <p className="text-[11px] text-[#3D3C3A] mt-1">
                 {completedLessons}/{totalLessons} completed
               </p>
             </div>

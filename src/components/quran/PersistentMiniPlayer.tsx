@@ -102,7 +102,7 @@ export function PersistentMiniPlayer() {
     <div
       className={
         inMainLayout
-          ? 'fixed z-50 left-3 right-3 bottom-[calc(env(safe-area-inset-bottom)+12px)] rounded-2xl overflow-hidden shadow-modal lg:left-60 lg:right-0 lg:bottom-0 lg:rounded-none'
+          ? 'fixed z-50 left-3 right-3 bottom-[calc(env(safe-area-inset-bottom)+76px)] rounded-2xl overflow-hidden shadow-modal lg:left-64 lg:right-0 lg:bottom-0 lg:rounded-none'
           : 'fixed z-50 left-0 right-0 bottom-0'
       }
       style={{ pointerEvents: 'auto' }}
@@ -140,7 +140,7 @@ export function PersistentMiniPlayer() {
           aria-label={`Return to ${surahName} reader`}
         >
           <span className="block text-sm font-medium truncate" style={{ color: G.textPrimary }}>{surahName}</span>
-          <span className="block text-[11px] truncate" style={{ color: G.textTert }}>
+          <span className="block text-[12px] truncate" style={{ color: G.textTert }}>
             Ayah {currentAyah} of {totalAyahs}
             {duration > 0 && ` · ${formatTime(currentTime)} / ${formatTime(duration)}`}
             <span className="ml-2" style={{ color: G.gold }}>↑ Return to reader</span>

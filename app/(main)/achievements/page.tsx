@@ -1,6 +1,7 @@
 import { sql } from 'drizzle-orm';
 import { db, dbQuery } from '@/db';
 import { auth } from '@/lib/auth';
+import { CommunityTabs } from '@/components/community/CommunityTabs';
 
 export const dynamic = 'force-dynamic';
 
@@ -56,8 +57,8 @@ export default async function AchievementsPage() {
 
   return (
     <div>
+      <CommunityTabs />
       <div className="mb-6">
-        <div className="text-[10px] font-semibold uppercase tracking-[0.16em]" style={{ color: 'var(--color-primary)' }}>Community</div>
         <h1 className="text-3xl sm:text-4xl font-heading tracking-tight leading-[1.05]" style={{ color: 'var(--color-ivory)' }}>Badges</h1>
         <p className="mt-2 text-sm text-text-secondary max-w-xl">
           {session?.user?.id
@@ -99,10 +100,10 @@ export default async function AchievementsPage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <p className="text-sm font-semibold text-text truncate">{b.title}</p>
-                        {b.mine && <span className="text-[10px] font-bold uppercase text-primary">✓ earned</span>}
+                        {b.mine && <span className="text-[11px] font-bold uppercase text-primary">✓ earned</span>}
                       </div>
                       {b.description && <p className="text-xs text-text-secondary mt-0.5 leading-relaxed">{b.description}</p>}
-                      <p className="text-[11px] text-text-tertiary mt-1.5">
+                      <p className="text-[12px] text-text-tertiary mt-1.5">
                         {b.xp_bonus ? `+${b.xp_bonus} XP · ` : ''}{b.earned_count} {b.earned_count === 1 ? 'learner has' : 'learners have'} this
                       </p>
                     </div>

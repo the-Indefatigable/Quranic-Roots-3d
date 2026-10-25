@@ -36,7 +36,7 @@ export default function Page() {
       />
       <article className="max-w-2xl mx-auto px-4 py-10">
         {/* Crumb */}
-        <div className="mb-6 text-[11px]" style={{ color: '#57534E' }}>
+        <div className="mb-6 text-[12px]" style={{ color: '#8F8D88' }}>
           <Link href="/blog" className="hover:text-[#D4A246] transition-colors">Blog</Link>
           <span className="mx-2">›</span>
           <span style={{ color: '#A09F9B' }}>Daily Arabic</span>
@@ -46,7 +46,7 @@ export default function Page() {
         <header className="mb-10">
           <div className="flex items-center gap-2 mb-4">
             <span className="h-px w-6" style={{ background: 'rgba(16,185,129,0.6)' }} />
-            <span className="text-[10px] font-bold uppercase tracking-[0.25em]" style={{ color: '#34D399' }}>
+            <span className="text-[11px] font-bold uppercase tracking-[0.25em]" style={{ color: '#34D399' }}>
               Vocabulary · Beginner
             </span>
           </div>
@@ -56,7 +56,7 @@ export default function Page() {
           <p className="text-base leading-relaxed" style={{ color: '#A09F9B' }}>
             Thirty everyday Arabic words and twelve ready-to-use sentences, fully vowelled, with transliteration, English meaning, and a Quranic context line for each. Tap any card to flip it. Strictly <em>fusha</em> (Modern Standard / classical) — no dialect.
           </p>
-          <div className="mt-5 flex items-center gap-2 text-[11px]" style={{ color: '#636260' }}>
+          <div className="mt-5 flex items-center gap-2 text-[12px]" style={{ color: '#636260' }}>
             <span className="px-2 py-0.5 rounded-full" style={{ background: 'rgba(16,185,129,0.12)', color: '#34D399' }}>5 min read</span>
             <span>·</span>
             <span>30 words · 12 sentences</span>

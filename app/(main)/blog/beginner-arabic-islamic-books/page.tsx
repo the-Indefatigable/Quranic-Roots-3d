@@ -158,7 +158,7 @@ export default function Page() {
       />
       <article className="max-w-2xl mx-auto px-4 py-10">
         {/* Crumb */}
-        <div className="mb-6 text-[11px]" style={{ color: '#57534E' }}>
+        <div className="mb-6 text-[12px]" style={{ color: '#8F8D88' }}>
           <Link href="/blog" className="hover:text-[#D4A246] transition-colors">Blog</Link>
           <span className="mx-2">›</span>
           <span style={{ color: '#A09F9B' }}>Beginner Books</span>
@@ -168,7 +168,7 @@ export default function Page() {
         <header className="mb-10">
           <div className="flex items-center gap-2 mb-4">
             <span className="h-px w-6" style={{ background: 'rgba(16,185,129,0.6)' }} />
-            <span className="text-[10px] font-bold uppercase tracking-[0.25em]" style={{ color: '#34D399' }}>
+            <span className="text-[11px] font-bold uppercase tracking-[0.25em]" style={{ color: '#34D399' }}>
               Books · Beginner
             </span>
           </div>
@@ -178,7 +178,7 @@ export default function Page() {
           <p className="text-base leading-relaxed" style={{ color: '#A09F9B' }}>
             A short, opinionated list of books a complete beginner can actually finish. Every entry has a free legal PDF link (archive.org / sunnah.com / altafsir.com) and a rough price for a paper copy. No affiliate links — these are simply the books that have worked for generations of students.
           </p>
-          <div className="mt-5 flex flex-wrap items-center gap-2 text-[11px]" style={{ color: '#636260' }}>
+          <div className="mt-5 flex flex-wrap items-center gap-2 text-[12px]" style={{ color: '#636260' }}>
             <span className="px-2 py-0.5 rounded-full" style={{ background: 'rgba(16,185,129,0.12)', color: '#34D399' }}>{BOOKS.length} books</span>
             <span>·</span>
             <span>Free PDFs included</span>
@@ -189,7 +189,7 @@ export default function Page() {
 
         {/* Reading order callout */}
         <div className="mb-10 rounded-2xl p-5" style={{ background: 'rgba(212,162,70,0.05)', border: '1px solid rgba(212,162,70,0.18)' }}>
-          <h2 className="text-[11px] font-bold uppercase tracking-[0.2em] mb-3" style={{ color: '#D4A246' }}>
+          <h2 className="text-[12px] font-bold uppercase tracking-[0.2em] mb-3" style={{ color: '#D4A246' }}>
             Suggested order
           </h2>
           <ol className="space-y-1.5 text-sm" style={{ color: '#A09F9B' }}>
@@ -226,7 +226,7 @@ export default function Page() {
                     <h3 className="font-heading text-lg leading-tight" style={{ color: '#F0E8D8' }}
                         dangerouslySetInnerHTML={{ __html: book.title }} />
                     <span
-                      className="shrink-0 text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"
+                      className="shrink-0 text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"
                       style={{ background: LEVEL_BADGE[book.level], color: LEVEL_TEXT[book.level] }}
                     >
                       {book.level}
@@ -235,7 +235,7 @@ export default function Page() {
                   <p className="font-arabic text-xl leading-none mb-1" style={{ color: book.accent, textShadow: `0 0 18px ${book.accent}40` }}>
                     {book.arabic}
                   </p>
-                  <p className="text-[11px]" style={{ color: '#636260' }}>
+                  <p className="text-[12px]" style={{ color: '#636260' }}>
                     {book.author}
                   </p>
                 </div>
@@ -251,7 +251,7 @@ export default function Page() {
                 {book.format.map((f) => (
                   <span
                     key={f}
-                    className="text-[10px] px-2 py-0.5 rounded-full"
+                    className="text-[11px] px-2 py-0.5 rounded-full"
                     style={{ background: 'rgba(255,255,255,0.04)', color: '#A09F9B', border: '1px solid rgba(255,255,255,0.06)' }}
                   >
                     {f}
@@ -266,7 +266,7 @@ export default function Page() {
                     href={book.freeUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-[11px] font-semibold px-3 py-1.5 rounded-full transition-all hover:scale-[1.02]"
+                    className="inline-flex items-center gap-1.5 text-[12px] font-semibold px-3 py-1.5 rounded-full transition-all hover:scale-[1.02]"
                     style={{ background: `${book.accent}18`, color: book.accent, border: `1px solid ${book.accent}40` }}
                   >
                     <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
@@ -276,7 +276,7 @@ export default function Page() {
                   </a>
                 )}
                 {book.buyNote && (
-                  <span className="text-[11px]" style={{ color: '#636260' }}>
+                  <span className="text-[12px]" style={{ color: '#636260' }}>
                     · {book.buyNote}
                   </span>
                 )}

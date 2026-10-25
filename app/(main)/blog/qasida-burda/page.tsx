@@ -41,7 +41,7 @@ function WordTable({ words }: { words: Word[] }) {
               {['Word', 'Root / Ḥarf', 'Meaning'].map((h) => (
                 <th
                   key={h}
-                  className="text-left px-4 py-2.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-white/30"
+                  className="text-left px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-white/30"
                 >
                   {h}
                 </th>
@@ -55,7 +55,7 @@ function WordTable({ words }: { words: Word[] }) {
                   <span className="font-arabic text-lg text-white/80" dir="rtl" lang="ar">
                     {w.ar}
                   </span>
-                  <span className="block text-[11px] text-white/25 italic">{w.translit}</span>
+                  <span className="block text-[12px] text-white/25 italic">{w.translit}</span>
                 </td>
                 <td className="px-4 py-3 whitespace-nowrap">
                   {w.root ? (
@@ -63,12 +63,12 @@ function WordTable({ words }: { words: Word[] }) {
                       {w.root}
                     </span>
                   ) : (
-                    <span className="text-[11px] text-white/35">{w.harf}</span>
+                    <span className="text-[12px] text-white/35">{w.harf}</span>
                   )}
                 </td>
                 <td className="px-4 py-3 text-white/45 leading-relaxed">
                   {w.gloss}
-                  {w.note && <span className="block text-[11px] text-white/25 mt-0.5">{w.note}</span>}
+                  {w.note && <span className="block text-[12px] text-white/25 mt-0.5">{w.note}</span>}
                 </td>
               </tr>
             ))}
@@ -100,12 +100,12 @@ function Verse({
             {line}
           </p>
         ))}
-        <p className="text-[11px] text-white/25 italic mt-3">{translit}</p>
+        <p className="text-[12px] text-white/25 italic mt-3">{translit}</p>
         <p className="text-sm text-white/50 mt-2 leading-relaxed">{translation}</p>
       </div>
       <WordTable words={words} />
       <div className="mt-4 rounded-lg border-l-2 border-primary/40 bg-white/[0.02] px-4 py-3">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-primary/60 mb-1.5">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary/60 mb-1.5">
           What to notice
         </p>
         <p className="text-sm text-white/45 leading-relaxed">{insight}</p>
@@ -385,7 +385,7 @@ export default function QasidaBurdaPage() {
                 <div key={r.root} className="text-center">
                   <p className="font-arabic text-lg text-primary/80 mb-1.5" dir="rtl" lang="ar">{r.root}</p>
                   <p className="font-arabic text-sm text-white/55" dir="rtl" lang="ar">{r.quran}</p>
-                  <p className="text-[10px] text-white/20 my-0.5">Quran · Burda</p>
+                  <p className="text-[11px] text-white/20 my-0.5">Quran · Burda</p>
                   <p className="font-arabic text-sm text-white/40" dir="rtl" lang="ar">{r.burda}</p>
                 </div>
               ))}

@@ -51,7 +51,7 @@ export function CommunityStrip() {
               <span className="relative inline-flex w-2 h-2 rounded-full" style={{ background: '#5FB57A' }} />
             </span>
             <span
-              className="text-[10px] font-bold uppercase tracking-[0.22em]"
+              className="text-[11px] font-bold uppercase tracking-[0.22em]"
               style={{ color: '#D4A246' }}
             >
               New · Community is live
@@ -62,7 +62,7 @@ export function CommunityStrip() {
             The Learners&rsquo; Lounge is open
           </h3>
 
-          <p className="text-sm" style={{ color: '#8A8783' }}>
+          <p className="text-sm" style={{ color: '#9A9893' }}>
             {hasActivity ? (
               <>
                 {stats!.totalParticipants} {stats!.totalParticipants === 1 ? 'learner has' : 'learners have'} joined the

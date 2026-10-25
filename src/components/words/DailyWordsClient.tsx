@@ -43,7 +43,7 @@ export function DailyWordsClient() {
     <div className="max-w-3xl mx-auto">
       {/* Header */}
       <div className="mb-6">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.18em]" style={{ color: GOLD }}>Speak Arabic</p>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: GOLD }}>Speak Arabic</p>
         <h1 className="text-3xl sm:text-4xl font-heading tracking-tight leading-[1.05]" style={{ color: 'var(--color-ivory)' }}>
           Everyday Words
         </h1>
@@ -57,7 +57,7 @@ export function DailyWordsClient() {
       {/* Search */}
       <div className="sticky top-16 lg:top-3 z-10 -mx-1 px-1 py-2" style={{ background: 'var(--color-canvas)' }}>
         <div className="relative">
-          <svg className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: '#78716C' }} fill="none" viewBox="0 0 24 24" strokeWidth={1.6} stroke="currentColor">
+          <svg className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: '#A3A19C' }} fill="none" viewBox="0 0 24 24" strokeWidth={1.6} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
           </svg>
           <input
@@ -68,7 +68,7 @@ export function DailyWordsClient() {
             style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border-light)', color: 'var(--color-ivory)' }}
           />
           {query && (
-            <button onClick={() => setQuery('')} aria-label="Clear search" className="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded-lg" style={{ color: '#78716C' }}>
+            <button onClick={() => setQuery('')} aria-label="Clear search" className="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded-lg" style={{ color: '#A3A19C' }}>
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
               </svg>
@@ -112,15 +112,15 @@ export function DailyWordsClient() {
             <article key={w.en} className="rounded-2xl p-4 flex flex-col" style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border-light)' }}>
               <div className="flex items-start justify-between gap-2 mb-2">
                 <h2 className="text-[15px] font-semibold" style={{ color: 'var(--color-ivory)' }}>{w.en}</h2>
-                <span className="shrink-0 text-[9px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full" style={{ background: 'rgba(212,162,70,0.1)', color: GOLD }}>
+                <span className="shrink-0 text-[11px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full" style={{ background: 'rgba(212,162,70,0.1)', color: GOLD }}>
                   {w.type}
                 </span>
               </div>
 
               <p className="font-arabic leading-none text-right" dir="rtl" style={{ fontSize: '1.9rem', color: '#F0E8D8' }}>{w.ar}</p>
-              <p className="text-xs italic mt-1.5" style={{ color: '#78716C' }}>{w.translit}</p>
+              <p className="text-xs italic mt-1.5" style={{ color: '#A3A19C' }}>{w.translit}</p>
 
-              {w.note && <p className="text-[11px] mt-2 leading-relaxed" style={{ color: 'var(--color-text-tertiary)' }}>{w.note}</p>}
+              {w.note && <p className="text-[12px] mt-2 leading-relaxed" style={{ color: 'var(--color-text-tertiary)' }}>{w.note}</p>}
 
               {w.example && (
                 <div className="mt-3 pt-3" style={{ borderTop: '1px solid var(--color-border-light)' }}>
@@ -133,7 +133,7 @@ export function DailyWordsClient() {
         </div>
       )}
 
-      <p className="text-center text-[11px] mt-8" style={{ color: 'var(--color-text-tertiary)' }}>
+      <p className="text-center text-[12px] mt-8" style={{ color: 'var(--color-text-tertiary)' }}>
         {dailyWords.length} everyday words & expressions — the pieces that make speech flow. More added regularly.
       </p>
     </div>

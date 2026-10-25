@@ -53,7 +53,7 @@ export function GuestQuiz() {
           Sign in to keep your score and get quizzes chosen for the words you are learning.
         </p>
         <div className="flex gap-3 justify-center flex-wrap">
-          <button onClick={() => login()} className="btn-primary">Sign in to save progress</button>
+          <button onClick={() => login('Save your quiz progress')} className="btn-primary">Sign in to save progress</button>
           <button onClick={load} className="px-5 py-2.5 rounded-xl border border-border text-text hover:bg-surface transition-colors">Try five more</button>
         </div>
       </motion.div>

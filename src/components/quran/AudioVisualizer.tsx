@@ -768,7 +768,7 @@ export function AudioVisualizer({ analyserNode, isPlaying, mode, currentAyah }: 
               }`}>
                 Avg: {sessionStats.averageScore}%
               </div>
-              <span className="text-[10px] text-text-tertiary">
+              <span className="text-[11px] text-text-tertiary">
                 {sessionStats.scores.length} phrase{sessionStats.scores.length !== 1 ? 's' : ''}
               </span>
             </div>
@@ -849,14 +849,14 @@ function ScoreBar({ label, value }: { label: string; value: number }) {
   const color = value >= 80 ? 'bg-correct' : value >= 60 ? 'bg-accent' : 'bg-wrong';
   return (
     <div className="flex items-center gap-2">
-      <span className="text-[10px] text-text-tertiary w-12 text-right">{label}</span>
+      <span className="text-[11px] text-text-tertiary w-12 text-right">{label}</span>
       <div className="flex-1 h-1.5 rounded-full bg-border-light">
         <div
           className={`h-full rounded-full transition-all duration-500 ${color}`}
           style={{ width: `${value}%` }}
         />
       </div>
-      <span className="text-[10px] text-text-secondary font-medium w-8">{value}%</span>
+      <span className="text-[11px] text-text-secondary font-medium w-8">{value}%</span>
     </div>
   );
 }

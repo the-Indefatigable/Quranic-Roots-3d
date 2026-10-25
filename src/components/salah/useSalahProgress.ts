@@ -26,8 +26,8 @@ export type Overview = {
   days: { day: number; title: string; free: boolean; pctSalah: number; rootCount: number; lineCount: number; locked: boolean }[];
 };
 
-export async function startPathCheckout(login: () => void, signedIn: boolean): Promise<string | null> {
-  if (!signedIn) { login(); return null; }
+export async function startPathCheckout(login: (reason?: string) => void, signedIn: boolean): Promise<string | null> {
+  if (!signedIn) { login('Sign in to unlock the full path'); return null; }
   const r = await fetch('/api/checkout/salah', { method: 'POST' });
   const d = await r.json().catch(() => ({}));
   if (r.ok && d.url) { window.location.href = d.url; return null; }

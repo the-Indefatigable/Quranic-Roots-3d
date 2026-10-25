@@ -197,7 +197,7 @@ export default function ProfilePage() {
                 <p className="text-sm font-medium text-text">{article.title}</p>
               </div>
               <span className={cn(
-                'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full shrink-0',
+                'text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full shrink-0',
                 article.level === 'Essential' ? 'bg-correct/10 text-correct'
                   : article.level === 'Intermediate' ? 'bg-accent/10 text-accent'
                   : 'bg-info/10 text-info'

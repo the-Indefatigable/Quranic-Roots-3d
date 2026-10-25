@@ -10,7 +10,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <div>
       <div className="mb-2">
-        <div className="text-[10px] font-semibold uppercase tracking-[0.16em]" style={{ color: 'var(--color-primary)' }}>
+        <div className="text-[11px] font-semibold uppercase tracking-[0.16em]" style={{ color: 'var(--color-primary)' }}>
           Admin
         </div>
         <h1 className="text-3xl sm:text-4xl font-heading tracking-tight leading-[1.05]" style={{ color: 'var(--color-ivory)' }}>

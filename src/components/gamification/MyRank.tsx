@@ -16,7 +16,8 @@ interface MyRankProps {
 
 export function MyRank({ entry }: MyRankProps) {
   const isTopThree = entry.rank <= 3;
-  const medalEmojis = ['🥇', '🥈', '🥉'];
+  // Gold, silver and bronze discs instead of medal emoji.
+const MEDALS = ['linear-gradient(145deg,#F3D07A,#B8863B)', 'linear-gradient(145deg,#E4E2DD,#9C9A95)', 'linear-gradient(145deg,#E0A776,#9A5F33)'];
 
   return (
     <motion.div
@@ -33,7 +34,7 @@ export function MyRank({ entry }: MyRankProps) {
               animate={{ scale: [1, 1.1, 1] }}
               transition={{ duration: 2, repeat: Infinity }}
             >
-              {medalEmojis[entry.rank - 1]}
+              <span className="w-16 h-16 text-[24px] rounded-full grid place-items-center font-bold" style={{ background: MEDALS[entry.rank - 1], color: '#1a1206' }}>{entry.rank}</span>
             </motion.div>
           ) : (
             <div className="w-16 h-16 rounded-full bg-primary-light border-2 border-primary/40 flex items-center justify-center">
@@ -45,7 +46,7 @@ export function MyRank({ entry }: MyRankProps) {
           <div>
             <p className="text-xs text-text-tertiary uppercase tracking-wider">Your Rank</p>
             <p className="text-2xl font-bold text-text mt-1">
-              {isTopThree ? `#${entry.rank} 🎉` : `#${entry.rank}`}
+              {isTopThree ? `#${entry.rank}` : `#${entry.rank}`}
             </p>
             <p className="text-sm text-text-secondary mt-1">Level {entry.userLevel}</p>
           </div>
@@ -73,8 +74,8 @@ export function MyRank({ entry }: MyRankProps) {
         >
           <p className="text-sm text-primary font-semibold">
             {entry.rank === 1
-              ? '🌟 You\'re on top! Keep the momentum going!'
-              : '🚀 Amazing! You\'re in the top 3!'}
+              ? 'You\'re at the top. Keep going.'
+              : 'You\'re in the top 3.'}
           </p>
         </motion.div>
       )}

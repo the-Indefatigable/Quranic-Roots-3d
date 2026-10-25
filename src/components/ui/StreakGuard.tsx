@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useAuthStore } from '@/store/useAuthStore';
+import { FlameIcon } from '@/components/ui/icons';
 
 // A gentle "your streak is at risk" banner — loss aversion is the single
 // strongest retention mechanic. Shows once per day for signed-in users who have
@@ -54,7 +55,7 @@ export function StreakGuard() {
         >
           <div className="rounded-2xl border p-4 shadow-xl flex items-start gap-3"
             style={{ background: 'var(--color-surface)', borderColor: 'var(--color-primary)' }}>
-            <span className="text-2xl leading-none">🔥</span>
+            <span style={{ color: 'var(--color-primary)' }}><FlameIcon className="w-6 h-6 shrink-0" /></span>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-text">
                 Your {state.currentStreak}-day streak is at risk!

@@ -14,7 +14,9 @@ import { rateLimit, clientKey, tooManyRequests } from '@/lib/rateLimit';
 const POLL_LIMIT = 45;
 const POLL_WINDOW_MS = 60_000;
 
-const ROOM = 'general';
+// The lounge is 'general'; each salah-path day has its own thread.
+const ROOM_RE = /^(general|salah-day-([1-9]|[12][0-9]|30))$/;
+const roomOf = (v: unknown) => (typeof v === 'string' && ROOM_RE.test(v) ? v : 'general');
 const PAGE_SIZE = 50;
 const MAX_BODY = 1000;
 const MIN_INTERVAL_MS = 2000; // anti-spam: one message per user per 2s
@@ -65,6 +67,7 @@ export async function GET(req: NextRequest) {
     const limited = rateLimit(`chat-poll:${session.user.id}`, POLL_LIMIT, POLL_WINDOW_MS);
     if (!limited.ok) return tooManyRequests(limited);
 
+    const ROOM = roomOf(req.nextUrl.searchParams.get('room'));
     const afterParam = req.nextUrl.searchParams.get('after');
     const after = afterParam ? new Date(afterParam) : null;
     const validAfter = after && !isNaN(after.getTime()) ? after : null;
@@ -109,6 +112,7 @@ export async function GET(req: NextRequest) {
 
 const PostSchema = z.object({
   body: z.string().trim().min(1).max(MAX_BODY),
+  room: z.string().optional(),
 });
 
 // POST /api/chat/messages → send a message
@@ -144,7 +148,7 @@ export async function POST(req: NextRequest) {
     const [inserted] = await dbQuery(() =>
       db
         .insert(chatMessages)
-        .values({ userId: session.user.id, room: ROOM, body: parsed.data.body })
+        .values({ userId: session.user.id, room: roomOf(parsed.data.room), body: parsed.data.body })
         .returning({ id: chatMessages.id, createdAt: chatMessages.createdAt })
     );
 

@@ -251,15 +251,15 @@ export default function VerbFormsMeaningChangePage() {
             }}
           >
             <span className="font-arabic text-2xl" style={{ color: '#5AB8A8' }}>عَلِمَ</span>
-            <svg className="w-4 h-4 shrink-0" style={{ color: '#3D3C3A' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className="w-4 h-4 shrink-0" style={{ color: '#7A7874' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
             </svg>
             <span className="font-arabic text-2xl" style={{ color: '#5AB8A8' }}>عَلَّمَ</span>
-            <svg className="w-4 h-4 shrink-0" style={{ color: '#3D3C3A' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className="w-4 h-4 shrink-0" style={{ color: '#7A7874' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
             </svg>
             <span className="font-arabic text-2xl" style={{ color: '#5AB8A8' }}>تَعَلَّمَ</span>
-            <span className="text-[10px] ml-2" style={{ color: '#636260' }}>
+            <span className="text-[11px] ml-2" style={{ color: '#636260' }}>
               knew → taught → learned
             </span>
           </div>
@@ -277,13 +277,13 @@ export default function VerbFormsMeaningChangePage() {
 
           <div className="flex flex-wrap gap-2 mt-6">
             <span
-              className="text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full"
+              className="text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full"
               style={{ background: 'rgba(212,162,70,0.12)', color: '#D4A246' }}
             >
               Intermediate
             </span>
             <span
-              className="text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full"
+              className="text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full"
               style={{ background: 'rgba(255,255,255,0.05)', color: '#636260' }}
             >
               6 min read
@@ -333,7 +333,7 @@ export default function VerbFormsMeaningChangePage() {
                       <span className="font-arabic text-sm" style={{ color: '#A09F9B' }}>
                         {ex.from}
                       </span>
-                      <span className="text-[10px]" style={{ color: '#57534E' }}>
+                      <span className="text-[11px]" style={{ color: '#8F8D88' }}>
                         {ex.meaning}
                       </span>
                     </div>
@@ -371,13 +371,13 @@ export default function VerbFormsMeaningChangePage() {
                   {/* From → To */}
                   <div className="flex flex-wrap items-center gap-3 mb-4">
                     <div className="text-center">
-                      <p className="text-[9px] font-bold uppercase tracking-wider mb-1" style={{ color: '#57534E' }}>
+                      <p className="text-[11px] font-bold uppercase tracking-wider mb-1" style={{ color: '#8F8D88' }}>
                         Form {t.fromForm}
                       </p>
                       <p className="font-arabic text-xl" style={{ color: '#A09F9B' }} dir="rtl">
                         {t.fromArabic}
                       </p>
-                      <p className="text-[10px] italic" style={{ color: '#57534E' }}>
+                      <p className="text-[11px] italic" style={{ color: '#8F8D88' }}>
                         {t.fromMeaning}
                       </p>
                     </div>
@@ -394,13 +394,13 @@ export default function VerbFormsMeaningChangePage() {
                     </svg>
 
                     <div className="text-center">
-                      <p className="text-[9px] font-bold uppercase tracking-wider mb-1" style={{ color: t.rootColor }}>
+                      <p className="text-[11px] font-bold uppercase tracking-wider mb-1" style={{ color: t.rootColor }}>
                         Form {t.toForm}
                       </p>
                       <p className="font-arabic text-xl" style={{ color: t.rootColor }} dir="rtl">
                         {t.toArabic}
                       </p>
-                      <p className="text-[10px] italic" style={{ color: '#A09F9B' }}>
+                      <p className="text-[11px] italic" style={{ color: '#A09F9B' }}>
                         {t.toMeaning}
                       </p>
                     </div>
@@ -427,7 +427,7 @@ export default function VerbFormsMeaningChangePage() {
                       >
                         {t.quranic}
                       </p>
-                      <p className="text-xs" style={{ color: '#57534E' }}>
+                      <p className="text-xs" style={{ color: '#8F8D88' }}>
                         <span style={{ color: t.rootColor }}>{t.ref}</span>
                         {t.refMeaning && <> — &ldquo;{t.refMeaning}&rdquo;</>}
                       </p>

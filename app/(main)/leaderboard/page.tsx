@@ -3,6 +3,7 @@ import { db, dbQuery } from '@/db';
 import { auth } from '@/lib/auth';
 import { LeaderboardTabs } from '@/components/gamification/LeaderboardTabs';
 import { ShareButton } from '@/components/gamification/ShareButton';
+import { CommunityTabs } from '@/components/community/CommunityTabs';
 
 export const dynamic = 'force-dynamic';
 
@@ -38,7 +39,7 @@ function RankMedal({ rank }: { rank: number }) {
   const m = MEDAL[rank - 1];
   return (
     <span
-      className="inline-flex items-center justify-center w-6 h-6 rounded-full text-[11px] font-bold tabular-nums"
+      className="inline-flex items-center justify-center w-6 h-6 rounded-full text-[12px] font-bold tabular-nums"
       style={{ background: m.bg, color: m.fg, border: `1px solid ${m.border}` }}
     >
       {rank}
@@ -88,10 +89,8 @@ export default async function LeaderboardPage({
 
   return (
     <div>
+      <CommunityTabs />
       <div className="mb-2">
-        <div className="text-[10px] font-semibold uppercase tracking-[0.16em]" style={{ color: 'var(--color-primary)' }}>
-          Community
-        </div>
         <h1 className="text-3xl sm:text-4xl font-heading tracking-tight leading-[1.05]" style={{ color: 'var(--color-ivory)' }}>
           Leaderboard
         </h1>
@@ -109,7 +108,7 @@ export default async function LeaderboardPage({
         ].map((s) => (
           <div key={s.label} className="rounded-xl border border-border p-3 text-center" style={{ background: 'var(--color-surface)' }}>
             <div className="text-xl font-heading" style={{ color: 'var(--color-primary)' }}>{s.n.toLocaleString()}</div>
-            <div className="text-[10px] uppercase tracking-wider text-text-tertiary">{s.label}</div>
+            <div className="text-[11px] uppercase tracking-wider text-text-tertiary">{s.label}</div>
           </div>
         ))}
       </div>
@@ -134,7 +133,7 @@ export default async function LeaderboardPage({
             </p>
           </div>
           <ShareButton
-            text={`I'm #${myIndex + 1} on QuRoots learning Quranic Arabic! 📖`}
+            text={`I'm #${myIndex + 1} on QuRoots learning Quranic Arabic`}
             url={`/share/progress?n=${encodeURIComponent(displayName(rows[myIndex]))}&lvl=${rows[myIndex].user_level ?? 1}&streak=${rows[myIndex].streak_days ?? 0}&xp=${rows[myIndex].total_xp ?? 0}`}
             label="Share rank"
           />
@@ -143,7 +142,7 @@ export default async function LeaderboardPage({
       )}
       {meId && myIndex < 0 && (
         <div className="rounded-2xl border border-border p-4 mb-4 text-sm text-text-secondary" style={{ background: 'var(--color-surface)' }}>
-          You’re not on the board yet — finish a lesson to earn your first XP and appear here. 🌱
+          You’re not on the board yet — finish a lesson to earn your first XP and appear here.
         </div>
       )}
 
@@ -176,9 +175,9 @@ export default async function LeaderboardPage({
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-text truncate">
                   {displayName(r)}
-                  {isMe && <span className="ml-1.5 text-[10px] font-semibold uppercase text-primary">you</span>}
+                  {isMe && <span className="ml-1.5 text-[11px] font-semibold uppercase text-primary">you</span>}
                 </p>
-                <p className="text-[11px] text-text-tertiary">Level {r.user_level ?? 1}</p>
+                <p className="text-[12px] text-text-tertiary">Level {r.user_level ?? 1}</p>
               </div>
               {sort === 'streak' ? (
                 <span className="flex items-center gap-1 text-sm font-semibold tabular-nums text-text-secondary whitespace-nowrap">
@@ -197,7 +196,7 @@ export default async function LeaderboardPage({
         })}
         {rows.length === 0 && (
           <li className="text-center py-12 text-text-tertiary text-sm">
-            No one has earned XP yet — be the first! 🚀
+            No one has earned XP yet — be the first.
           </li>
         )}
       </ol>

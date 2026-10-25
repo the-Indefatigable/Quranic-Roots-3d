@@ -152,7 +152,7 @@ export default function BlogPage() {
       <div className="mb-10">
         <div className="flex items-center gap-2 mb-4">
           <span className="h-px w-6" style={{ background: 'rgba(212,162,70,0.5)' }} />
-          <span className="text-[10px] font-bold uppercase tracking-[0.25em]" style={{ color: '#D4A246' }}>
+          <span className="text-[11px] font-bold uppercase tracking-[0.25em]" style={{ color: '#D4A246' }}>
             QuRoots Blog
           </span>
         </div>
@@ -171,7 +171,7 @@ export default function BlogPage() {
         return (
           <section key={cat} className="mb-12">
             <div className="flex items-center gap-3 mb-4">
-              <span className="text-[10px] font-bold uppercase tracking-[0.25em]" style={{ color: '#D4A246' }}>
+              <span className="text-[11px] font-bold uppercase tracking-[0.25em]" style={{ color: '#D4A246' }}>
                 {cat}
               </span>
               <span className="h-px flex-1" style={{ background: 'rgba(212,162,70,0.15)' }} />
@@ -206,20 +206,20 @@ export default function BlogPage() {
                           {topic.title}
                         </h2>
                         <span
-                          className="shrink-0 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"
+                          className="shrink-0 text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"
                           style={{ background: lvl.bg, color: lvl.text }}
                         >
                           {topic.level}
                         </span>
                       </div>
-                      <p className="text-xs leading-relaxed" style={{ color: '#57534E' }}>
+                      <p className="text-xs leading-relaxed" style={{ color: '#8F8D88' }}>
                         {topic.description}
                       </p>
                     </div>
 
                     <svg
                       className="w-4 h-4 shrink-0 mt-1 transition-transform group-hover:translate-x-0.5"
-                      style={{ color: '#3D3C3A' }}
+                      style={{ color: '#7A7874' }}
                       fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"
                     >
                       <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
@@ -239,7 +239,7 @@ export default function BlogPage() {
           <div className="w-1.5 h-1.5 rotate-45" style={{ background: '#D4A246', opacity: 0.3 }} />
           <span className="h-px w-14 bg-gradient-to-l from-transparent to-[#D4A246]/20" />
         </div>
-        <p className="text-[#2D2C2A] text-[11px] tracking-wider">
+        <p className="text-[#2D2C2A] text-[12px] tracking-wider">
           New articles are being crafted with care
         </p>
       </div>

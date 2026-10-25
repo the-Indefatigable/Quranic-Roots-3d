@@ -16,20 +16,21 @@ interface TenseData {
   conjugation: ConjugationForm[];
 }
 
+// One palette: tenses differ by shade of gold and ivory, not by unrelated hues.
 const TENSE_ACCENTS: Record<string, string> = {
-  madi: 'text-amber-400',
-  mudari: 'text-cyan-400',
-  amr: 'text-rose-400',
-  passive_madi: 'text-purple-400',
-  passive_mudari: 'text-correct',
+  madi: 'text-[#E8BF62]',
+  mudari: 'text-[#F0E4CA]',
+  amr: 'text-[#D4A246]',
+  passive_madi: 'text-[#C9B48A]',
+  passive_mudari: 'text-[#C9B48A]',
 };
 
 const TENSE_BG: Record<string, string> = {
-  madi: 'bg-amber-400/10',
-  mudari: 'bg-cyan-400/10',
-  amr: 'bg-rose-400/10',
-  passive_madi: 'bg-purple-400/10',
-  passive_mudari: 'bg-correct/10',
+  madi: 'bg-[rgba(232,191,98,0.10)]',
+  mudari: 'bg-[rgba(240,228,202,0.07)]',
+  amr: 'bg-[rgba(212,162,70,0.10)]',
+  passive_madi: 'bg-[rgba(201,180,138,0.08)]',
+  passive_mudari: 'bg-[rgba(201,180,138,0.08)]',
 };
 
 const MATRIX_ROWS = [
@@ -53,7 +54,7 @@ export function ConjugationGrid({ tense }: { tense: TenseData }) {
         <div className="flex border-b border-border-light pb-3 mb-2">
           <div className="w-16 sm:w-20 shrink-0" />
           {['Singular', 'Dual', 'Plural'].map((h) => (
-            <div key={h} className="flex-1 text-center text-[10px] text-text-tertiary uppercase tracking-widest">
+            <div key={h} className="flex-1 text-center text-[11px] text-text-tertiary uppercase tracking-widest">
               {h}
             </div>
           ))}
@@ -62,7 +63,7 @@ export function ConjugationGrid({ tense }: { tense: TenseData }) {
         {/* Rows */}
         {rows.map((row) => (
           <div key={row.id} className="flex items-center border-b border-border-light py-2.5 sm:py-3">
-            <div className="w-16 sm:w-20 shrink-0 text-[10px] text-text-tertiary uppercase tracking-wider leading-tight">
+            <div className="w-16 sm:w-20 shrink-0 text-[11px] text-text-tertiary uppercase tracking-wider leading-tight">
               {row.label}
             </div>
             {row.keys.map((key, i) => {
@@ -75,7 +76,7 @@ export function ConjugationGrid({ tense }: { tense: TenseData }) {
                       <span className={`font-arabic text-lg sm:text-xl ${accent} leading-relaxed`} dir="rtl">
                         {c.arabic}
                       </span>
-                      <span className="text-[10px] text-white/30 italic mt-0.5 truncate max-w-full">
+                      <span className="text-[11px] text-white/30 italic mt-0.5 truncate max-w-full">
                         {c.transliteration}
                       </span>
                     </>
@@ -118,7 +119,7 @@ export function TenseAccordion({ tenses }: { tenses: TenseData[] }) {
               </div>
               <div className="flex items-center gap-2">
                 {tense.occurrences > 0 && (
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full ${bg} ${accent}`}>
+                  <span className={`text-[11px] px-2 py-0.5 rounded-full ${bg} ${accent}`}>
                     {tense.occurrences}x
                   </span>
                 )}

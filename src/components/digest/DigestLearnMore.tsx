@@ -24,7 +24,7 @@ export function DigestLearnMore() {
             <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
           </svg>
         </div>
-        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] mb-2" style={{ color: GOLD }}>One email, every Friday</p>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.2em] mb-2" style={{ color: GOLD }}>One email, every Friday</p>
         <h1 className="font-heading text-3xl sm:text-4xl mb-3" style={{ color: '#F0E8D8' }}>The QuRoots Weekly Digest</h1>
         <p className="text-sm sm:text-base leading-relaxed max-w-lg mx-auto" style={{ color: '#A09F9B' }}>
           A single, unhurried email to keep the Quran in your week — a verse to learn, what’s new, and your own

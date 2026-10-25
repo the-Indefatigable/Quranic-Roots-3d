@@ -221,7 +221,7 @@ export default async function SurahPage({ params }: Props) {
         {/* Surah number badge */}
         <div className="flex justify-center mb-4">
           <span
-            className="text-[10px] font-bold uppercase tracking-[0.25em] px-3 py-1 rounded-full"
+            className="text-[11px] font-bold uppercase tracking-[0.25em] px-3 py-1 rounded-full"
             style={{
               background: 'rgba(212,162,70,0.1)',
               color: '#D4A246',
@@ -246,14 +246,14 @@ export default async function SurahPage({ params }: Props) {
                 style={{
                   background: 'rgba(255,255,255,0.04)',
                   border: '1px solid rgba(255,255,255,0.08)',
-                  color: '#78716C',
+                  color: '#A3A19C',
                 }}
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
                 </svg>
               </div>
-              <span className="hidden sm:block text-[10px]" style={{ color: '#57534E' }}>{prevSurah.arabicName}</span>
+              <span className="hidden sm:block text-[11px]" style={{ color: '#8F8D88' }}>{prevSurah.arabicName}</span>
             </Link>
           ) : <div className="w-10" />}
 
@@ -278,7 +278,7 @@ export default async function SurahPage({ params }: Props) {
             <h1 className="font-heading text-xl sm:text-2xl font-light" style={{ color: '#EDEDEC' }}>
               {surah.englishName}
             </h1>
-            <p className="text-sm mt-1" style={{ color: '#57534E' }}>
+            <p className="text-sm mt-1" style={{ color: '#8F8D88' }}>
               {surah.versesCount} Ayahs
             </p>
           </div>
@@ -294,14 +294,14 @@ export default async function SurahPage({ params }: Props) {
                 style={{
                   background: 'rgba(255,255,255,0.04)',
                   border: '1px solid rgba(255,255,255,0.08)',
-                  color: '#78716C',
+                  color: '#A3A19C',
                 }}
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
                 </svg>
               </div>
-              <span className="hidden sm:block text-[10px]" style={{ color: '#57534E' }}>{nextSurah.arabicName}</span>
+              <span className="hidden sm:block text-[11px]" style={{ color: '#8F8D88' }}>{nextSurah.arabicName}</span>
             </Link>
           ) : <div className="w-10" />}
         </div>
@@ -313,7 +313,7 @@ export default async function SurahPage({ params }: Props) {
               className="font-arabic"
               style={{
                 fontSize: 'clamp(1.25rem, 4vw, 1.75rem)',
-                color: '#78716C',
+                color: '#A3A19C',
                 letterSpacing: '0.02em',
               }}
             >
@@ -348,7 +348,7 @@ export default async function SurahPage({ params }: Props) {
               style={{
                 background: 'rgba(255,255,255,0.04)',
                 border: '1px solid rgba(255,255,255,0.08)',
-                color: '#57534E',
+                color: '#8F8D88',
               }}
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -356,7 +356,7 @@ export default async function SurahPage({ params }: Props) {
               </svg>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wider mb-0.5" style={{ color: '#57534E' }}>Previous</p>
+              <p className="text-[11px] uppercase tracking-wider mb-0.5" style={{ color: '#8F8D88' }}>Previous</p>
               <p className="text-sm font-medium" style={{ color: '#EDEDEC' }}>{prevSurah.englishName}</p>
             </div>
           </Link>
@@ -368,7 +368,7 @@ export default async function SurahPage({ params }: Props) {
             className="flex items-center gap-3 group text-right"
           >
             <div>
-              <p className="text-[10px] uppercase tracking-wider mb-0.5" style={{ color: '#57534E' }}>Next</p>
+              <p className="text-[11px] uppercase tracking-wider mb-0.5" style={{ color: '#8F8D88' }}>Next</p>
               <p className="text-sm font-medium" style={{ color: '#EDEDEC' }}>{nextSurah.englishName}</p>
             </div>
             <div
@@ -376,7 +376,7 @@ export default async function SurahPage({ params }: Props) {
               style={{
                 background: 'rgba(255,255,255,0.04)',
                 border: '1px solid rgba(255,255,255,0.08)',
-                color: '#57534E',
+                color: '#8F8D88',
               }}
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">

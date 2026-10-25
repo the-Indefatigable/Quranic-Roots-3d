@@ -108,10 +108,10 @@ function FlipCard({ word }: { word: Word }) {
           >
             {word.ar}
           </span>
-          <span className="text-[10px] uppercase tracking-[0.2em]" style={{ color }}>
+          <span className="text-[11px] uppercase tracking-[0.2em]" style={{ color }}>
             {word.type}
           </span>
-          <span className="absolute bottom-2 right-3 text-[9px]" style={{ color: '#3D3C3A' }}>
+          <span className="absolute bottom-2 right-3 text-[11px]" style={{ color: '#7A7874' }}>
             tap ↻
           </span>
         </div>
@@ -127,7 +127,7 @@ function FlipCard({ word }: { word: Word }) {
             border: `1px solid ${color}40`,
           }}
         >
-          <span className="text-[11px] italic mb-1" style={{ color: '#A09F9B' }}>{word.tr}</span>
+          <span className="text-[12px] italic mb-1" style={{ color: '#A09F9B' }}>{word.tr}</span>
           <span className="text-base font-semibold mb-1" style={{ color: '#F0E8D8' }}>{word.en}</span>
           {word.example && (
             <span className="font-arabic text-sm leading-snug mt-1" style={{ color: color }}>
@@ -146,7 +146,7 @@ export default function DailyArabicClient() {
       {/* Section: words */}
       <section className="mb-12">
         <div className="flex items-center gap-3 mb-5">
-          <span className="text-[10px] font-bold uppercase tracking-[0.25em]" style={{ color: '#34D399' }}>
+          <span className="text-[11px] font-bold uppercase tracking-[0.25em]" style={{ color: '#34D399' }}>
             Part 1 · 30 Words
           </span>
           <span className="h-px flex-1" style={{ background: 'rgba(16,185,129,0.18)' }} />
@@ -162,7 +162,7 @@ export default function DailyArabicClient() {
       {/* Section: sentences */}
       <section className="mb-4">
         <div className="flex items-center gap-3 mb-5">
-          <span className="text-[10px] font-bold uppercase tracking-[0.25em]" style={{ color: '#D4A246' }}>
+          <span className="text-[11px] font-bold uppercase tracking-[0.25em]" style={{ color: '#D4A246' }}>
             Part 2 · 12 Sentences
           </span>
           <span className="h-px flex-1" style={{ background: 'rgba(212,162,70,0.18)' }} />
@@ -182,7 +182,7 @@ export default function DailyArabicClient() {
                 className="cursor-pointer list-none flex items-start gap-4 p-5 transition-colors hover:bg-white/[0.04]"
               >
                 <span
-                  className="shrink-0 text-[10px] font-bold w-6 h-6 rounded-full flex items-center justify-center"
+                  className="shrink-0 text-[11px] font-bold w-6 h-6 rounded-full flex items-center justify-center"
                   style={{ background: 'rgba(212,162,70,0.12)', color: '#D4A246' }}
                 >
                   {String(i + 1).padStart(2, '0')}
@@ -194,7 +194,7 @@ export default function DailyArabicClient() {
                 </div>
                 <svg
                   className="w-4 h-4 shrink-0 mt-1 transition-transform group-open:rotate-180"
-                  style={{ color: '#57534E' }}
+                  style={{ color: '#8F8D88' }}
                   fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
@@ -206,7 +206,7 @@ export default function DailyArabicClient() {
               >
                 <p className="text-xs italic mt-3" style={{ color: '#A09F9B' }}>{s.tr}</p>
                 <p className="text-sm font-medium" style={{ color: '#EDEDEC' }}>{s.en}</p>
-                <p className="text-[11px]" style={{ color: '#57534E' }}>
+                <p className="text-[12px]" style={{ color: '#8F8D88' }}>
                   <span className="uppercase tracking-wider">When:</span> {s.context}
                 </p>
               </div>

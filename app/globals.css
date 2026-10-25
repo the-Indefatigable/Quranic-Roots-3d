@@ -84,8 +84,8 @@ html, body {
   --color-info: #6AAFE0;
   --color-info-light: rgba(106, 175, 224, 0.10);
   --color-text: #EDEDEC;
-  --color-text-secondary: #A09F9B;
-  --color-text-tertiary: #7A7975;
+  --color-text-secondary: #B5B3AE; /* 9.6:1 on canvas */
+  --color-text-tertiary: #918F8A;  /* 6.2:1 on canvas — was #7A7975, too faint for small text */
   --color-border: rgba(255, 255, 255, 0.07);
   --color-border-light: rgba(255, 255, 255, 0.035);
   /* Shadows carry the elevation — not borders */

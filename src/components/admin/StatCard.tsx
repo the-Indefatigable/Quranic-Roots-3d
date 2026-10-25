@@ -17,7 +17,7 @@ export function StatCard({ label, value, sub, accent }: StatCardProps) {
         borderColor: accent ? 'var(--color-primary)' : 'var(--color-border)',
       }}
     >
-      <span className="text-[11px] font-semibold uppercase tracking-[0.1em] text-text-tertiary">
+      <span className="text-[12px] font-semibold uppercase tracking-[0.1em] text-text-tertiary">
         {label}
       </span>
       <span

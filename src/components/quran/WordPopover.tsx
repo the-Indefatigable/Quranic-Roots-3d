@@ -70,21 +70,21 @@ export function WordPopover({ word, anchorElement, onClose }: Props) {
           <div className="space-y-2.5">
             {word.transliteration && (
               <div className="flex items-center justify-between">
-                <span className="text-[10px] text-text-tertiary uppercase tracking-wider">Transliteration</span>
+                <span className="text-[11px] text-text-tertiary uppercase tracking-wider">Transliteration</span>
                 <span className="text-sm text-text-secondary italic">{word.transliteration}</span>
               </div>
             )}
 
             {word.translation && (
               <div className="flex items-center justify-between">
-                <span className="text-[10px] text-text-tertiary uppercase tracking-wider">Meaning</span>
+                <span className="text-[11px] text-text-tertiary uppercase tracking-wider">Meaning</span>
                 <span className="text-sm text-text">{word.translation}</span>
               </div>
             )}
 
             {word.rootArabic && (
               <div className="flex items-center justify-between">
-                <span className="text-[10px] text-text-tertiary uppercase tracking-wider">Root</span>
+                <span className="text-[11px] text-text-tertiary uppercase tracking-wider">Root</span>
                 <span className="font-arabic text-lg text-primary">{word.rootArabic}</span>
               </div>
             )}
@@ -103,7 +103,7 @@ export function WordPopover({ word, anchorElement, onClose }: Props) {
               </svg>
             </Link>
           ) : (
-            <div className="mt-4 text-center text-[10px] text-text-tertiary uppercase tracking-wider">
+            <div className="mt-4 text-center text-[11px] text-text-tertiary uppercase tracking-wider">
               Particle / Function word
             </div>
           )}

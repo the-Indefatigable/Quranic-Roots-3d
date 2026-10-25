@@ -49,13 +49,13 @@ export function SalahOverview() {
         Al-Fatiha and the short surahs you pray with use {data?.totals.roots ?? 85} roots. Learn two or three a day,
         and in 30 days you will understand what you say five times a day.
       </p>
-      <p className="text-sm mb-10" style={{ color: '#8A8783' }}>Ten minutes a day. The first week, all of Al-Fatiha, is free.</p>
+      <p className="text-sm mb-10" style={{ color: '#9A9893' }}>Ten minutes a day. The first week, all of Al-Fatiha, is free.</p>
 
       {/* progress */}
       <div className="rounded-2xl p-6 mb-10" style={{ background: 'rgba(255,255,255,.03)', border: '1px solid rgba(212,162,70,.18)' }}>
         <div className="flex items-end justify-between gap-4 mb-3">
           <div>
-            <p className="text-sm" style={{ color: '#8A8783' }}>Root words of your salah you understand</p>
+            <p className="text-sm" style={{ color: '#9A9893' }}>Root words of your salah you understand</p>
             <p className="font-heading text-5xl" style={{ color: '#F0E8D8' }}>{pct}%</p>
           </div>
           {next && (

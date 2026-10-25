@@ -84,14 +84,14 @@ export function AyahLessonModal({ surahNumber, ayahNumber, words, translation, o
   } else if (step.kind === 'flashcard') {
     body = (
       <div className="flex-1 flex flex-col">
-        <p className="text-[11px] uppercase tracking-widest mb-6" style={{ color: '#57534E' }}>New word</p>
+        <p className="text-[12px] uppercase tracking-widest mb-6" style={{ color: '#8F8D88' }}>New word</p>
         <div className="flex-1 flex flex-col items-center justify-center text-center">
           <p className="font-arabic mb-3" style={{ fontSize: '2.75rem', color: '#F0E8D8' }} dir="rtl">{step.word.textUthmani}</p>
-          {step.word.transliteration && <p className="text-sm italic mb-4" style={{ color: '#78716C' }}>{step.word.transliteration}</p>}
+          {step.word.transliteration && <p className="text-sm italic mb-4" style={{ color: '#A3A19C' }}>{step.word.transliteration}</p>}
           <p className="text-lg font-medium" style={{ color: GOLD }}>{step.word.translation}</p>
           {step.word.rootArabic && (
             <div className="mt-5 inline-flex items-center gap-2 px-3 py-1.5 rounded-full" style={{ background: 'rgba(212,162,70,0.08)', border: '1px solid rgba(212,162,70,0.2)' }}>
-              <span className="text-[10px] uppercase tracking-wider" style={{ color: '#78716C' }}>Root</span>
+              <span className="text-[11px] uppercase tracking-wider" style={{ color: '#A3A19C' }}>Root</span>
               <span className="font-arabic text-base" style={{ color: GOLD }} dir="rtl">{step.word.rootArabic}</span>
             </div>
           )}
@@ -104,7 +104,7 @@ export function AyahLessonModal({ surahNumber, ayahNumber, words, translation, o
   } else if (step.kind === 'mcq') {
     body = (
       <div className="flex-1 flex flex-col">
-        <p className="text-[11px] uppercase tracking-widest mb-5" style={{ color: '#57534E' }}>What does this mean?</p>
+        <p className="text-[12px] uppercase tracking-widest mb-5" style={{ color: '#8F8D88' }}>What does this mean?</p>
         <p className="font-arabic text-center mb-6" style={{ fontSize: '2.5rem', color: '#F0E8D8' }} dir="rtl">{step.prompt}</p>
         <div className="space-y-2.5 flex-1">
           {step.options.map((opt) => {
@@ -135,13 +135,13 @@ export function AyahLessonModal({ surahNumber, ayahNumber, words, translation, o
     // recall
     body = (
       <div className="flex-1 flex flex-col">
-        <p className="text-[11px] uppercase tracking-widest mb-5" style={{ color: '#57534E' }}>The whole ayah</p>
+        <p className="text-[12px] uppercase tracking-widest mb-5" style={{ color: '#8F8D88' }}>The whole ayah</p>
         <div className="flex-1 flex flex-col items-center justify-center text-center">
           <p className="font-arabic leading-loose mb-6" style={{ fontSize: '1.9rem', color: '#F0E8D8' }} dir="rtl">{step.arabic}</p>
           {revealed ? (
             <p className="text-sm leading-relaxed" style={{ color: '#A8946A' }}>{step.translation}</p>
           ) : (
-            <button onClick={() => setRevealed(true)} className="text-sm px-4 py-2 rounded-lg" style={{ background: 'rgba(255,255,255,0.05)', color: '#78716C' }}>
+            <button onClick={() => setRevealed(true)} className="text-sm px-4 py-2 rounded-lg" style={{ background: 'rgba(255,255,255,0.05)', color: '#A3A19C' }}>
               Reveal meaning
             </button>
           )}
@@ -170,7 +170,7 @@ export function AyahLessonModal({ surahNumber, ayahNumber, words, translation, o
         {/* Header + progress */}
         <div className="px-5 pt-4 pb-3">
           <div className="flex items-center gap-3 mb-3">
-            <button onClick={onClose} className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'rgba(255,255,255,0.05)', color: '#78716C' }} aria-label="Close lesson">
+            <button onClick={onClose} className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'rgba(255,255,255,0.05)', color: '#A3A19C' }} aria-label="Close lesson">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
               </svg>
@@ -178,7 +178,7 @@ export function AyahLessonModal({ surahNumber, ayahNumber, words, translation, o
             <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.07)' }}>
               <motion.div className="h-full rounded-full" style={{ background: GOLD }} animate={{ width: `${progress}%` }} transition={{ duration: 0.35 }} />
             </div>
-            <span className="text-[11px] font-medium tabular-nums shrink-0" style={{ color: '#78716C' }}>{surahNumber}:{ayahNumber}</span>
+            <span className="text-[12px] font-medium tabular-nums shrink-0" style={{ color: '#A3A19C' }}>{surahNumber}:{ayahNumber}</span>
           </div>
         </div>
 

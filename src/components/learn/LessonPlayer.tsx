@@ -265,7 +265,7 @@ export function LessonPlayer({
 
       {/* Lesson title + unit breadcrumb */}
       <div className="relative z-10 px-5 pb-1 shrink-0">
-        <p className="text-[10px] uppercase tracking-[0.2em] font-medium" style={{ color: `${unitColor}80` }}>
+        <p className="text-[11px] uppercase tracking-[0.2em] font-medium" style={{ color: `${unitColor}80` }}>
           {unitTitle}
         </p>
         <p className="text-[#A09F9B] text-xs truncate">{title}</p>

@@ -307,9 +307,9 @@ export function HomepageClient() {
               Every Arabic word grows from a root. Learn the root{' '}
               <span className="font-arabic text-xl" style={{ color: '#D4A246' }} dir="rtl">ع ل م</span>{' '}
               and you can recognise <em>knowledge</em>, <em>scholar</em>, <em>teacher</em> and <em>All-Knowing</em>:
-              935 words across the Quran.
+              854 times across the Quran.
             </p>
-            <p className="text-sm leading-relaxed mb-8 max-w-xl mx-auto lg:mx-0" style={{ color: '#8A8783' }}>
+            <p className="text-sm leading-relaxed mb-8 max-w-xl mx-auto lg:mx-0" style={{ color: '#9A9893' }}>
               Start with your prayer: Al-Fatiha and the short surahs you recite use just 85 roots.
               Learn two or three a day, and in 30 days you understand every word. The first week is free.
             </p>
@@ -338,7 +338,7 @@ export function HomepageClient() {
             </p>
           </div>
           <div className="relative">
-            <RootBloom caption="935 times in the Quran" />
+            <RootBloom caption="854 times in the Quran" />
           </div>
         </div>
       </section>
@@ -354,7 +354,7 @@ export function HomepageClient() {
       <section className="px-5 py-20 max-w-5xl mx-auto" data-reveal-group>
         <div className="text-center mb-12" data-reveal-group>
           <p
-            className="reveal text-[10px] uppercase tracking-[0.25em] font-bold mb-3"
+            className="reveal text-[11px] uppercase tracking-[0.25em] font-bold mb-3"
             style={{ color: '#D4A246', '--reveal-delay': '0s' } as React.CSSProperties}
           >
             What you can do
@@ -423,7 +423,7 @@ export function HomepageClient() {
       ══════════════════════════════════════════════════════ */}
       <section className="px-5 py-20 max-w-3xl mx-auto" data-reveal-group>
         <div className="text-center mb-10">
-          <p className="reveal text-[10px] uppercase tracking-[0.25em] font-bold mb-3" style={{ color: '#D4A246', '--reveal-delay': '0s' } as React.CSSProperties}>
+          <p className="reveal text-[11px] uppercase tracking-[0.25em] font-bold mb-3" style={{ color: '#D4A246', '--reveal-delay': '0s' } as React.CSSProperties}>
             Try it now
           </p>
           <h2 className="reveal font-heading text-3xl sm:text-4xl mb-3" style={{ color: '#F0E8D8', letterSpacing: '-0.02em', '--reveal-delay': '0.07s' } as React.CSSProperties}>
@@ -479,7 +479,7 @@ export function HomepageClient() {
                   >
                     {w.arabic}
                   </span>
-                  <span className="text-[10px]" style={{ color: '#636260' }} dir="ltr">
+                  <span className="text-[11px]" style={{ color: '#636260' }} dir="ltr">
                     {w.transliteration}
                   </span>
                 </button>
@@ -499,19 +499,19 @@ export function HomepageClient() {
               <div className="px-6 py-5 animate-fade-in">
                 <div className="flex flex-wrap gap-6 items-start">
                   <div>
-                    <p className="text-[10px] uppercase tracking-wider mb-1" style={{ color: '#57534E' }}>Meaning</p>
+                    <p className="text-[11px] uppercase tracking-wider mb-1" style={{ color: '#8F8D88' }}>Meaning</p>
                     <p className="font-semibold" style={{ color: '#EDEDEC' }}>{DEMO_AYAH.words[activeWord].meaning}</p>
                   </div>
                   {DEMO_AYAH.words[activeWord].root && (
                     <>
                       <div>
-                        <p className="text-[10px] uppercase tracking-wider mb-1" style={{ color: '#57534E' }}>Root</p>
+                        <p className="text-[11px] uppercase tracking-wider mb-1" style={{ color: '#8F8D88' }}>Root</p>
                         <p className="font-arabic text-xl font-bold" style={{ color: '#D4A246' }}>
                           {DEMO_AYAH.words[activeWord].root}
                         </p>
                       </div>
                       <div>
-                        <p className="text-[10px] uppercase tracking-wider mb-1" style={{ color: '#57534E' }}>Root meaning</p>
+                        <p className="text-[11px] uppercase tracking-wider mb-1" style={{ color: '#8F8D88' }}>Root meaning</p>
                         <p className="font-semibold" style={{ color: '#EDEDEC' }}>{DEMO_AYAH.words[activeWord].rootMeaning}</p>
                       </div>
                     </>
@@ -519,7 +519,7 @@ export function HomepageClient() {
                 </div>
               </div>
             ) : (
-              <div className="px-6 py-5 flex items-center gap-2" style={{ color: '#3D3C3A' }}>
+              <div className="px-6 py-5 flex items-center gap-2" style={{ color: '#7A7874' }}>
                 <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15.042 21.672 13.684 16.6m0 0-2.51 2.225.569-9.47 5.227 7.917-3.286-.672ZM12 2.25V4.5m5.834.166-1.591 1.591M20.25 10.5H18M7.757 14.743l-1.59 1.59M6 10.5H3.75m4.007-4.243-1.59-1.59" />
                 </svg>
@@ -536,7 +536,7 @@ export function HomepageClient() {
       <section className="px-5 py-20 max-w-3xl mx-auto" data-reveal-group>
         <div className="flex items-end justify-between mb-8">
           <div>
-            <p className="reveal text-[10px] uppercase tracking-[0.25em] font-bold mb-2" style={{ color: '#D4A246', '--reveal-delay': '0s' } as React.CSSProperties}>
+            <p className="reveal text-[11px] uppercase tracking-[0.25em] font-bold mb-2" style={{ color: '#D4A246', '--reveal-delay': '0s' } as React.CSSProperties}>
               Root Library
             </p>
             <h2 className="reveal font-heading text-2xl sm:text-3xl" style={{ color: '#F0E8D8', '--reveal-delay': '0.07s' } as React.CSSProperties}>
@@ -570,7 +570,7 @@ export function HomepageClient() {
                   {r.root}
                 </span>
                 <span
-                  className="text-[9px] font-bold px-2 py-0.5 rounded-full"
+                  className="text-[11px] font-bold px-2 py-0.5 rounded-full"
                   style={{ background: 'rgba(212,162,70,0.1)', color: '#D4A246' }}
                 >
                   ×{r.freq.toLocaleString()}
@@ -605,7 +605,7 @@ export function HomepageClient() {
           <div className="relative z-10">
             <div className="flex items-center justify-center gap-3 mb-7">
               <span style={{ height: 1, width: 24, background: 'rgba(212,162,70,0.35)' }} />
-              <p className="text-[10px] uppercase tracking-[0.25em] font-bold" style={{ color: '#D4A246' }}>
+              <p className="text-[11px] uppercase tracking-[0.25em] font-bold" style={{ color: '#D4A246' }}>
                 Verse of the Day
               </p>
               <span style={{ height: 1, width: 24, background: 'rgba(212,162,70,0.35)' }} />
@@ -626,7 +626,7 @@ export function HomepageClient() {
             >
               &ldquo;{verse.translation}&rdquo;
             </p>
-            <p className="text-xs" style={{ color: '#57534E' }}>{verse.reference}</p>
+            <p className="text-xs" style={{ color: '#8F8D88' }}>{verse.reference}</p>
           </div>
         </div>
       </section>
@@ -695,7 +695,7 @@ export function HomepageClient() {
             { href: '/privacy',     label: 'Privacy' },
             { href: '/terms',       label: 'Terms'   },
           ].map((l) => (
-            <Link key={l.href} href={l.href} className="text-sm transition-colors" style={{ color: '#8A8783' }}
+            <Link key={l.href} href={l.href} className="text-sm transition-colors" style={{ color: '#9A9893' }}
               onMouseEnter={e => (e.currentTarget.style.color = '#EDEDEC')}
               onMouseLeave={e => (e.currentTarget.style.color = '#8A8783')}
             >

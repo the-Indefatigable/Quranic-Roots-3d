@@ -43,7 +43,7 @@ function getDirectionInfo(centsOffset: number | null): {
   inZone: boolean;
 } {
   if (centsOffset === null) {
-    return { label: 'Open your mouth and make a sound — any sound', arrow: null, color: '#57534E', inZone: false };
+    return { label: 'Open your mouth and make a sound — any sound', arrow: null, color: '#8F8D88', inZone: false };
   }
   const abs = Math.abs(centsOffset);
   if (abs <= ZONE_CENTS) {
@@ -414,7 +414,7 @@ export function PitchMatchStep({ content, onAnswer }: Props) {
 
       {/* Header */}
       <div className="mb-4">
-        <p className="text-[10px] uppercase tracking-[0.2em] font-medium mb-1" style={{ color: '#D4A246' }}>
+        <p className="text-[11px] uppercase tracking-[0.2em] font-medium mb-1" style={{ color: '#D4A246' }}>
           {content.jinsName} — Pitch Training
         </p>
         <p className="text-[#EDEDEC] text-lg font-semibold">

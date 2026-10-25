@@ -143,7 +143,7 @@ export function TafsirPanel({ surahNumber, ayahNumber, ayahs, onClose }: Props) 
               <div>
                 <h3 className="text-sm font-medium text-text">Tafsir</h3>
                 {meta && (
-                  <p className="text-[10px] text-text-tertiary mt-0.5">
+                  <p className="text-[11px] text-text-tertiary mt-0.5">
                     {meta.tafsirName} — {meta.authorName}
                   </p>
                 )}
@@ -203,7 +203,7 @@ export function TafsirPanel({ surahNumber, ayahNumber, ayahs, onClose }: Props) 
                       {coveredAyahs.map((a) => (
                         <p key={a.number} className="font-arabic text-2xl text-text leading-loose text-right" dir="rtl">
                           {a.textUthmani}
-                          <span className="inline-block shrink-0 w-8 h-8 ml-2 text-center rounded-full bg-primary-light text-primary text-[10px] font-sans font-medium">
+                          <span className="inline-block shrink-0 w-8 h-8 ml-2 text-center rounded-full bg-primary-light text-primary text-[11px] font-sans font-medium">
                             <span className="flex items-center justify-center h-full pt-[2px]">{a.number}</span>
                           </span>
                         </p>

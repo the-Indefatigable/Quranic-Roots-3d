@@ -69,7 +69,7 @@ export default function QiratPage() {
             {/* Ornamental label */}
             <div className="flex items-center justify-center gap-3 mb-6">
               <span className="h-px w-10 bg-gradient-to-r from-transparent to-[#D4A246]/40" />
-              <span className="text-[#D4A246]/60 text-[10px] tracking-[0.3em] uppercase">
+              <span className="text-[#D4A246]/60 text-[11px] tracking-[0.3em] uppercase">
                 Coming Soon
               </span>
               <span className="h-px w-10 bg-gradient-to-l from-transparent to-[#D4A246]/40" />
@@ -108,7 +108,7 @@ export default function QiratPage() {
                   }}
                 >
                   <span className="font-arabic text-sm" style={{ color: m.color }}>{m.arabic}</span>
-                  <span className="text-[10px] font-medium" style={{ color: `${m.color}90` }}>{m.label}</span>
+                  <span className="text-[11px] font-medium" style={{ color: `${m.color}90` }}>{m.label}</span>
                 </div>
               ))}
             </div>
@@ -182,7 +182,7 @@ export default function QiratPage() {
         >
           <div className="flex items-center justify-center gap-3 mb-5">
             <span className="h-px w-10 bg-gradient-to-r from-transparent to-[#D4A246]/40" />
-            <span className="text-[#D4A246]/60 text-[10px] tracking-[0.3em] uppercase">
+            <span className="text-[#D4A246]/60 text-[11px] tracking-[0.3em] uppercase">
               The Path of Recitation
             </span>
             <span className="h-px w-10 bg-gradient-to-l from-transparent to-[#D4A246]/40" />
@@ -231,7 +231,7 @@ export default function QiratPage() {
           transition={{ duration: 0.6, delay: 0.18, ease: [0.22, 1, 0.36, 1] }}
           className="mb-14"
         >
-          <p className="text-[#57534E] text-[10px] uppercase tracking-[0.25em] text-center mb-3">
+          <p className="text-[#57534E] text-[11px] uppercase tracking-[0.25em] text-center mb-3">
             The Six Maqamat
           </p>
           <div className="flex gap-2.5 overflow-x-auto pb-1 scrollbar-hide">
@@ -255,10 +255,10 @@ export default function QiratPage() {
                 >
                   {m.arabic}
                 </span>
-                <span className="text-[11px] font-semibold" style={{ color: m.color }}>
+                <span className="text-[12px] font-semibold" style={{ color: m.color }}>
                   {m.label}
                 </span>
-                <span className="text-[9px] text-[#57534E] text-center leading-tight">
+                <span className="text-[11px] text-[#57534E] text-center leading-tight">
                   {m.tagline}
                 </span>
               </motion.div>
@@ -289,19 +289,19 @@ export default function QiratPage() {
                   <div className="flex-1 pr-3 min-w-0">
                     <div className="flex items-center gap-2 mb-1.5">
                       <span
-                        className="text-[10px] font-bold uppercase tracking-[0.18em] px-2 py-0.5 rounded-full"
+                        className="text-[11px] font-bold uppercase tracking-[0.18em] px-2 py-0.5 rounded-full"
                         style={{ background: `${unit.color}18`, color: unit.color }}
                       >
                         Unit {toEastern(unitIdx + 1)}
                       </span>
-                      <span className="text-[#3D3C3A] text-[10px]">
+                      <span className="text-[#3D3C3A] text-[11px]">
                         {unit.lessons.length} lessons
                       </span>
                     </div>
                     <h2 className="text-[#EDEDEC] font-semibold text-base leading-snug mb-1">
                       {unit.title}
                     </h2>
-                    <p className="text-[#57534E] text-[11px] leading-relaxed line-clamp-2">
+                    <p className="text-[#57534E] text-[12px] leading-relaxed line-clamp-2">
                       {unit.description}
                     </p>
                   </div>
@@ -401,7 +401,7 @@ export default function QiratPage() {
                           <p className="text-[#CCCBC8] text-[13px] font-medium leading-snug mb-0.5 group-hover:text-white transition-colors">
                             {lesson.title}
                           </p>
-                          <div className="flex items-center justify-center gap-1.5 text-[10px] text-[#3D3C3A]">
+                          <div className="flex items-center justify-center gap-1.5 text-[11px] text-[#3D3C3A]">
                             <span>{lesson.steps.length} steps</span>
                             <span>·</span>
                             <span style={{ color: `${unit.color}70` }}>{lesson.xpReward} XP</span>
