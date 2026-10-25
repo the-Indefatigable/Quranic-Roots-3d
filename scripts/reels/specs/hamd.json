@@ -35,7 +35,7 @@
   },
   {
    "id": "count",
-   "say": "Sixty seven words in the Quran grow from this one root.",
+   "say": "Sixty eight words in the Quran grow from this one root.",
    "gap": 0.3
   },
   {
@@ -49,8 +49,8 @@
    {
     "seg": "count",
     "from": "Sixty",
-    "to": "seven",
-    "as": "67"
+    "to": "eight",
+    "as": "68"
    }
   ],
   "map": {
@@ -192,7 +192,7 @@
   },
   {
    "type": "count",
-   "n": 67,
+   "n": 68,
    "sub": "words in the Quran grow from <span style=\"font-family:Amiri;color:#D4A246\">ح م د</span>",
    "from": {
     "seg": "count",

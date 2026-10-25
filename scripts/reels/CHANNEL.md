@@ -37,7 +37,7 @@ Art is made by `scripts/reels/brand.sh` from `brand.html`. Reels are made from `
 
 > Most of us recite Al-Fātiḥa 17 times a day without knowing what each word means. QuRoots fixes that, one root at a time.
 >
-> Nearly every Quranic word grows from a root of three letters. Learn the root ر ح م (mercy) and you recognise 333 words. The 250 most common roots cover about 80% of the root words in the Quran.
+> Nearly every Quranic word grows from a root of three letters. Learn the root ر ح م (mercy) and you recognise 339 words. The 250 most common roots cover about 80% of the root words in the Quran.
 >
 > Every week on this channel:
 > • Root reels: one root, the words that grow from it, and where they appear
