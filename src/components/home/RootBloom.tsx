@@ -180,13 +180,13 @@ export function RootBloom({ caption }: { caption?: string } = {}) {
           {ROOT.letters}
         </span>
         <span
-          className="mt-2 text-[10px] font-bold uppercase tracking-[0.3em]"
+          className="mt-2 text-[11px] font-bold uppercase tracking-[0.3em]"
           style={{ color: '#D4A246', opacity: 0.85 }}
         >
           {ROOT.meaning}
         </span>
         {caption && (
-          <span className="mt-1 text-[11px]" style={{ color: '#A09F9B' }}>{caption}</span>
+          <span className="mt-1 text-[12px]" style={{ color: '#A09F9B' }}>{caption}</span>
         )}
       </motion.div>
 
@@ -236,13 +236,13 @@ export function RootBloom({ caption }: { caption?: string } = {}) {
                 {d.arabic}
               </p>
               <p
-                className="text-[9px] italic leading-tight"
+                className="text-[11px] italic leading-tight"
                 style={{ color: '#D4A246', opacity: 0.85 }}
               >
                 {d.transliteration}
               </p>
               <p
-                className="text-[9px] leading-tight mt-0.5"
+                className="text-[11px] leading-tight mt-0.5"
                 style={{ color: '#A09F9B' }}
               >
                 {d.english}

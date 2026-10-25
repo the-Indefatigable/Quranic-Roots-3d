@@ -295,7 +295,7 @@ export default function ArifaVsAlimaVsFahimaPage() {
             >
               عَرَفَ
             </span>
-            <span className="text-2xl font-light" style={{ color: '#3D3C3A' }}>
+            <span className="text-2xl font-light" style={{ color: '#7A7874' }}>
               ·
             </span>
             <span
@@ -304,7 +304,7 @@ export default function ArifaVsAlimaVsFahimaPage() {
             >
               عَلِمَ
             </span>
-            <span className="text-2xl font-light" style={{ color: '#3D3C3A' }}>
+            <span className="text-2xl font-light" style={{ color: '#7A7874' }}>
               ·
             </span>
             <span
@@ -330,13 +330,13 @@ export default function ArifaVsAlimaVsFahimaPage() {
 
           <div className="flex flex-wrap gap-2 mt-6">
             <span
-              className="text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full"
+              className="text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full"
               style={{ background: 'rgba(212,162,70,0.12)', color: '#D4A246' }}
             >
               Intermediate
             </span>
             <span
-              className="text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full"
+              className="text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full"
               style={{ background: 'rgba(255,255,255,0.05)', color: '#636260' }}
             >
               5 min read
@@ -458,7 +458,7 @@ export default function ArifaVsAlimaVsFahimaPage() {
               <thead>
                 <tr style={{ background: 'rgba(255,255,255,0.03)' }}>
                   <th
-                    className="text-left text-[10px] uppercase tracking-wider font-bold px-4 py-3 border-b border-border"
+                    className="text-left text-[11px] uppercase tracking-wider font-bold px-4 py-3 border-b border-border"
                     style={{ color: '#636260', width: 56 }}
                   >
                     Bab
@@ -468,21 +468,21 @@ export default function ArifaVsAlimaVsFahimaPage() {
                     style={{ color: '#D4A246' }}
                   >
                     <span className="font-arabic text-base">عَرَفَ</span>
-                    <span className="block text-[9px] mt-0.5 font-normal opacity-70">recognize</span>
+                    <span className="block text-[11px] mt-0.5 font-normal opacity-70">recognize</span>
                   </th>
                   <th
                     className="text-center px-4 py-3 border-b border-border"
                     style={{ color: '#5AB8A8' }}
                   >
                     <span className="font-arabic text-base">عَلِمَ</span>
-                    <span className="block text-[9px] mt-0.5 font-normal opacity-70">know</span>
+                    <span className="block text-[11px] mt-0.5 font-normal opacity-70">know</span>
                   </th>
                   <th
                     className="text-center px-4 py-3 border-b border-border"
                     style={{ color: '#A78BFA' }}
                   >
                     <span className="font-arabic text-base">فَهِمَ</span>
-                    <span className="block text-[9px] mt-0.5 font-normal opacity-70">understand</span>
+                    <span className="block text-[11px] mt-0.5 font-normal opacity-70">understand</span>
                   </th>
                 </tr>
               </thead>
@@ -515,15 +515,15 @@ export default function ArifaVsAlimaVsFahimaPage() {
                               <p className="font-arabic text-base leading-none mb-1" style={{ color }} dir="rtl">
                                 {entry.arabic}
                               </p>
-                              <p className="text-[10px] italic mb-0.5" style={{ color: '#A09F9B' }}>
+                              <p className="text-[11px] italic mb-0.5" style={{ color: '#A09F9B' }}>
                                 {entry.transliteration}
                               </p>
-                              <p className="text-[10px]" style={{ color: '#636260' }}>
+                              <p className="text-[11px]" style={{ color: '#636260' }}>
                                 {entry.meaning}
                               </p>
                             </div>
                           ) : (
-                            <span className="text-[10px]" style={{ color: '#2D2C2A' }}>
+                            <span className="text-[11px]" style={{ color: '#2D2C2A' }}>
                               —
                             </span>
                           )}
@@ -564,7 +564,7 @@ export default function ArifaVsAlimaVsFahimaPage() {
                           {entry!.arabic}
                         </span>
                         <div className="min-w-0">
-                          <p className="text-[10px] italic" style={{ color: '#A09F9B' }}>
+                          <p className="text-[11px] italic" style={{ color: '#A09F9B' }}>
                             {entry!.transliteration}
                           </p>
                           <p className="text-xs" style={{ color: '#636260' }}>
@@ -600,12 +600,12 @@ export default function ArifaVsAlimaVsFahimaPage() {
                   >
                     <div className="flex items-center gap-3 mb-3">
                       <span
-                        className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"
+                        className="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"
                         style={{ background: `${verb.color}18`, color: verb.color }}
                       >
                         {verb.rootLetters} · Form {e.form}
                       </span>
-                      <span className="text-[10px]" style={{ color: '#57534E' }}>
+                      <span className="text-[11px]" style={{ color: '#8F8D88' }}>
                         {e.ref}
                       </span>
                     </div>
@@ -646,7 +646,7 @@ export default function ArifaVsAlimaVsFahimaPage() {
                         {w.arabic}
                       </span>
                       <div className="min-w-0">
-                        <p className="text-[10px] italic text-text-tertiary">{w.transliteration}</p>
+                        <p className="text-[11px] italic text-text-tertiary">{w.transliteration}</p>
                         <p className="text-xs text-text-secondary">{w.meaning}</p>
                       </div>
                     </div>

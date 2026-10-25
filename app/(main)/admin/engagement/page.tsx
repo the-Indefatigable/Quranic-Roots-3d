@@ -113,7 +113,7 @@ export default async function AdminEngagementPage() {
           ) : (
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-left text-[11px] uppercase tracking-wider text-text-tertiary">
+                <tr className="text-left text-[12px] uppercase tracking-wider text-text-tertiary">
                   <th className="pb-2 font-semibold">Type</th>
                   <th className="pb-2 font-semibold text-right">Sessions</th>
                   <th className="pb-2 font-semibold text-right">Avg score</th>

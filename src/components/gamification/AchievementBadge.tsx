@@ -94,7 +94,7 @@ export function AchievementBadge({
           {title}
         </p>
         {description && (
-          <p className={`text-[10px] ${isUnlocked ? 'text-slate-300' : 'text-slate-600'}`}>
+          <p className={`text-[11px] ${isUnlocked ? 'text-slate-300' : 'text-slate-600'}`}>
             {description}
           </p>
         )}

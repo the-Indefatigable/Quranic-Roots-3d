@@ -111,7 +111,7 @@ export function SignupModal() {
                 >
                   Create your free account
                 </button>
-                <button onClick={close} className="mt-3 text-xs font-medium" style={{ color: '#78716C' }}>
+                <button onClick={close} className="mt-3 text-xs font-medium" style={{ color: '#A3A19C' }}>
                   Maybe later
                 </button>
               </div>

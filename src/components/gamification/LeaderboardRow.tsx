@@ -16,7 +16,8 @@ interface LeaderboardRowProps {
   isMedal?: boolean;
 }
 
-const medalEmojis = ['🥇', '🥈', '🥉'];
+// Gold, silver and bronze discs instead of medal emoji.
+const MEDALS = ['linear-gradient(145deg,#F3D07A,#B8863B)', 'linear-gradient(145deg,#E4E2DD,#9C9A95)', 'linear-gradient(145deg,#E0A776,#9A5F33)'];
 
 export function LeaderboardRow({ entry, isCurrentUser = false, isMedal = false }: LeaderboardRowProps) {
   const getMedalColor = (rank: number) => {
@@ -53,7 +54,7 @@ export function LeaderboardRow({ entry, isCurrentUser = false, isMedal = false }
               transition={{ type: 'spring', stiffness: 200 }}
               className="text-3xl"
             >
-              {medalEmojis[entry.rank - 1]}
+              <span className="w-11 h-11 text-[17px] rounded-full grid place-items-center font-bold" style={{ background: MEDALS[entry.rank - 1], color: '#1a1206' }}>{entry.rank}</span>
             </motion.div>
           ) : (
             <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-surface border border-border-light shadow-card">

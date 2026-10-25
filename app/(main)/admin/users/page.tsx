@@ -74,7 +74,7 @@ export default async function AdminUsersPage({
       <div className="overflow-x-auto rounded-2xl border border-border" style={{ background: 'var(--color-surface)' }}>
         <table className="w-full text-sm min-w-[720px]">
           <thead>
-            <tr className="text-left text-[11px] uppercase tracking-wider text-text-tertiary border-b border-border">
+            <tr className="text-left text-[12px] uppercase tracking-wider text-text-tertiary border-b border-border">
               <th className="px-4 py-3 font-semibold">User</th>
               <th className="px-4 py-3 font-semibold">Joined</th>
               <th className="px-4 py-3 font-semibold">Last active</th>
@@ -93,7 +93,7 @@ export default async function AdminUsersPage({
                     <span className="font-medium text-text group-hover:text-primary transition-colors truncate max-w-[220px]">
                       {u.name || u.email.split('@')[0]}
                       {u.role !== 'student' && (
-                        <span className="ml-2 text-[10px] font-semibold uppercase tracking-wide text-primary">{u.role}</span>
+                        <span className="ml-2 text-[11px] font-semibold uppercase tracking-wide text-primary">{u.role}</span>
                       )}
                     </span>
                     <span className="text-xs text-text-tertiary truncate max-w-[220px]">{u.email}</span>

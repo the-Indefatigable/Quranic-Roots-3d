@@ -101,7 +101,7 @@ export function DailyQuiz({ words, done, onComplete }: { words: Word[]; done: bo
   if (finished || done) {
     return (
       <section className="rounded-2xl border border-border p-5 sm:p-6" style={{ background: 'var(--color-surface)' }}>
-        <span className="text-xs font-semibold uppercase tracking-wider text-text-tertiary">🧠 Test Yourself</span>
+        <span className="text-xs font-semibold uppercase tracking-wider text-text-tertiary">Test yourself</span>
         <div className="mt-3 py-2.5 rounded-xl text-sm font-semibold text-center flex items-center justify-center gap-2"
           style={{ background: 'rgba(95,181,122,0.12)', color: 'var(--color-correct, #5FB57A)' }}>
           ✓ Quiz done today
@@ -132,7 +132,7 @@ export function DailyQuiz({ words, done, onComplete }: { words: Word[]; done: bo
   return (
     <section className="rounded-2xl border border-border p-5 sm:p-6" style={{ background: 'var(--color-surface)' }}>
       <div className="flex items-center justify-between mb-4">
-        <span className="text-xs font-semibold uppercase tracking-wider text-text-tertiary">🧠 Test Yourself</span>
+        <span className="text-xs font-semibold uppercase tracking-wider text-text-tertiary">Test yourself</span>
         <span className="text-xs text-text-tertiary">{idx + 1} / {questions.length}</span>
       </div>
 
@@ -144,7 +144,7 @@ export function DailyQuiz({ words, done, onComplete }: { words: Word[]; done: bo
       <div className="space-y-2 mt-3">
         {q.options.map((o, i) => {
           const isPicked = picked === i;
-          let bg = 'var(--color-canvas)', border = 'var(--color-border-light)';
+          let bg = 'rgba(255,255,255,0.04)', border = 'rgba(255,255,255,0.10)';
           const color = 'var(--color-text)';
           if (answered) {
             if (o.correct) { bg = 'rgba(95,181,122,0.14)'; border = '#5FB57A'; }
@@ -155,7 +155,7 @@ export function DailyQuiz({ words, done, onComplete }: { words: Word[]; done: bo
               key={i}
               onClick={() => choose(i)}
               disabled={answered}
-              className={`w-full text-left px-4 py-2.5 rounded-xl border transition-colors ${o.arabic ? 'font-arabic text-xl text-right' : 'text-sm'}`}
+              className={`w-full px-4 rounded-2xl border transition-colors hover:border-[rgba(212,162,70,0.45)] ${o.arabic ? 'font-arabic text-[26px] text-center py-2' : 'text-[15px] text-left py-3'}`}
               dir={o.arabic ? 'rtl' : 'ltr'}
               style={{ background: bg, borderColor: border, color }}
             >

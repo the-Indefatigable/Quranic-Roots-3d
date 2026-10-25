@@ -93,7 +93,7 @@ export function DigestSubscribeBanner() {
             >
               {saving ? 'Subscribing…' : 'Subscribe'}
             </button>
-            <button onClick={dismiss} className="text-xs font-medium px-3 py-2 rounded-xl" style={{ color: '#78716C' }}>
+            <button onClick={dismiss} className="text-xs font-medium px-3 py-2 rounded-xl" style={{ color: '#A3A19C' }}>
               Not now
             </button>
           </div>

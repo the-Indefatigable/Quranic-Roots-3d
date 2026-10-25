@@ -20,7 +20,7 @@ export function PageHeader({ title, subtitle, eyebrow, children }: PageHeaderPro
       <div>
         {eyebrow && (
           <div
-            className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em]"
+            className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em]"
             style={{ color: 'var(--color-primary)' }}
           >
             {eyebrow}

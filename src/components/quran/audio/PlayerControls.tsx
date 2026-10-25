@@ -89,7 +89,7 @@ export function SeekBar({
         />
       </div>
       {large && (
-        <div className="flex justify-between text-[11px] tabular-nums" style={{ color: G.textTert }}>
+        <div className="flex justify-between text-[12px] tabular-nums" style={{ color: G.textTert }}>
           <span>{formatTime(currentTime)}</span>
           <span>-{formatTime(Math.max(0, duration - currentTime))}</span>
         </div>

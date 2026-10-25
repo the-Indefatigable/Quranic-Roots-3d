@@ -632,7 +632,7 @@ export function GuidedPractice({
               className="px-4 py-2 rounded-lg text-xs font-medium transition-all"
               style={practiceMode === 'mode1'
                 ? { background: 'rgba(212,162,70,0.15)', color: '#D4A246' }
-                : { color: '#57534E' }
+                : { color: '#8F8D88' }
               }
             >
               🎧 Listen then Recite
@@ -642,7 +642,7 @@ export function GuidedPractice({
               className="px-4 py-2 rounded-lg text-xs font-medium transition-all"
               style={practiceMode === 'mode2'
                 ? { background: 'rgba(212,162,70,0.15)', color: '#D4A246' }
-                : { color: '#57534E' }
+                : { color: '#8F8D88' }
               }
             >
               🎤 Sing Together
@@ -650,7 +650,7 @@ export function GuidedPractice({
           </div>
 
           {/* Mode description */}
-          <p className="text-xs text-center mb-2" style={{ color: '#57534E', maxWidth: '260px' }}>
+          <p className="text-xs text-center mb-2" style={{ color: '#8F8D88', maxWidth: '260px' }}>
             {practiceMode === 'mode1'
               ? 'Pauses playback, plays one ayah, then records your recitation — scored on pitch accuracy'
               : 'Mic opens while the Qari plays — both pitch contours shown in real-time'
@@ -660,7 +660,7 @@ export function GuidedPractice({
           {/* Headphones warning for Mode 2 */}
           {practiceMode === 'mode2' && (
             <div
-              className="flex items-center gap-2 px-3 py-2 rounded-lg mb-3 text-[11px]"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg mb-3 text-[12px]"
               style={{ background: 'rgba(212,162,70,0.08)', border: '1px solid rgba(212,162,70,0.15)', color: '#D4A246', maxWidth: '280px' }}
             >
               <span className="text-base">🎧</span>
@@ -675,7 +675,7 @@ export function GuidedPractice({
                 onClick={() => setSelectedAyah(a => Math.max(1, a - 1))}
                 disabled={selectedAyah <= 1}
                 className="w-8 h-8 rounded-xl flex items-center justify-center text-base font-bold disabled:opacity-30 transition-all"
-                style={{ background: 'rgba(255,255,255,0.05)', color: '#78716C', border: '1px solid rgba(255,255,255,0.08)' }}
+                style={{ background: 'rgba(255,255,255,0.05)', color: '#A3A19C', border: '1px solid rgba(255,255,255,0.08)' }}
               >
                 ‹
               </button>
@@ -686,7 +686,7 @@ export function GuidedPractice({
                 onClick={() => setSelectedAyah(a => Math.min(totalAyahs, a + 1))}
                 disabled={selectedAyah >= totalAyahs}
                 className="w-8 h-8 rounded-xl flex items-center justify-center text-base font-bold disabled:opacity-30 transition-all"
-                style={{ background: 'rgba(255,255,255,0.05)', color: '#78716C', border: '1px solid rgba(255,255,255,0.08)' }}
+                style={{ background: 'rgba(255,255,255,0.05)', color: '#A3A19C', border: '1px solid rgba(255,255,255,0.08)' }}
               >
                 ›
               </button>
@@ -698,7 +698,7 @@ export function GuidedPractice({
             <p
               className="font-arabic text-sm text-center mb-4 leading-[2]"
               dir="rtl"
-              style={{ color: '#57534E', maxWidth: '280px' }}
+              style={{ color: '#8F8D88', maxWidth: '280px' }}
             >
               {selectedAyahText}
             </p>
@@ -706,7 +706,7 @@ export function GuidedPractice({
 
           {/* Mode 2 hint */}
           {practiceMode === 'mode2' && (
-            <p className="text-xs text-center mb-4" style={{ color: '#3D3C3A', maxWidth: '240px' }}>
+            <p className="text-xs text-center mb-4" style={{ color: '#7A7874', maxWidth: '240px' }}>
               Keep the Quran playing — hit Start and sing along
             </p>
           )}
@@ -723,7 +723,7 @@ export function GuidedPractice({
               >
                 Session avg: {sessionStats.averageScore}%
               </span>
-              <span className="text-[10px]" style={{ color: '#3D3C3A' }}>
+              <span className="text-[11px]" style={{ color: '#7A7874' }}>
                 {allScores.length} ayah{allScores.length !== 1 ? 's' : ''}
               </span>
             </div>
@@ -816,7 +816,7 @@ export function GuidedPractice({
               >
                 {latestScore.grade}
               </div>
-              <p className="text-xs mb-0.5" style={{ color: '#57534E' }}>Ayah {latestScore.ayahNumber}</p>
+              <p className="text-xs mb-0.5" style={{ color: '#8F8D88' }}>Ayah {latestScore.ayahNumber}</p>
               <p className="text-2xl font-bold" style={{ color: '#EDEDEC' }}>{latestScore.overall}%</p>
             </div>
 
@@ -829,7 +829,7 @@ export function GuidedPractice({
             {latestScore.feedback.length > 0 && (
               <div className="space-y-1 mb-4">
                 {latestScore.feedback.slice(0, 2).map((msg, i) => (
-                  <p key={i} className="text-xs leading-relaxed" style={{ color: '#78716C' }}>
+                  <p key={i} className="text-xs leading-relaxed" style={{ color: '#A3A19C' }}>
                     {i === 0 && latestScore.overall >= 70 ? '✨ ' : '→ '}{msg}
                   </p>
                 ))}
@@ -884,14 +884,14 @@ function ScoreBar({ label, value }: { label: string; value: number }) {
   const color = value >= 80 ? '#D4A246' : value >= 60 ? '#E8B84B' : '#D9635B';
   return (
     <div className="flex items-center gap-2">
-      <span className="text-[10px] w-12 text-right" style={{ color: '#57534E' }}>{label}</span>
+      <span className="text-[11px] w-12 text-right" style={{ color: '#8F8D88' }}>{label}</span>
       <div className="flex-1 h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.06)' }}>
         <div
           className="h-full rounded-full transition-all duration-700"
           style={{ width: `${value}%`, background: color }}
         />
       </div>
-      <span className="text-[10px] font-medium w-8" style={{ color: '#A09F9B' }}>{value}%</span>
+      <span className="text-[11px] font-medium w-8" style={{ color: '#A09F9B' }}>{value}%</span>
     </div>
   );
 }

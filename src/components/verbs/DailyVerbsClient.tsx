@@ -1,7 +1,6 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { signIn } from 'next-auth/react';
 import { dailyVerbs, type DailyVerb } from '@/data/dailyVerbs';
 import { useAuthStore } from '@/store/useAuthStore';
 
@@ -65,7 +64,7 @@ async function failureMessage(res: Response, fallback: string): Promise<string> 
 }
 
 export function DailyVerbsClient() {
-  const { user, isLoading: authLoading } = useAuthStore();
+  const { user, isLoading: authLoading, login } = useAuthStore();
   const userId = user?.id ?? null;
 
   const [query, setQuery] = useState('');
@@ -132,7 +131,7 @@ export function DailyVerbsClient() {
 
   const toggle = useCallback(async (verbId: string) => {
     if (!userId) {
-      signIn('google', { callbackUrl: '/verbs' });
+      login('Sign in to tick off the verbs you know');
       return;
     }
     if (inFlight.current.has(verbId)) return;
@@ -206,7 +205,7 @@ export function DailyVerbsClient() {
     <div className="max-w-3xl mx-auto">
       {/* Header */}
       <div className="mb-6">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.18em]" style={{ color: GOLD }}>Speak Arabic</p>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: GOLD }}>Speak Arabic</p>
         <h1 className="text-3xl sm:text-4xl font-heading tracking-tight leading-[1.05]" style={{ color: 'var(--color-ivory)' }}>
           Daily Verbs
         </h1>
@@ -247,7 +246,7 @@ export function DailyVerbsClient() {
             Sign in to tick off the verbs you know and watch the list shrink.
           </p>
           <button
-            onClick={() => signIn('google', { callbackUrl: '/verbs' })}
+            onClick={() => login('Sign in to tick off the verbs you know')}
             className="shrink-0 text-xs font-semibold px-3.5 py-2 rounded-full transition-opacity hover:opacity-90"
             style={{ background: GOLD, color: '#14120F' }}
           >
@@ -265,7 +264,7 @@ export function DailyVerbsClient() {
       {/* Search */}
       <div className="sticky top-16 lg:top-3 z-10 -mx-1 px-1 py-2" style={{ background: 'var(--color-canvas)' }}>
         <div className="relative">
-          <svg className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: '#78716C' }} fill="none" viewBox="0 0 24 24" strokeWidth={1.6} stroke="currentColor">
+          <svg className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: '#A3A19C' }} fill="none" viewBox="0 0 24 24" strokeWidth={1.6} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
           </svg>
           <input
@@ -280,7 +279,7 @@ export function DailyVerbsClient() {
               onClick={() => { setQuery(''); newPass(); }}
               aria-label="Clear search"
               className="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded-lg"
-              style={{ color: '#78716C' }}
+              style={{ color: '#A3A19C' }}
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
@@ -372,7 +371,7 @@ export function DailyVerbsClient() {
                 <div className="flex items-start justify-between gap-2 mb-2">
                   <h2 className="text-[15px] font-semibold" style={{ color: 'var(--color-ivory)' }}>{v.en}</h2>
                   <div className="flex items-center gap-1.5 shrink-0">
-                    <span className="text-[9px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full" style={{ background: 'rgba(212,162,70,0.1)', color: GOLD }}>
+                    <span className="text-[11px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full" style={{ background: 'rgba(212,162,70,0.1)', color: GOLD }}>
                       {v.cat}
                     </span>
                     <button
@@ -399,7 +398,7 @@ export function DailyVerbsClient() {
                   <span className="font-arabic leading-none" style={{ fontSize: '1.9rem', color: '#F0E8D8' }}>{v.ar}</span>
                   <span className="font-arabic leading-none" style={{ fontSize: '1.35rem', color: GOLD, opacity: 0.85 }}>{v.present}</span>
                 </div>
-                <p className="text-xs italic mt-1.5" style={{ color: '#78716C' }}>{v.translit}</p>
+                <p className="text-xs italic mt-1.5" style={{ color: '#A3A19C' }}>{v.translit}</p>
 
                 {/* Examples */}
                 <div className="mt-3 pt-3 space-y-2.5" style={{ borderTop: '1px solid var(--color-border-light)' }}>
@@ -414,14 +413,14 @@ export function DailyVerbsClient() {
                 {/* Same root, other wazn — the point of the whole site, in miniature */}
                 {v.family && v.family.length > 0 && (
                   <div className="mt-3 pt-3" style={{ borderTop: '1px solid var(--color-border-light)' }}>
-                    <p className="text-[9px] font-semibold uppercase tracking-[0.16em] mb-2" style={{ color: GOLD, opacity: 0.75 }}>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] mb-2" style={{ color: GOLD, opacity: 0.75 }}>
                       Same root, other forms
                     </p>
                     <ul className="space-y-1.5">
                       {v.family.map((f) => (
                         <li key={f.ar} className="flex items-baseline gap-2">
                           <span
-                            className="shrink-0 text-[9px] font-bold px-1.5 py-0.5 rounded"
+                            className="shrink-0 text-[11px] font-bold px-1.5 py-0.5 rounded"
                             style={{ background: 'rgba(212,162,70,0.1)', color: GOLD, minWidth: '1.9rem', textAlign: 'center' }}
                           >
                             {f.form}
@@ -442,7 +441,7 @@ export function DailyVerbsClient() {
       )}
 
       {/* Footnote */}
-      <p className="text-center text-[11px] mt-8" style={{ color: 'var(--color-text-tertiary)' }}>
+      <p className="text-center text-[12px] mt-8" style={{ color: 'var(--color-text-tertiary)' }}>
         Showing {dailyVerbs.length} everyday verbs — more added regularly. The gold word is the present tense
         (يفعل), the form you use to say “I do it”. Where a root has other common measures, they are
         listed under “same root, other forms” — learn one, half-know the rest.

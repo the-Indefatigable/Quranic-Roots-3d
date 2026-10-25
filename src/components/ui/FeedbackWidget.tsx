@@ -1,15 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useAuthStore } from '@/store/useAuthStore';
 
 const CATEGORIES = [
-  { id: 'suggestion', label: '💡 Suggestion' },
-  { id: 'content', label: '📖 Content request' },
-  { id: 'bug', label: '🐛 Something broke' },
-  { id: 'other', label: '💬 Other' },
+  { id: 'suggestion', label: 'Suggestion' },
+  { id: 'content', label: 'Content request' },
+  { id: 'bug', label: 'Something broke' },
+  { id: 'other', label: 'Other' },
 ] as const;
 
 /**
@@ -25,6 +25,13 @@ export function FeedbackWidget() {
   const [body, setBody] = useState('');
   const [state, setState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
   const [errorMsg, setErrorMsg] = useState('');
+
+  // On phones the launcher lives in the "More" sheet, which fires this event.
+  useEffect(() => {
+    const show = () => setOpen(true);
+    window.addEventListener('qr:feedback', show);
+    return () => window.removeEventListener('qr:feedback', show);
+  }, []);
 
   // Hide inside lessons/quizzes — don't overlap the answer buttons
   if (pathname.startsWith('/lesson') || pathname.startsWith('/quiz/')) return null;
@@ -58,11 +65,11 @@ export function FeedbackWidget() {
 
   return (
     <>
-      {/* Launcher button — bottom corner (no bottom nav to clear on mobile now) */}
+      {/* Launcher button — desktop only; phones open it from the "More" sheet */}
       <button
         onClick={() => setOpen((v) => !v)}
         aria-label="Send feedback"
-        className="fixed z-40 right-4 bottom-[calc(env(safe-area-inset-bottom)+16px)] lg:bottom-6 lg:right-6 flex items-center justify-center w-11 h-11 rounded-full transition-transform hover:scale-105 active:scale-95"
+        className="hidden fixed z-40 lg:bottom-6 lg:right-6 lg:flex items-center justify-center w-11 h-11 rounded-full transition-transform hover:scale-105 active:scale-95"
         style={{
           background: 'var(--color-nav-glass)',
           backdropFilter: 'blur(20px)',
@@ -90,18 +97,21 @@ export function FeedbackWidget() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 12, scale: 0.97 }}
             transition={{ duration: 0.18 }}
-            className="fixed z-40 right-4 bottom-[calc(env(safe-area-inset-bottom)+72px)] lg:bottom-20 lg:right-6 w-[calc(100vw-2rem)] max-w-sm rounded-2xl p-4"
+            className="fixed z-50 right-4 bottom-[calc(env(safe-area-inset-bottom)+80px)] lg:bottom-20 lg:right-6 w-[calc(100vw-2rem)] max-w-sm rounded-2xl p-4"
             style={{
               background: 'var(--color-surface)',
               border: '1px solid var(--color-border-light)',
               boxShadow: 'var(--shadow-modal)',
             }}
           >
+            <button onClick={() => setOpen(false)} aria-label="Close feedback" className="lg:hidden absolute top-2 right-2 w-8 h-8 grid place-items-center rounded-full text-text-tertiary">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+            </button>
             {!user ? (
               <div className="text-center py-4">
                 <p className="text-sm text-text-secondary mb-3">Sign in to send feedback</p>
                 <button
-                  onClick={() => { setOpen(false); setShowLoginModal(true); }}
+                  onClick={() => { setOpen(false); setShowLoginModal(true, 'Sign in to send feedback'); }}
                   className="px-5 py-2 rounded-xl text-sm font-semibold"
                   style={{ background: 'var(--color-primary)', color: '#1a1206' }}
                 >
@@ -110,7 +120,7 @@ export function FeedbackWidget() {
               </div>
             ) : state === 'sent' ? (
               <div className="text-center py-6">
-                <div className="text-3xl mb-2">🤍</div>
+                
                 <p className="text-sm font-semibold" style={{ color: 'var(--color-text)' }}>
                   JazakAllah khair — received!
                 </p>

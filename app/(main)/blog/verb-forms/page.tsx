@@ -192,7 +192,7 @@ export default function VerbFormsPage() {
               <div className="flex items-center gap-4 mb-4">
                 <div className="text-center">
                   <p className="font-arabic text-lg text-text" dir="rtl">{f.example}</p>
-                  <p className="text-[10px] text-text-tertiary">{f.exampleMeaning}</p>
+                  <p className="text-[11px] text-text-tertiary">{f.exampleMeaning}</p>
                 </div>
               </div>
 

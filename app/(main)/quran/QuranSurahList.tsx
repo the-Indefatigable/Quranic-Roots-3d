@@ -62,7 +62,7 @@ export function QuranSurahList() {
       >
         <div>
           <div
-            className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em]"
+            className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em]"
             style={{ color: 'var(--color-primary)' }}
           >
             The Holy Book
@@ -210,7 +210,7 @@ export function QuranSurahList() {
                     </span>
                   </div>
                   <div
-                    className="flex items-center gap-2 mt-1 text-[11px] text-text-tertiary"
+                    className="flex items-center gap-2 mt-1 text-[12px] text-text-tertiary"
                     style={{ fontVariantNumeric: 'tabular-nums' }}
                   >
                     <span>{surah.versesCount} ayahs</span>

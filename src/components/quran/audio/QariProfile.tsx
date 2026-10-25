@@ -50,7 +50,7 @@ export function QariProfile({ qari, onQariChange }: Props) {
           >
             {qari.name}
           </h4>
-          <p className="text-[11px] mt-1 tracking-wider uppercase" style={{ color: G.textTert }}>
+          <p className="text-[12px] mt-1 tracking-wider uppercase" style={{ color: G.textTert }}>
             {[qari.country, qari.era].filter(Boolean).join(' · ')}
           </p>
         </div>
@@ -78,7 +78,7 @@ export function QariProfile({ qari, onQariChange }: Props) {
             {qari.tags.map((tag) => (
               <span
                 key={tag}
-                className="text-[10px] px-2.5 py-1 rounded-full font-medium tracking-wide"
+                className="text-[11px] px-2.5 py-1 rounded-full font-medium tracking-wide"
                 style={{
                   background: 'rgba(212,162,70,0.10)',
                   border: `1px solid ${G.goldBorder}`,
@@ -111,7 +111,7 @@ export function QariProfile({ qari, onQariChange }: Props) {
             }}
           >
             <p
-              className="text-[10px] uppercase tracking-[0.15em] mb-1.5 font-semibold"
+              className="text-[11px] uppercase tracking-[0.15em] mb-1.5 font-semibold"
               style={{ color: G.gold }}
             >
               Signature
@@ -132,7 +132,7 @@ export function QariProfile({ qari, onQariChange }: Props) {
             }}
           >
             <p
-              className="text-[10px] uppercase tracking-[0.15em] mb-1.5 font-semibold"
+              className="text-[11px] uppercase tracking-[0.15em] mb-1.5 font-semibold"
               style={{ color: G.textTert }}
             >
               Recommended for
@@ -147,7 +147,7 @@ export function QariProfile({ qari, onQariChange }: Props) {
         {onQariChange && (
           <div className="mt-8">
             <p
-              className="text-[10px] uppercase tracking-[0.18em] mb-3 font-semibold text-center"
+              className="text-[11px] uppercase tracking-[0.18em] mb-3 font-semibold text-center"
               style={{ color: G.textTert }}
             >
               Try another qari
@@ -172,7 +172,7 @@ export function QariProfile({ qari, onQariChange }: Props) {
                         {q.name}
                       </span>
                       <span
-                        className="text-[9px] px-1.5 py-0.5 rounded font-semibold shrink-0"
+                        className="text-[11px] px-1.5 py-0.5 rounded font-semibold shrink-0"
                         style={{ background: 'rgba(212,162,70,0.10)', color: G.gold }}
                       >
                         {q.styleLabel}
@@ -180,7 +180,7 @@ export function QariProfile({ qari, onQariChange }: Props) {
                     </div>
                     {q.signature && (
                       <p
-                        className="text-[11px] mt-0.5 truncate"
+                        className="text-[12px] mt-0.5 truncate"
                         style={{ color: G.textTert }}
                       >
                         {q.signature}
@@ -218,7 +218,7 @@ function Fact({ label, value, fullSpan }: { label: string; value: string; fullSp
       }}
     >
       <p
-        className="text-[9px] uppercase tracking-[0.15em] mb-0.5 font-semibold"
+        className="text-[11px] uppercase tracking-[0.15em] mb-0.5 font-semibold"
         style={{ color: G.textTert }}
       >
         {label}

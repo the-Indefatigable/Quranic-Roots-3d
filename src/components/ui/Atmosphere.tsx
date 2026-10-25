@@ -1,11 +1,10 @@
 /**
  * Atmosphere — site-wide ambient layer.
  *
- * Four passes, all fixed-positioned, all pointer-events-none:
+ * Three passes, all fixed-positioned, all pointer-events-none:
  *   1. Manuscript ruling lines (horizontal gold rules, like a mushaf page)
  *   2. SVG turbulence grain (4% opacity, vellum texture)
  *   3. Two animated radial glows that drift on a 40s loop — the page breathes
- *   4. Bismillah corner watermark (top-right, 5% opacity, Uthmani)
  *
  * Sits at z-0 with pointer-events-none. Page content should sit at z-10.
  */
@@ -58,27 +57,6 @@ export function Atmosphere() {
          ───────────────────────────────────────────── */}
       <div className="atmosphere-glow atmosphere-glow-amber" />
       <div className="atmosphere-glow atmosphere-glow-teal" />
-
-      {/* ─────────────────────────────────────────────
-         4. Bismillah corner watermark (top-right)
-         Uthmani, very faint — a constant signature
-         ───────────────────────────────────────────── */}
-      <div
-        className="font-arabic absolute select-none"
-        style={{
-          top: '14px',
-          right: '20px',
-          fontSize: '13px',
-          color: '#D4A246',
-          opacity: 0.18,
-          letterSpacing: '0.02em',
-          lineHeight: 1,
-          textShadow: '0 0 8px rgba(212,162,70,0.2)',
-        }}
-        dir="rtl"
-      >
-        بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
-      </div>
     </div>
   );
 }

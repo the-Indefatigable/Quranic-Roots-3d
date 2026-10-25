@@ -114,17 +114,17 @@ export default function MufradPage() {
               <div className="flex gap-6 items-center">
                 <div className="text-center">
                   <p className="font-arabic text-lg text-white/50" dir="rtl">مُسْلِمٌ</p>
-                  <p className="text-[10px] text-white/25">singular</p>
+                  <p className="text-[11px] text-white/25">singular</p>
                 </div>
                 <span className="text-white/20">&rarr;</span>
                 <div className="text-center">
                   <p className="font-arabic text-lg text-white/70" dir="rtl">مُسْلِمُونَ</p>
-                  <p className="text-[10px] text-white/25">plural (raf&apos;)</p>
+                  <p className="text-[11px] text-white/25">plural (raf&apos;)</p>
                 </div>
                 <span className="text-white/20">/</span>
                 <div className="text-center">
                   <p className="font-arabic text-lg text-white/70" dir="rtl">مُسْلِمِينَ</p>
-                  <p className="text-[10px] text-white/25">plural (nasb/jarr)</p>
+                  <p className="text-[11px] text-white/25">plural (nasb/jarr)</p>
                 </div>
               </div>
             </div>
@@ -136,12 +136,12 @@ export default function MufradPage() {
               <div className="flex gap-6 items-center">
                 <div className="text-center">
                   <p className="font-arabic text-lg text-white/50" dir="rtl">مُسْلِمَةٌ</p>
-                  <p className="text-[10px] text-white/25">singular</p>
+                  <p className="text-[11px] text-white/25">singular</p>
                 </div>
                 <span className="text-white/20">&rarr;</span>
                 <div className="text-center">
                   <p className="font-arabic text-lg text-white/70" dir="rtl">مُسْلِمَاتٌ</p>
-                  <p className="text-[10px] text-white/25">plural</p>
+                  <p className="text-[11px] text-white/25">plural</p>
                 </div>
               </div>
             </div>
@@ -160,7 +160,7 @@ export default function MufradPage() {
                     <p className="font-arabic text-white/40 mb-0.5" dir="rtl">{w.sg}</p>
                     <p className="text-white/15 text-xs">&darr;</p>
                     <p className="font-arabic text-lg text-white/70" dir="rtl">{w.pl}</p>
-                    <p className="text-[10px] text-white/25">{w.en}</p>
+                    <p className="text-[11px] text-white/25">{w.en}</p>
                   </div>
                 ))}
               </div>

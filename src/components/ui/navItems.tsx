@@ -4,42 +4,79 @@ import type { ComponentType } from 'react';
 
 const QIRAT_UNLOCKED = process.env.NEXT_PUBLIC_UNLOCK_QIRAT === 'true';
 
-export type NavEntry =
-  | { type: 'section'; label: string }
-  | { type: 'divider' }
-  | {
-      href: string;
-      label: string;
-      icon: ComponentType<{ className?: string }>;
-      requiresAuth?: boolean;
-      requiresAdmin?: boolean;
-      badge?: string;
-    };
+export type NavLink = {
+  href: string;
+  label: string;
+  icon: ComponentType<{ className?: string }>;
+  requiresAuth?: boolean;
+  requiresAdmin?: boolean;
+  hideWhenSignedIn?: boolean;
+  badge?: string;
+};
+export type NavEntry = { type: 'section'; label: string } | { type: 'divider' } | NavLink;
 
-export const navItems: NavEntry[] = [
-  { type: 'section', label: 'Practice' },
-  { href: '/dashboard',   label: 'Home',         icon: HomeIcon,   requiresAuth: true },
-  { href: '/salah',       label: 'Your Salah',   icon: BookIcon, badge: 'New' },
-  { href: '/learn/path',  label: 'Learn Arabic', icon: LearnIcon },
-  { href: '/verbs',       label: 'Daily Verbs',  icon: VerbsIcon },
-  { href: '/words',       label: 'Everyday Words', icon: WordsIcon },
-  ...(QIRAT_UNLOCKED ? [{ href: '/learn/qirat', label: 'Learn Qirat', icon: QiratIcon, badge: 'New' } as NavEntry] : []),
-  { type: 'section', label: 'Read' },
-  { href: '/quran',       label: 'Quran',        icon: BookIcon },
-  { href: '/roots',       label: 'Roots',        icon: RootIcon },
-  { type: 'section', label: 'Explore' },
-  { href: '/search',      label: 'Search',       icon: SearchIcon },
-  { href: '/blog',        label: 'Blog',         icon: BlogIcon },
-  { href: '/community',   label: 'Community',    icon: ChatIcon },
-  { href: '/leaderboard', label: 'Leaderboard',  icon: TrophyIcon },
-  { href: '/achievements', label: 'Badges',      icon: BadgeIcon },
-  { href: '/daily',       label: 'Daily Ayah',   icon: SparkleIcon },
-  { type: 'divider' },
-  { href: '/support',     label: 'Support Us',   icon: HeartIcon },
-  { href: '/admin/feedback', label: 'Feedback',  icon: InboxIcon, requiresAdmin: true },
-  { href: '/admin',       label: 'Admin',        icon: AdminIcon, requiresAdmin: true },
+/**
+ * The five places a learner actually goes. Today is the signed-in home; signed out,
+ * the salah path stands in its place.
+ */
+export const primaryNav: NavLink[] = [
+  { href: '/dashboard', label: 'Today',      icon: TodayIcon, requiresAuth: true },
+  { href: '/salah',     label: 'Your Salah', icon: SalahIcon, badge: 'New' },
+  { href: '/quran',     label: 'Quran',      icon: BookIcon },
+  { href: '/roots',     label: 'Roots',      icon: RootIcon },
+  { href: '/community', label: 'Community',  icon: ChatIcon },
 ];
 
+/** Everything else, one tap away under "More". */
+export const moreNav: NavLink[] = [
+  { href: '/learn/path',   label: 'Arabic course',  icon: LearnIcon },
+  { href: '/daily',        label: 'Daily Ayah',     icon: SparkleIcon },
+  { href: '/verbs',        label: 'Daily Verbs',    icon: VerbsIcon },
+  { href: '/words',        label: 'Everyday Words', icon: WordsIcon },
+  ...(QIRAT_UNLOCKED ? [{ href: '/learn/qirat', label: 'Learn Qirat', icon: QiratIcon, badge: 'New' }] : []),
+  { href: '/leaderboard',  label: 'Leaderboard',    icon: TrophyIcon },
+  { href: '/achievements', label: 'Badges',         icon: BadgeIcon },
+  { href: '/blog',         label: 'Blog',           icon: BlogIcon },
+  { href: '/support',      label: 'Support QuRoots', icon: HeartIcon },
+  { href: '/admin/feedback', label: 'Feedback',     icon: InboxIcon, requiresAdmin: true },
+  { href: '/admin',        label: 'Admin',          icon: AdminIcon, requiresAdmin: true },
+];
+
+/** Community is one place with three tabs. */
+export const communityTabs = [
+  { href: '/community', label: 'Lounge' },
+  { href: '/leaderboard', label: 'Leaderboard' },
+  { href: '/achievements', label: 'Badges' },
+];
+
+export const navItems: NavEntry[] = [...primaryNav, ...moreNav, { href: '/search', label: 'Search', icon: SearchIcon }];
+
+export function visibleFor(user: { role?: string } | null) {
+  return (i: NavLink) => !(i.requiresAuth && !user) && !(i.requiresAdmin && user?.role !== 'admin') && !(i.hideWhenSignedIn && user);
+}
+
+export function TodayIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1.5m0 15V21m9-9h-1.5M4.5 12H3m15.364 6.364-1.06-1.06M6.697 6.697l-1.06-1.06m12.727 0-1.06 1.06M6.697 17.303l-1.06 1.06M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
+    </svg>
+  );
+}
+/** A mihrab arch: the salah path. */
+export function SalahIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 21V10.5C5.25 6.4 8.27 3.4 12 2.25c3.73 1.15 6.75 4.15 6.75 8.25V21M3 21h18M9 21v-6a3 3 0 0 1 6 0v6" />
+    </svg>
+  );
+}
+export function MoreIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
+    </svg>
+  );
+}
 export function UserIcon({ className }: { className?: string }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -54,10 +91,15 @@ export function BookIcon({ className }: { className?: string }) {
     </svg>
   );
 }
+/** One root branching into its words. */
 export function RootIcon({ className }: { className?: string }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" />
+      <circle cx="12" cy="5" r="2.25" />
+      <circle cx="5" cy="18.5" r="2" />
+      <circle cx="12" cy="19.5" r="2" />
+      <circle cx="19" cy="18.5" r="2" />
+      <path strokeLinecap="round" d="M12 7.25v10.25M10.6 6.8 6 16.7M13.4 6.8 18 16.7" />
     </svg>
   );
 }

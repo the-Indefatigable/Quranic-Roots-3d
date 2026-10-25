@@ -9,7 +9,7 @@ interface BadgeProps {
 const variants = {
   default: 'bg-canvas text-text-secondary',
   emerald: 'bg-correct-light text-correct',
-  amber: 'bg-accent-light text-accent',
+  amber: 'bg-primary-light text-primary',
   red: 'bg-wrong-light text-wrong',
   sky: 'bg-info-light text-info',
   stone: 'bg-border-light text-text-tertiary',

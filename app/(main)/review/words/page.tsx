@@ -59,7 +59,7 @@ export default function WordReviewPage() {
     return (
       <div className="max-w-lg mx-auto text-center py-20">
         <p className="text-text-secondary mb-4">Sign in to review your words</p>
-        <button onClick={() => setShowLoginModal(true)} className="px-6 py-2.5 rounded-xl text-sm font-semibold" style={{ background: 'var(--color-primary)', color: '#1a1206' }}>Sign in</button>
+        <button onClick={() => setShowLoginModal(true, 'Sign in to review your words')} className="px-6 py-2.5 rounded-xl text-sm font-semibold" style={{ background: 'var(--color-primary)', color: '#1a1206' }}>Sign in</button>
       </div>
     );
   }
@@ -132,7 +132,7 @@ export default function WordReviewPage() {
             minHeight: 320,
           }}
         >
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-8" style={{ color: 'var(--color-primary)' }}>
+          <p className="text-[11px] font-bold uppercase tracking-[0.2em] mb-8" style={{ color: 'var(--color-primary)' }}>
             {TYPE_LABEL[card.wordType] ?? card.wordType}
           </p>
           <p dir="rtl" className="font-arabic leading-relaxed mb-6" style={{ fontSize: 64, color: 'var(--color-ivory)', textShadow: '0 0 40px rgba(212,162,70,0.25)' }}>

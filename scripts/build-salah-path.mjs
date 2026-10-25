@@ -89,7 +89,9 @@ try {
   for (let d = 1; d <= DAYS; d++) {
     const roots = order.filter((r) => dayOf.get(r.key) === d).map((r) => {
       const m = meta.get(r.key) ?? {};
-      return { root: r.key, letters: r.spaced, meaning: m.meaning || MEANINGS[r.key] || '', quranCount: occ.get(r.key) ?? 0, firstIn: SURAH_NAMES[r.surah], words: wordsByRoot.get(r.key) };
+      return { root: r.key, letters: r.spaced, meaning: m.meaning || MEANINGS[r.key] || '', // roots.total_freq is the count every page shows (it matches the Quranic Arabic Corpus);
+      // tagged words in quran_words are the fallback for the few roots without one.
+      quranCount: m.total_freq || occ.get(r.key) || 0, firstIn: SURAH_NAMES[r.surah], words: wordsByRoot.get(r.key) };
     });
     const learned = new Set(order.filter((r) => (dayOf.get(r.key) ?? 99) <= d).map((r) => r.key));
     const understood = words.filter((w) => w.root_arabic && learned.has(w.root_arabic.replace(/\s+/g, ''))).length;

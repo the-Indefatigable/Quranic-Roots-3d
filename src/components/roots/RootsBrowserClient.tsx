@@ -137,7 +137,7 @@ export function RootsBrowserClient({
       <PageHeader
         title="Roots"
         subtitle={
-          tab === 'verbs' ? `${roots.length} Quranic verb roots` :
+          tab === 'verbs' ? `1,716 Quranic roots · ${roots.length.toLocaleString()} with verb forms, most frequent first` :
           tab === 'nouns' ? `${nouns.length} derived nouns & participles` :
           `${particles.length} Quranic particles`
         }
@@ -168,7 +168,7 @@ export function RootsBrowserClient({
             }`}
           >
             {t.label}
-            <span className={`text-[10px] px-1.5 py-0.5 rounded-md ${
+            <span className={`text-[11px] px-1.5 py-0.5 rounded-md ${
               tab === t.key ? 'bg-primary/20 text-primary' : 'bg-surface text-text-tertiary'
             }`}>
               {t.count.toLocaleString()}
@@ -187,7 +187,7 @@ export function RootsBrowserClient({
         animate={{ opacity: 1 }}
         transition={{ delay: 0.12, duration: 0.3 }}
       >
-        <span className="text-[10px] text-text-tertiary uppercase tracking-wider">Sort</span>
+        <span className="text-[11px] text-text-tertiary uppercase tracking-wider">Sort</span>
 
         {tab === 'verbs' && (
           <>
@@ -244,18 +244,11 @@ export function RootsBrowserClient({
           {filteredRoots.map((root) => (
             <Link key={root.id} href={`/roots/${encodeURIComponent(root.root)}`} prefetch={false}>
               <Card className="h-full">
-                <div className="flex items-start justify-between mb-2">
-                  <ArabicText size="2xl" className="text-primary">{root.root}</ArabicText>
-                  <div className="flex items-center gap-1.5">
-                    {root.formCount > 0 && (
-                      <Badge variant="stone">
-                        {root.formCount} form{root.formCount !== 1 ? 's' : ''}
-                      </Badge>
-                    )}
-                    <Badge variant="amber">{root.totalFreq}x</Badge>
-                  </div>
+                <div className="flex items-start justify-between gap-3 mb-1">
+                  <p className="font-arabic text-[34px] leading-[1.4]" dir="rtl" lang="ar" style={{ color: 'var(--color-primary)' }}>{root.root.split('').join(' ')}</p>
+                  <span className="text-[13px] tabular-nums text-text-tertiary mt-2 shrink-0">{root.totalFreq.toLocaleString()}×</span>
                 </div>
-                <p className="text-sm text-text-secondary line-clamp-2">{root.meaning}</p>
+                <p className="text-[15px] text-text-secondary line-clamp-2">{root.meaning}</p>
               </Card>
             </Link>
           ))}

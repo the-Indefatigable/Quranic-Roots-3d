@@ -68,7 +68,7 @@ export function DonateWidget({ defaultAmount = 10 }: { defaultAmount?: number })
         className="flex items-center gap-2 mb-4 px-3 py-2.5 rounded-xl"
         style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid ${custom.trim() ? GOLD : 'rgba(255,255,255,0.08)'}` }}
       >
-        <span className="text-sm" style={{ color: '#78716C' }}>$</span>
+        <span className="text-sm" style={{ color: '#A3A19C' }}>$</span>
         <input
           type="number" min={1} inputMode="decimal" placeholder="Other amount"
           value={custom}

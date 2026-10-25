@@ -233,7 +233,7 @@ export default function AdminContentEditorPage() {
               className="w-full text-left px-4 py-3 flex items-center gap-4 hover:bg-canvas transition-colors"
             >
               <span
-                className={`text-[10px] transition-transform ${
+                className={`text-[11px] transition-transform ${
                   expandedId === item.id ? 'rotate-90' : ''
                 }`}
               >
@@ -310,7 +310,7 @@ function InlineField({
 
   return (
     <div>
-      <label className="block text-[11px] uppercase tracking-wider text-text-tertiary mb-1">{label}</label>
+      <label className="block text-[12px] uppercase tracking-wider text-text-tertiary mb-1">{label}</label>
       {multiline ? (
         <textarea
           value={value}
@@ -506,13 +506,13 @@ function TenseEditor({
       {/* Conjugations grid */}
       {conjugations.length > 0 && (
         <div className="space-y-1.5 mb-3">
-          <label className="block text-[11px] uppercase tracking-wider text-text-tertiary">
+          <label className="block text-[12px] uppercase tracking-wider text-text-tertiary">
             Conjugations
           </label>
           <div className="grid gap-1.5">
             {conjugations.map((conj, i) => (
               <div key={i} className="flex items-center gap-2">
-                <span className="text-[11px] text-text-tertiary w-20 shrink-0">
+                <span className="text-[12px] text-text-tertiary w-20 shrink-0">
                   {PERSON_LABELS[conj.person] || conj.person}
                 </span>
                 <input

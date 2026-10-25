@@ -57,7 +57,7 @@ export default function SupportPage() {
         <div className="relative z-10">
           <div className="flex items-center justify-center gap-3 mb-6">
             <span style={{ height: 1, width: 28, background: 'rgba(212,162,70,0.4)' }} />
-            <span className="text-[10px] font-bold tracking-[0.3em] uppercase" style={{ color: GOLD }}>
+            <span className="text-[11px] font-bold tracking-[0.3em] uppercase" style={{ color: GOLD }}>
               Sadaqah Jariyah
             </span>
             <span style={{ height: 1, width: 28, background: 'rgba(212,162,70,0.4)' }} />
@@ -87,7 +87,7 @@ export default function SupportPage() {
               “When a person dies, their deeds end — except three: an ongoing charity,
               knowledge that benefits, or a righteous child who prays for them.”
             </p>
-            <p className="text-[11px] uppercase tracking-widest" style={{ color: '#57534E' }}>
+            <p className="text-[12px] uppercase tracking-widest" style={{ color: '#8F8D88' }}>
               Ṣaḥīḥ Muslim · 1631
             </p>
           </div>
@@ -112,7 +112,7 @@ export default function SupportPage() {
           <div className="text-center mb-6">
             <p className="font-arabic text-2xl mb-1" style={{ color: GOLD }} dir="rtl">هَدِيَّة</p>
             <h2 className="font-heading text-xl" style={{ color: '#F0E4CA' }}>Give what you can</h2>
-            <p className="text-xs mt-1" style={{ color: '#8A8783' }}>One-time · any amount · secure checkout by Stripe</p>
+            <p className="text-xs mt-1" style={{ color: '#9A9893' }}>One-time · any amount · secure checkout by Stripe</p>
           </div>
           <div className="max-w-sm mx-auto">
             <DonateWidget />
@@ -122,7 +122,7 @@ export default function SupportPage() {
 
       {/* ── Where your gift goes ── */}
       <section className="mb-14">
-        <p className="text-center text-[10px] uppercase tracking-[0.25em] font-bold mb-6" style={{ color: GOLD }}>
+        <p className="text-center text-[11px] uppercase tracking-[0.25em] font-bold mb-6" style={{ color: GOLD }}>
           Where your gift goes
         </p>
         <div className="grid sm:grid-cols-3 gap-4">
@@ -141,7 +141,7 @@ export default function SupportPage() {
                 </svg>
               </div>
               <h3 className="text-sm font-semibold mb-1.5" style={{ color: '#EDEDEC' }}>{item.title}</h3>
-              <p className="text-xs leading-relaxed" style={{ color: '#8A8783' }}>{item.body}</p>
+              <p className="text-xs leading-relaxed" style={{ color: '#9A9893' }}>{item.body}</p>
             </div>
           ))}
         </div>
@@ -149,7 +149,7 @@ export default function SupportPage() {
 
       {/* ── Closing reassurance ── */}
       <section className="text-center">
-        <p className="text-sm leading-relaxed max-w-md mx-auto" style={{ color: '#8A8783' }}>
+        <p className="text-sm leading-relaxed max-w-md mx-auto" style={{ color: '#9A9893' }}>
           Not able to give right now? That&apos;s completely okay — QuRoots stays free for you
           either way. The most valuable thing you can share is a{' '}
           <Link href="/quran" className="underline" style={{ color: GOLD }}>link to a friend</Link>.

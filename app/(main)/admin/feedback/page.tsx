@@ -111,14 +111,14 @@ export default function AdminFeedbackPage() {
               >
                 <div className="flex flex-wrap items-center gap-2 mb-2">
                   <span
-                    className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full"
+                    className="text-[11px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full"
                     style={{ background: 'rgba(212,162,70,0.14)', color: 'var(--color-primary)' }}
                   >
                     {meta.emoji} {meta.label}
                   </span>
                   {item.status === 'new' && (
                     <span
-                      className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full"
+                      className="text-[11px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full"
                       style={{ background: 'rgba(95,181,122,0.15)', color: '#5FB57A' }}
                     >
                       New

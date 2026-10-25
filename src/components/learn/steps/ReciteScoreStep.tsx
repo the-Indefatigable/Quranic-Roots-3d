@@ -236,7 +236,7 @@ export function ReciteScoreStep({ content, onAnswer }: Props) {
       {/* Header */}
       <div className="mb-5">
         {content.expectedMaqam && (
-          <p className="text-[10px] uppercase tracking-[0.2em] font-medium mb-1" style={{ color: '#D4A246' }}>
+          <p className="text-[11px] uppercase tracking-[0.2em] font-medium mb-1" style={{ color: '#D4A246' }}>
             Maqam {content.expectedMaqam}
           </p>
         )}
@@ -259,7 +259,7 @@ export function ReciteScoreStep({ content, onAnswer }: Props) {
               {i > 0 && <div className="w-4 h-px bg-[#2D2C2A]" />}
               <div className="flex items-center gap-1.5">
                 <div
-                  className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold transition-all"
+                  className="w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold transition-all"
                   style={{
                     background: done ? '#5CB889' : active ? 'rgba(212,162,70,0.2)' : 'rgba(255,255,255,0.05)',
                     border: `1px solid ${done ? '#5CB889' : active ? 'rgba(212,162,70,0.4)' : 'rgba(255,255,255,0.08)'}`,
@@ -293,7 +293,7 @@ export function ReciteScoreStep({ content, onAnswer }: Props) {
               ].map(({ n, text }) => (
                 <div key={n} className="flex items-start gap-2.5">
                   <span
-                    className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5"
+                    className="w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5"
                     style={{ background: 'rgba(212,162,70,0.15)', color: '#D4A246' }}
                   >
                     {n}

@@ -1,7 +1,3 @@
-import type { navItems } from './navItems';
-
-type NavEntry = (typeof navItems)[number];
-
 /**
  * Which nav item should be marked as the current page.
  *
@@ -22,8 +18,6 @@ export function isActiveNav(pathname: string, href: string, allHrefs: string[]):
 }
 
 /** Every href in a nav item list, for use with isActiveNav. */
-export function navHrefs(items: readonly NavEntry[]): string[] {
-  return items
-    .filter((i): i is Extract<NavEntry, { href: string }> => 'href' in i)
-    .map((i) => i.href);
+export function navHrefs(items: readonly ({ href: string } | object)[]): string[] {
+  return items.filter((i): i is { href: string } => 'href' in i).map((i) => i.href);
 }

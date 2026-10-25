@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-23",
+ "generated": "2026-10-25",
  "surahs": [
   {
    "number": 1,
@@ -91,7 +91,7 @@
      "root": "رحم",
      "letters": "ر ح م",
      "meaning": "to have mercy, to show compassion",
-     "quranCount": 333,
+     "quranCount": 563,
      "firstIn": "Al-Fatiha",
      "words": [
       {
@@ -110,7 +110,7 @@
      "root": "حمد",
      "letters": "ح م د",
      "meaning": "to praise, to commend",
-     "quranCount": 67,
+     "quranCount": 68,
      "firstIn": "Al-Fatiha",
      "words": [
       {
@@ -141,7 +141,7 @@
      "root": "علم",
      "letters": "ع ل م",
      "meaning": "to know",
-     "quranCount": 935,
+     "quranCount": 854,
      "firstIn": "Al-Fatiha",
      "words": [
       {
@@ -155,7 +155,7 @@
      "root": "ملك",
      "letters": "م ل ك",
      "meaning": "to possess, to own",
-     "quranCount": 204,
+     "quranCount": 206,
      "firstIn": "Al-Fatiha",
      "words": [
       {
@@ -284,7 +284,7 @@
      "root": "هدي",
      "letters": "ه د ي",
      "meaning": "to guide, to lead",
-     "quranCount": 252,
+     "quranCount": 316,
      "firstIn": "Al-Fatiha",
      "words": [
       {
@@ -332,7 +332,7 @@
      "root": "قوم",
      "letters": "ق و م",
      "meaning": "to rise, to stand up",
-     "quranCount": 538,
+     "quranCount": 660,
      "firstIn": "Al-Fatiha",
      "words": [
       {
@@ -371,7 +371,7 @@
      "root": "غير",
      "letters": "غ ي ر",
      "meaning": "to change, to alter",
-     "quranCount": 151,
+     "quranCount": 154,
      "firstIn": "Al-Fatiha",
      "words": [
       {
@@ -451,7 +451,7 @@
      "root": "ولد",
      "letters": "و ل د",
      "meaning": "to give birth, to bear",
-     "quranCount": 97,
+     "quranCount": 102,
      "firstIn": "Al-Ikhlas",
      "words": [
       {
@@ -493,7 +493,7 @@
      "root": "عوذ",
      "letters": "ع و ذ",
      "meaning": "to seek refuge, to shelter",
-     "quranCount": 8,
+     "quranCount": 17,
      "firstIn": "Al-Falaq",
      "words": [
       {
@@ -633,7 +633,7 @@
      "root": "انس",
      "letters": "ا ن س",
      "meaning": "to be companionable, to feel at ease",
-     "quranCount": 298,
+     "quranCount": 338,
      "firstIn": "An-Nas",
      "words": [
       {
@@ -711,7 +711,7 @@
      "root": "صدر",
      "letters": "ص د ر",
      "meaning": "to turn away, to emanate",
-     "quranCount": 45,
+     "quranCount": 46,
      "firstIn": "An-Nas",
      "words": [
       {
@@ -725,7 +725,7 @@
      "root": "كثر",
      "letters": "ك ث ر",
      "meaning": "to be many, to increase",
-     "quranCount": 166,
+     "quranCount": 167,
      "firstIn": "Al-Kawthar",
      "words": [
       {
@@ -807,7 +807,7 @@
      "root": "خسر",
      "letters": "خ س ر",
      "meaning": "to lose, to be at loss",
-     "quranCount": 58,
+     "quranCount": 65,
      "firstIn": "Al-Asr",
      "words": [
       {
@@ -821,7 +821,7 @@
      "root": "امن",
      "letters": "ا م ن",
      "meaning": "to be safe / feel secure",
-     "quranCount": 748,
+     "quranCount": 879,
      "firstIn": "Al-Asr",
      "words": [
       {
@@ -840,7 +840,7 @@
      "root": "عمل",
      "letters": "ع م ل",
      "meaning": "to work, to do, to act",
-     "quranCount": 354,
+     "quranCount": 360,
      "firstIn": "Al-Asr",
      "words": [
       {
@@ -879,7 +879,7 @@
      "root": "صبر",
      "letters": "ص ب ر",
      "meaning": "to be patient, to endure",
-     "quranCount": 102,
+     "quranCount": 103,
      "firstIn": "Al-Asr",
      "words": [
       {
@@ -893,7 +893,7 @@
      "root": "نصر",
      "letters": "ن ص ر",
      "meaning": "to help",
-     "quranCount": 157,
+     "quranCount": 143,
      "firstIn": "An-Nasr",
      "words": [
       {
@@ -1000,7 +1000,7 @@
      "root": "توب",
      "letters": "ت و ب",
      "meaning": "to repent, to turn back",
-     "quranCount": 46,
+     "quranCount": 87,
      "firstIn": "An-Nasr",
      "words": [
       {
@@ -1014,7 +1014,7 @@
      "root": "كفر",
      "letters": "ك ف ر",
      "meaning": "to disbelieve, to reject faith",
-     "quranCount": 505,
+     "quranCount": 524,
      "firstIn": "Al-Kafirun",
      "words": [
       {
@@ -1054,7 +1054,7 @@
      "root": "غني",
      "letters": "غ ن ي",
      "meaning": "to be rich, to be wealthy",
-     "quranCount": 59,
+     "quranCount": 73,
      "firstIn": "Al-Masad",
      "words": [
       {
@@ -1068,7 +1068,7 @@
      "root": "كسب",
      "letters": "ك س ب",
      "meaning": "to earn, to gain",
-     "quranCount": 51,
+     "quranCount": 67,
      "firstIn": "Al-Masad",
      "words": [
       {
@@ -1094,7 +1094,7 @@
      "root": "صلي",
      "letters": "ص ل ي",
      "meaning": "to pray, to worship",
-     "quranCount": 11,
+     "quranCount": 25,
      "firstIn": "Al-Masad",
      "words": [
       {
@@ -1228,7 +1228,7 @@
      "root": "كذب",
      "letters": "ك ذ ب",
      "meaning": "to lie, to deny",
-     "quranCount": 270,
+     "quranCount": 282,
      "firstIn": "Al-Ma'un",
      "words": [
       {
@@ -1242,7 +1242,7 @@
      "root": "يتم",
      "letters": "ي ت م",
      "meaning": "to be orphaned",
-     "quranCount": 19,
+     "quranCount": 23,
      "firstIn": "Al-Ma'un",
      "words": [
       {
@@ -1289,7 +1289,7 @@
      "root": "سكن",
      "letters": "س ك ن",
      "meaning": "to dwell, to settle, to reside",
-     "quranCount": 65,
+     "quranCount": 69,
      "firstIn": "Al-Ma'un",
      "words": [
       {
@@ -1303,7 +1303,7 @@
      "root": "وئل",
      "letters": "و ئ ل",
      "meaning": "woe, ruin",
-     "quranCount": 40,
+     "quranCount": 1,
      "firstIn": "Al-Ma'un",
      "words": [
       {
@@ -1421,7 +1421,7 @@
      "root": "بيت",
      "letters": "ب ي ت",
      "meaning": "to dwell, to lodge",
-     "quranCount": 72,
+     "quranCount": 73,
      "firstIn": "Quraysh",
      "words": [
       {
@@ -1462,7 +1462,7 @@
      "root": "خوف",
      "letters": "خ و ف",
      "meaning": "to fear",
-     "quranCount": 32,
+     "quranCount": 124,
      "firstIn": "Quraysh",
      "words": [
       {
@@ -1476,7 +1476,7 @@
      "root": "فعل",
      "letters": "ف ع ل",
      "meaning": "to do, to act",
-     "quranCount": 107,
+     "quranCount": 108,
      "firstIn": "Al-Fil",
      "words": [
       {
@@ -1529,7 +1529,7 @@
      "root": "جعل",
      "letters": "ج ع ل",
      "meaning": "to make, to place, to set",
-     "quranCount": 341,
+     "quranCount": 346,
      "firstIn": "Al-Fil",
      "words": [
       {
@@ -1548,7 +1548,7 @@
      "root": "كيد",
      "letters": "ك ي د",
      "meaning": "to plot, to scheme",
-     "quranCount": 33,
+     "quranCount": 35,
      "firstIn": "Al-Fil",
      "words": [
       {
@@ -1573,7 +1573,7 @@
      "root": "ضلل",
      "letters": "ض ل ل",
      "meaning": "to go astray, to err",
-     "quranCount": 66,
+     "quranCount": 189,
      "firstIn": "Al-Fil",
      "words": [
       {
@@ -1587,7 +1587,7 @@
      "root": "رسل",
      "letters": "ر س ل",
      "meaning": "to send",
-     "quranCount": 512,
+     "quranCount": 513,
      "firstIn": "Al-Fil",
      "words": [
       {
@@ -1601,7 +1601,7 @@
      "root": "طير",
      "letters": "ط ي ر",
      "meaning": "to fly",
-     "quranCount": 29,
+     "quranCount": 28,
      "firstIn": "Al-Fil",
      "words": [
       {
@@ -1626,7 +1626,7 @@
      "root": "ابل",
      "letters": "ا ب ل",
      "meaning": "to turn towards",
-     "quranCount": 3,
+     "quranCount": 2,
      "firstIn": "Al-Fil",
      "words": [
       {
@@ -1640,7 +1640,7 @@
      "root": "رمي",
      "letters": "ر م ي",
      "meaning": "to throw, to cast",
-     "quranCount": 5,
+     "quranCount": 9,
      "firstIn": "Al-Fil",
      "words": [
       {
@@ -1654,7 +1654,7 @@
      "root": "حجر",
      "letters": "ح ج ر",
      "meaning": "to prevent, to forbid",
-     "quranCount": 20,
+     "quranCount": 21,
      "firstIn": "Al-Fil",
      "words": [
       {
@@ -1679,7 +1679,7 @@
      "root": "سجل",
      "letters": "س ج ل",
      "meaning": "to record, to register",
-     "quranCount": 4,
+     "quranCount": 1,
      "firstIn": "Al-Fil",
      "words": [
       {
@@ -1707,7 +1707,7 @@
      "root": "اكل",
      "letters": "ا ك ل",
      "meaning": "to eat",
-     "quranCount": 76,
+     "quranCount": 109,
      "firstIn": "Al-Fil",
      "words": [
       {

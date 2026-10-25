@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
 
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           {isIjazah && <div style={{ fontSize: 60, marginBottom: 8 }}>🎓</div>}
-          <div style={{ fontSize: 34, color: '#8A8783' }}>{name}</div>
+          <div style={{ fontSize: 34, color: '#9A9893' }}>{name}</div>
           <div style={{ fontSize: 62, fontWeight: 700, lineHeight: 1.1, marginTop: 6, color: '#F0E4CA' }}>
             {headline}
           </div>
@@ -64,7 +64,7 @@ export async function GET(req: NextRequest) {
           <Stat label="XP" value={xp} gold={gold} />
         </div>
 
-        <div style={{ display: 'flex', fontSize: 26, color: '#8A8783' }}>
+        <div style={{ display: 'flex', fontSize: 26, color: '#9A9893' }}>
           Learn Quranic Arabic free at quroots.com
         </div>
       </div>
@@ -77,7 +77,7 @@ function Stat({ label, value, gold }: { label: string; value: string; gold: stri
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
       <div style={{ fontSize: 52, fontWeight: 700, color: gold }}>{value}</div>
-      <div style={{ fontSize: 24, color: '#8A8783', textTransform: 'uppercase', letterSpacing: 2 }}>{label}</div>
+      <div style={{ fontSize: 24, color: '#9A9893', textTransform: 'uppercase', letterSpacing: 2 }}>{label}</div>
     </div>
   );
 }

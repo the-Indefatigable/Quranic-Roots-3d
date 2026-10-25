@@ -31,7 +31,7 @@ export default function Error({
         Try again
       </button>
       {error.digest && (
-        <p className="text-[10px] text-text-tertiary/60 mt-6 font-mono">
+        <p className="text-[11px] text-text-tertiary/60 mt-6 font-mono">
           Reference: {error.digest}
         </p>
       )}

@@ -678,7 +678,7 @@ export function AudioPlayer({
             </button>
 
             <span
-              className="text-[10px] font-semibold tracking-[0.15em] uppercase"
+              className="text-[11px] font-semibold tracking-[0.15em] uppercase"
               style={{ color: G.textTert }}
             >
               Now Playing
@@ -737,7 +737,7 @@ export function AudioPlayer({
               >
                 {selectedQari.name}
                 <span
-                  className="px-1.5 py-0.5 rounded text-[9px] font-semibold"
+                  className="px-1.5 py-0.5 rounded text-[11px] font-semibold"
                   style={{ background: 'rgba(212,162,70,0.18)', color: G.gold }}
                 >
                   {selectedQari.styleLabel}
@@ -766,13 +766,13 @@ export function AudioPlayer({
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-medium truncate">{qari.name}</span>
                           <span
-                            className="text-[9px] px-1.5 py-0.5 rounded font-medium shrink-0"
+                            className="text-[11px] px-1.5 py-0.5 rounded font-medium shrink-0"
                             style={{ background: 'rgba(255,255,255,0.06)', color: G.textTert }}
                           >
                             {qari.styleLabel}
                           </span>
                         </div>
-                        <p className="text-[11px] mt-0.5 truncate" style={{ color: G.textTert }}>{qari.description}</p>
+                        <p className="text-[12px] mt-0.5 truncate" style={{ color: G.textTert }}>{qari.description}</p>
                       </div>
                       {qari.id === selectedQari.id && (
                         <svg className="w-4 h-4 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke={G.gold}>
@@ -785,7 +785,7 @@ export function AudioPlayer({
               )}
             </div>
 
-            <p className="text-[11px] mt-1" style={{ color: G.textTert }}>
+            <p className="text-[12px] mt-1" style={{ color: G.textTert }}>
               Ayah {currentAyah} / {totalAyahs}
             </p>
           </div>
@@ -880,7 +880,7 @@ export function AudioPlayer({
                     >
                       <div className="flex items-start gap-3">
                         <span
-                          className="shrink-0 w-7 h-7 flex items-center justify-center rounded-full text-[11px] font-medium mt-1 transition-colors"
+                          className="shrink-0 w-7 h-7 flex items-center justify-center rounded-full text-[12px] font-medium mt-1 transition-colors"
                           style={{
                             background: isActive ? G.gold : 'rgba(255,255,255,0.06)',
                             color:      isActive ? G.bg   : G.textTert,
@@ -951,7 +951,7 @@ export function AudioPlayer({
                   currentAyah={currentAyah}
                 />
                 <div
-                  className="absolute top-3 right-3 text-[10px] px-2 py-1 rounded-md"
+                  className="absolute top-3 right-3 text-[11px] px-2 py-1 rounded-md"
                   style={{ background: 'rgba(14,13,12,0.8)', color: G.textTert, backdropFilter: 'blur(6px)' }}
                 >
                   The qari&apos;s melody — copy the contour
@@ -981,7 +981,7 @@ export function AudioPlayer({
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 0 0-3.7-3.7 48.678 48.678 0 0 0-7.324 0 4.006 4.006 0 0 0-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 0 0 3.7 3.7 48.656 48.656 0 0 0 7.324 0 4.006 4.006 0 0 0 3.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3-3 3" />
                 </svg>
                 {loopLabel && (
-                  <span className="absolute -top-0.5 -right-0.5 text-[9px] font-bold" style={{ color: G.gold }}>{loopLabel}</span>
+                  <span className="absolute -top-0.5 -right-0.5 text-[11px] font-bold" style={{ color: G.gold }}>{loopLabel}</span>
                 )}
               </button>
 
@@ -1085,7 +1085,7 @@ export function AudioPlayer({
   // ── COLLAPSED MINI-BAR ─────────────────────────────────────────────────────
   return createPortal(
     <div
-      className="fixed bottom-16 left-0 right-0 lg:bottom-0 lg:left-60 z-30"
+      className="fixed bottom-[calc(env(safe-area-inset-bottom)+64px)] left-0 right-0 lg:bottom-0 lg:left-64 z-30"
       style={{ pointerEvents: 'auto' }}
     >
       {/* Refined top seekbar — 2px hairline, gold-on-warm */}
@@ -1160,7 +1160,7 @@ export function AudioPlayer({
             {surahName}
           </p>
           <p
-            className="text-[11px] truncate mt-0.5 tabular-nums"
+            className="text-[12px] truncate mt-0.5 tabular-nums"
             style={{ color: G.textTert, letterSpacing: '0.01em' }}
           >
             {playMode === 'surah'
@@ -1259,7 +1259,7 @@ export function AudioPlayer({
         <div className="hidden sm:flex items-center gap-0.5 opacity-70 hover:opacity-100 transition-opacity">
           <button
             onClick={(e) => { e.stopPropagation(); cycleSpeed(); }}
-            className="text-[11px] font-bold px-2 py-1 rounded-md transition-colors"
+            className="text-[12px] font-bold px-2 py-1 rounded-md transition-colors"
             style={{
               color: playbackSpeed !== 1 ? G.gold : G.textTert,
               background: playbackSpeed !== 1 ? 'rgba(212,162,70,0.1)' : 'transparent',
@@ -1270,7 +1270,7 @@ export function AudioPlayer({
 
           <button
             onClick={(e) => { e.stopPropagation(); onPlayModeChange(playMode === 'ayah' ? 'surah' : 'ayah'); }}
-            className="text-[11px] font-medium px-2 py-1 rounded-md transition-colors"
+            className="text-[12px] font-medium px-2 py-1 rounded-md transition-colors"
             style={{
               color: playMode === 'surah' ? G.gold : G.textTert,
               background: playMode === 'surah' ? 'rgba(212,162,70,0.1)' : 'transparent',

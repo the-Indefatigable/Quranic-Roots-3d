@@ -88,7 +88,7 @@ export function LearningPathClient() {
       >
         <div className="flex items-center justify-center gap-3 mb-5">
           <span className="h-px w-10 bg-gradient-to-r from-transparent to-[#D4A246]/40" />
-          <span className="text-[#D4A246]/60 text-[10px] tracking-[0.3em] uppercase">
+          <span className="text-[#D4A246]/60 text-[11px] tracking-[0.3em] uppercase">
             The Path of Knowledge
           </span>
           <span className="h-px w-10 bg-gradient-to-l from-transparent to-[#D4A246]/40" />
