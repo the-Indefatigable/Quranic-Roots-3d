@@ -28,7 +28,9 @@ const SEARCH_ENGINES = /Googlebot|bingbot|DuckDuckBot|Applebot|YandexBot|OAI-Sea
 // address hammering one region; the Vercel Firewall rate-limit rule covers the rest.
 const WINDOW_MS = 60_000;
 // A spoofed crawler user agent must not buy a bigger allowance, so crawlers get the page limit.
-const LIMITS = { api: 60, page: 90, bot: 90 };
+// Client-side navigations and link prefetches (RSC requests) fire several per click, so they
+// get their own, larger allowance instead of eating into the page limit.
+const LIMITS = { api: 60, page: 90, rsc: 400, bot: 90 };
 const hits = new Map<string, number[]>();
 
 function overLimit(key: string, limit: number, now: number): boolean {
@@ -87,7 +89,8 @@ export async function middleware(request: NextRequest) {
     if (!ua || BLOCKED_AGENTS.test(ua)) {
       return new NextResponse('Automated access is not permitted. See https://quroots.com/terms', { status: 403 });
     }
-    const bucket = SEARCH_ENGINES.test(ua) ? 'bot' : isApi ? 'api' : 'page';
+    const isRsc = request.headers.has('rsc') || request.headers.has('next-router-prefetch');
+    const bucket = SEARCH_ENGINES.test(ua) ? 'bot' : isApi ? 'api' : isRsc ? 'rsc' : 'page';
     if (overLimit(`${clientIp(request)}:${bucket}`, LIMITS[bucket], Date.now())) {
       return new NextResponse('Too many requests. Please slow down.', { status: 429, headers: { 'Retry-After': '60' } });
     }
