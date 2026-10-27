@@ -26,8 +26,10 @@ export function MobileNav() {
   const sheetRef = useRef<HTMLElement>(null);
   const show = visibleFor(user);
 
-  const tabs = primaryNav.filter(show).filter((i) => (user ? i.href !== '/community' : true)).slice(0, 4);
-  const sheetItems: NavLink[] = [...primaryNav.filter(show).filter((i) => !tabs.includes(i)), ...moreNav.filter(show)];
+  const tabs = primaryNav.filter(show).slice(0, 4);
+  // Whatever didn't fit in the tab bar, then More, without listing anything twice.
+  const sheetItems: NavLink[] = [...primaryNav.filter(show).filter((i) => !tabs.includes(i)), ...moreNav.filter(show)]
+    .filter((i, n, all) => !tabs.some((t) => t.href === i.href) && all.findIndex((x) => x.href === i.href) === n);
   const moreActive = sheetItems.some((i) => isActiveNav(pathname, i.href, allHrefs));
 
   useEffect(() => { setOpen(false); }, [pathname]);

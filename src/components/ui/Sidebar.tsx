@@ -39,7 +39,7 @@ export function Sidebar() {
   const router = useRouter();
   const { user, isLoading, login } = useAuthStore();
   const show = visibleFor(user);
-  const more = moreNav.filter(show);
+  const more = moreNav.filter(show).filter((i) => !primaryNav.some((p) => p.href === i.href));
   const inMore = more.some((i) => isActiveNav(pathname, i.href, allHrefs));
   const [moreOpen, setMoreOpen] = useState(false);
 

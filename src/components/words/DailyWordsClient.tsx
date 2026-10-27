@@ -47,9 +47,9 @@ export function DailyWordsClient() {
         <h1 className="text-3xl sm:text-4xl font-heading tracking-tight leading-[1.05]" style={{ color: 'var(--color-ivory)' }}>
           Everyday Words
         </h1>
-        <p className="mt-2 text-sm leading-relaxed max-w-xl" style={{ color: 'var(--color-text-secondary)' }}>
-          The glue of real conversation — expressions like <span className="font-arabic" style={{ color: GOLD }}>بِصَراحة</span> (honestly),
-          connectors like <span className="font-arabic" style={{ color: GOLD }}>على العَكْس</span> (on the contrary), feelings, and describing
+        <p className="mt-2 text-[15px] leading-relaxed max-w-xl" style={{ color: '#C9C5BD' }}>
+          The glue of real conversation — expressions like <span className="font-arabic-text" style={{ color: GOLD }}>بِصَراحة</span> (honestly),
+          connectors like <span className="font-arabic-text" style={{ color: GOLD }}>على العَكْس</span> (on the contrary), feelings, and describing
           words. Search in English or Arabic.
         </p>
       </div>
@@ -111,21 +111,21 @@ export function DailyWordsClient() {
           {results.map((w) => (
             <article key={w.en} className="rounded-2xl p-4 flex flex-col" style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border-light)' }}>
               <div className="flex items-start justify-between gap-2 mb-2">
-                <h2 className="text-[15px] font-semibold" style={{ color: 'var(--color-ivory)' }}>{w.en}</h2>
+                <h2 className="text-[17px] font-semibold" style={{ color: 'var(--color-ivory)' }}>{w.en}</h2>
                 <span className="shrink-0 text-[11px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full" style={{ background: 'rgba(212,162,70,0.1)', color: GOLD }}>
                   {w.type}
                 </span>
               </div>
 
-              <p className="font-arabic leading-none text-right" dir="rtl" style={{ fontSize: '1.9rem', color: '#F0E8D8' }}>{w.ar}</p>
-              <p className="text-xs italic mt-1.5" style={{ color: '#A3A19C' }}>{w.translit}</p>
+              <p className="font-arabic-text leading-snug text-right" dir="rtl" lang="ar" style={{ fontSize: '2rem', color: '#F0E8D8' }}>{w.ar}</p>
+              <p className="text-[15px] mt-1 font-medium" style={{ color: '#D9C9A3' }}>{w.translit}</p>
 
-              {w.note && <p className="text-[12px] mt-2 leading-relaxed" style={{ color: 'var(--color-text-tertiary)' }}>{w.note}</p>}
+              {w.note && <p className="text-[14px] mt-2 leading-relaxed" style={{ color: '#C9C5BD' }}>{w.note}</p>}
 
               {w.example && (
                 <div className="mt-3 pt-3" style={{ borderTop: '1px solid var(--color-border-light)' }}>
-                  <p className="font-arabic leading-relaxed text-right" dir="rtl" style={{ fontSize: '1.05rem', color: '#E8DFC9' }}>{w.example.ar}</p>
-                  <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-tertiary)' }}>{w.example.en}</p>
+                  <p className="font-arabic-text leading-relaxed text-right" dir="rtl" lang="ar" style={{ fontSize: '1.3rem', color: '#EDE6D6' }}>{w.example.ar}</p>
+                  <p className="text-[15px] mt-1 leading-relaxed" style={{ color: '#D5D1C9' }}>{w.example.en}</p>
                 </div>
               )}
             </article>

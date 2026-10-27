@@ -16,19 +16,22 @@ export type NavLink = {
 export type NavEntry = { type: 'section'; label: string } | { type: 'divider' } | NavLink;
 
 /**
- * The five places a learner actually goes. Today is the signed-in home; signed out,
- * the salah path stands in its place.
+ * The places a learner actually goes. Today is the signed-in home; signed out, the salah path
+ * leads and Gift takes the fourth tab (phones show four tabs plus More).
  */
 export const primaryNav: NavLink[] = [
   { href: '/dashboard', label: 'Today',      icon: TodayIcon, requiresAuth: true },
   { href: '/salah',     label: 'Your Salah', icon: SalahIcon, badge: 'New' },
   { href: '/quran',     label: 'Quran',      icon: BookIcon },
   { href: '/roots',     label: 'Roots',      icon: RootIcon },
-  { href: '/community', label: 'Community',  icon: ChatIcon },
+  { href: '/gift',      label: 'Gift',       icon: GiftIcon },
 ];
 
-/** Everything else, one tap away under "More". */
+/** Everything else, one tap away under "More". Giving comes first: it keeps QuRoots running. */
 export const moreNav: NavLink[] = [
+  { href: '/gift',         label: 'Gift the path',  icon: GiftIcon },
+  { href: '/support',      label: 'Give sadaqah',   icon: HeartIcon },
+  { href: '/community',    label: 'Community',      icon: ChatIcon },
   { href: '/learn/path',   label: 'Arabic course',  icon: LearnIcon },
   { href: '/daily',        label: 'Daily Ayah',     icon: SparkleIcon },
   { href: '/verbs',        label: 'Daily Verbs',    icon: VerbsIcon },
@@ -37,7 +40,6 @@ export const moreNav: NavLink[] = [
   { href: '/leaderboard',  label: 'Leaderboard',    icon: TrophyIcon },
   { href: '/achievements', label: 'Badges',         icon: BadgeIcon },
   { href: '/blog',         label: 'Blog',           icon: BlogIcon },
-  { href: '/support',      label: 'Support QuRoots', icon: HeartIcon },
   { href: '/admin/feedback', label: 'Feedback',     icon: InboxIcon, requiresAdmin: true },
   { href: '/admin',        label: 'Admin',          icon: AdminIcon, requiresAdmin: true },
 ];
@@ -200,6 +202,14 @@ export function HeartIcon({ className }: { className?: string }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+    </svg>
+  );
+}
+
+export function GiftIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M21 11.25v8.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 1 0 9.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1 1 14.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
     </svg>
   );
 }

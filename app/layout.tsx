@@ -32,6 +32,16 @@ const uthmani = localFont({
   display: 'swap',
 });
 
+// For everyday (non-Quranic) Arabic: the Uthmani font draws punctuation like ، as Quran ornaments.
+const scheherazade = localFont({
+  src: [
+    { path: '../public/fonts/ScheherazadeNew-Regular.ttf', weight: '400' },
+    { path: '../public/fonts/ScheherazadeNew-Bold.ttf', weight: '700' },
+  ],
+  variable: '--font-arabic-text',
+  display: 'swap',
+});
+
 export const viewport: Viewport = {
   themeColor: '#0C0A09',
 };
@@ -135,7 +145,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   };
 
   return (
-    <html lang="en" className={`dark ${jakarta.variable} ${fraunces.variable} ${uthmani.variable}`}>
+    <html lang="en" className={`dark ${jakarta.variable} ${fraunces.variable} ${uthmani.variable} ${scheherazade.variable}`}>
       <head>
         <link rel="manifest" href="/manifest.json" />
         <script

@@ -239,12 +239,13 @@ export function HomepageClient() {
 
         <div className="hidden sm:flex items-center gap-7">
           {[
+            { href: '/salah',       label: 'Your Salah' },
             { href: '/quran',       label: 'Quran'  },
             { href: '/roots',       label: 'Roots'  },
             { href: '/learn/path',  label: 'Learn'  },
             ...(QIRAT_UNLOCKED ? [{ href: '/learn/qirat', label: 'Qirat' }] : []),
-            { href: '/blog',        label: 'Blog'   },
-            { href: '/support',     label: 'Support' },
+            { href: '/gift',        label: 'Gift'   },
+            { href: '/support',     label: 'Sadaqah' },
           ].map((l) => (
             <Link
               key={l.href}
@@ -691,6 +692,7 @@ export function HomepageClient() {
             { href: '/blog',        label: 'Blog'    },
             { href: '/support',     label: 'Support' },
             { href: '/privacy',     label: 'Privacy' },
+            { href: '/gift',        label: 'Gift'    },
             { href: '/terms',       label: 'Terms'   },
             { href: '/sources',     label: 'Sources' },
           ].map((l) => (

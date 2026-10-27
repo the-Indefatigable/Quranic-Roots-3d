@@ -85,7 +85,7 @@ html, body {
   --color-info-light: rgba(106, 175, 224, 0.10);
   --color-text: #EDEDEC;
   --color-text-secondary: #B5B3AE; /* 9.6:1 on canvas */
-  --color-text-tertiary: #918F8A;  /* 6.2:1 on canvas — was #7A7975, too faint for small text */
+  --color-text-tertiary: #ABA79F;  /* 8:1 on canvas; #918F8A was still too faint for small text */
   --color-border: rgba(255, 255, 255, 0.07);
   --color-border-light: rgba(255, 255, 255, 0.035);
   /* Shadows carry the elevation — not borders */
@@ -121,6 +121,11 @@ html, body {
 
 @utility font-arabic {
   font-family: var(--font-arabic);
+}
+
+/* Modern Arabic (everyday words, example sentences): ordinary punctuation, no Quran ornaments. */
+@utility font-arabic-text {
+  font-family: var(--font-arabic-text), var(--font-arabic), serif;
 }
 
 /* ===== Base elements ===== */
