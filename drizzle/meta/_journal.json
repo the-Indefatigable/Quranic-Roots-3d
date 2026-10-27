@@ -15,6 +15,13 @@
       "when": 1787675298035,
       "tag": "0001_bitter_captain_stacy",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793115804263,
+      "tag": "0002_growth_events",
+      "breakpoints": true
     }
   ]
 }

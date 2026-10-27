@@ -112,6 +112,12 @@ export default function PrivacyPage() {
           used, and we do not use it for advertising or share it with anyone.
         </p>
         <p>
+          We also keep our own simple count of how people use the salah path: a random id stored
+          in your browser, which site sent you here (for example Instagram), and which steps you
+          reached (opened a day, finished a day, started checkout). No IP address or device
+          details are stored with it, and it never leaves QuRoots.
+        </p>
+        <p>
           If you would rather not be counted, your browser&rsquo;s &ldquo;do not track&rdquo; or
           cookie-blocking settings, or any standard content blocker, will stop it — and nothing on
           QuRoots will work any differently. You can also email us and we will delete anything

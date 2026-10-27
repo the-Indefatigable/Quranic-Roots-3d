@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getStripe } from '@/lib/stripe';
 import { db } from '@/db';
-import { users } from '@/db/schema';
+import { users, growthEvents } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { PATH_ORDER_PREFIX } from '@/lib/salahPath';
 
@@ -43,6 +43,7 @@ export async function POST(request: NextRequest) {
   if (event.type === 'checkout.session.completed') {
     const s = event.data.object as {
       id: string;
+      amount_total?: number | null;
       payment_status?: string;
       client_reference_id?: string | null;
       metadata?: Record<string, string> | null;
@@ -73,6 +74,13 @@ export async function POST(request: NextRequest) {
         })
         .where(eq(users.id, userId));
       console.log(`[stripe] granted supporter to ${userId} (session ${s.id})`);
+      if (isPath) {
+        const m = s.metadata ?? {};
+        await db.insert(growthEvents).values({
+          name: 'purchase', visitorId: m.vid || `user:${userId}`, userId, value: s.amount_total ?? null,
+          source: m.source || null, campaign: m.campaign || null, variant: m.variant || null, path: '/salah',
+        }).catch((err) => console.warn('[stripe] purchase event not recorded:', (err as Error).message));
+      }
     } catch (err) {
       console.error('[stripe] failed to grant supporter:', err);
       return NextResponse.json({ error: 'DB update failed' }, { status: 500 });

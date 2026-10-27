@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useSalahProgress, startPathCheckout, type Overview } from './useSalahProgress';
+import { track } from '@/lib/track';
 
 const GOLD = '#D4A246';
 
@@ -15,6 +16,8 @@ export function SalahOverview() {
   const [data, setData] = useState<Overview | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+
+  useEffect(() => { track('path_view'); }, []);
 
   useEffect(() => {
     fetch('/api/salah').then((r) => r.json()).then(setData).catch(() => setError('Could not load the path. Please refresh.'));

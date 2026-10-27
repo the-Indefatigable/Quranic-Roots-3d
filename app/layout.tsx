@@ -6,6 +6,7 @@ import { NavigationProgress } from '@/components/ui/NavigationProgress';
 import { GlobalAudioProvider } from '@/components/GlobalAudioProvider';
 import { Atmosphere } from '@/components/ui/Atmosphere';
 import { Analytics } from '@/components/ui/Analytics';
+import { Tracker } from '@/components/ui/Tracker';
 import './globals.css';
 
 const jakarta = Plus_Jakarta_Sans({
@@ -136,6 +137,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </GlobalAudioProvider>
         {/* Loads GA only after the visitor opts in — see the component. */}
         <Analytics />
+        <Tracker />
       </body>
     </html>
   );

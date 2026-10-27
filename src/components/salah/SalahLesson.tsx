@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useSalahProgress, startPathCheckout } from './useSalahProgress';
 import { unpack } from '@/lib/wire';
+import { track } from '@/lib/track';
 import { ChatRoom } from '@/components/community/ChatRoom';
 
 const GOLD = '#D4A246';
@@ -33,6 +34,7 @@ export function SalahLesson({ day }: { day: number }) {
   // Linked from the lounge as /salah/N#discuss: show the thread without finishing the lesson.
   const [discussOpen, setDiscussOpen] = useState(false);
   useEffect(() => { setDiscussOpen(window.location.hash === '#discuss'); }, []);
+  useEffect(() => { track('day_open', { day }); }, [day]);
   const [picked, setPicked] = useState<string | null>(null);
   const [score, setScore] = useState(0);
 
@@ -174,6 +176,7 @@ function Done({ day, pct, score, quizLen }: { day: number; pct: number; score: n
     : `Day ${day} of 30: I now understand ${pct}% of the root words in my salah. Learning on QuRoots:`;
   const url = 'https://quroots.com/salah';
   const share = async () => {
+    track('share', { day });
     if (navigator.share) { try { await navigator.share({ text, url }); return; } catch { /* cancelled */ } }
     window.open(`https://wa.me/?text=${encodeURIComponent(`${text} ${url}`)}`, '_blank');
   };

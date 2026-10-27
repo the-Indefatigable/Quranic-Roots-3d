@@ -653,3 +653,31 @@ export const userVerbProgress = pgTable('user_verb_progress', {
 }, (table) => [
   primaryKey({ columns: [table.userId, table.verbId] }),
 ]);
+
+// ── Growth events ────────────────────────────────────────────
+/**
+ * One row per step a visitor takes toward paying: visit, path_view, day_open, day_complete,
+ * share, checkout_start, purchase. Powers the private /admin/growth dashboard.
+ *
+ * `visitorId` is a random id kept in the visitor's browser; no IP address or user agent is
+ * stored. `source` is the first place we saw them come from (instagram, tiktok, youtube,
+ * google, direct, …) and `campaign`/`variant` come from the link they used, e.g. a reel id
+ * and its A/B sound style. `value` is cents, set on purchases.
+ */
+export const growthEvents = pgTable('growth_events', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: text('name').notNull(),
+  visitorId: text('visitor_id').notNull(),
+  userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
+  day: smallint('day'),
+  source: text('source'),
+  campaign: text('campaign'),
+  variant: text('variant'),
+  path: text('path'),
+  value: integer('value'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => [
+  index('growth_events_name_created_idx').on(table.name, table.createdAt),
+  index('growth_events_visitor_idx').on(table.visitorId),
+  index('growth_events_user_idx').on(table.userId),
+]);

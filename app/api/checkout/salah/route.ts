@@ -22,6 +22,11 @@ export async function POST(request: NextRequest) {
   const stripe = getStripe();
   if (!stripe) return NextResponse.json({ error: 'Payments are not configured yet.' }, { status: 503 });
 
+  // Where the buyer came from (src/lib/track.ts), so the webhook can credit the purchase.
+  const body = await request.json().catch(() => ({}));
+  const tag = (v: unknown, n = 40) => (typeof v === 'string' ? v.toLowerCase().replace(/[^a-z0-9_.-]/g, '').slice(0, n) : '');
+  const attribution = { vid: /^[0-9a-f-]{36}$/.test(body?.vid ?? '') ? body.vid : '', source: tag(body?.source), campaign: tag(body?.campaign), variant: tag(body?.variant) };
+
   const origin = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'https://quroots.com';
   try {
     const checkout = await stripe.checkout.sessions.create({
@@ -29,7 +34,7 @@ export async function POST(request: NextRequest) {
       client_reference_id: userId,
       customer_email: session.user.email ?? undefined,
       allow_promotion_codes: true,
-      metadata: { user_id: userId, kind: 'salah_path' },
+      metadata: { user_id: userId, kind: 'salah_path', ...attribution },
       payment_intent_data: { metadata: { user_id: userId, kind: 'salah_path' } },
       line_items: [{
         quantity: 1,
