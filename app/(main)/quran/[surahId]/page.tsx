@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { db, dbQuery } from '@/db';
-import { surahs, ayahs, translationEntries, translations, quranWords, tafsirEntries } from '@/db/schema';
+import { surahs, ayahs, translationEntries, translations, quranWords } from '@/db/schema';
 import { eq, and, asc } from 'drizzle-orm';
 import Link from 'next/link';
 import { SurahReaderClient } from '@/components/quran/SurahReaderClient';
@@ -141,19 +141,6 @@ export default async function SurahPage({ params }: Props) {
     hasWords = wordRows.length > 0;
   } catch {
     // Table may not exist yet — gracefully degrade
-  }
-
-  // Check if tafsir exists for this surah
-  let hasTafsir = false;
-  try {
-    const [tafsirCount] = await db
-      .select({ count: tafsirEntries.id })
-      .from(tafsirEntries)
-      .where(eq(tafsirEntries.surahNumber, surahNumber))
-      .limit(1);
-    hasTafsir = !!tafsirCount;
-  } catch {
-    // Table may not exist yet
   }
 
   // Prev/next surah info
@@ -330,7 +317,6 @@ export default async function SurahPage({ params }: Props) {
         surahName={surah.englishName}
         surahArabicName={surah.arabicName}
         hasWords={hasWords}
-        hasTafsir={hasTafsir}
       />
 
       {/* Bottom navigation */}

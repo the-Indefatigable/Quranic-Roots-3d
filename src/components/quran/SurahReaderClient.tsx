@@ -5,7 +5,6 @@ import dynamic from 'next/dynamic';
 import { useAppStore } from '@/store/useAppStore';
 import { useGlobalAudioStore } from '@/store/useGlobalAudioStore';
 import { WordPopover, type WordData } from './WordPopover';
-import { TafsirPanel } from './TafsirPanel';
 import { AyahLessonModal } from './AyahLessonModal';
 import type { PlayMode, LoopMode } from './AudioPlayer';
 import { unpack } from '@/lib/wire';
@@ -30,7 +29,6 @@ interface SurahBlock {
   arabicName: string;
   ayahs: AyahData[];
   hasWords: boolean;
-  hasTafsir: boolean;
 }
 
 interface Props {
@@ -39,7 +37,6 @@ interface Props {
   surahName: string;
   surahArabicName: string;
   hasWords: boolean;
-  hasTafsir?: boolean;
 }
 
 async function shareAyah(surahNumber: number, ayahNumber: number, setCopied: (k: string | null) => void) {
@@ -89,14 +86,13 @@ function toEastern(n: number): string {
   return String(n).replace(/[0-9]/g, d => '٠١٢٣٤٥٦٧٨٩'[parseInt(d)]);
 }
 
-export function SurahReaderClient({ ayahs, surahNumber, surahName, surahArabicName, hasWords, hasTafsir }: Props) {
+export function SurahReaderClient({ ayahs, surahNumber, surahName, surahArabicName, hasWords }: Props) {
   const { quranSettings, updateQuranSettings, setLastRead, updateStreak, selectedQariId, setSelectedQariId } = useAppStore();
   const { audioEl, playInfo, setPlayInfo, updatePlayInfo } = useGlobalAudioStore();
   const [showSettings, setShowSettings] = useState(false);
   const [selectedWord, setSelectedWord] = useState<WordData | null>(null);
   const [wordAnchor, setWordAnchor] = useState<HTMLElement | null>(null);
   const [wordByWord, setWordByWord] = useState(hasWords);
-  const [tafsirAyah, setTafsirAyah] = useState<{ surah: number; ayah: number } | null>(null);
   const [lessonAyah, setLessonAyah] = useState<{ surah: number; ayah: number; words: WordData[]; translation: string } | null>(null);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
@@ -107,7 +103,6 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, surahArabicNa
     arabicName: surahArabicName,
     ayahs,
     hasWords,
-    hasTafsir: hasTafsir ?? false,
   }]);
   const [loadingNext, setLoadingNext] = useState(false);
   const [allLoaded, setAllLoaded] = useState(surahNumber >= 114);
@@ -134,7 +129,6 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, surahArabicNa
         arabicName: data.surah.arabicName,
         ayahs: data.ayahs,
         hasWords: data.ayahs[0]?.words?.length > 0,
-        hasTafsir: false,
       };
       setSurahBlocks((prev) => [...prev, nextBlock]);
       lastSurahRef.current = nextNum;
@@ -686,18 +680,19 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, surahArabicNa
                         </button>
                       )}
 
-                      {block.hasTafsir && (
-                        <button
-                          onClick={() => setTafsirAyah({ surah: block.surahNumber, ayah: ayah.number })}
-                          className="flex items-center gap-1.5 text-[12px] px-2.5 py-1.5 rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100"
-                          style={{ background: 'rgba(212,162,70,0.08)', color: '#D4A246', border: '1px solid rgba(212,162,70,0.15)' }}
-                        >
-                          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                      {/* Tafsir opens on Quran.com: we link to it rather than host a copyrighted commentary. */}
+                      <a
+                        href={`https://quran.com/${block.surahNumber}/${ayah.number}/tafsirs/en-tafisr-ibn-kathir`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1.5 text-[12px] px-2.5 py-1.5 rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100"
+                        style={{ background: 'rgba(212,162,70,0.08)', color: '#D4A246', border: '1px solid rgba(212,162,70,0.15)' }}
+                      >
+                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
                           </svg>
-                          Tafsir
-                        </button>
-                      )}
+                        Tafsir ↗
+                      </a>
 
                       <button
                         onClick={() => shareAyah(block.surahNumber, ayah.number, setCopiedKey)}
@@ -791,12 +786,6 @@ export function SurahReaderClient({ ayahs, surahNumber, surahName, surahArabicNa
         word={selectedWord}
         anchorElement={wordAnchor}
         onClose={() => { setSelectedWord(null); setWordAnchor(null); }}
-      />
-      <TafsirPanel
-        surahNumber={tafsirAyah?.surah ?? surahNumber}
-        ayahNumber={tafsirAyah?.ayah ?? null}
-        ayahs={tafsirAyah ? (surahBlocks.find((b) => b.surahNumber === tafsirAyah.surah)?.ayahs ?? ayahs) : ayahs}
-        onClose={() => setTafsirAyah(null)}
       />
       {lessonAyah && (
         <AyahLessonModal

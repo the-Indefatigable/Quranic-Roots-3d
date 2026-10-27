@@ -98,8 +98,7 @@ export default function TermsPage() {
           details.
         </p>
         <p>
-          If it isn&rsquo;t for you, email us within 14 days of buying and we will refund you in
-          full, no questions asked.
+          Questions about a purchase, or a problem with one: email us and we will sort it out.
         </p>
       </Section>
 

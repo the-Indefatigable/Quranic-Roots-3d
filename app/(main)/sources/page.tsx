@@ -77,8 +77,9 @@ export default function SourcesPage() {
 
       <Section title="Tafsir">
         <p>
-          Tafsir shown alongside the reader is <em>Tafsir Ibn Kathir (Abridged)</em>, published in
-          English by Darussalam, as provided through the Quran Foundation.
+          We don&rsquo;t host a tafsir. The Tafsir button on each ayah opens that ayah&rsquo;s
+          commentary on <A href="https://quran.com">Quran.com</A>, where it is published with its
+          publishers&rsquo; permission.
         </p>
       </Section>
 
