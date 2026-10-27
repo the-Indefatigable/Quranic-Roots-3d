@@ -98,7 +98,9 @@ export default function TermsPage() {
           details.
         </p>
         <p>
-          Questions about a purchase, or a problem with one: email us and we will sort it out.
+          If it isn&rsquo;t for you, email us within 14 days of buying and we will refund you in
+          full, no questions asked. After that, email us anyway if something went wrong and we
+          will do our best to make it right.
         </p>
       </Section>
 
