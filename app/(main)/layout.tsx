@@ -4,6 +4,7 @@ import { FeedbackWidget } from '@/components/ui/FeedbackWidget';
 import { StreakGuard } from '@/components/ui/StreakGuard';
 import { SignupModal } from '@/components/ui/SignupModal';
 import { AuthProvider } from '@/components/auth/AuthProvider';
+import { SiteFooter } from '@/components/ui/SiteFooter';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -15,6 +16,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         <main className="lg:pl-64 pt-14 lg:pt-0 pb-[calc(env(safe-area-inset-bottom)+88px)] lg:pb-0 min-h-screen relative z-10">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-10 py-6 sm:py-8 lg:py-10 page-enter">
             {children}
+            <SiteFooter />
           </div>
         </main>
         <FeedbackWidget />

@@ -6,7 +6,7 @@ import type { Metadata } from 'next';
  * and description, despite being in the sitemap at priority 0.8.
  */
 export const metadata: Metadata = {
-  title: 'Daily Ayah & Hadith — A Verse a Day | QuRoots',
+  title: 'Daily Ayah & Hadith — A Verse a Day',
   description:
     'A fresh Quranic verse and prophetic hadith every day, with word-by-word meaning and a short quiz. Build a daily habit and keep your streak alive.',
   openGraph: {

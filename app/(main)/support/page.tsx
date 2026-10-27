@@ -5,12 +5,12 @@ import { DonateWidget } from '@/components/support/DonateWidget';
 export const metadata: Metadata = {
   title: 'Support QuRoots — Sadaqah Jariyah for Quranic Learning',
   description:
-    'QuRoots is free for everyone, forever. Support it with a one-time gift and help keep Quranic Arabic learning open to every Muslim — a sadaqah jariyah that keeps giving.',
+    'The Quran reader, every root and the Arabic course are free for everyone, with no ads. A one-time gift keeps them that way: a sadaqah jariyah that keeps giving.',
   alternates: { canonical: 'https://quroots.com/support' },
   openGraph: {
     title: 'Support QuRoots — Sadaqah Jariyah for Quranic Learning',
     description:
-      'QuRoots is free for everyone, forever. Your gift keeps Quranic Arabic learning open to every Muslim.',
+      'The Quran reader, every root and the Arabic course are free for everyone. Your gift keeps them that way.',
     url: 'https://quroots.com/support',
     siteName: 'QuRoots',
   },
@@ -21,7 +21,7 @@ const GOLD = '#D4A246';
 const WHERE_IT_GOES = [
   {
     title: 'Keep it free',
-    body: 'No ads, no paywalls, no “premium” tier. Every learner gets everything — your gift is what makes that possible.',
+    body: 'No ads, ever. The Quran reader, all 1,716 roots and the Arabic course stay free for every learner. Your gift is what makes that possible.',
     icon: (
       <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0 0V3m9 9H3" />
     ),
@@ -93,8 +93,9 @@ export default function SupportPage() {
           </div>
 
           <p className="text-base leading-relaxed max-w-lg mx-auto" style={{ color: '#A09F9B' }}>
-            QuRoots is free for everyone, forever — no ads, nothing locked. Every gift helps
-            another Muslim understand the words they recite. That understanding is yours to give.
+            The Quran reader, every root and the Arabic course are free for everyone, with no ads.
+            Every gift helps another Muslim understand the words they recite. That understanding is
+            yours to give.
           </p>
         </div>
       </section>
@@ -150,8 +151,8 @@ export default function SupportPage() {
       {/* ── Closing reassurance ── */}
       <section className="text-center">
         <p className="text-sm leading-relaxed max-w-md mx-auto" style={{ color: '#9A9893' }}>
-          Not able to give right now? That&apos;s completely okay — QuRoots stays free for you
-          either way. The most valuable thing you can share is a{' '}
+          Not able to give right now? That&apos;s completely okay. Everything free on QuRoots stays
+          free for you. The most valuable thing you can share is a{' '}
           <Link href="/quran" className="underline" style={{ color: GOLD }}>link to a friend</Link>.
         </p>
         <p className="mt-6 font-arabic text-lg" style={{ color: 'rgba(212,162,70,0.4)' }} dir="rtl">جَزَاكُمُ اللّٰهُ خَيْرًا</p>

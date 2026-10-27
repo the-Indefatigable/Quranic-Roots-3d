@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Beginner-Friendly Arabic & Islamic Books — Free & Cheap | QuRoots',
+  title: 'Beginner-Friendly Arabic & Islamic Books — Free & Cheap',
   description: "A curated reading list for beginners: Abul Hasan Ali Nadwi's Qasas an-Nabiyyin, Stories of the Prophets, the Madinah Books, Duruus al-Lughah, Al-Arabiyyah Bayna Yadayk and more — with free archive.org links.",
   alternates: { canonical: 'https://quroots.com/blog/beginner-arabic-islamic-books' },
   openGraph: {

@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { LearningPathClient } from './LearningPathClient';
 
 export const metadata: Metadata = {
-  title: 'Learn Quranic Arabic — Interactive Path | QuRoots',
+  title: 'Learn Quranic Arabic — Interactive Path',
   description: 'Master Quranic Arabic grammar through interactive Duolingo-style lessons with practice exercises, streaks, and achievements.',
   alternates: { canonical: '/learn/path' },
 };

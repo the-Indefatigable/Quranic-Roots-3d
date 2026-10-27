@@ -53,7 +53,9 @@ export default function SourcesPage() {
         <p>
           What we changed: we converted the corpus from Buckwalter transliteration to Arabic script,
           grouped words by root, counted occurrences, and generated conjugation tables and derived
-          forms from it. Root counts on QuRoots follow the corpus. Our changes to this
+          forms from it. Root counts on QuRoots follow the corpus. The salah path uses the corpus&rsquo;s
+          Arabic-script edition with root corrections, published at{' '}
+          <A href="https://github.com/mustafa0x/quran-morphology">github.com/mustafa0x/quran-morphology</A> under the same licence. Our changes to this
           data are covered by the same licence.
         </p>
       </Section>
@@ -97,6 +99,15 @@ export default function SourcesPage() {
           Arabic is set in <em>KFGQPC Uthmanic Script Hafs</em> by the King Fahd Glorious Quran
           Printing Complex, used under its free-use terms, and in <em>Scheherazade New</em> by SIL
           International, used under the <A href="https://openfontlicense.org">SIL Open Font License</A>.
+        </p>
+      </Section>
+
+      <Section title="Accuracy">
+        <p>
+          QuRoots is a learning aid, made with care by people and tools that can make mistakes. Meanings
+          are simplified for learners, some were drafted with AI, and root data and our videos may
+          contain errors. Nothing here is a fatwa or a tafsir; for religious guidance, ask a qualified
+          scholar. When you report a mistake, we fix it and note the correction.
         </p>
       </Section>
 

@@ -40,3 +40,18 @@ export function linesFor(day: number): PathLine[] {
 export function linesOf(surah: number): PathLine[] {
   return PATH.lines.filter((l) => l.surah === surah);
 }
+
+/** What the paid part of the path contains, for the offer shown to people who haven't bought it. */
+export function pathOffer() {
+  const free = PATH.days.filter((d) => d.free);
+  const lastFree = free[free.length - 1];
+  const paidSurahs = PATH.surahs.filter((s) => s.number !== 1).map((s) => s.name);
+  return {
+    priceCents: PATH_PRICE_CENTS,
+    paidDays: PATH.days.length - free.length,
+    paidRoots: PATH.totals.roots - free.reduce((n, d) => n + d.roots.length, 0),
+    paidSurahs,
+    freePct: lastFree?.pctSalah ?? 0,
+  };
+}
+export type PathOfferInfo = ReturnType<typeof pathOffer>;

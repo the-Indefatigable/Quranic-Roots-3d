@@ -7,6 +7,7 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { RootDetailClient } from '@/components/roots/RootDetailClient';
 import { QuranicOccurrences } from '@/components/roots/QuranicOccurrences';
 import Link from 'next/link';
+import { PATH } from '@/lib/salahPath';
 
 interface Props {
   params: { rootId: string };
@@ -340,6 +341,8 @@ export default async function RootDetailPage({ params }: Props) {
         </p>
       </header>
 
+      <SalahCard root={root.root} />
+
       {/* The family: every word this root grows into, most common first */}
       {nounRows.length > 0 && (
         <section className="mb-14">
@@ -349,7 +352,7 @@ export default async function RootDetailPage({ params }: Props) {
             {[...nounRows].sort((x, y) => (y.totalFreq ?? 0) - (x.totalFreq ?? 0)).map((noun, i) => (
               <div key={i} className="rounded-2xl px-5 py-4" style={{ background: 'var(--color-surface)', border: i === 0 ? '1px solid rgba(212,162,70,0.35)' : '1px solid rgba(255,255,255,0.06)' }}>
                 <div className="flex items-start justify-between gap-3">
-                  <p className="font-arabic text-[34px] leading-[1.5]" dir="rtl" lang="ar" style={{ color: 'var(--color-ivory)' }}>{noun.lemma}</p>
+                  <p className="font-arabic text-[34px] leading-[1.5]" dir="rtl" lang="ar" style={{ color: 'var(--color-ivory)' }}>{withoutLeadingShadda(noun.lemma)}</p>
                   {noun.totalFreq ? <span className="text-[13px] tabular-nums text-text-tertiary mt-2 shrink-0">{noun.totalFreq}×</span> : null}
                 </div>
                 <p className="text-[15px] text-text-secondary leading-snug">{noun.meaning}</p>
@@ -385,4 +388,36 @@ export default async function RootDetailPage({ params }: Props) {
       )}
     </div>
   );
+}
+
+
+// Points every root page at the salah path: the day this root is taught, or where to start.
+function SalahCard({ root }: { root: string }) {
+  const norm = (r: string) => r.replace(/\s+/g, '').replace(/[أإآ]/g, 'ا').replace(/[ؤئ]/g, 'ء');
+  const day = PATH.days.find((d) => d.roots.some((r) => norm(r.root) === norm(root)));
+  const taught = day?.roots.find((r) => norm(r.root) === norm(root));
+  const word = taught?.words[0];
+  return (
+    <aside className="mb-14 rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6"
+      style={{ background: 'linear-gradient(180deg, rgba(212,162,70,.10), rgba(212,162,70,.03))', border: '1px solid rgba(212,162,70,.28)' }}>
+      <div className="flex-1 min-w-0">
+        <p className="text-[12px] font-semibold uppercase tracking-[0.14em] mb-1.5" style={{ color: 'var(--color-primary)' }}>{day ? 'In your salah' : 'Start with your prayer'}</p>
+        {day && word ? (
+          <p className="text-[15px] leading-relaxed text-text-secondary">
+            <b className="text-text">You say this root when you pray.</b> You meet <span className="font-arabic text-lg" dir="rtl" lang="ar">{word.ar}</span> ({word.en}) in {taught!.firstIn}, and it&rsquo;s taught on day {day.day} of <i>Understand your salah</i>{day.free ? ', in the free first week' : ''}.
+          </p>
+        ) : (
+          <p className="text-[15px] leading-relaxed text-text-secondary">
+            <b className="text-text">Learn the {PATH.totals.roots} roots of your salah first.</b> Al-Fatiha and the short surahs you pray with grow from roots like this one. Two or three a day, and in 30 days you understand every word.
+          </p>
+        )}
+      </div>
+      <Link href="/salah" className="btn-primary whitespace-nowrap text-center">Start day 1, free</Link>
+    </aside>
+  );
+}
+
+// Lemmas lifted out of "al-" words keep the shadda the article caused (رَّحِيم); a word can't start doubled.
+function withoutLeadingShadda(word: string) {
+  return word.replace(/^([\u0621-\u064A])([\u064B-\u0652\u0670]*)/, (_m, letter: string, marks: string) => letter + marks.replace('\u0651', ''));
 }

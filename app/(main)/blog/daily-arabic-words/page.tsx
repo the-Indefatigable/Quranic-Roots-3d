@@ -3,7 +3,7 @@ import Link from 'next/link';
 import DailyArabicClient from './DailyArabicClient';
 
 export const metadata: Metadata = {
-  title: 'Daily Arabic — 30 Fusha Words & Sentences to Live With | QuRoots',
+  title: 'Daily Arabic — 30 Fusha Words & Sentences to Live With',
   description: 'A handpicked list of 30 everyday classical Arabic (fusha) words and 12 ready-to-use sentences — vowelled, transliterated, with Quranic context. Strictly fusha, no dialect.',
   alternates: { canonical: 'https://quroots.com/blog/daily-arabic-words' },
   openGraph: {

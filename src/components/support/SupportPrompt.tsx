@@ -25,7 +25,7 @@ export function SupportPrompt({ className = '' }: { className?: string }) {
       </span>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold" style={{ color: '#F0E4CA' }}>Enjoying QuRoots?</p>
-        <p className="text-xs" style={{ color: '#A8946A' }}>It&apos;s free for everyone — a small gift helps keep it that way.</p>
+        <p className="text-xs" style={{ color: '#A8946A' }}>The reader, roots and course are free for everyone. A small gift keeps them free.</p>
       </div>
       <span
         className="flex items-center gap-1 text-sm font-semibold shrink-0 transition-all duration-200 group-hover:gap-2"

@@ -6,7 +6,7 @@ import { CommunityTabs } from '@/components/community/CommunityTabs';
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-  title: 'Achievements & Badges — Quranic Arabic Milestones | QuRoots',
+  title: 'Achievements & Badges — Quranic Arabic Milestones',
   description:
     'Every badge on QuRoots, what it takes to earn it, and how many learners have. Track your Quranic Arabic milestones.',
   alternates: { canonical: '/achievements' },

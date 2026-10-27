@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -8,6 +9,8 @@ type Question = { root: string; occurrences: number; options: string[]; answer: 
 
 // Five questions anyone can take before signing in. Signing in is offered at the end,
 // to keep the score and get questions chosen for you.
+const SALAH_ROOTS = 110;
+
 export function GuestQuiz() {
   const { login } = useAuthStore();
   const [questions, setQuestions] = useState<Question[] | null>(null);
@@ -50,12 +53,13 @@ export function GuestQuiz() {
         <p className="font-heading text-6xl text-text mb-3">{score} / {questions.length}</p>
         <p className="text-text-secondary mb-8">
           These five roots alone appear {questions.reduce((s, q) => s + q.occurrences, 0).toLocaleString()} times in the Quran.
-          Sign in to keep your score and get quizzes chosen for the words you are learning.
+          The best place to start is your own prayer: Al-Fatiha and the short surahs grow from {SALAH_ROOTS} roots, and the first week is free.
         </p>
         <div className="flex gap-3 justify-center flex-wrap">
-          <button onClick={() => login('Save your quiz progress')} className="btn-primary">Sign in to save progress</button>
+          <Link href="/salah" className="btn-primary">Understand your salah, free</Link>
           <button onClick={load} className="px-5 py-2.5 rounded-xl border border-border text-text hover:bg-surface transition-colors">Try five more</button>
         </div>
+        <button onClick={() => login('Save your quiz progress')} className="mt-5 text-sm text-text-tertiary underline underline-offset-4">Sign in to save your score</button>
       </motion.div>
     );
   }
@@ -77,14 +81,16 @@ export function GuestQuiz() {
       <AnimatePresence mode="wait">
         <motion.div key={q.root} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.35 }}>
           <p className="text-text-secondary mb-3">What does this root mean?</p>
-          <p className="font-arabic text-7xl text-primary text-center my-10" dir="rtl" lang="ar">{q.root}</p>
+          <p className="font-arabic text-7xl text-primary text-center my-10" dir="rtl" lang="ar">{[...q.root.replace(/\s+/g, '')].join(' ')}</p>
           <p className="text-center text-sm text-text-tertiary mb-8">appears {q.occurrences.toLocaleString()} times in the Quran</p>
           <div className="grid gap-3">
             {q.options.map((opt) => {
-              const state = !picked ? '' : opt === q.answer ? 'border-correct bg-correct-light' : opt === picked ? 'border-wrong bg-wrong-light' : 'opacity-50';
+              // Inline so the answer colours can't lose to the base border and background classes.
+              const state = !picked ? undefined : opt === q.answer ? { borderColor: '#10B981', background: 'rgba(16,185,129,.12)' }
+                : opt === picked ? { borderColor: '#F87171', background: 'rgba(248,113,113,.1)' } : { opacity: 0.5 };
               return (
-                <button key={opt} onClick={() => choose(opt)} disabled={!!picked}
-                  className={`text-left px-5 py-4 rounded-xl border border-border bg-surface hover:border-primary/50 transition-all ${state}`}>
+                <button key={opt} onClick={() => choose(opt)} disabled={!!picked} style={state}
+                  className="text-left px-5 py-4 rounded-xl border border-border bg-surface hover:border-primary/50 transition-all">
                   {opt}
                 </button>
               );

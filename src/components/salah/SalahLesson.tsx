@@ -3,8 +3,8 @@
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAuthStore } from '@/store/useAuthStore';
-import { useSalahProgress, startPathCheckout } from './useSalahProgress';
+import { useSalahProgress } from './useSalahProgress';
+import { PathOffer, type Offer } from './PathOffer';
 import { unpack } from '@/lib/wire';
 import { track } from '@/lib/track';
 import { ChatRoom } from '@/components/community/ChatRoom';
@@ -15,7 +15,7 @@ type Word = { ar: string; en: string | null; root: string | null };
 type Line = { surah: number; surahName: string; ayah: number; words: Word[] };
 type Root = { root: string; letters: string; meaning: string; quranCount: number; firstIn: string; words: { ar: string; en: string | null; ref: string }[] };
 type Day = { day: number; free: boolean; title: string; roots: Root[]; pctSalah: number };
-type Payload = { day: Day; lines: Line[]; earlierMeanings: string[] };
+type Payload = { day: Day; lines: Line[]; earlierMeanings: string[]; access: boolean; offer: Offer | null };
 type Step = { kind: 'root'; i: number } | { kind: 'quiz'; i: number } | { kind: 'lines' } | { kind: 'done' };
 
 function shuffle<T>(xs: T[]): T[] {
@@ -25,10 +25,9 @@ function shuffle<T>(xs: T[]): T[] {
 }
 
 export function SalahLesson({ day }: { day: number }) {
-  const { login, user } = useAuthStore();
   const { done, complete } = useSalahProgress();
   const [data, setData] = useState<Payload | null>(null);
-  const [locked, setLocked] = useState<string | null>(null);
+  const [locked, setLocked] = useState<{ title: string; offer: Offer } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [step, setStep] = useState<Step>({ kind: 'root', i: 0 });
   // Linked from the lounge as /salah/N#discuss: show the thread without finishing the lesson.
@@ -41,7 +40,7 @@ export function SalahLesson({ day }: { day: number }) {
   useEffect(() => {
     fetch(`/api/salah/day/${day}`).then(async (r) => {
       const d = await unpack(r).catch(() => ({}));
-      if (r.status === 402) setLocked(d.title || '');
+      if (r.status === 402) setLocked({ title: d.title || '', offer: d.offer });
       else if (!r.ok) setError(d.error || 'Could not load this day.');
       else { setData(d); setStep(d.day.roots.length ? { kind: 'root', i: 0 } : { kind: 'lines' }); }
     }).catch(() => setError('Could not load this day. Check your connection.'));
@@ -57,9 +56,7 @@ export function SalahLesson({ day }: { day: number }) {
     return { root: r, options: shuffle([r.meaning, ...pool.slice(0, 3)]) };
   }), [data]);
 
-  if (locked !== null) {
-    return <Paywall day={day} title={locked} onBuy={() => startPathCheckout(login, !!user).then((e) => e && setError(e))} error={error} signedIn={!!user} />;
-  }
+  if (locked !== null) return <Paywall day={day} title={locked.title} offer={locked.offer} />;
   if (error) return <Centered><p style={{ color: '#A09F9B' }}>{error}</p><Link href="/salah" className="btn-primary mt-6 inline-block">Back to the path</Link></Centered>;
   if (!data) return <Centered><div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" /></Centered>;
 
@@ -105,12 +102,13 @@ export function SalahLesson({ day }: { day: number }) {
 
           {step.kind === 'quiz' && (() => {
             const q = quiz[step.i];
+            const next = () => { setPicked(null); setStep(step.i + 1 < quiz.length ? { kind: 'quiz', i: step.i + 1 } : { kind: 'lines' }); };
             const choose = (opt: string) => {
               if (picked) return;
               setPicked(opt);
-              if (opt === q.root.meaning) setScore((s) => s + 1);
-              setTimeout(() => { setPicked(null); setStep(step.i + 1 < quiz.length ? { kind: 'quiz', i: step.i + 1 } : { kind: 'lines' }); }, 1000);
+              if (opt === q.root.meaning) { setScore((s) => s + 1); setTimeout(next, 900); }
             };
+            const missed = !!picked && picked !== q.root.meaning;
             return (
               <div>
                 <p className="text-sm mb-2" style={{ color: '#9A9893' }}>Check yourself · {step.i + 1} of {quiz.length}</p>
@@ -124,6 +122,14 @@ export function SalahLesson({ day }: { day: number }) {
                     );
                   })}
                 </div>
+                {missed && (
+                  <div className="mt-6">
+                    <p className="text-[15px] leading-relaxed mb-4" style={{ color: '#D8D4CC' }}>
+                      <span className="font-arabic text-xl" style={{ color: GOLD }} dir="rtl" lang="ar">{q.root.letters}</span> means <b style={{ color: '#F0E8D8' }}>{q.root.meaning}</b>, as in {q.root.words[0]?.en ?? 'the words above'} <span className="font-arabic" dir="rtl" lang="ar">{q.root.words[0]?.ar}</span>.
+                    </p>
+                    <button className="btn-primary w-full" onClick={next}>Continue</button>
+                  </div>
+                )}
               </div>
             );
           })()}
@@ -154,10 +160,14 @@ export function SalahLesson({ day }: { day: number }) {
           )}
 
           {step.kind === 'done' && (
-            <Done day={day} pct={data.day.pctSalah} score={score} quizLen={quiz.length} completedBefore={done.includes(day)} />
+            <Done day={day} pct={data.day.pctSalah} score={score} quizLen={quiz.length} completedBefore={done.includes(day)} offer={data.access ? null : data.offer} />
           )}
         </motion.div>
       </AnimatePresence>
+
+      <p className="mt-12 text-[12px] leading-relaxed text-center" style={{ color: '#6E6B66' }}>
+        Meanings are simplified for learners and may contain errors. Check anything important with a qualified teacher.
+      </p>
 
       {(step.kind === 'done' || discussOpen) && (
         <section id="discuss" className="mt-14">
@@ -170,41 +180,48 @@ export function SalahLesson({ day }: { day: number }) {
   );
 }
 
-function Done({ day, pct, score, quizLen }: { day: number; pct: number; score: number; quizLen: number; completedBefore: boolean }) {
+function Done({ day, pct, score, quizLen, offer }: { day: number; pct: number; score: number; quizLen: number; completedBefore: boolean; offer: Offer | null }) {
   const text = day === 7
     ? 'I now understand every word of Al-Fatiha. Learning the roots of my salah on QuRoots:'
     : `Day ${day} of 30: I now understand ${pct}% of the root words in my salah. Learning on QuRoots:`;
-  const url = 'https://quroots.com/salah';
+  const url = 'https://quroots.com/salah?src=share';
   const share = async () => {
     track('share', { day });
     if (navigator.share) { try { await navigator.share({ text, url }); return; } catch { /* cancelled */ } }
     window.open(`https://wa.me/?text=${encodeURIComponent(`${text} ${url}`)}`, '_blank');
   };
+  const nudge = day === 5 ? 'Two more days and you understand all of Al-Fatiha.' : day === 6 ? 'Tomorrow: every word of Al-Fatiha.' : null;
   return (
     <div className="text-center py-6">
       <p className="font-arabic text-4xl mb-4" style={{ color: GOLD }} dir="rtl" lang="ar">مَا شَاءَ ٱللَّهُ</p>
       <h2 className="font-heading text-4xl mb-3" style={{ color: '#F0E8D8' }}>{day === 7 ? 'You understand Al-Fatiha.' : `Day ${day} done.`}</h2>
       <p className="mb-2" style={{ color: '#B5B2AC' }}>You now understand <b style={{ color: '#F0E8D8' }}>{pct}%</b> of the root words in your salah.</p>
-      {quizLen > 0 && <p className="text-sm mb-8" style={{ color: '#9A9893' }}>{score} of {quizLen} right in today&rsquo;s check.</p>}
-      <div className="flex gap-3 justify-center flex-wrap mt-6">
-        {day < 30 && <Link href={`/salah/${day + 1}`} className="btn-primary">Day {day + 1}</Link>}
-        <button onClick={share} className="px-5 py-2.5 rounded-xl border transition-colors hover:bg-white/5" style={{ borderColor: 'rgba(212,162,70,.35)', color: GOLD }}>Share with a friend</button>
-        <Link href="/salah" className="px-5 py-2.5 rounded-xl" style={{ color: '#A09F9B' }}>Back to the path</Link>
-      </div>
+      {quizLen > 0 && <p className="text-sm" style={{ color: '#9A9893' }}>{score} of {quizLen} right in today&rsquo;s check.</p>}
+      {nudge && <p className="text-[15px] mt-4" style={{ color: GOLD }}>{nudge}</p>}
+      {day === 7 && offer ? (
+        <div className="mt-10"><PathOffer offer={offer} variant="peak" pct={pct} returnTo="/salah/7" /></div>
+      ) : (
+        <div className="flex gap-3 justify-center flex-wrap mt-8">
+          {day < 30 && <Link href={`/salah/${day + 1}`} className="btn-primary">Day {day + 1}</Link>}
+          <button onClick={share} className="px-5 py-2.5 rounded-xl border transition-colors hover:bg-white/5" style={{ borderColor: 'rgba(212,162,70,.35)', color: GOLD }}>Share with a friend</button>
+          <Link href="/salah" className="px-5 py-2.5 rounded-xl" style={{ color: '#A09F9B' }}>Back to the path</Link>
+        </div>
+      )}
+      {day === 7 && offer && (
+        <button onClick={share} className="mt-6 text-sm underline underline-offset-4" style={{ color: '#A09F9B' }}>Share Al-Fatiha with a friend</button>
+      )}
     </div>
   );
 }
 
-function Paywall({ day, title, onBuy, error, signedIn }: { day: number; title: string; onBuy: () => void; error: string | null; signedIn: boolean }) {
+function Paywall({ day, title, offer }: { day: number; title: string; offer: Offer }) {
   return (
-    <Centered>
-      <p className="text-sm mb-2" style={{ color: '#9A9893' }}>Day {day} · {title}</p>
-      <h2 className="font-heading text-3xl mb-3" style={{ color: '#F0E8D8' }}>This day is part of the full path.</h2>
-      <p className="mb-8 max-w-md mx-auto" style={{ color: '#A09F9B' }}>The first week, all of Al-Fatiha, is free. Unlock days 8 to 30 once, at the founding price, and keep them for life.</p>
-      <button onClick={onBuy} className="btn-primary">{signedIn ? 'Unlock the full path' : 'Sign in to unlock'}</button>
-      {error && <p className="mt-4 text-sm" style={{ color: '#F87171' }}>{error}</p>}
-      <div className="mt-6"><Link href="/salah" className="text-sm" style={{ color: '#9A9893' }}>← Back to the path</Link></div>
-    </Centered>
+    <div className="max-w-xl mx-auto px-5 py-10">
+      <Link href="/salah" className="text-sm" style={{ color: '#9A9893' }}>← Your salah</Link>
+      <p className="text-sm mt-6 mb-1" style={{ color: '#9A9893' }}>Day {day} of 30</p>
+      <p className="font-heading text-2xl mb-6" style={{ color: '#F0E8D8' }}>{title}</p>
+      <PathOffer offer={offer} variant="locked" day={day} returnTo={`/salah/${day}`} />
+    </div>
   );
 }
 

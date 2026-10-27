@@ -1,18 +1,20 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { PATH, PATH_PRICE_CENTS, hasPathAccess } from '@/lib/salahPath';
+import { PATH, PATH_PRICE_CENTS, pathOffer } from '@/lib/salahPath';
+import { requestHasPathAccess } from '@/lib/pathPurchase';
 
 export const dynamic = 'force-dynamic';
 
 // The path overview: every day's title and progress, never the content of a locked day.
 export async function GET() {
   const session = await auth();
-  const access = await hasPathAccess(session?.user?.id);
+  const access = await requestHasPathAccess(session?.user?.id);
   return NextResponse.json({
     access,
     signedIn: !!session?.user?.id,
     checkoutEnabled: !!process.env.STRIPE_SECRET_KEY,
     priceCents: PATH_PRICE_CENTS,
+    offer: pathOffer(),
     totals: PATH.totals,
     surahs: PATH.surahs,
     days: PATH.days.map((d) => ({

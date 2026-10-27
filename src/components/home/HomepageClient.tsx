@@ -2,10 +2,10 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { ACCURACY_NOTICE } from '@/components/ui/SiteFooter';
 import { useEffect, useState } from 'react';
 import { useAppStore } from '@/store/useAppStore';
 import { RootBloom } from './RootBloom';
-import { CommunityStrip } from './CommunityStrip';
 import { SupportPrompt } from '@/components/support/SupportPrompt';
 import { TOTAL_ROOTS, TOTAL_AYAHS, TOTAL_WORD_TOKENS, fmt } from '@/lib/corpusStats';
 
@@ -234,7 +234,7 @@ export function HomepageClient() {
       >
         <Link href="/" className="flex items-center gap-2 text-base font-heading tracking-tight text-[#EDEDEC]">
           <Image src="/logo.png" alt="QuRoots" width={26} height={26} className="object-contain" />
-          Qu<span style={{ color: '#D4A246' }}>Roots</span>
+          <span>Qu<span style={{ color: '#D4A246' }}>Roots</span></span>
         </Link>
 
         <div className="hidden sm:flex items-center gap-7">
@@ -272,7 +272,7 @@ export function HomepageClient() {
             </svg>
           </Link>
           <Link
-            href="/learn/path"
+            href="/salah"
             className="text-sm font-bold px-4 py-2 rounded-xl transition-all duration-150"
             style={{
               background: 'linear-gradient(135deg, #D4A246, #E8B84B)',
@@ -280,7 +280,7 @@ export function HomepageClient() {
               boxShadow: '0 2px 12px rgba(212,162,70,0.3)',
             }}
           >
-            Start Learning
+            Start free
           </Link>
         </div>
       </nav>
@@ -310,7 +310,7 @@ export function HomepageClient() {
               854 times across the Quran.
             </p>
             <p className="text-sm leading-relaxed mb-8 max-w-xl mx-auto lg:mx-0" style={{ color: '#9A9893' }}>
-              Start with your prayer: Al-Fatiha and the short surahs you recite use just 85 roots.
+              Start with your prayer: Al-Fatiha and the short surahs you recite grow from 110 roots.
               Learn two or three a day, and in 30 days you understand every word. The first week is free.
             </p>
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 mb-6">
@@ -333,8 +333,7 @@ export function HomepageClient() {
               </Link>
             </div>
             <p className="text-xs" style={{ color: '#6E6B66' }}>
-              Free, with no ads.{' '}
-              <Link href="/support" className="underline underline-offset-4 hover:text-[#D4A246] transition-colors">Support QuRoots</Link>
+              Day 1 takes a few minutes. No account needed.
             </p>
           </div>
           <div className="relative">
@@ -346,7 +345,6 @@ export function HomepageClient() {
       {/* ══════════════════════════════════════════════════════
           COMMUNITY — live social proof strip
       ══════════════════════════════════════════════════════ */}
-      <CommunityStrip />
 
       {/* ══════════════════════════════════════════════════════
           FEATURES
@@ -663,10 +661,10 @@ export function HomepageClient() {
               Start your Quranic journey today
             </h2>
             <p className="text-base mb-8 max-w-md mx-auto" style={{ color: '#636260' }}>
-              Free. No download. Works on any device. Every Muslim deserves to understand what they recite.
+              Start with Al-Fatiha. The first week is free, with nothing to download and no account needed.
             </p>
             <Link
-              href="/learn/path"
+              href="/salah"
               className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl text-base font-bold transition-all duration-200 hover:scale-105 active:scale-95"
               style={{
                 background: 'linear-gradient(135deg, #D4A246, #C89535)',
@@ -674,7 +672,7 @@ export function HomepageClient() {
                 boxShadow: '0 4px 28px rgba(212,162,70,0.4)',
               }}
             >
-              Begin Learning
+              Start day 1
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
               </svg>
@@ -704,7 +702,10 @@ export function HomepageClient() {
             </Link>
           ))}
         </div>
-        <p className="mt-6 text-xs" style={{ color: '#2D2C2A' }}>
+        <p className="mt-6 text-xs leading-relaxed max-w-2xl mx-auto" style={{ color: '#8A8783' }}>
+          {ACCURACY_NOTICE} Spotted a mistake? Tell us at salam@quroots.com and we&rsquo;ll fix it.
+        </p>
+        <p className="mt-4 text-xs" style={{ color: '#6E6B66' }}>
           © {new Date().getFullYear()} QuRoots · Built with love for the Ummah
         </p>
       </section>

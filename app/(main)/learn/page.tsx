@@ -4,7 +4,7 @@ import Link from 'next/link';
 const QIRAT_UNLOCKED = process.env.NEXT_PUBLIC_UNLOCK_QIRAT === 'true';
 
 export const metadata: Metadata = {
-  title: 'Learn Arabic — Interactive Quranic Arabic Courses | QuRoots',
+  title: 'Learn Arabic — Interactive Quranic Arabic Courses',
   description: 'Structured, interactive courses to learn Quranic Arabic from scratch — vocabulary, grammar, recitation and qirat, with progress tracking.',
   alternates: { canonical: 'https://quroots.com/learn' },
   openGraph: {

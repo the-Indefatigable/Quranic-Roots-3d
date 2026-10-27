@@ -55,7 +55,7 @@ function renderEmail(opts: {
   const supportBlock = `<tr><td style="padding:0 32px 24px">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#111110;border:1px solid rgba(212,162,70,0.2);border-radius:12px">
         <tr><td style="padding:20px 22px;text-align:center">
-          <p style="margin:0;font-size:14px;line-height:1.6;color:#F0E4CA">Enjoying QuRoots? It stays free for everyone — a small gift keeps it growing.</p>
+          <p style="margin:0;font-size:14px;line-height:1.6;color:#F0E4CA">Enjoying QuRoots? The reader, roots and course stay free for everyone. A small gift keeps them growing.</p>
           <a href="${SITE}/support" style="display:inline-block;margin-top:12px;background:${gold};color:#1a1206;font-weight:bold;font-size:13px;text-decoration:none;padding:11px 22px;border-radius:10px">Support QuRoots</a>
         </td></tr>
       </table>

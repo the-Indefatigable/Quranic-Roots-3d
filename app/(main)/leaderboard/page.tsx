@@ -8,7 +8,7 @@ import { CommunityTabs } from '@/components/community/CommunityTabs';
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-  title: 'Leaderboard — Top Quranic Arabic Learners | QuRoots',
+  title: 'Leaderboard — Top Quranic Arabic Learners',
   description:
     'See who is furthest along in learning Quranic Arabic, ranked by all-time XP and current streak. Free to join.',
   alternates: { canonical: '/leaderboard' },

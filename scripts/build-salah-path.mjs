@@ -6,6 +6,9 @@
  * is fully understood by day 6 and celebrated on day 7. Every ayah becomes "unlocked"
  * on the day its last root is learned. Read-only: writes src/data/salahPath.json.
  *
+ * Roots and counts come from the Quranic Arabic Corpus (scripts/data/qac-salah.json, made by
+ * scripts/extract-qac-salah.py); the database supplies the text, glosses and root meanings.
+ *
  * Run: node scripts/build-salah-path.mjs
  */
 import fs from 'fs';
@@ -24,27 +27,48 @@ const SURAH_NAMES = {
   109: 'Al-Kafirun', 110: 'An-Nasr', 111: 'Al-Masad', 112: 'Al-Ikhlas', 113: 'Al-Falaq', 114: 'An-Nas',
 };
 const DAYS = 30, FREE_DAYS = 7;
-// Noun roots that have no verb meaning in the roots table.
-const MEANINGS = {
-  'اله': 'god, deity (the root of Allah)', 'يوم': 'day', 'صرط': 'path, way', 'احد': 'one, single',
-  'فوج': 'group, crowd', 'ذات': 'possessor of, having', 'مرا': 'person; woman, wife', 'وئل': 'woe, ruin',
-  'ويل': 'woe, ruin', 'فيل': 'elephant',
+// Each day is named for what it lets you understand, checked against the lines it unlocks.
+const TITLES = {
+  1: 'Bismillah: In the name of Allah', 2: 'All praise to the Lord of the worlds', 3: 'Master of the Day of Judgment',
+  4: 'You alone we worship', 5: 'Guide us to the straight path', 6: 'The path of those You blessed',
+  7: 'All of Al-Fatiha, word by word', 8: 'Al-Ikhlas: Say, He is Allah, One', 9: 'Al-Ikhlas ends, Al-Falaq begins',
+  10: 'Al-Falaq: the evil of the dark', 11: 'Al-Falaq ends, An-Nas begins', 12: 'An-Nas: the whisperer who withdraws',
+  13: 'Al-Kawthar: pray and sacrifice', 14: 'Al-Asr: by time', 15: 'Al-Asr: truth and patience',
+  16: "An-Nasr: when Allah's help comes", 17: 'An-Nasr: people entering in crowds', 18: 'An-Nasr ends, Al-Kafirun begins',
+  19: 'Al-Masad: the hands of Abu Lahab', 20: 'Al-Masad: his wealth did not help him', 21: 'Al-Masad: the carrier of firewood',
+  22: "Al-Masad ends, Al-Ma'un begins", 23: "Al-Ma'un: the orphan and the needy", 24: "Al-Ma'un ends, Quraysh begins",
+  25: 'Quraysh: the winter and summer journeys', 26: 'Quraysh: safe from hunger and fear', 27: 'Al-Fil: the people of the elephant',
+  28: 'Al-Fil: birds in flocks', 29: 'Al-Fil: like eaten straw', 30: 'Your whole salah',
 };
+// Meanings for roots the roots table has no (or no suitable) meaning for, keyed by normalised root.
+const MEANINGS = {
+  'اله': 'Allah, God (the root of Allah and ilāh)', 'ربب': 'Lord; to nurture and sustain', 'سمو': 'name; to be high',
+  'يوم': 'day', 'صرط': 'path, way', 'احد': 'one, single', 'فوج': 'group, crowd', 'ذات': 'possessor of, having',
+  'مرا': 'person; woman, wife', 'وال': 'woe, ruin', 'ويل': 'woe, ruin', 'فيل': 'elephant', 'كيف': 'how',
+  'قرش': 'Quraysh, the tribe', 'شنا': 'to hate, to bear hatred', 'ايي': 'which; O (in calling out)', 'يدي': 'hand',
+  'ابو': 'father', 'مول': 'wealth, property', 'نور': 'light; fire',
+};
+// One root spelling for matching the corpus with the database (hamza seats differ between them).
+const norm = (r) => r.replace(/\s+/g, '').replace(/[أإآ]/g, 'ا').replace(/[ؤئ]/g, 'ء');
+const QAC = JSON.parse(fs.readFileSync('scripts/data/qac-salah.json', 'utf8'));
 
 const sql = postgres(process.env.DATABASE_URL, { max: 1, prepare: false });
 try {
   await sql`set default_transaction_read_only = on`;
-  const words = await sql`
+  const raw = await sql`
     select surah_number, ayah_number, position, text_uthmani, translation, root_arabic
     from quran_words where char_type = 'word' and surah_number = any(${SURAHS})
     order by surah_number, ayah_number, position`;
-  const keys = [...new Set(words.filter((w) => w.root_arabic).map((w) => w.root_arabic.replace(/\s+/g, '')))];
-  const rootRows = await sql`select root, meaning, total_freq from roots where root = any(${keys})`;
-  const quranCounts = await sql`
-    select replace(root_arabic, ' ', '') as k, count(*)::int as n from quran_words
-    where char_type = 'word' and root_arabic is not null and replace(root_arabic, ' ', '') = any(${keys}) group by 1`;
-  const meta = new Map(rootRows.map((r) => [r.root, r]));
-  const occ = new Map(quranCounts.map((r) => [r.k, r.n]));
+  const rootRows = await sql`select root, meaning, total_freq from roots`;
+  const meta = new Map(rootRows.map((r) => [norm(r.root), r]));
+  // The corpus decides each word's root; its count is what corpus.quran.com shows.
+  const counts = new Map(Object.entries(QAC.counts).map(([r, n]) => [norm(r), n]));
+  const words = raw.map((w) => {
+    const q = QAC.words[`${w.surah_number}:${w.ayah_number}:${w.position}`];
+    const key = q ? norm(q) : w.root_arabic ? norm(w.root_arabic) : null;
+    return { ...w, root_arabic: key ? [...key].join(' ') : null };
+  });
+  const occ = counts;
 
   // order of first appearance while reciting
   const order = [], seen = new Set(), wordsByRoot = new Map();
@@ -89,14 +113,13 @@ try {
   for (let d = 1; d <= DAYS; d++) {
     const roots = order.filter((r) => dayOf.get(r.key) === d).map((r) => {
       const m = meta.get(r.key) ?? {};
-      return { root: r.key, letters: r.spaced, meaning: m.meaning || MEANINGS[r.key] || '', // roots.total_freq is the count every page shows (it matches the Quranic Arabic Corpus);
-      // tagged words in quran_words are the fallback for the few roots without one.
-      quranCount: m.total_freq || occ.get(r.key) || 0, firstIn: SURAH_NAMES[r.surah], words: wordsByRoot.get(r.key) };
+      return { root: m.root ?? r.key, letters: r.spaced, meaning: MEANINGS[r.key] || m.meaning || '',
+        quranCount: occ.get(r.key) || m.total_freq || 0, firstIn: SURAH_NAMES[r.surah], words: wordsByRoot.get(r.key) };
     });
     const learned = new Set(order.filter((r) => (dayOf.get(r.key) ?? 99) <= d).map((r) => r.key));
     const understood = words.filter((w) => w.root_arabic && learned.has(w.root_arabic.replace(/\s+/g, ''))).length;
     const unlocked = lines.filter((l) => l.unlockDay === d).map((l) => `${l.surah}:${l.ayah}`);
-    const title = d === 7 ? 'Al-Fatiha, every word' : d === 30 ? 'Your whole salah' : roots.length ? `${roots.map((r) => r.meaning.split(/[,;/]/)[0].trim()).filter(Boolean).slice(0, 2).join(' · ')}` : 'Review';
+    const title = TITLES[d];
     days.push({ day: d, free: d <= FREE_DAYS, title, roots, unlocked, pctSalah: Math.round((100 * understood) / rootedTokens) });
   }
 

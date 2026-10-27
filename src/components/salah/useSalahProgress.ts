@@ -24,15 +24,16 @@ export function useSalahProgress() {
 
 export type Overview = {
   access: boolean; signedIn: boolean; checkoutEnabled: boolean; priceCents: number;
+  offer: { priceCents: number; paidDays: number; paidRoots: number; paidSurahs: string[]; freePct: number };
   totals: { roots: number; words: number; rootedWords: number; freeDays: number; days: number };
   days: { day: number; title: string; free: boolean; pctSalah: number; rootCount: number; lineCount: number; locked: boolean }[];
 };
 
-export async function startPathCheckout(login: (reason?: string) => void, signedIn: boolean): Promise<string | null> {
+/** Opens Stripe Checkout for the full path. No sign-in needed; Stripe asks for the email. */
+export async function startPathCheckout(returnTo = '/salah'): Promise<string | null> {
   track('checkout_start');
-  if (!signedIn) { login('Sign in to unlock the full path'); return null; }
-  const r = await fetch('/api/checkout/salah', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(touch() ?? {}) });
+  const r = await fetch('/api/checkout/salah', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...(touch() ?? {}), returnTo }) });
   const d = await r.json().catch(() => ({}));
   if (r.ok && d.url) { window.location.href = d.url; return null; }
-  return d.error || 'Could not start checkout. Please try again.';
+  return d.error || 'Could not open checkout. Please try again.';
 }

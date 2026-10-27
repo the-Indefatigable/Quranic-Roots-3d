@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getStripe } from '@/lib/stripe';
 import { db } from '@/db';
-import { users, growthEvents } from '@/db/schema';
+import type Stripe from 'stripe';
+import { users } from '@/db/schema';
+import { grantPathPurchase } from '@/lib/pathPurchase';
 import { eq } from 'drizzle-orm';
 import { PATH_ORDER_PREFIX } from '@/lib/salahPath';
 
@@ -39,48 +41,44 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ received: true, ignored: 'test_mode_event' });
   }
 
-  // A completed, paid Checkout Session grants Founding Supporter status.
+  // A completed, paid Checkout Session: a salah path purchase, or a donation.
   if (event.type === 'checkout.session.completed') {
-    const s = event.data.object as {
-      id: string;
-      amount_total?: number | null;
-      payment_status?: string;
-      client_reference_id?: string | null;
-      metadata?: Record<string, string> | null;
-    };
-    const userId = s.metadata?.user_id || s.client_reference_id || undefined;
-
+    const s = event.data.object as Stripe.Checkout.Session;
     if (s.payment_status && s.payment_status !== 'paid') {
       return NextResponse.json({ received: true, ignored: 'unpaid' });
     }
-    if (!userId) {
-      console.warn('[stripe] checkout.session.completed without user_id');
-      return NextResponse.json({ received: true, warning: 'no user_id' });
+
+    // The path can be bought without signing in, so it is matched to an account by email.
+    if (s.metadata?.kind === 'salah_path') {
+      try {
+        const { userId } = await grantPathPurchase(s);
+        console.log(`[stripe] salah path unlocked for ${userId} (session ${s.id})`);
+      } catch (err) {
+        console.error('[stripe] failed to unlock the salah path:', err);
+        return NextResponse.json({ error: 'DB update failed' }, { status: 500 });
+      }
+      return NextResponse.json({ received: true });
     }
 
+    // A donation grants Founding Supporter status, without replacing a path purchase.
+    const userId = s.metadata?.user_id || s.client_reference_id || undefined;
+    if (!userId) {
+      console.warn('[stripe] donation checkout without user_id');
+      return NextResponse.json({ received: true, warning: 'no user_id' });
+    }
     try {
-      // A salah-path purchase is recorded with a prefix so it unlocks the paid days; a later
-      // donation must not overwrite it.
-      const isPath = s.metadata?.kind === 'salah_path';
       const [current] = await db.select({ order: users.supporterOrderId }).from(users).where(eq(users.id, userId)).limit(1);
-      const keepPath = !isPath && current?.order?.startsWith(PATH_ORDER_PREFIX);
+      const keepPath = current?.order?.startsWith(PATH_ORDER_PREFIX);
       await db
         .update(users)
         .set({
           isSupporter: true,
           supporterSince: new Date(),
-          ...(keepPath ? {} : { supporterOrderId: isPath ? `${PATH_ORDER_PREFIX}${s.id}` : s.id }), // unique index makes re-delivery idempotent
+          ...(keepPath ? {} : { supporterOrderId: s.id }), // unique index makes re-delivery idempotent
           updatedAt: new Date(),
         })
         .where(eq(users.id, userId));
       console.log(`[stripe] granted supporter to ${userId} (session ${s.id})`);
-      if (isPath) {
-        const m = s.metadata ?? {};
-        await db.insert(growthEvents).values({
-          name: 'purchase', visitorId: m.vid || `user:${userId}`, userId, value: s.amount_total ?? null,
-          source: m.source || null, campaign: m.campaign || null, variant: m.variant || null, path: '/salah',
-        }).catch((err) => console.warn('[stripe] purchase event not recorded:', (err as Error).message));
-      }
     } catch (err) {
       console.error('[stripe] failed to grant supporter:', err);
       return NextResponse.json({ error: 'DB update failed' }, { status: 500 });

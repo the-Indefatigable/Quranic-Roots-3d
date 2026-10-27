@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Blog — Quranic Arabic, Grammar & Books | QuRoots',
+  title: 'Blog — Quranic Arabic, Grammar & Books',
   description: "Articles on Quranic Arabic grammar, daily fusha vocabulary, beginner book recommendations, verb forms, i'rab and more.",
   alternates: { canonical: 'https://quroots.com/blog' },
   openGraph: {

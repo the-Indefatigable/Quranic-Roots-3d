@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-25",
+ "generated": "2026-10-27",
  "surahs": [
   {
    "number": 1,
@@ -51,9 +51,9 @@
   }
  ],
  "totals": {
-  "roots": 85,
+  "roots": 110,
   "words": 244,
-  "rootedWords": 125,
+  "rootedWords": 174,
   "freeDays": 7,
   "days": 30
  },
@@ -61,19 +61,38 @@
   {
    "day": 1,
    "free": true,
-   "title": "god · to have mercy",
+   "title": "Bismillah: In the name of Allah",
    "roots": [
+    {
+     "root": "سمو",
+     "letters": "س م و",
+     "meaning": "name; to be high",
+     "quranCount": 381,
+     "firstIn": "Al-Fatiha",
+     "words": [
+      {
+       "ar": "بِسْمِ",
+       "en": "In (the) name",
+       "ref": "1:1"
+      }
+     ]
+    },
     {
      "root": "اله",
      "letters": "ا ل ه",
-     "meaning": "god, deity (the root of Allah)",
-     "quranCount": 2944,
+     "meaning": "Allah, God (the root of Allah and ilāh)",
+     "quranCount": 2851,
      "firstIn": "Al-Fatiha",
      "words": [
       {
        "ar": "ٱللَّهِ",
        "en": "(of) Allah",
        "ref": "1:1"
+      },
+      {
+       "ar": "لِلَّهِ",
+       "en": "(be) to Allah",
+       "ref": "1:2"
       },
       {
        "ar": "ٱللَّهُ",
@@ -105,7 +124,19 @@
        "ref": "1:1"
       }
      ]
-    },
+    }
+   ],
+   "unlocked": [
+    "1:1",
+    "1:3"
+   ],
+   "pctSalah": 7
+  },
+  {
+   "day": 2,
+   "free": true,
+   "title": "All praise to the Lord of the worlds",
+   "roots": [
     {
      "root": "حمد",
      "letters": "ح م د",
@@ -124,19 +155,46 @@
        "ref": "110:3"
       }
      ]
-    }
-   ],
-   "unlocked": [
-    "1:1",
-    "1:3"
-   ],
-   "pctSalah": 10
-  },
-  {
-   "day": 2,
-   "free": true,
-   "title": "to know · to possess",
-   "roots": [
+    },
+    {
+     "root": "ربب",
+     "letters": "ر ب ب",
+     "meaning": "Lord; to nurture and sustain",
+     "quranCount": 980,
+     "firstIn": "Al-Fatiha",
+     "words": [
+      {
+       "ar": "رَبِّ",
+       "en": "the Lord",
+       "ref": "1:2"
+      },
+      {
+       "ar": "بِرَبِّ",
+       "en": "in (the) Lord",
+       "ref": "113:1"
+      },
+      {
+       "ar": "لِرَبِّكَ",
+       "en": "to your Lord",
+       "ref": "108:2"
+      },
+      {
+       "ar": "رَبِّكَ",
+       "en": "(of) your Lord",
+       "ref": "110:3"
+      },
+      {
+       "ar": "رَبَّ",
+       "en": "(the) Lord",
+       "ref": "106:3"
+      },
+      {
+       "ar": "رَبُّكَ",
+       "en": "your Lord",
+       "ref": "105:1"
+      }
+     ]
+    },
     {
      "root": "علم",
      "letters": "ع ل م",
@@ -150,7 +208,18 @@
        "ref": "1:2"
       }
      ]
-    },
+    }
+   ],
+   "unlocked": [
+    "1:2"
+   ],
+   "pctSalah": 13
+  },
+  {
+   "day": 3,
+   "free": true,
+   "title": "Master of the Day of Judgment",
+   "roots": [
     {
      "root": "ملك",
      "letters": "م ل ك",
@@ -169,23 +238,12 @@
        "ref": "114:2"
       }
      ]
-    }
-   ],
-   "unlocked": [
-    "1:2"
-   ],
-   "pctSalah": 12
-  },
-  {
-   "day": 3,
-   "free": true,
-   "title": "day · to judge",
-   "roots": [
+    },
     {
      "root": "يوم",
      "letters": "ي و م",
      "meaning": "day",
-     "quranCount": 326,
+     "quranCount": 475,
      "firstIn": "Al-Fatiha",
      "words": [
       {
@@ -234,7 +292,7 @@
   {
    "day": 4,
    "free": true,
-   "title": "to worship · to guide",
+   "title": "You alone we worship",
    "roots": [
     {
      "root": "عبد",
@@ -281,6 +339,25 @@
      ]
     },
     {
+     "root": "عون",
+     "letters": "ع و ن",
+     "meaning": "to help, to aid",
+     "quranCount": 12,
+     "firstIn": "Al-Fatiha",
+     "words": [
+      {
+       "ar": "نَسْتَعِينُ",
+       "en": "we ask for help",
+       "ref": "1:5"
+      },
+      {
+       "ar": "ٱلْمَاعُونَ",
+       "en": "[the] small kindnesses",
+       "ref": "107:7"
+      }
+     ]
+    },
+    {
      "root": "هدي",
      "letters": "ه د ي",
      "meaning": "to guide, to lead",
@@ -293,7 +370,22 @@
        "ref": "1:6"
       }
      ]
-    },
+    }
+   ],
+   "unlocked": [
+    "1:5",
+    "109:2",
+    "109:3",
+    "109:4",
+    "109:5"
+   ],
+   "pctSalah": 25
+  },
+  {
+   "day": 5,
+   "free": true,
+   "title": "Guide us to the straight path",
+   "roots": [
     {
      "root": "صرط",
      "letters": "ص ر ط",
@@ -312,22 +404,7 @@
        "ref": "1:7"
       }
      ]
-    }
-   ],
-   "unlocked": [
-    "1:5",
-    "109:2",
-    "109:3",
-    "109:4",
-    "109:5"
-   ],
-   "pctSalah": 27
-  },
-  {
-   "day": 5,
-   "free": true,
-   "title": "to rise · to bless",
-   "roots": [
+    },
     {
      "root": "قوم",
      "letters": "ق و م",
@@ -346,7 +423,7 @@
      "root": "نعم",
      "letters": "ن ع م",
      "meaning": "to bless, to favor",
-     "quranCount": 144,
+     "quranCount": 140,
      "firstIn": "Al-Fatiha",
      "words": [
       {
@@ -360,12 +437,12 @@
    "unlocked": [
     "1:6"
    ],
-   "pctSalah": 29
+   "pctSalah": 27
   },
   {
    "day": 6,
    "free": true,
-   "title": "to change · to be angry",
+   "title": "The path of those You blessed",
    "roots": [
     {
      "root": "غير",
@@ -394,26 +471,59 @@
        "ref": "1:7"
       }
      ]
+    },
+    {
+     "root": "ضلل",
+     "letters": "ض ل ل",
+     "meaning": "to go astray, to err",
+     "quranCount": 191,
+     "firstIn": "Al-Fatiha",
+     "words": [
+      {
+       "ar": "ٱلضَّآلِّينَ",
+       "en": "(of) those who go astray",
+       "ref": "1:7"
+      },
+      {
+       "ar": "تَضْلِيلٍۢ",
+       "en": "astray",
+       "ref": "105:2"
+      }
+     ]
     }
    ],
    "unlocked": [
     "1:7"
    ],
-   "pctSalah": 30
+   "pctSalah": 29
   },
   {
    "day": 7,
    "free": true,
-   "title": "Al-Fatiha, every word",
+   "title": "All of Al-Fatiha, word by word",
    "roots": [],
    "unlocked": [],
-   "pctSalah": 30
+   "pctSalah": 29
   },
   {
    "day": 8,
    "free": false,
-   "title": "one · to endure",
+   "title": "Al-Ikhlas: Say, He is Allah, One",
    "roots": [
+    {
+     "root": "قول",
+     "letters": "ق و ل",
+     "meaning": "to say",
+     "quranCount": 1722,
+     "firstIn": "Al-Ikhlas",
+     "words": [
+      {
+       "ar": "قُلْ",
+       "en": "Say",
+       "ref": "112:1"
+      }
+     ]
+    },
     {
      "root": "احد",
      "letters": "ا ح د",
@@ -455,6 +565,11 @@
      "firstIn": "Al-Ikhlas",
      "words": [
       {
+       "ar": "يَلِدْ",
+       "en": "He begets",
+       "ref": "112:3"
+      },
+      {
        "ar": "يُولَدْ",
        "en": "He is begotten",
        "ref": "112:3"
@@ -462,9 +577,41 @@
      ]
     },
     {
-     "root": "كفو",
-     "letters": "ك ف و",
-     "meaning": "to be equal, to match",
+     "root": "كون",
+     "letters": "ك و ن",
+     "meaning": "to be, to exist",
+     "quranCount": 1390,
+     "firstIn": "Al-Ikhlas",
+     "words": [
+      {
+       "ar": "يَكُن",
+       "en": "is",
+       "ref": "112:4"
+      },
+      {
+       "ar": "كَانَ",
+       "en": "is",
+       "ref": "110:3"
+      }
+     ]
+    }
+   ],
+   "unlocked": [
+    "112:1",
+    "112:2",
+    "112:3"
+   ],
+   "pctSalah": 36
+  },
+  {
+   "day": 9,
+   "free": false,
+   "title": "Al-Ikhlas ends, Al-Falaq begins",
+   "roots": [
+    {
+     "root": "كفا",
+     "letters": "ك ف ا",
+     "meaning": "",
      "quranCount": 1,
      "firstIn": "Al-Ikhlas",
      "words": [
@@ -474,21 +621,7 @@
        "ref": "112:4"
       }
      ]
-    }
-   ],
-   "unlocked": [
-    "112:1",
-    "112:2",
-    "112:3",
-    "112:4"
-   ],
-   "pctSalah": 34
-  },
-  {
-   "day": 9,
-   "free": false,
-   "title": "to seek refuge · to split",
-   "roots": [
+    },
     {
      "root": "عوذ",
      "letters": "ع و ذ",
@@ -518,6 +651,32 @@
      ]
     },
     {
+     "root": "شرر",
+     "letters": "ش ر ر",
+     "meaning": "to spark, to kindle",
+     "quranCount": 31,
+     "firstIn": "Al-Falaq",
+     "words": [
+      {
+       "ar": "شَرِّ",
+       "en": "(the) evil",
+       "ref": "113:2"
+      }
+     ]
+    }
+   ],
+   "unlocked": [
+    "112:4",
+    "113:1"
+   ],
+   "pctSalah": 41
+  },
+  {
+   "day": 10,
+   "free": false,
+   "title": "Al-Falaq: the evil of the dark",
+   "roots": [
+    {
      "root": "خلق",
      "letters": "خ ل ق",
      "meaning": "to create",
@@ -530,19 +689,7 @@
        "ref": "113:2"
       }
      ]
-    }
-   ],
-   "unlocked": [
-    "113:1",
-    "113:2"
-   ],
-   "pctSalah": 38
-  },
-  {
-   "day": 10,
-   "free": false,
-   "title": "to become dark (night) · to enter",
-   "roots": [
+    },
     {
      "root": "غسق",
      "letters": "غ س ق",
@@ -587,14 +734,15 @@
     }
    ],
    "unlocked": [
+    "113:2",
     "113:3"
    ],
-   "pctSalah": 40
+   "pctSalah": 43
   },
   {
    "day": 11,
    "free": false,
-   "title": "to tie · to envy",
+   "title": "Al-Falaq ends, An-Nas begins",
    "roots": [
     {
      "root": "عقد",
@@ -657,23 +805,7 @@
        "ref": "110:2"
       }
      ]
-    }
-   ],
-   "unlocked": [
-    "113:4",
-    "113:5",
-    "114:1",
-    "114:2",
-    "114:3",
-    "114:6"
-   ],
-   "pctSalah": 48
-  },
-  {
-   "day": 12,
-   "free": false,
-   "title": "to whisper · to hide",
-   "roots": [
+    },
     {
      "root": "وسوس",
      "letters": "و س و س",
@@ -692,7 +824,22 @@
        "ref": "114:5"
       }
      ]
-    },
+    }
+   ],
+   "unlocked": [
+    "113:4",
+    "113:5",
+    "114:1",
+    "114:2",
+    "114:3"
+   ],
+   "pctSalah": 50
+  },
+  {
+   "day": 12,
+   "free": false,
+   "title": "An-Nas: the whisperer who withdraws",
+   "roots": [
     {
      "root": "خنس",
      "letters": "خ ن س",
@@ -722,6 +869,47 @@
      ]
     },
     {
+     "root": "جنن",
+     "letters": "ج ن ن",
+     "meaning": "to be mad, to go insane",
+     "quranCount": 201,
+     "firstIn": "An-Nas",
+     "words": [
+      {
+       "ar": "ٱلْجِنَّةِ",
+       "en": "the jinn",
+       "ref": "114:6"
+      }
+     ]
+    },
+    {
+     "root": "عطو",
+     "letters": "ع ط و",
+     "meaning": "to give, to bestow",
+     "quranCount": 14,
+     "firstIn": "Al-Kawthar",
+     "words": [
+      {
+       "ar": "أَعْطَيْنَـٰكَ",
+       "en": "We have given you",
+       "ref": "108:1"
+      }
+     ]
+    }
+   ],
+   "unlocked": [
+    "114:4",
+    "114:5",
+    "114:6"
+   ],
+   "pctSalah": 52
+  },
+  {
+   "day": 13,
+   "free": false,
+   "title": "Al-Kawthar: pray and sacrifice",
+   "roots": [
+    {
      "root": "كثر",
      "letters": "ك ث ر",
      "meaning": "to be many, to increase",
@@ -734,20 +922,31 @@
        "ref": "108:1"
       }
      ]
-    }
-   ],
-   "unlocked": [
-    "114:4",
-    "114:5",
-    "108:1"
-   ],
-   "pctSalah": 52
-  },
-  {
-   "day": 13,
-   "free": false,
-   "title": "to slaughter · to cut off",
-   "roots": [
+    },
+    {
+     "root": "صلو",
+     "letters": "ص ل و",
+     "meaning": "to pray",
+     "quranCount": 99,
+     "firstIn": "Al-Kawthar",
+     "words": [
+      {
+       "ar": "فَصَلِّ",
+       "en": "So pray",
+       "ref": "108:2"
+      },
+      {
+       "ar": "لِّلْمُصَلِّينَ",
+       "en": "to those who pray",
+       "ref": "107:4"
+      },
+      {
+       "ar": "صَلَاتِهِمْ",
+       "en": "their prayers",
+       "ref": "107:5"
+      }
+     ]
+    },
     {
      "root": "نحر",
      "letters": "ن ح ر",
@@ -759,6 +958,20 @@
        "ar": "وَٱنْحَرْ",
        "en": "and sacrifice",
        "ref": "108:2"
+      }
+     ]
+    },
+    {
+     "root": "شنا",
+     "letters": "ش ن ا",
+     "meaning": "to hate, to bear hatred",
+     "quranCount": 3,
+     "firstIn": "Al-Kawthar",
+     "words": [
+      {
+       "ar": "شَانِئَكَ",
+       "en": "your enemy ",
+       "ref": "108:3"
       }
      ]
     },
@@ -775,7 +988,20 @@
        "ref": "108:3"
       }
      ]
-    },
+    }
+   ],
+   "unlocked": [
+    "108:1",
+    "108:2",
+    "108:3"
+   ],
+   "pctSalah": 56
+  },
+  {
+   "day": 14,
+   "free": false,
+   "title": "Al-Asr: by time",
+   "roots": [
     {
      "root": "عصر",
      "letters": "ع ص ر",
@@ -789,20 +1015,7 @@
        "ref": "103:1"
       }
      ]
-    }
-   ],
-   "unlocked": [
-    "108:2",
-    "108:3",
-    "103:1"
-   ],
-   "pctSalah": 54
-  },
-  {
-   "day": 14,
-   "free": false,
-   "title": "to lose · to be safe",
-   "roots": [
+    },
     {
      "root": "خسر",
      "letters": "خ س ر",
@@ -852,14 +1065,15 @@
     }
    ],
    "unlocked": [
+    "103:1",
     "103:2"
    ],
-   "pctSalah": 58
+   "pctSalah": 59
   },
   {
    "day": 15,
    "free": false,
-   "title": "to be at peace · to be patient",
+   "title": "Al-Asr: truth and patience",
    "roots": [
     {
      "root": "صلح",
@@ -871,6 +1085,34 @@
       {
        "ar": "ٱلصَّـٰلِحَـٰتِ",
        "en": "righteous deeds",
+       "ref": "103:3"
+      }
+     ]
+    },
+    {
+     "root": "وصي",
+     "letters": "و ص ي",
+     "meaning": "to entrust, to bequeath",
+     "quranCount": 32,
+     "firstIn": "Al-Asr",
+     "words": [
+      {
+       "ar": "وَتَوَاصَوْا۟",
+       "en": "and enjoin (each other)",
+       "ref": "103:3"
+      }
+     ]
+    },
+    {
+     "root": "حقق",
+     "letters": "ح ق ق",
+     "meaning": "to verify, to confirm, to be true",
+     "quranCount": 287,
+     "firstIn": "Al-Asr",
+     "words": [
+      {
+       "ar": "بِٱلْحَقِّ",
+       "en": "to the truth",
        "ref": "103:3"
       }
      ]
@@ -888,12 +1130,37 @@
        "ref": "103:3"
       }
      ]
+    }
+   ],
+   "unlocked": [
+    "103:3"
+   ],
+   "pctSalah": 62
+  },
+  {
+   "day": 16,
+   "free": false,
+   "title": "An-Nasr: when Allah's help comes",
+   "roots": [
+    {
+     "root": "جيا",
+     "letters": "ج ي ا",
+     "meaning": "to live, to be alive",
+     "quranCount": 278,
+     "firstIn": "An-Nasr",
+     "words": [
+      {
+       "ar": "جَآءَ",
+       "en": "comes",
+       "ref": "110:1"
+      }
+     ]
     },
     {
      "root": "نصر",
      "letters": "ن ص ر",
      "meaning": "to help",
-     "quranCount": 143,
+     "quranCount": 158,
      "firstIn": "An-Nasr",
      "words": [
       {
@@ -902,18 +1169,7 @@
        "ref": "110:1"
       }
      ]
-    }
-   ],
-   "unlocked": [
-    "103:3"
-   ],
-   "pctSalah": 60
-  },
-  {
-   "day": 16,
-   "free": false,
-   "title": "to open · to enter",
-   "roots": [
+    },
     {
      "root": "فتح",
      "letters": "ف ت ح",
@@ -928,6 +1184,47 @@
       }
      ]
     },
+    {
+     "root": "راي",
+     "letters": "ر ا ي",
+     "meaning": "to see, to view, to think",
+     "quranCount": 328,
+     "firstIn": "An-Nasr",
+     "words": [
+      {
+       "ar": "وَرَأَيْتَ",
+       "en": "And you see",
+       "ref": "110:2"
+      },
+      {
+       "ar": "أَرَءَيْتَ",
+       "en": "Have you seen",
+       "ref": "107:1"
+      },
+      {
+       "ar": "يُرَآءُونَ",
+       "en": "make show",
+       "ref": "107:6"
+      },
+      {
+       "ar": "تَرَ",
+       "en": "you seen",
+       "ref": "105:1"
+      }
+     ]
+    }
+   ],
+   "unlocked": [
+    "110:1",
+    "107:6"
+   ],
+   "pctSalah": 66
+  },
+  {
+   "day": 17,
+   "free": false,
+   "title": "An-Nasr: people entering in crowds",
+   "roots": [
     {
      "root": "دخل",
      "letters": "د خ ل",
@@ -969,19 +1266,7 @@
        "ref": "110:3"
       }
      ]
-    }
-   ],
-   "unlocked": [
-    "110:1",
-    "110:2"
-   ],
-   "pctSalah": 63
-  },
-  {
-   "day": 17,
-   "free": false,
-   "title": "to forgive · to repent",
-   "roots": [
+    },
     {
      "root": "غفر",
      "letters": "غ ف ر",
@@ -995,7 +1280,18 @@
        "ref": "110:3"
       }
      ]
-    },
+    }
+   ],
+   "unlocked": [
+    "110:2"
+   ],
+   "pctSalah": 68
+  },
+  {
+   "day": 18,
+   "free": false,
+   "title": "An-Nasr ends, Al-Kafirun begins",
+   "roots": [
     {
      "root": "توب",
      "letters": "ت و ب",
@@ -1011,10 +1307,24 @@
      ]
     },
     {
+     "root": "ايي",
+     "letters": "ا ي ي",
+     "meaning": "which; O (in calling out)",
+     "quranCount": 597,
+     "firstIn": "Al-Kafirun",
+     "words": [
+      {
+       "ar": "يَـٰٓأَيُّهَا",
+       "en": "O",
+       "ref": "109:1"
+      }
+     ]
+    },
+    {
      "root": "كفر",
      "letters": "ك ف ر",
      "meaning": "to disbelieve, to reject faith",
-     "quranCount": 524,
+     "quranCount": 525,
      "firstIn": "Al-Kafirun",
      "words": [
       {
@@ -1023,19 +1333,66 @@
        "ref": "109:1"
       }
      ]
+    },
+    {
+     "root": "تبب",
+     "letters": "ت ب ب",
+     "meaning": "to ruin, to destroy",
+     "quranCount": 4,
+     "firstIn": "Al-Masad",
+     "words": [
+      {
+       "ar": "تَبَّتْ",
+       "en": "Perish",
+       "ref": "111:1"
+      },
+      {
+       "ar": "وَتَبَّ",
+       "en": "and perish he",
+       "ref": "111:1"
+      }
+     ]
     }
    ],
    "unlocked": [
     "110:3",
     "109:1"
    ],
-   "pctSalah": 66
+   "pctSalah": 71
   },
   {
-   "day": 18,
+   "day": 19,
    "free": false,
-   "title": "to blaze · to be rich",
+   "title": "Al-Masad: the hands of Abu Lahab",
    "roots": [
+    {
+     "root": "يدي",
+     "letters": "ي د ي",
+     "meaning": "hand",
+     "quranCount": 120,
+     "firstIn": "Al-Masad",
+     "words": [
+      {
+       "ar": "يَدَآ",
+       "en": "(the) hands",
+       "ref": "111:1"
+      }
+     ]
+    },
+    {
+     "root": "ابو",
+     "letters": "ا ب و",
+     "meaning": "father",
+     "quranCount": 117,
+     "firstIn": "Al-Masad",
+     "words": [
+      {
+       "ar": "أَبِى",
+       "en": "(of) Abu",
+       "ref": "111:1"
+      }
+     ]
+    },
     {
      "root": "لهب",
      "letters": "ل ه ب",
@@ -1065,6 +1422,31 @@
      ]
     },
     {
+     "root": "مول",
+     "letters": "م و ل",
+     "meaning": "wealth, property",
+     "quranCount": 86,
+     "firstIn": "Al-Masad",
+     "words": [
+      {
+       "ar": "مَالُهُۥ",
+       "en": "his wealth",
+       "ref": "111:2"
+      }
+     ]
+    }
+   ],
+   "unlocked": [
+    "111:1"
+   ],
+   "pctSalah": 75
+  },
+  {
+   "day": 20,
+   "free": false,
+   "title": "Al-Masad: his wealth did not help him",
+   "roots": [
+    {
      "root": "كسب",
      "letters": "ك س ب",
      "meaning": "to earn, to gain",
@@ -1077,19 +1459,7 @@
        "ref": "111:2"
       }
      ]
-    }
-   ],
-   "unlocked": [
-    "111:1",
-    "111:2"
-   ],
-   "pctSalah": 69
-  },
-  {
-   "day": 19,
-   "free": false,
-   "title": "to pray · possessor of",
-   "roots": [
+    },
     {
      "root": "صلي",
      "letters": "ص ل ي",
@@ -1100,6 +1470,20 @@
       {
        "ar": "سَيَصْلَىٰ",
        "en": "He will be burnt",
+       "ref": "111:3"
+      }
+     ]
+    },
+    {
+     "root": "نور",
+     "letters": "ن و ر",
+     "meaning": "light; fire",
+     "quranCount": 194,
+     "firstIn": "Al-Masad",
+     "words": [
+      {
+       "ar": "نَارًۭا",
+       "en": "(in) a Fire",
        "ref": "111:3"
       }
      ]
@@ -1117,12 +1501,24 @@
        "ref": "111:3"
       }
      ]
-    },
+    }
+   ],
+   "unlocked": [
+    "111:2",
+    "111:3"
+   ],
+   "pctSalah": 77
+  },
+  {
+   "day": 21,
+   "free": false,
+   "title": "Al-Masad: the carrier of firewood",
+   "roots": [
     {
      "root": "مرا",
      "letters": "م ر ا",
      "meaning": "person; woman, wife",
-     "quranCount": 27,
+     "quranCount": 38,
      "firstIn": "Al-Masad",
      "words": [
       {
@@ -1131,18 +1527,7 @@
        "ref": "111:4"
       }
      ]
-    }
-   ],
-   "unlocked": [
-    "111:3"
-   ],
-   "pctSalah": 71
-  },
-  {
-   "day": 20,
-   "free": false,
-   "title": "to carry · to gather firewood",
-   "roots": [
+    },
     {
      "root": "حمل",
      "letters": "ح م ل",
@@ -1189,12 +1574,12 @@
    "unlocked": [
     "111:4"
    ],
-   "pctSalah": 74
+   "pctSalah": 79
   },
   {
-   "day": 21,
+   "day": 22,
    "free": false,
-   "title": "to tie with a rope · to twist",
+   "title": "Al-Masad ends, Al-Ma'un begins",
    "roots": [
     {
      "root": "حبل",
@@ -1239,6 +1624,32 @@
      ]
     },
     {
+     "root": "دعع",
+     "letters": "د ع ع",
+     "meaning": "to push, to press",
+     "quranCount": 3,
+     "firstIn": "Al-Ma'un",
+     "words": [
+      {
+       "ar": "يَدُعُّ",
+       "en": "repulses",
+       "ref": "107:2"
+      }
+     ]
+    }
+   ],
+   "unlocked": [
+    "111:5",
+    "107:1"
+   ],
+   "pctSalah": 82
+  },
+  {
+   "day": 23,
+   "free": false,
+   "title": "Al-Ma'un: the orphan and the needy",
+   "roots": [
+    {
      "root": "يتم",
      "letters": "ي ت م",
      "meaning": "to be orphaned",
@@ -1251,21 +1662,21 @@
        "ref": "107:2"
       }
      ]
-    }
-   ],
-   "unlocked": [
-    "111:5",
-    "107:1",
-    "107:2",
-    "107:6"
-   ],
-   "pctSalah": 77
-  },
-  {
-   "day": 22,
-   "free": false,
-   "title": "to taste · to dwell",
-   "roots": [
+    },
+    {
+     "root": "حضض",
+     "letters": "ح ض ض",
+     "meaning": "to urge, to incite",
+     "quranCount": 3,
+     "firstIn": "Al-Ma'un",
+     "words": [
+      {
+       "ar": "يَحُضُّ",
+       "en": "feel the urge",
+       "ref": "107:3"
+      }
+     ]
+    },
     {
      "root": "طعم",
      "letters": "ط ع م",
@@ -1298,11 +1709,23 @@
        "ref": "107:3"
       }
      ]
-    },
+    }
+   ],
+   "unlocked": [
+    "107:2",
+    "107:3"
+   ],
+   "pctSalah": 84
+  },
+  {
+   "day": 24,
+   "free": false,
+   "title": "Al-Ma'un ends, Quraysh begins",
+   "roots": [
     {
      "root": "وئل",
-     "letters": "و ئ ل",
-     "meaning": "woe, ruin",
+     "letters": "و ء ل",
+     "meaning": "",
      "quranCount": 1,
      "firstIn": "Al-Ma'un",
      "words": [
@@ -1312,19 +1735,7 @@
        "ref": "107:4"
       }
      ]
-    }
-   ],
-   "unlocked": [
-    "107:3",
-    "107:4"
-   ],
-   "pctSalah": 80
-  },
-  {
-   "day": 23,
-   "free": false,
-   "title": "to be inattentive · to prevent",
-   "roots": [
+    },
     {
      "root": "سهو",
      "letters": "س ه و",
@@ -1354,32 +1765,6 @@
      ]
     },
     {
-     "root": "معن",
-     "letters": "م ع ن",
-     "meaning": "to help, to assist",
-     "quranCount": 1,
-     "firstIn": "Al-Ma'un",
-     "words": [
-      {
-       "ar": "ٱلْمَاعُونَ",
-       "en": "[the] small kindnesses",
-       "ref": "107:7"
-      }
-     ]
-    }
-   ],
-   "unlocked": [
-    "107:5",
-    "107:7"
-   ],
-   "pctSalah": 82
-  },
-  {
-   "day": 24,
-   "free": false,
-   "title": "to familiarize · to depart",
-   "roots": [
-    {
      "root": "الف",
      "letters": "ا ل ف",
      "meaning": "to familiarize, to make accustomed",
@@ -1395,14 +1780,37 @@
        "ar": "إِۦلَـٰفِهِمْ",
        "en": "Their familiarity",
        "ref": "106:2"
-      },
-      {
-       "ar": "وَٱلصَّيْفِ",
-       "en": "and summer",
-       "ref": "106:2"
       }
      ]
     },
+    {
+     "root": "قرش",
+     "letters": "ق ر ش",
+     "meaning": "Quraysh, the tribe",
+     "quranCount": 1,
+     "firstIn": "Quraysh",
+     "words": [
+      {
+       "ar": "قُرَيْشٍ",
+       "en": "(of the) Quraish",
+       "ref": "106:1"
+      }
+     ]
+    }
+   ],
+   "unlocked": [
+    "107:4",
+    "107:5",
+    "107:7",
+    "106:1"
+   ],
+   "pctSalah": 88
+  },
+  {
+   "day": 25,
+   "free": false,
+   "title": "Quraysh: the winter and summer journeys",
+   "roots": [
     {
      "root": "رحل",
      "letters": "ر ح ل",
@@ -1413,6 +1821,34 @@
       {
        "ar": "رِحْلَةَ",
        "en": "(with the) journey",
+       "ref": "106:2"
+      }
+     ]
+    },
+    {
+     "root": "شتو",
+     "letters": "ش ت و",
+     "meaning": "to spend the winter",
+     "quranCount": 1,
+     "firstIn": "Quraysh",
+     "words": [
+      {
+       "ar": "ٱلشِّتَآءِ",
+       "en": "(of) winter",
+       "ref": "106:2"
+      }
+     ]
+    },
+    {
+     "root": "صيف",
+     "letters": "ص ي ف",
+     "meaning": "",
+     "quranCount": 1,
+     "firstIn": "Quraysh",
+     "words": [
+      {
+       "ar": "وَٱلصَّيْفِ",
+       "en": "and summer",
        "ref": "106:2"
       }
      ]
@@ -1433,16 +1869,15 @@
     }
    ],
    "unlocked": [
-    "106:1",
     "106:2",
     "106:3"
    ],
-   "pctSalah": 86
+   "pctSalah": 90
   },
   {
-   "day": 25,
+   "day": 26,
    "free": false,
-   "title": "to hunger · to fear",
+   "title": "Quraysh: safe from hunger and fear",
    "roots": [
     {
      "root": "جوع",
@@ -1473,6 +1908,20 @@
      ]
     },
     {
+     "root": "كيف",
+     "letters": "ك ي ف",
+     "meaning": "how",
+     "quranCount": 83,
+     "firstIn": "Al-Fil",
+     "words": [
+      {
+       "ar": "كَيْفَ",
+       "en": "how",
+       "ref": "105:1"
+      }
+     ]
+    },
+    {
      "root": "فعل",
      "letters": "ف ع ل",
      "meaning": "to do, to act",
@@ -1485,7 +1934,18 @@
        "ref": "105:1"
       }
      ]
-    },
+    }
+   ],
+   "unlocked": [
+    "106:4"
+   ],
+   "pctSalah": 93
+  },
+  {
+   "day": 27,
+   "free": false,
+   "title": "Al-Fil: the people of the elephant",
+   "roots": [
     {
      "root": "صحب",
      "letters": "ص ح ب",
@@ -1499,18 +1959,7 @@
        "ref": "105:1"
       }
      ]
-    }
-   ],
-   "unlocked": [
-    "106:4"
-   ],
-   "pctSalah": 90
-  },
-  {
-   "day": 26,
-   "free": false,
-   "title": "elephant · to make",
-   "roots": [
+    },
     {
      "root": "فيل",
      "letters": "ف ي ل",
@@ -1560,29 +2009,16 @@
     }
    ],
    "unlocked": [
-    "105:1"
+    "105:1",
+    "105:2"
    ],
-   "pctSalah": 93
+   "pctSalah": 95
   },
   {
-   "day": 27,
+   "day": 28,
    "free": false,
-   "title": "to go astray · to send",
+   "title": "Al-Fil: birds in flocks",
    "roots": [
-    {
-     "root": "ضلل",
-     "letters": "ض ل ل",
-     "meaning": "to go astray, to err",
-     "quranCount": 189,
-     "firstIn": "Al-Fil",
-     "words": [
-      {
-       "ar": "تَضْلِيلٍۢ",
-       "en": "astray",
-       "ref": "105:2"
-      }
-     ]
-    },
     {
      "root": "رسل",
      "letters": "ر س ل",
@@ -1601,7 +2037,7 @@
      "root": "طير",
      "letters": "ط ي ر",
      "meaning": "to fly",
-     "quranCount": 28,
+     "quranCount": 29,
      "firstIn": "Al-Fil",
      "words": [
       {
@@ -1610,23 +2046,12 @@
        "ref": "105:3"
       }
      ]
-    }
-   ],
-   "unlocked": [
-    "105:2"
-   ],
-   "pctSalah": 95
-  },
-  {
-   "day": 28,
-   "free": false,
-   "title": "to turn towards · to throw",
-   "roots": [
+    },
     {
      "root": "ابل",
      "letters": "ا ب ل",
      "meaning": "to turn towards",
-     "quranCount": 2,
+     "quranCount": 3,
      "firstIn": "Al-Fil",
      "words": [
       {
@@ -1649,7 +2074,18 @@
        "ref": "105:4"
       }
      ]
-    },
+    }
+   ],
+   "unlocked": [
+    "105:3"
+   ],
+   "pctSalah": 98
+  },
+  {
+   "day": 29,
+   "free": false,
+   "title": "Al-Fil: like eaten straw",
+   "roots": [
     {
      "root": "حجر",
      "letters": "ح ج ر",
@@ -1663,23 +2099,12 @@
        "ref": "105:4"
       }
      ]
-    }
-   ],
-   "unlocked": [
-    "105:3"
-   ],
-   "pctSalah": 98
-  },
-  {
-   "day": 29,
-   "free": false,
-   "title": "to record · to scatter",
-   "roots": [
+    },
     {
      "root": "سجل",
      "letters": "س ج ل",
      "meaning": "to record, to register",
-     "quranCount": 1,
+     "quranCount": 4,
      "firstIn": "Al-Fil",
      "words": [
       {
@@ -1743,7 +2168,7 @@
     {
      "ar": "بِسْمِ",
      "en": "In (the) name",
-     "root": null
+     "root": "سمو"
     },
     {
      "ar": "ٱللَّهِ",
@@ -1776,12 +2201,12 @@
     {
      "ar": "لِلَّهِ",
      "en": "(be) to Allah",
-     "root": null
+     "root": "اله"
     },
     {
      "ar": "رَبِّ",
      "en": "the Lord",
-     "root": null
+     "root": "ربب"
     },
     {
      "ar": "ٱلْعَـٰلَمِينَ",
@@ -1855,7 +2280,7 @@
     {
      "ar": "نَسْتَعِينُ",
      "en": "we ask for help",
-     "root": null
+     "root": "عون"
     }
    ]
   },
@@ -1931,7 +2356,7 @@
     {
      "ar": "ٱلضَّآلِّينَ",
      "en": "(of) those who go astray",
-     "root": null
+     "root": "ضلل"
     }
    ]
   },
@@ -1944,7 +2369,7 @@
     {
      "ar": "قُلْ",
      "en": "Say",
-     "root": null
+     "root": "قول"
     },
     {
      "ar": "هُوَ",
@@ -1995,7 +2420,7 @@
     {
      "ar": "يَلِدْ",
      "en": "He begets",
-     "root": null
+     "root": "ولد"
     },
     {
      "ar": "وَلَمْ",
@@ -2013,7 +2438,7 @@
    "surah": 112,
    "surahName": "Al-Ikhlas",
    "ayah": 4,
-   "unlockDay": 8,
+   "unlockDay": 9,
    "words": [
     {
      "ar": "وَلَمْ",
@@ -2023,7 +2448,7 @@
     {
      "ar": "يَكُن",
      "en": "is",
-     "root": null
+     "root": "كون"
     },
     {
      "ar": "لَّهُۥ",
@@ -2033,7 +2458,7 @@
     {
      "ar": "كُفُوًا",
      "en": "equivalent",
-     "root": "كفو"
+     "root": "كفا"
     },
     {
      "ar": "أَحَدٌۢ",
@@ -2051,7 +2476,7 @@
     {
      "ar": "قُلْ",
      "en": "Say",
-     "root": null
+     "root": "قول"
     },
     {
      "ar": "أَعُوذُ",
@@ -2061,7 +2486,7 @@
     {
      "ar": "بِرَبِّ",
      "en": "in (the) Lord",
-     "root": null
+     "root": "ربب"
     },
     {
      "ar": "ٱلْفَلَقِ",
@@ -2074,7 +2499,7 @@
    "surah": 113,
    "surahName": "Al-Falaq",
    "ayah": 2,
-   "unlockDay": 9,
+   "unlockDay": 10,
    "words": [
     {
      "ar": "مِن",
@@ -2084,7 +2509,7 @@
     {
      "ar": "شَرِّ",
      "en": "(the) evil",
-     "root": null
+     "root": "شرر"
     },
     {
      "ar": "مَا",
@@ -2112,7 +2537,7 @@
     {
      "ar": "شَرِّ",
      "en": "(the) evil",
-     "root": null
+     "root": "شرر"
     },
     {
      "ar": "غَاسِقٍ",
@@ -2145,7 +2570,7 @@
     {
      "ar": "شَرِّ",
      "en": "(the) evil",
-     "root": null
+     "root": "شرر"
     },
     {
      "ar": "ٱلنَّفَّـٰثَـٰتِ",
@@ -2178,7 +2603,7 @@
     {
      "ar": "شَرِّ",
      "en": "(the) evil",
-     "root": null
+     "root": "شرر"
     },
     {
      "ar": "حَاسِدٍ",
@@ -2206,7 +2631,7 @@
     {
      "ar": "قُلْ",
      "en": "Say",
-     "root": null
+     "root": "قول"
     },
     {
      "ar": "أَعُوذُ",
@@ -2216,7 +2641,7 @@
     {
      "ar": "بِرَبِّ",
      "en": "in (the) Lord",
-     "root": null
+     "root": "ربب"
     },
     {
      "ar": "ٱلنَّاسِ",
@@ -2275,7 +2700,7 @@
     {
      "ar": "شَرِّ",
      "en": "(the) evil",
-     "root": null
+     "root": "شرر"
     },
     {
      "ar": "ٱلْوَسْوَاسِ",
@@ -2326,7 +2751,7 @@
    "surah": 114,
    "surahName": "An-Nas",
    "ayah": 6,
-   "unlockDay": 11,
+   "unlockDay": 12,
    "words": [
     {
      "ar": "مِنَ",
@@ -2336,7 +2761,7 @@
     {
      "ar": "ٱلْجِنَّةِ",
      "en": "the jinn",
-     "root": null
+     "root": "جنن"
     },
     {
      "ar": "وَٱلنَّاسِ",
@@ -2349,7 +2774,7 @@
    "surah": 108,
    "surahName": "Al-Kawthar",
    "ayah": 1,
-   "unlockDay": 12,
+   "unlockDay": 13,
    "words": [
     {
      "ar": "إِنَّآ",
@@ -2359,7 +2784,7 @@
     {
      "ar": "أَعْطَيْنَـٰكَ",
      "en": "We have given you",
-     "root": null
+     "root": "عطو"
     },
     {
      "ar": "ٱلْكَوْثَرَ",
@@ -2377,12 +2802,12 @@
     {
      "ar": "فَصَلِّ",
      "en": "So pray",
-     "root": null
+     "root": "صلو"
     },
     {
      "ar": "لِرَبِّكَ",
      "en": "to your Lord",
-     "root": null
+     "root": "ربب"
     },
     {
      "ar": "وَٱنْحَرْ",
@@ -2405,7 +2830,7 @@
     {
      "ar": "شَانِئَكَ",
      "en": "your enemy ",
-     "root": null
+     "root": "شنا"
     },
     {
      "ar": "هُوَ",
@@ -2423,7 +2848,7 @@
    "surah": 103,
    "surahName": "Al-Asr",
    "ayah": 1,
-   "unlockDay": 13,
+   "unlockDay": 14,
    "words": [
     {
      "ar": "وَٱلْعَصْرِ",
@@ -2494,17 +2919,17 @@
     {
      "ar": "وَتَوَاصَوْا۟",
      "en": "and enjoin (each other)",
-     "root": null
+     "root": "وصي"
     },
     {
      "ar": "بِٱلْحَقِّ",
      "en": "to the truth",
-     "root": null
+     "root": "حقق"
     },
     {
      "ar": "وَتَوَاصَوْا۟",
      "en": "and enjoin (each other)",
-     "root": null
+     "root": "وصي"
     },
     {
      "ar": "بِٱلصَّبْرِ",
@@ -2527,7 +2952,7 @@
     {
      "ar": "جَآءَ",
      "en": "comes",
-     "root": null
+     "root": "جيا"
     },
     {
      "ar": "نَصْرُ",
@@ -2550,12 +2975,12 @@
    "surah": 110,
    "surahName": "An-Nasr",
    "ayah": 2,
-   "unlockDay": 16,
+   "unlockDay": 17,
    "words": [
     {
      "ar": "وَرَأَيْتَ",
      "en": "And you see",
-     "root": null
+     "root": "راي"
     },
     {
      "ar": "ٱلنَّاسَ",
@@ -2593,7 +3018,7 @@
    "surah": 110,
    "surahName": "An-Nasr",
    "ayah": 3,
-   "unlockDay": 17,
+   "unlockDay": 18,
    "words": [
     {
      "ar": "فَسَبِّحْ",
@@ -2608,7 +3033,7 @@
     {
      "ar": "رَبِّكَ",
      "en": "(of) your Lord",
-     "root": null
+     "root": "ربب"
     },
     {
      "ar": "وَٱسْتَغْفِرْهُ ۚ",
@@ -2623,7 +3048,7 @@
     {
      "ar": "كَانَ",
      "en": "is",
-     "root": null
+     "root": "كون"
     },
     {
      "ar": "تَوَّابًۢا",
@@ -2636,17 +3061,17 @@
    "surah": 109,
    "surahName": "Al-Kafirun",
    "ayah": 1,
-   "unlockDay": 17,
+   "unlockDay": 18,
    "words": [
     {
      "ar": "قُلْ",
      "en": "Say",
-     "root": null
+     "root": "قول"
     },
     {
      "ar": "يَـٰٓأَيُّهَا",
      "en": "O",
-     "root": null
+     "root": "ايي"
     },
     {
      "ar": "ٱلْكَـٰفِرُونَ",
@@ -2814,22 +3239,22 @@
    "surah": 111,
    "surahName": "Al-Masad",
    "ayah": 1,
-   "unlockDay": 18,
+   "unlockDay": 19,
    "words": [
     {
      "ar": "تَبَّتْ",
      "en": "Perish",
-     "root": null
+     "root": "تبب"
     },
     {
      "ar": "يَدَآ",
      "en": "(the) hands",
-     "root": null
+     "root": "يدي"
     },
     {
      "ar": "أَبِى",
      "en": "(of) Abu",
-     "root": null
+     "root": "ابو"
     },
     {
      "ar": "لَهَبٍۢ",
@@ -2839,7 +3264,7 @@
     {
      "ar": "وَتَبَّ",
      "en": "and perish he",
-     "root": null
+     "root": "تبب"
     }
    ]
   },
@@ -2847,7 +3272,7 @@
    "surah": 111,
    "surahName": "Al-Masad",
    "ayah": 2,
-   "unlockDay": 18,
+   "unlockDay": 20,
    "words": [
     {
      "ar": "مَآ",
@@ -2867,7 +3292,7 @@
     {
      "ar": "مَالُهُۥ",
      "en": "his wealth",
-     "root": null
+     "root": "مول"
     },
     {
      "ar": "وَمَا",
@@ -2885,7 +3310,7 @@
    "surah": 111,
    "surahName": "Al-Masad",
    "ayah": 3,
-   "unlockDay": 19,
+   "unlockDay": 20,
    "words": [
     {
      "ar": "سَيَصْلَىٰ",
@@ -2895,7 +3320,7 @@
     {
      "ar": "نَارًۭا",
      "en": "(in) a Fire",
-     "root": null
+     "root": "نور"
     },
     {
      "ar": "ذَاتَ",
@@ -2913,7 +3338,7 @@
    "surah": 111,
    "surahName": "Al-Masad",
    "ayah": 4,
-   "unlockDay": 20,
+   "unlockDay": 21,
    "words": [
     {
      "ar": "وَٱمْرَأَتُهُۥ",
@@ -2936,7 +3361,7 @@
    "surah": 111,
    "surahName": "Al-Masad",
    "ayah": 5,
-   "unlockDay": 21,
+   "unlockDay": 22,
    "words": [
     {
      "ar": "فِى",
@@ -2969,12 +3394,12 @@
    "surah": 107,
    "surahName": "Al-Ma'un",
    "ayah": 1,
-   "unlockDay": 21,
+   "unlockDay": 22,
    "words": [
     {
      "ar": "أَرَءَيْتَ",
      "en": "Have you seen",
-     "root": null
+     "root": "راي"
     },
     {
      "ar": "ٱلَّذِى",
@@ -2997,7 +3422,7 @@
    "surah": 107,
    "surahName": "Al-Ma'un",
    "ayah": 2,
-   "unlockDay": 21,
+   "unlockDay": 23,
    "words": [
     {
      "ar": "فَذَٰلِكَ",
@@ -3012,7 +3437,7 @@
     {
      "ar": "يَدُعُّ",
      "en": "repulses",
-     "root": null
+     "root": "دعع"
     },
     {
      "ar": "ٱلْيَتِيمَ",
@@ -3025,7 +3450,7 @@
    "surah": 107,
    "surahName": "Al-Ma'un",
    "ayah": 3,
-   "unlockDay": 22,
+   "unlockDay": 23,
    "words": [
     {
      "ar": "وَلَا",
@@ -3035,7 +3460,7 @@
     {
      "ar": "يَحُضُّ",
      "en": "feel the urge",
-     "root": null
+     "root": "حضض"
     },
     {
      "ar": "عَلَىٰ",
@@ -3058,17 +3483,17 @@
    "surah": 107,
    "surahName": "Al-Ma'un",
    "ayah": 4,
-   "unlockDay": 22,
+   "unlockDay": 24,
    "words": [
     {
      "ar": "فَوَيْلٌۭ",
      "en": "So woe",
-     "root": "وئل"
+     "root": "وءل"
     },
     {
      "ar": "لِّلْمُصَلِّينَ",
      "en": "to those who pray",
-     "root": null
+     "root": "صلو"
     }
    ]
   },
@@ -3076,7 +3501,7 @@
    "surah": 107,
    "surahName": "Al-Ma'un",
    "ayah": 5,
-   "unlockDay": 23,
+   "unlockDay": 24,
    "words": [
     {
      "ar": "ٱلَّذِينَ",
@@ -3096,7 +3521,7 @@
     {
      "ar": "صَلَاتِهِمْ",
      "en": "their prayers",
-     "root": null
+     "root": "صلو"
     },
     {
      "ar": "سَاهُونَ",
@@ -3109,7 +3534,7 @@
    "surah": 107,
    "surahName": "Al-Ma'un",
    "ayah": 6,
-   "unlockDay": 21,
+   "unlockDay": 16,
    "words": [
     {
      "ar": "ٱلَّذِينَ",
@@ -3124,7 +3549,7 @@
     {
      "ar": "يُرَآءُونَ",
      "en": "make show",
-     "root": null
+     "root": "راي"
     }
    ]
   },
@@ -3132,7 +3557,7 @@
    "surah": 107,
    "surahName": "Al-Ma'un",
    "ayah": 7,
-   "unlockDay": 23,
+   "unlockDay": 24,
    "words": [
     {
      "ar": "وَيَمْنَعُونَ",
@@ -3142,7 +3567,7 @@
     {
      "ar": "ٱلْمَاعُونَ",
      "en": "[the] small kindnesses",
-     "root": "معن"
+     "root": "عون"
     }
    ]
   },
@@ -3160,7 +3585,7 @@
     {
      "ar": "قُرَيْشٍ",
      "en": "(of the) Quraish",
-     "root": null
+     "root": "قرش"
     }
    ]
   },
@@ -3168,7 +3593,7 @@
    "surah": 106,
    "surahName": "Quraysh",
    "ayah": 2,
-   "unlockDay": 24,
+   "unlockDay": 25,
    "words": [
     {
      "ar": "إِۦلَـٰفِهِمْ",
@@ -3183,12 +3608,12 @@
     {
      "ar": "ٱلشِّتَآءِ",
      "en": "(of) winter",
-     "root": null
+     "root": "شتو"
     },
     {
      "ar": "وَٱلصَّيْفِ",
      "en": "and summer",
-     "root": "الف"
+     "root": "صيف"
     }
    ]
   },
@@ -3196,7 +3621,7 @@
    "surah": 106,
    "surahName": "Quraysh",
    "ayah": 3,
-   "unlockDay": 24,
+   "unlockDay": 25,
    "words": [
     {
      "ar": "فَلْيَعْبُدُوا۟",
@@ -3206,7 +3631,7 @@
     {
      "ar": "رَبَّ",
      "en": "(the) Lord",
-     "root": null
+     "root": "ربب"
     },
     {
      "ar": "هَـٰذَا",
@@ -3224,7 +3649,7 @@
    "surah": 106,
    "surahName": "Quraysh",
    "ayah": 4,
-   "unlockDay": 25,
+   "unlockDay": 26,
    "words": [
     {
      "ar": "ٱلَّذِىٓ",
@@ -3267,7 +3692,7 @@
    "surah": 105,
    "surahName": "Al-Fil",
    "ayah": 1,
-   "unlockDay": 26,
+   "unlockDay": 27,
    "words": [
     {
      "ar": "أَلَمْ",
@@ -3277,12 +3702,12 @@
     {
      "ar": "تَرَ",
      "en": "you seen",
-     "root": null
+     "root": "راي"
     },
     {
      "ar": "كَيْفَ",
      "en": "how",
-     "root": null
+     "root": "كيف"
     },
     {
      "ar": "فَعَلَ",
@@ -3292,7 +3717,7 @@
     {
      "ar": "رَبُّكَ",
      "en": "your Lord",
-     "root": null
+     "root": "ربب"
     },
     {
      "ar": "بِأَصْحَـٰبِ",

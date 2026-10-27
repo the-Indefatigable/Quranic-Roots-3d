@@ -28,7 +28,8 @@ export function SignupModal() {
 
   useEffect(() => {
     if (isLoading || user) return; // signed-in users never see it
-    if (pathname?.startsWith('/lesson') || pathname?.startsWith('/quiz/')) return;
+    // Never interrupt a lesson or the salah path; the path asks at the right moment itself.
+    if (pathname?.startsWith('/lesson') || pathname?.startsWith('/quiz/') || pathname?.startsWith('/salah') || pathname === '/quiz') return;
     try {
       if (localStorage.getItem(SEEN_KEY) === today()) return; // already shown today
     } catch { /* ignore */ }
@@ -92,7 +93,7 @@ export function SignupModal() {
 
                 <h2 className="font-heading text-2xl mb-2" style={{ color: '#F0E8D8' }}>Keep your progress</h2>
                 <p className="text-sm leading-relaxed mb-6" style={{ color: '#A09F9B' }}>
-                  QuRoots is free. Create an account to save everything and learn a little every day.
+                  Save your progress and pick up on any device. An account is free.
                 </p>
 
                 <ul className="text-left space-y-2.5 mb-7">
