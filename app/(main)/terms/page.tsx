@@ -4,11 +4,11 @@ import Link from 'next/link';
 export const metadata: Metadata = {
   title: 'Terms of Use — QuRoots',
   description:
-    'The terms you agree to when using QuRoots: what you can expect from us, what we expect from you, and how donations work.',
+    'The terms you agree to when using QuRoots: what you can expect from us, what we expect from you, and how purchases and donations work.',
   alternates: { canonical: '/terms' },
 };
 
-const UPDATED = '27 July 2026';
+const UPDATED = '27 October 2026';
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -31,9 +31,10 @@ export default function TermsPage() {
 
       <Section title="What QuRoots is">
         <p>
-          A free platform for learning Quranic Arabic — a grammar course, a word-by-word Quran
-          reader, a dictionary of Arabic roots, and related study tools. It is free to use, and
-          there is no paid tier.
+          A platform for learning Quranic Arabic — a grammar course, a word-by-word Quran reader, a
+          dictionary of Arabic roots, and related study tools. Almost all of it is free. The one
+          paid product is the full 30-day &ldquo;Understand your salah&rdquo; path, whose first
+          seven days are also free.
         </p>
       </Section>
 
@@ -69,14 +70,19 @@ export default function TermsPage() {
 
       <Section title="Content and copyright">
         <p>
-          The Quranic text is the revealed word of Allah and is in the public domain. Translations
-          and tafsir are reproduced from their respective sources.
+          The Quranic text is the revealed word of Allah. Translations, tafsir, recitation and fonts
+          belong to their authors and publishers and are credited on our{' '}
+          <Link href="/sources" className="text-primary hover:underline">Sources &amp; Credits</Link>{' '}
+          page.
         </p>
         <p>
-          The linguistic dataset — conjugation tables, derivational forms, glosses, root and
-          reference mappings — along with the course material, site design and source code, was
-          compiled and built for QuRoots and remains our copyright. You are welcome to use the
-          site to learn and to share what you learn. You may not republish the dataset or the
+          Root and morphology data is derived from the Quranic Arabic Corpus and shared under its
+          licence, the GNU General Public License v3; the details are on the Sources page.
+        </p>
+        <p>
+          The course material, the salah path, lessons, quizzes, explanations, videos, site design
+          and source code were written and built for QuRoots and remain our copyright. You are
+          welcome to use the site to learn and to share what you learn. You may not republish our
           course content as your own.
         </p>
         <p>
@@ -85,11 +91,23 @@ export default function TermsPage() {
         </p>
       </Section>
 
+      <Section title="Purchases">
+        <p>
+          The full salah path is a one-time purchase that gives the account you bought it with
+          lifetime access to all 30 days. Payments are processed by Stripe; we never see your card
+          details.
+        </p>
+        <p>
+          If it isn&rsquo;t for you, email us within 14 days of buying and we will refund you in
+          full, no questions asked.
+        </p>
+      </Section>
+
       <Section title="Donations">
         <p>
           Donations are voluntary and support the running of the site. They are a gift, not a
-          purchase — they do not buy features, and everything on QuRoots is available whether you
-          donate or not. Supporters get a badge, which is a thank-you rather than a product.
+          purchase — they do not buy features or unlock the salah path. Supporters get a badge,
+          which is a thank-you rather than a product.
         </p>
         <p>
           Payments are processed by Stripe. Because donations are gifts rather than purchases,
@@ -139,6 +157,10 @@ export default function TermsPage() {
         See also our{' '}
         <Link href="/privacy" className="text-primary hover:underline">
           Privacy Policy
+        </Link>{' '}
+        and{' '}
+        <Link href="/sources" className="text-primary hover:underline">
+          Sources &amp; Credits
         </Link>
         .
       </div>
