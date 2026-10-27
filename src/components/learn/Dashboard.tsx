@@ -16,6 +16,7 @@ interface DashboardData {
   coverage: { percent: number; tokensRecognized: number; totalTokens: number; wordsLearned: number; rootsLearned: number };
   review: { due: number; deckSize: number };
   digestOptIn: boolean;
+  remindersOptIn: boolean;
   nextLesson: { lessonId: string; lessonTitle: string; unitTitle: string; unitColor: string; unitEmoji: string } | null;
   league: { tier: number; name: string; rank: number | null; weeklyXp: number } | null;
 }
@@ -192,9 +193,10 @@ export function Dashboard() {
   }
 
   const firstName = (data?.user.name ?? user?.name ?? '').split(' ')[0];
-  const enableDigest = async () => {
-    setData((d) => (d ? { ...d, digestOptIn: true } : d));
-    await fetch('/api/digest/subscribe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ optIn: true }) }).catch(() => {});
+  // Each kind of email is its own yes, recorded with the words shown here (see src/lib/email.ts).
+  const optIn = async (kind: 'weekly' | 'reminders') => {
+    setData((d) => (d ? { ...d, ...(kind === 'weekly' ? { digestOptIn: true } : { remindersOptIn: true }) } : d));
+    await fetch('/api/digest/subscribe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ optIn: true, kind, source: 'dashboard' }) }).catch(() => {});
   };
   const hideDigest = () => { try { localStorage.setItem('digestNudgeDismissed', '1'); } catch { /* storage unavailable */ } setDigestHidden(true); };
 
@@ -228,16 +230,25 @@ export function Dashboard() {
           {data?.league && (
             <Row href="/leaderboard" icon={<TrophyIcon className="w-5 h-5" />} title={`${data.league.name} league`} sub={`${data.league.rank ? `#${data.league.rank}` : 'Unranked'} · ${data.league.weeklyXp} XP this week`} />
           )}
-          {data && !data.digestOptIn && !digestHidden && (
+          {data && (!data.digestOptIn || !data.remindersOptIn) && !digestHidden && (
             <section className="flex items-start gap-3 p-5 rounded-2xl" style={{ ...cardStyle, borderStyle: 'dashed', borderColor: 'rgba(212,162,70,0.3)' }}>
               <MailIcon className="w-5 h-5 mt-0.5 shrink-0" />
-              <div className="flex-1">
-                <p className="text-[15px] font-semibold text-text">The Friday email</p>
-                <p className="text-[14px] text-text-tertiary mb-3">One ayah and what&rsquo;s new, once a week.</p>
-                <div className="flex gap-2">
-                  <button onClick={enableDigest} className="h-9 px-4 rounded-full text-[14px] font-semibold" style={{ background: GOLD, color: '#1a1206' }}>Subscribe</button>
-                  <button onClick={hideDigest} className="h-9 px-3 text-[14px] text-text-tertiary">Not now</button>
-                </div>
+              <div className="flex-1 space-y-4">
+                {!data.digestOptIn && (
+                  <div>
+                    <p className="text-[15px] font-semibold text-text">The Friday email</p>
+                    <p className="text-[14px] text-text-tertiary mb-2">One ayah, the root inside it, and what&rsquo;s new on QuRoots. Once a week. Unsubscribe any time.</p>
+                    <button onClick={() => optIn('weekly')} className="h-9 px-4 rounded-full text-[14px] font-semibold" style={{ background: GOLD, color: '#1a1206' }}>Yes, send it</button>
+                  </div>
+                )}
+                {!data.remindersOptIn && (
+                  <div>
+                    <p className="text-[15px] font-semibold text-text">Lesson reminders</p>
+                    <p className="text-[14px] text-text-tertiary mb-2">A short email on days your next salah lesson is waiting. Never more than one a day. Unsubscribe any time.</p>
+                    <button onClick={() => optIn('reminders')} className="h-9 px-4 rounded-full text-[14px] font-semibold" style={{ background: GOLD, color: '#1a1206' }}>Yes, remind me</button>
+                  </div>
+                )}
+                <button onClick={hideDigest} className="h-9 text-[14px] text-text-tertiary">Not now</button>
               </div>
             </section>
           )}

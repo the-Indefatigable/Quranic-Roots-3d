@@ -5,11 +5,7 @@
       "schedule": "0 13 * * 5"
     },
     {
-      "path": "/api/cron/streak-saver",
-      "schedule": "0 16 * * *"
-    },
-    {
-      "path": "/api/cron/daily-nudge",
+      "path": "/api/cron/daily-reminder",
       "schedule": "0 15 * * *"
     }
   ]

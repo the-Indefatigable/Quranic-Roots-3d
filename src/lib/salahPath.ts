@@ -55,3 +55,20 @@ export function pathOffer() {
   };
 }
 export type PathOfferInfo = ReturnType<typeof pathOffer>;
+
+/** The last salah day each user finished (from growth_events), for emails that follow their progress. */
+export async function pathProgressByUser(): Promise<Map<string, { day: number; lastAt: Date }>> {
+  const { sql } = await import('drizzle-orm');
+  const rows = (await db.execute(sql`
+    SELECT user_id, max(day)::int AS day, max(created_at) AS last_at
+    FROM growth_events WHERE name = 'day_complete' AND user_id IS NOT NULL AND day IS NOT NULL
+    GROUP BY user_id`)) as unknown as { user_id: string; day: number; last_at: string }[];
+  return new Map(rows.map((r) => [r.user_id, { day: r.day, lastAt: new Date(r.last_at) }]));
+}
+
+/** The first line a day unlocks, in Arabic with its word-by-word English, for emails. */
+export function previewLine(day: number): { ar: string; en: string } | null {
+  const line = PATH.lines.find((l) => l.unlockDay === day) ?? (day === 7 ? PATH.lines.find((l) => l.surah === 1) : undefined);
+  if (!line) return null;
+  return { ar: line.words.map((w) => w.ar).join(' '), en: line.words.map((w) => w.en ?? '').filter(Boolean).join(' · ') };
+}

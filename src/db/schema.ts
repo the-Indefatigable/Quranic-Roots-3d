@@ -193,6 +193,7 @@ export const users = pgTable('users', {
   userLevel: integer('user_level').default(1),
   levelProgress: integer('level_progress').default(0),
   digestOptIn: boolean('digest_opt_in').default(false).notNull(),
+  remindersOptIn: boolean('reminders_opt_in').default(false).notNull(), // daily lesson reminders, separate consent from the Friday email
   unsubscribeToken: uuid('unsubscribe_token').defaultRandom().notNull(),
   // ── Founding Supporter (one-time lifetime purchase via LemonSqueezy) ──
   isSupporter: boolean('is_supporter').default(false).notNull(),
@@ -680,4 +681,24 @@ export const growthEvents = pgTable('growth_events', {
   index('growth_events_name_created_idx').on(table.name, table.createdAt),
   index('growth_events_visitor_idx').on(table.visitorId),
   index('growth_events_user_idx').on(table.userId),
+]);
+
+
+// ── Email consents ───────────────────────────────────────────
+/**
+ * Proof of every email permission: one row each time someone says yes or no to a kind of
+ * email ('weekly' = the Friday email, 'reminders' = daily lesson reminders), with the exact
+ * words they were shown and where. Canada's CASL and the GDPR both expect consent to be
+ * provable; users.digestOptIn / remindersOptIn hold the current state.
+ */
+export const emailConsents = pgTable('email_consents', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  kind: text('kind').notNull(),
+  granted: boolean('granted').notNull(),
+  wording: text('wording').notNull(),
+  source: text('source').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => [
+  index('email_consents_user_idx').on(table.userId),
 ]);

@@ -134,6 +134,7 @@ export async function GET() {
         deckSize: reviewCounts?.total ?? 0,
       },
       digestOptIn: user?.digestOptIn ?? false,
+      remindersOptIn: user?.remindersOptIn ?? false,
       nextLesson: nextLessonResult[0] || null,
       league: leagueResult[0]
         ? { tier: leagueResult[0].tier, name: LEAGUE_NAMES[leagueResult[0].tier] || 'Bronze', rank: leagueResult[0].rank, weeklyXp: leagueResult[0].weeklyXp }
