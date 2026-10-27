@@ -93,6 +93,9 @@ export function PathOffer({ offer, variant, pct, returnTo = '/salah', day }: { o
       </div>
 
       <p className="mt-5 text-[14px] leading-relaxed" style={{ color: SOFT }}>
+        Buying it for someone else? <a href="/gift" className="underline underline-offset-2" style={{ color: GOLD }}>Give it as a gift</a>.
+      </p>
+      <p className="mt-2 text-[14px] leading-relaxed" style={{ color: SOFT }}>
         Can&rsquo;t afford it right now? Email <a href="mailto:salam@quroots.com?subject=A%20free%20place%20on%20the%20salah%20path" className="underline underline-offset-2" style={{ color: GOLD }}>salam@quroots.com</a> and we&rsquo;ll give you a place for free. No questions asked.
       </p>
       <p className="mt-4 pt-4 text-[13px] leading-relaxed" style={{ color: QUIET, borderTop: '1px solid rgba(255,255,255,.07)' }}>

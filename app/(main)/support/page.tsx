@@ -148,6 +148,17 @@ export default function SupportPage() {
         </div>
       </section>
 
+      {/* ── Sponsor a learner ── */}
+      <section className="text-center mb-12">
+        <div className="max-w-xl mx-auto rounded-3xl p-6" style={{ background: 'rgba(212,162,70,0.06)', border: '1px solid rgba(212,162,70,0.25)' }}>
+          <p className="font-heading text-2xl mb-2" style={{ color: '#F0E8D8' }}>Give someone their salah</p>
+          <p className="text-sm leading-relaxed mb-5" style={{ color: '#A09F9B' }}>
+            Pay for a place on the 30-day salah path for someone who can&rsquo;t afford it, or gift it to someone you love.
+          </p>
+          <Link href="/gift" className="btn-primary inline-block px-6">Sponsor or gift a place</Link>
+        </div>
+      </section>
+
       {/* ── Closing reassurance ── */}
       <section className="text-center">
         <p className="text-sm leading-relaxed max-w-md mx-auto" style={{ color: '#9A9893' }}>

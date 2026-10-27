@@ -4,6 +4,9 @@ import { db } from '@/db';
 import type Stripe from 'stripe';
 import { users } from '@/db/schema';
 import { grantPathPurchase } from '@/lib/pathPurchase';
+import { issueGiftCode } from '@/lib/gifts';
+import { giftReady } from '@/lib/emails';
+import { sendMail } from '@/lib/email';
 import { eq } from 'drizzle-orm';
 import { PATH_ORDER_PREFIX } from '@/lib/salahPath';
 
@@ -56,6 +59,25 @@ export async function POST(request: NextRequest) {
       } catch (err) {
         console.error('[stripe] failed to unlock the salah path:', err);
         return NextResponse.json({ error: 'DB update failed' }, { status: 500 });
+      }
+      return NextResponse.json({ received: true });
+    }
+
+    // A gift or sponsorship becomes a single-use code; the buyer is emailed the link.
+    if (s.metadata?.kind === 'salah_gift' || s.metadata?.kind === 'salah_sponsor') {
+      try {
+        const stripe = getStripe()!;
+        const { code, kind } = await issueGiftCode(stripe, s);
+        const to = s.customer_details?.email || s.customer_email;
+        if (to && !s.metadata?.gift_emailed) {
+          const mail = giftReady({ kind, code, url: `https://quroots.com/gift/${code}` });
+          await sendMail({ to, subject: mail.subject, html: mail.html });
+          await stripe.checkout.sessions.update(s.id, { metadata: { ...s.metadata, gift_emailed: '1' } }).catch(() => {});
+        }
+        console.log(`[stripe] ${kind} code ${code} issued (session ${s.id})`);
+      } catch (err) {
+        console.error('[stripe] failed to issue a gift code:', err);
+        return NextResponse.json({ error: 'Gift failed' }, { status: 500 });
       }
       return NextResponse.json({ received: true });
     }

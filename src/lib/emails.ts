@@ -127,3 +127,27 @@ export function confirmReminders(o: { day: number; pct: number; nextTitle: strin
     html: layout({ preheader: `You understand ${pct}% of your salah. One tap to keep going.`, body, list: 'reminders', token, reason: 'You&rsquo;re getting this one email because someone asked for QuRoots lesson reminders with this address.' }),
   };
 }
+
+// ── Gifts ────────────────────────────────────────────────────────────────────────────────────────
+
+export function giftReady(o: { kind: 'gift' | 'sponsor'; url: string; code: string }) {
+  const { kind, url, code } = o;
+  const body = kind === 'gift' ? [
+    row(p('Salaam,', 16, INK), '22px 30px 0'),
+    row(p('JazakAllahu khayran. Your gift is ready: the full 30-day path to understanding every word of salah, for whoever you send this link to.'), '4px 30px 0'),
+    row(`<div style="text-align:center;padding:14px 0 6px">${button(url, 'Open the gift link')}</div>
+      <p style="margin:12px 0 0;text-align:center;font-size:14px;line-height:1.6;color:${SOFT}">Send them this link: <a href="${url}" style="color:${GOLD}">${esc(url.replace('https://', ''))}</a></p>
+      <p style="margin:8px 0 0;text-align:center;font-size:13px;color:${QUIET}">Gift code ${esc(code)} · works once, for one person</p>`, '0 30px 6px'),
+    row(p('The Prophet ﷺ said: “Whoever guides someone to goodness will have a reward like the one who does it.” (Muslim)', 15), '14px 30px 4px'),
+  ] : [
+    row(p('Salaam,', 16, INK), '22px 30px 0'),
+    row(p('JazakAllahu khayran. You have paid for a free place on the salah path. The next person who writes to us saying they can&rsquo;t afford it will get your place, and every word of their salah.'), '4px 30px 0'),
+    row(p('The Prophet ﷺ said: “Whoever guides someone to goodness will have a reward like the one who does it.” (Muslim)', 15), '0 30px 4px'),
+    row(`<p style="margin:6px 0 0;font-size:13px;color:${QUIET}">Place code ${esc(code)}</p>`, '0 30px 6px'),
+  ];
+  return {
+    subject: kind === 'gift' ? 'Your gift is ready to send' : 'You’ve given someone their salah',
+    html: layout({ preheader: kind === 'gift' ? 'One link, all 30 days, for whoever you send it to.' : 'A free place for someone who can’t afford it.', body: body.join(''), list: 'reminders',
+      reason: 'You&rsquo;re getting this because you bought this on QuRoots. Stripe sends your receipt separately.' }),
+  };
+}

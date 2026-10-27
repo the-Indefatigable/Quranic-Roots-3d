@@ -185,9 +185,15 @@ function Done({ day, pct, score, quizLen, offer }: { day: number; pct: number; s
   const text = day === 7
     ? 'I now understand every word of Al-Fatiha. Learning the roots of my salah on QuRoots:'
     : `Day ${day} of 30: I now understand ${pct}% of the root words in my salah. Learning on QuRoots:`;
-  const url = 'https://quroots.com/salah?src=share';
+  const url = `https://quroots.com/s/${day}`;
   const share = async () => {
     track('share', { day });
+    // Phones can share the progress card itself, ready for an Instagram or WhatsApp story.
+    try {
+      const blob = await (await fetch(`/api/og/salah?d=${day}&story=1`)).blob();
+      const file = new File([blob], `quroots-day-${day}.png`, { type: 'image/png' });
+      if (navigator.canShare?.({ files: [file] })) { await navigator.share({ files: [file], text: `${text} ${url}` }); return; }
+    } catch { /* cancelled or unsupported: share the link instead */ }
     if (navigator.share) { try { await navigator.share({ text, url }); return; } catch { /* cancelled */ } }
     window.open(`https://wa.me/?text=${encodeURIComponent(`${text} ${url}`)}`, '_blank');
   };

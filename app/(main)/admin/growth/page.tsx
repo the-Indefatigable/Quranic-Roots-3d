@@ -2,6 +2,8 @@ import Link from 'next/link';
 import { sql } from 'drizzle-orm';
 import { db, dbQuery } from '@/db';
 import { relativeDay } from '@/lib/adminStats';
+import { getStripe } from '@/lib/stripe';
+import { sponsorPool } from '@/lib/gifts';
 
 export const dynamic = 'force-dynamic';
 
@@ -184,6 +186,8 @@ export default async function AdminGrowthPage({ searchParams }: { searchParams: 
         </div>
       </section>
 
+      <SponsorPool />
+
       <section className="rounded-2xl border border-border p-5" style={{ background: 'var(--color-surface)' }}>
         <h3 className="text-sm font-semibold text-text mb-4">Latest activity</h3>
         <Table head={['When', 'What', 'Who', 'Source']} rows={recent.map((r) => [relativeDay(r.created_at), label(r.name, r.day), r.user_name || r.email || 'guest', r.source ?? '—'])} empty="Nothing yet. Activity shows up here as soon as visitors use the path." />
@@ -205,5 +209,20 @@ function Table({ head, rows, empty }: { head: string[]; rows: (string | number)[
         <tbody>{rows.map((r, i) => <tr key={i} className="border-t border-border">{r.map((c, j) => <td key={j} className={`py-2 tabular-nums ${j ? 'text-right text-text-secondary' : 'text-left text-text'}`}>{c}</td>)}</tr>)}</tbody>
       </table>
     </div>
+  );
+}
+
+// Places people have paid for, waiting for someone who asks for a free place.
+async function SponsorPool() {
+  const stripe = getStripe();
+  const pool = stripe ? await sponsorPool(stripe).catch(() => []) : [];
+  return (
+    <section className="rounded-2xl border border-border p-5" style={{ background: 'var(--color-surface)' }}>
+      <h3 className="text-sm font-semibold text-text mb-1">Sponsored places ready to give</h3>
+      <p className="text-xs text-text-tertiary mb-4">When someone emails asking for a free place, reply with one of these links. Each works once.</p>
+      {pool.length ? (
+        <ul className="space-y-1.5 text-sm">{pool.map((p) => <li key={p.code} className="font-mono text-text-secondary select-all">https://quroots.com/gift/{p.code}</li>)}</ul>
+      ) : <p className="text-sm text-text-tertiary">None yet. Places appear here when someone sponsors one at /gift.</p>}
+    </section>
   );
 }

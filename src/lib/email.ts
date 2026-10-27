@@ -34,7 +34,7 @@ export function button(href: string, label: string) {
   return `<a href="${href}" style="display:inline-block;background:${GOLD};color:#1a1206;font-weight:bold;font-size:16px;line-height:1;text-decoration:none;padding:16px 30px;border-radius:14px;font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif">${esc(label)}</a>`;
 }
 
-export function layout(opts: { preheader: string; body: string; list: MailList; token: string; credit?: string; reason?: string }) {
+export function layout(opts: { preheader: string; body: string; list: MailList; token?: string; credit?: string; reason?: string }) {
   const { preheader, body, list, token, credit, reason } = opts;
   const why = list === 'weekly' ? 'the Friday email' : 'lesson reminders';
   const address = process.env.MAIL_POSTAL_ADDRESS;
@@ -48,8 +48,8 @@ export function layout(opts: { preheader: string; body: string; list: MailList; 
   ${body}
   <tr><td style="padding:22px 30px 26px;border-top:1px solid rgba(255,255,255,0.06);font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif">
     <p style="margin:0 0 8px;font-size:12px;line-height:1.6;color:${QUIET}">${reason ?? `You&rsquo;re getting this because you said yes to ${why} on QuRoots.
-      <a href="${unsubscribeUrl(token, list)}" style="color:${QUIET};text-decoration:underline">Stop ${why}</a> ·
-      <a href="${unsubscribeUrl(token, 'all')}" style="color:${QUIET};text-decoration:underline">stop all QuRoots emails</a>`}</p>
+      <a href="${unsubscribeUrl(token ?? '', list)}" style="color:${QUIET};text-decoration:underline">Stop ${why}</a> ·
+      <a href="${unsubscribeUrl(token ?? '', 'all')}" style="color:${QUIET};text-decoration:underline">stop all QuRoots emails</a>`}</p>
     <p style="margin:0 0 8px;font-size:12px;line-height:1.6;color:${QUIET}">Meanings are simplified for learners and may contain errors. For religious guidance, ask a qualified scholar.${credit ? ` ${esc(credit)}` : ''}</p>
     <p style="margin:0;font-size:12px;line-height:1.6;color:${QUIET}">QuRoots${address ? ` · ${esc(address)}` : ''} · <a href="mailto:salam@quroots.com" style="color:${QUIET}">salam@quroots.com</a></p>
   </td></tr>
@@ -62,7 +62,7 @@ export const p = (html: string, size = 16, color = SOFT) => `<p style="margin:0 
 export const row = (inner: string, pad = '18px 30px 0') => `<tr><td style="padding:${pad}">${inner}</td></tr>`;
 export const COLORS = { GOLD, INK, SOFT, QUIET };
 
-export async function sendMail(opts: { to: string; subject: string; html: string; token: string; list: MailList }): Promise<{ ok: boolean; error?: string }> {
+export async function sendMail(opts: { to: string; subject: string; html: string; token?: string; list?: MailList }): Promise<{ ok: boolean; error?: string }> {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) return { ok: false, error: 'RESEND_API_KEY not configured' };
   const res = await fetch('https://api.resend.com/emails', {
@@ -74,11 +74,12 @@ export async function sendMail(opts: { to: string; subject: string; html: string
       to: [opts.to],
       subject: opts.subject,
       html: opts.html,
-      headers: {
-        // Gmail and Yahoo expect one-click unsubscribe from anyone sending regular email.
+      // Gmail and Yahoo expect one-click unsubscribe from anyone sending regular email. Receipts
+      // and gift links (no list) are one-off messages the person asked for.
+      ...(opts.token && opts.list ? { headers: {
         'List-Unsubscribe': `<${unsubscribeUrl(opts.token, opts.list)}>, <mailto:salam@quroots.com?subject=unsubscribe>`,
         'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
-      },
+      } } : {}),
     }),
   });
   return res.ok ? { ok: true } : { ok: false, error: `${res.status} ${(await res.text()).slice(0, 120)}` };

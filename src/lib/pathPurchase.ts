@@ -55,27 +55,35 @@ type PaidSession = Pick<Stripe.Checkout.Session, 'id' | 'amount_total' | 'paymen
 export async function grantPathPurchase(s: PaidSession): Promise<{ userId: string; email: string | null }> {
   const m = s.metadata ?? {};
   const email = (s.customer_details?.email || s.customer_email || '').trim().toLowerCase() || null;
-  let userId = m.user_id || s.client_reference_id || null;
+  return grantPath({ order: `${PATH_ORDER_PREFIX}${s.id}`, userId: m.user_id || s.client_reference_id || null, email, name: s.customer_details?.name ?? null,
+    event: { visitorId: m.vid || null, value: s.amount_total ?? null, source: m.source || null, campaign: m.campaign || null, variant: m.variant || null } });
+}
 
+/**
+ * Unlock the path on an account (found by id, else by email, else created) under an order id.
+ * Purchases use path:<checkout session>, redeemed gifts path:gift_<promotion code>.
+ */
+export async function grantPath(o: { order: string; userId?: string | null; email: string | null; name?: string | null;
+  event: { visitorId: string | null; value: number | null; source: string | null; campaign: string | null; variant: string | null } }): Promise<{ userId: string; email: string | null }> {
+  let userId = o.userId ?? null;
+  const email = o.email;
   if (!userId) {
-    if (!email) throw new Error(`checkout ${s.id} has neither a user nor an email`);
+    if (!email) throw new Error(`order ${o.order} has neither a user nor an email`);
     const [existing] = await db.select({ id: users.id }).from(users).where(sql`lower(${users.email}) = ${email}`).limit(1);
     if (existing) userId = existing.id;
     else {
-      const [created] = await db.insert(users).values({ email, name: s.customer_details?.name ?? null })
-        .onConflictDoNothing().returning({ id: users.id });
+      const [created] = await db.insert(users).values({ email, name: o.name ?? null }).onConflictDoNothing().returning({ id: users.id });
       userId = created?.id ?? (await db.select({ id: users.id }).from(users).where(sql`lower(${users.email}) = ${email}`).limit(1))[0]?.id ?? null;
     }
-    if (!userId) throw new Error(`could not create an account for checkout ${s.id}`);
+    if (!userId) throw new Error(`could not create an account for ${o.order}`);
   }
 
-  const order = `${PATH_ORDER_PREFIX}${s.id}`;
   const [current] = await db.select({ order: users.supporterOrderId, email: users.email }).from(users).where(eq(users.id, userId)).limit(1);
-  if (current?.order !== order) {
-    await db.update(users).set({ isSupporter: true, supporterSince: new Date(), supporterOrderId: order, updatedAt: new Date() }).where(eq(users.id, userId));
+  if (current?.order !== o.order) {
+    await db.update(users).set({ isSupporter: true, supporterSince: new Date(), supporterOrderId: o.order, updatedAt: new Date() }).where(eq(users.id, userId));
     await db.insert(growthEvents).values({
-      name: 'purchase', visitorId: m.vid || `user:${userId}`, userId, value: s.amount_total ?? null,
-      source: m.source || null, campaign: m.campaign || null, variant: m.variant || null, path: '/salah',
+      name: 'purchase', visitorId: o.event.visitorId || `user:${userId}`, userId, value: o.event.value,
+      source: o.event.source, campaign: o.event.campaign, variant: o.event.variant, path: '/salah',
     }).catch((err) => console.warn('[path] purchase event not recorded:', (err as Error).message));
   }
   return { userId, email: current?.email ?? email };
