@@ -38,10 +38,10 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: 'QuRoots — Quranic Arabic Learning Platform',
+    default: 'QuRoots (Quran Roots): Understand the Arabic of the Quran, Root by Root',
     template: '%s | QuRoots',
   },
-  description: 'Explore Quranic Arabic roots, read the Quran word-by-word, and study verb conjugations and morphology. A comprehensive platform for learning Quranic Arabic.',
+  description: 'QuRoots (Quran Roots) teaches the Arabic roots behind every word of the Quran: understand your salah in 30 days, read word by word, and explore all 1,716 Quranic roots.',
   keywords: ['Quranic Arabic', 'Arabic verb roots', 'learn Quran Arabic', 'Arabic conjugation', 'Arabic morphology', 'sarf', 'Quran reader', 'word by word Quran', 'Quranic vocabulary'],
   authors: [{ name: 'QuRoots' }],
   metadataBase: new URL('https://quroots.com'),
@@ -87,20 +87,36 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         '@id': 'https://quroots.com/#website',
         'url': 'https://quroots.com/',
         'name': 'QuRoots',
-        'description': 'Explore Quranic Arabic roots, read the Quran, and study verb conjugations.',
-        'publisher': {
-          '@type': 'Organization',
-          'name': 'QuRoots',
-          'logo': {
-            '@type': 'ImageObject',
-            'url': 'https://quroots.com/icon-512.png',
-          },
-        },
+        'alternateName': ['Quran Roots', 'QuranRoots', 'Qu Roots'],
+        'description': 'Understand the Arabic of the Quran, root by root.',
+        'publisher': { '@id': 'https://quroots.com/#organization' },
         'potentialAction': {
           '@type': 'SearchAction',
           'target': 'https://quroots.com/search?q={search_term_string}',
           'query-input': 'required name=search_term_string',
         },
+      },
+      {
+        '@type': 'Organization',
+        '@id': 'https://quroots.com/#organization',
+        'name': 'QuRoots',
+        'alternateName': ['Quran Roots', 'QuranRoots'],
+        'url': 'https://quroots.com/',
+        'logo': { '@type': 'ImageObject', 'url': 'https://quroots.com/icon-512.png' },
+        'founder': { '@type': 'Person', 'name': 'Mohammad Alam' },
+        'sameAs': ['https://www.youtube.com/@Quroots', 'https://www.instagram.com/quroots', 'https://www.tiktok.com/@quroots'],
+      },
+      {
+        '@type': 'Course',
+        '@id': 'https://quroots.com/salah#course',
+        'name': 'Understand your salah in 30 days',
+        'description': 'Learn the Arabic roots behind Al-Fatiha and the short surahs you pray with, two or three a day, until you understand every word of your salah.',
+        'url': 'https://quroots.com/salah',
+        'provider': { '@id': 'https://quroots.com/#organization' },
+        'inLanguage': 'en',
+        'isAccessibleForFree': false,
+        'offers': { '@type': 'Offer', 'price': '29', 'priceCurrency': 'USD', 'category': 'Paid', 'url': 'https://quroots.com/salah' },
+        'hasCourseInstance': { '@type': 'CourseInstance', 'courseMode': 'Online', 'courseWorkload': 'PT5M' },
       },
       {
         '@type': 'SoftwareApplication',

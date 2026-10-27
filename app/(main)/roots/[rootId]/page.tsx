@@ -26,8 +26,11 @@ export async function generateMetadata({ params }: Props) {
   if (!rootRow[0]) return { title: 'Root Not Found' };
   const r = rootRow[0];
   const url = `https://quroots.com/roots/${encodeURIComponent(r.root)}`;
-  const title = `${r.root} (${r.meaning}) — Quranic Arabic Root, Verb Forms & Occurrences`;
-  const description = `Study the Quranic Arabic root ${r.root} meaning "${r.meaning}". ${r.totalFreq} occurrences in the Quran with all 10 verb forms, derived nouns, conjugation tables, and verse-by-verse usage.`;
+  // Searchers type the bare root (عوم) or ask what it means, so lead with both.
+  const short = (r.meaning ?? '').split(/[;,(]/)[0].trim();
+  const times = r.totalFreq ? `, ${Number(r.totalFreq).toLocaleString('en-US')} times in the Quran` : ' in the Quran';
+  const title = `${r.root} meaning: “${short}”${times}`;
+  const description = `What does the Arabic root ${r.root} (${r.root.split('').join(' ')}) mean? “${r.meaning}”. See every word that grows from it, with the ayat it appears in, word by word.`;
   return {
     title,
     description,
