@@ -3,7 +3,7 @@
  *   npx tsx scripts/preview-emails.ts <out-dir>
  */
 import fs from 'fs';
-import { WEEKLY_VERSES, weeklyEmail, dayReminder, pathOfferReminder, streakReminder } from '../src/lib/emails';
+import { WEEKLY_VERSES, weeklyEmail, dayReminder, pathOfferReminder, streakReminder, confirmReminders } from '../src/lib/emails';
 import { PATH, previewLine } from '../src/lib/salahPath';
 
 const out = process.argv[2] ?? 'out/emails';
@@ -16,6 +16,7 @@ const files: Record<string, { subject: string; html: string }> = {
   'reminder-day': dayReminder({ firstName: 'Aisha', day: 4, title: d4.title, pctNow: d3.pctSalah, line: previewLine(4), token }),
   'reminder-offer': pathOfferReminder({ firstName: 'Aisha', pctNow: PATH.days[6].pctSalah, priceCents: 2900, token, finishedFatiha: true }),
   'reminder-streak': streakReminder({ firstName: 'Aisha', streak: 5, token }),
+  'confirm-reminders': confirmReminders({ day: 1, pct: PATH.days[0].pctSalah, nextTitle: PATH.days[1].title, confirmUrl: 'https://quroots.com/api/salah/remind/confirm?t=example', token }),
 };
 for (const [name, e] of Object.entries(files)) {
   fs.writeFileSync(`${out}/${name}.html`, e.html);

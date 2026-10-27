@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSalahProgress } from './useSalahProgress';
 import { PathOffer, type Offer } from './PathOffer';
+import { RemindCard } from './RemindCard';
 import { unpack } from '@/lib/wire';
 import { track } from '@/lib/track';
 import { ChatRoom } from '@/components/community/ChatRoom';
@@ -207,6 +208,7 @@ function Done({ day, pct, score, quizLen, offer }: { day: number; pct: number; s
           <Link href="/salah" className="px-5 py-2.5 rounded-xl" style={{ color: '#A09F9B' }}>Back to the path</Link>
         </div>
       )}
+      {day < 30 && !(day === 7 && offer) && <RemindCard day={day} />}
       {day === 7 && offer && (
         <button onClick={share} className="mt-6 text-sm underline underline-offset-4" style={{ color: '#A09F9B' }}>Share Al-Fatiha with a friend</button>
       )}

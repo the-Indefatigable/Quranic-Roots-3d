@@ -108,3 +108,22 @@ export function streakReminder(o: { firstName: string; streak: number; token: st
   ].join('');
   return { subject: `Your ${streak}-day streak ends tonight`, html: layout({ preheader: 'One short lesson keeps it going.', body, list: 'reminders', token }) };
 }
+
+// ── Confirming reminders (double opt-in) ────────────────────────────────────────────────────────
+// Sent once, when someone asks for reminders at the end of a lesson. Nothing else is sent until
+// they tap the button, which also proves the address is theirs.
+
+export function confirmReminders(o: { day: number; pct: number; nextTitle: string | null; confirmUrl: string; token: string }) {
+  const { day, pct, nextTitle, confirmUrl, token } = o;
+  const body = [
+    row(p('Salaam,', 16, INK), '22px 30px 0'),
+    row(p(`You finished day ${day}. You now understand <b style="color:${INK}">${pct}%</b> of the root words in your salah.`), '4px 30px 0'),
+    row(p(nextTitle ? `Tap below and we&rsquo;ll email you when day ${day + 1} is ready: <b style="color:${INK}">${esc(nextTitle)}</b>.` : 'Tap below to get lesson reminders.'), '0 30px 0'),
+    row(`<div style="text-align:center;padding:16px 0 8px">${button(confirmUrl, 'Yes, remind me')}</div>
+      <p style="margin:12px 0 0;text-align:center;font-size:13px;line-height:1.6;color:${QUIET}">Never more than one email a day. If you didn&rsquo;t ask for this, ignore it and you won&rsquo;t hear from us.</p>`, '0 30px 12px'),
+  ].join('');
+  return {
+    subject: nextTitle ? `Confirm, and day ${day + 1} comes to you` : 'Confirm your QuRoots reminders',
+    html: layout({ preheader: `You understand ${pct}% of your salah. One tap to keep going.`, body, list: 'reminders', token, reason: 'You&rsquo;re getting this one email because someone asked for QuRoots lesson reminders with this address.' }),
+  };
+}

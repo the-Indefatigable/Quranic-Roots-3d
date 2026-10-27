@@ -3,6 +3,8 @@ import { auth } from '@/lib/auth';
 import { db } from '@/db';
 import { growthEvents } from '@/db/schema';
 import { rateLimit, clientKey } from '@/lib/rateLimit';
+import { cookies } from 'next/headers';
+import { unsign, LEARNER_COOKIE } from '@/lib/signed';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,7 +26,8 @@ export async function POST(request: NextRequest) {
     await db.insert(growthEvents).values({
       name: b.name,
       visitorId: b.vid,
-      userId: session?.user?.id ?? null,
+      // A browser that asked for reminders counts toward that account even when not signed in.
+      userId: session?.user?.id ?? unsign('learner', cookies().get(LEARNER_COOKIE)?.value) ?? null,
       day,
       source: short(b.source),
       campaign: short(b.campaign),

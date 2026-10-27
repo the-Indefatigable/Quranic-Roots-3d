@@ -34,8 +34,8 @@ export function button(href: string, label: string) {
   return `<a href="${href}" style="display:inline-block;background:${GOLD};color:#1a1206;font-weight:bold;font-size:16px;line-height:1;text-decoration:none;padding:16px 30px;border-radius:14px;font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif">${esc(label)}</a>`;
 }
 
-export function layout(opts: { preheader: string; body: string; list: MailList; token: string; credit?: string }) {
-  const { preheader, body, list, token, credit } = opts;
+export function layout(opts: { preheader: string; body: string; list: MailList; token: string; credit?: string; reason?: string }) {
+  const { preheader, body, list, token, credit, reason } = opts;
   const why = list === 'weekly' ? 'the Friday email' : 'lesson reminders';
   const address = process.env.MAIL_POSTAL_ADDRESS;
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark light"></head>
@@ -47,9 +47,9 @@ export function layout(opts: { preheader: string; body: string; list: MailList; 
   <tr><td style="padding:26px 30px 0"><span style="font-size:17px;color:${INK}">Qu<span style="color:${GOLD}">Roots</span></span></td></tr>
   ${body}
   <tr><td style="padding:22px 30px 26px;border-top:1px solid rgba(255,255,255,0.06);font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif">
-    <p style="margin:0 0 8px;font-size:12px;line-height:1.6;color:${QUIET}">You&rsquo;re getting this because you said yes to ${why} on QuRoots.
+    <p style="margin:0 0 8px;font-size:12px;line-height:1.6;color:${QUIET}">${reason ?? `You&rsquo;re getting this because you said yes to ${why} on QuRoots.
       <a href="${unsubscribeUrl(token, list)}" style="color:${QUIET};text-decoration:underline">Stop ${why}</a> ·
-      <a href="${unsubscribeUrl(token, 'all')}" style="color:${QUIET};text-decoration:underline">stop all QuRoots emails</a></p>
+      <a href="${unsubscribeUrl(token, 'all')}" style="color:${QUIET};text-decoration:underline">stop all QuRoots emails</a>`}</p>
     <p style="margin:0 0 8px;font-size:12px;line-height:1.6;color:${QUIET}">Meanings are simplified for learners and may contain errors. For religious guidance, ask a qualified scholar.${credit ? ` ${esc(credit)}` : ''}</p>
     <p style="margin:0;font-size:12px;line-height:1.6;color:${QUIET}">QuRoots${address ? ` · ${esc(address)}` : ''} · <a href="mailto:salam@quroots.com" style="color:${QUIET}">salam@quroots.com</a></p>
   </td></tr>

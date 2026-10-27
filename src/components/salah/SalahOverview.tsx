@@ -28,6 +28,15 @@ export function SalahOverview() {
 
   return (
     <div className="max-w-3xl mx-auto px-5 py-12">
+      {params.get('reminders') && (
+        <div className="mb-8 p-4 rounded-xl border text-[15px]" style={params.get('reminders') === 'on'
+          ? { borderColor: 'rgba(16,185,129,.3)', background: 'rgba(16,185,129,.07)', color: '#CFE9DD' }
+          : { borderColor: 'rgba(255,255,255,.12)', background: 'rgba(255,255,255,.03)', color: '#B5B2AC' }}>
+          {params.get('reminders') === 'on'
+            ? 'Reminders are on. We’ll email you when your next day is ready, never more than once a day.'
+            : 'That confirmation link has expired. Finish a day and ask for reminders again.'}
+        </div>
+      )}
       {params.get('purchase') === 'cancelled' && (
         <div className="mb-8 p-4 rounded-xl border text-[15px]" style={{ borderColor: 'rgba(255,255,255,.12)', background: 'rgba(255,255,255,.03)', color: '#B5B2AC' }}>
           No payment was taken. Your free days are all still here.

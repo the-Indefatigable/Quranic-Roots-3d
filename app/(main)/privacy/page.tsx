@@ -100,6 +100,21 @@ export default function PrivacyPage() {
         </ul>
       </Section>
 
+      <Section title="Emails">
+        <p>
+          We send two kinds of email, each only if you say yes to it: the Friday email (one ayah and
+          the root inside it, once a week) and lesson reminders (a short email on days your next salah
+          lesson is waiting, never more than one a day). When you ask for reminders without an
+          account, we first send one email asking you to confirm, and nothing else until you do.
+        </p>
+        <p>
+          We keep a record of each yes and no: what you agreed to, the words you were shown, when,
+          and where. Every email has a one-click unsubscribe link for that kind of email, and one for
+          all of them. Sign-in links and receipts are sent only when you ask for them. Emails are sent
+          for us by Resend.
+        </p>
+      </Section>
+
       <Section title="Cookies & analytics">
         <p>
           A session cookie keeps you signed in. It is required — without it the site cannot tell
